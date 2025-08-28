@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>User Schedule Dashboard</title>
+<!-- Paste the same SDKs and <style> block from the admin.html file here -->
+<!-- The CSS is identical, so it's omitted here for brevity but should be included -->
+<style>
+    /* PASTE THE ENTIRE <style> BLOCK FROM ADMIN.HTML HERE */
+</style>
+</head>
+<body style="display: none;"> <!-- Hide body until auth check is complete -->
+
+<div id="app-container">
+    <div id="app-header">
+        <div id="user-info"></div>
+        <button id="sign-out-button">Sign Out</button>
+    </div>
+
+    <!-- User View -->
+    <div id="user-view">
+        <div class="master-container">
+            <button id="show-create-modal-btn">Create</button>
+            <div id="user-schedules-content" style="margin-top: 20px;"></div>
+            <button id="print-btn" style="display: none; margin-top: 20px;">Print</button>
+        </div>
+    </div>
+</div>
+
+<div id="user-selection-modal" class="modal-overlay">
+    <div class="modal-content">
+        <h2>Select Schedules to Prepare</h2>
+        <ul id="schedule-checklist"></ul>
+        <div class="modal-actions">
+            <button id="cancel-btn">Cancel</button>
+            <button id="generate-schedule-btn-modal">Generate My Schedule</button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    'use strict';
+    // --- FIREBASE SETUP ---
+    const firebaseConfig = { /* ... your config ... */ };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const schedulesCollection = db.collection("schedules");
+    const userAssignmentsCollection = db.collection("userAssignments");
+    const ADMIN_EMAIL = 'harshavardhanjw@gmail.com';
+    const debounce = (func, delay) => {
+        let timeout;
+        return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), delay); };
+    };
+
+    // --- AUTHENTICATION & APP ROUTING ---
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            if (user.email === ADMIN_EMAIL) {
+                // This is an admin, redirect them to the admin page
+                window.location.replace('./admin.html');
+                return;
+            }
+            // This is a regular user, show the page and initialize the app
+            document.body.style.display = 'block';
+            document.getElementById('user-info').innerHTML = `<img id="user-pic" src="${user.photoURL}" alt="User photo"><span>${user.displayName}</span>`;
+            initUserApp(user);
+        } else {
+            // Not logged in, redirect to login page
+            window.location.replace('./index.html');
+        }
+    });
+
+    document.getElementById('sign-out-button').addEventListener('click', () => auth.signOut());
+    
+    // --- USER APP LOGIC ---
+    function initUserApp(user) {
+        const showCreateModalBtn = document.getElementById('show-create-modal-btn');
+        const userSelectionModal = document.getElementById('user-selection-modal');
+        const checklist = document.getElementById('schedule-checklist');
+        const generateBtn = document.getElementById('generate-schedule-btn-modal');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const printBtn = document.getElementById('print-btn');
+        const userContentDiv = document.getElementById('user-schedules-content');
+
+        showCreateModalBtn.addEventListener('click', () => {
+            checklist.innerHTML = '<li>Loading...</li>';
+            userSelectionModal.style.display = 'flex';
+            schedulesCollection.orderBy("createdAt").get().then(snapshot => {
+                if (snapshot.empty) {
+                    checklist.innerHTML = '<li>No schedules have been created by the admin yet.</li>';
+                    return;
+                }
+                checklist.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const schedule = doc.data();
+                    const li = document.createElement('li');
+                    li.innerHTML = `<label><input type="checkbox" value="${doc.id}"><span>${schedule.name}</span></label>`;
+                    checklist.appendChild(li);
+                });
+            });
+        });
+
+        cancelBtn.addEventListener('click', () => userSelectionModal.style.display = 'none');
+        userSelectionModal.addEventListener('click', e => {
+            if (e.target === userSelectionModal) userSelectionModal.style.display = 'none';
+        });
+
+        generateBtn.addEventListener('click', async () => {
+            const selectedIds = Array.from(checklist.querySelectorAll('input:checked')).map(input => input.value);
+            if (selectedIds.length === 0) {
+                alert('Please select at least one schedule.');
+                return;
+            }
+            
+            userContentDiv.innerHTML = '';
+            printBtn.style.display = 'inline-block';
+
+            for (const scheduleId of selectedIds) {
+                const templateDoc = await schedulesCollection.doc(scheduleId).get();
+                const assignmentDocId = `${user.uid}_${scheduleId}`;
+                const assignmentDoc = await userAssignmentsCollection.doc(assignmentDocId).get();
+                
+                const templateData = templateDoc.data();
+                const assignmentData = assignmentDoc.exists ? assignmentDoc.data().assignments : {};
+
+                renderUserSchedule(scheduleId, templateData, assignmentData);
+            }
+            userSelectionModal.style.display = 'none';
+        });
+        
+        printBtn.addEventListener('click', () => window.print());
+    }
+
+    function renderUserSchedule(scheduleId, templateData, assignmentData) {
+        const userContentDiv = document.getElementById('user-schedules-content');
+        const block = document.createElement('div');
+        block.className = 'schedule-block';
+        block.innerHTML = `
+            <div class="schedule-header"><h2 class="schedule-title">${templateData.name}</h2></div>
+            <table class="user-view-table">
+                 <colgroup><col style="width: 60%;"><col style="width: 20%;"><col style="width: 20%;"></colgroup>
+                <tbody>${templateData.content}</tbody>
+            </table>`;
+        
+        const tableBody = block.querySelector('tbody');
+        const tempDiv = document.createElement('div');
+
+        tableBody.querySelectorAll('td, th').forEach((cell, index) => {
+            const cellId = `cell_${index}`;
+            tempDiv.innerHTML = cell.innerHTML;
+            const textContent = tempDiv.textContent.trim();
+            const hasOnlyHandle = cell.querySelector('.row-handle') && textContent === '';
+            
+            if (textContent === '' || textContent === '\u00a0' || hasOnlyHandle) {
+                cell.contentEditable = true;
+                cell.dataset.cellId = cellId;
+                if (assignmentData[cellId]) {
+                    cell.textContent = assignmentData[cellId];
+                }
+                cell.addEventListener('input', debounce(() => {
+                    saveUserAssignment(scheduleId, cellId, cell.textContent);
+                }, 1000));
+            } else {
+                cell.contentEditable = false;
+            }
+        });
+        userContentDiv.appendChild(block);
+    }
+    
+    async function saveUserAssignment(scheduleId, cellId, value) {
+        const user = auth.currentUser;
+        if (!user) return;
+        const assignmentDocId = `${user.uid}_${scheduleId}`;
+        const assignmentRef = userAssignmentsCollection.doc(assignmentDocId);
+        await assignmentRef.set({
+            userId: user.uid,
+            scheduleId: scheduleId,
+            assignments: { [cellId]: value }
+        }, { merge: true });
+        console.log(`Saved assignment for ${cellId}`);
+    }
+})();
+</script>
+</body>
+</html>
