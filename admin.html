@@ -88,8 +88,19 @@
     .row-handle-icon { opacity: 0; transition: opacity 0.2s; font-size: 18px; }
     tr:hover .row-handle-icon { opacity: 1; }
     
-    .context-menu { position: fixed; display: none; background: #fff; border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.15); z-index: 1001; padding: 6px 0; min-width: 200px; }
+    td.cell-selected, th.cell-selected {
+        outline: 2px solid var(--primary-color) !important;
+        outline-offset: -2px;
+        background-color: rgba(13, 110, 253, 0.1);
+    }
     
+    .context-menu { position: fixed; display: none; background: #fff; border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.15); z-index: 1001; padding: 6px 0; min-width: 200px; }
+    .context-menu-item { display: flex; align-items: center; gap: 10px; padding: 9px 15px; cursor: pointer; font-size: 14px; }
+    .context-menu-item:hover { background: #f0f0f0; }
+    .context-menu-item.disabled { color: #aaa; cursor: not-allowed; background: #fff; }
+    .context-menu-item.delete { color: var(--danger-color); }
+    .context-menu-item.active { background-color: #e9ecef; font-weight: bold; }
+
     .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; }
     .cell-icon { height: 70%; max-height: 24px; object-fit: contain; flex-shrink: 0; }
     .header-row .cell-icon { filter: brightness(0) invert(1); }
@@ -104,10 +115,9 @@
         transition: background-color 0.2s, color 0.2s;
     }
     #addNewScheduleFooterBtn:hover { background-color: var(--primary-color); border-color: var(--primary-color); color: white; }
-
 </style>
 </head>
-<body style="display: none;"> <!-- Hide body until auth check is complete -->
+<body style="display: none;">
 
 <div id="app-header">
     <div id="user-info"></div>
@@ -184,7 +194,7 @@
         return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), delay); };
     };
     
-    // --- The Schedule class is defined only ONCE ---
+    // The Schedule class is defined only ONCE
     class Schedule {
         constructor(id, initialData) {
             this.id = id; this.undoHistory = []; this.redoHistory = []; this.selectedCells = [];
@@ -320,24 +330,21 @@
     }
 
     // --- AUTHENTICATION & APP ROUTING ---
-    auth.onAuthStateChanged(user => {
-        if (user) {
-            if (user.email === ADMIN_EMAIL) {
-                // This is an admin, so initialize the admin app
-                document.body.style.display = 'block';
-                document.getElementById('user-info').innerHTML = `<img id="user-pic" src="${user.photoURL}" alt="User photo"><span>${user.displayName} (Admin)</span>`;
-                initAdminApp();
+    function initApp() {
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                if (user.email === ADMIN_EMAIL) {
+                    document.body.style.display = 'block';
+                    document.getElementById('user-info').innerHTML = `<img id="user-pic" src="${user.photoURL}" alt="User photo"><span>${user.displayName} (Admin)</span>`;
+                    initAdminApp();
+                } else {
+                    window.location.replace('./user.html');
+                }
             } else {
-                // Not an admin, redirect to user page
-                window.location.replace('./user.html');
+                window.location.replace('./index.html');
             }
-        } else {
-            // Not logged in, redirect to login page
-            window.location.replace('./index.html');
-        }
-    });
-
-    document.getElementById('sign-out-button').addEventListener('click', () => auth.signOut());
+        });
+    }
 
     // --- ADMIN APP ---
     function initAdminApp() {
@@ -352,7 +359,7 @@
 
     function loadAdminSchedulesFromCache() {
         schedulesWrapper.innerHTML = '';
-        activeSchedules = {}; // Clear existing instances
+        activeSchedules = {};
         const cache = getLocalStorageCache();
         for (const id in cache) {
             if (!activeSchedules[id]) {
@@ -390,6 +397,7 @@
     }
 
     function setupAdminUI() {
+        document.getElementById('sign-out-button').addEventListener('click', () => auth.signOut());
         document.getElementById('addNewScheduleFooterBtn').addEventListener('click', () => {
             schedulesCollection.add({
                 name: "New Schedule",
@@ -526,6 +534,10 @@
         }
         schedule.clearCellSelection();
     }
+
+    // --- START THE APP ---
+    initApp();
+
 })();
 </script>
 </body>
