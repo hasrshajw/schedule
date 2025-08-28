@@ -377,7 +377,12 @@
 
         setupEventListeners() {
             this.element.addEventListener('click', (e) => this.handleElementClick(e));
-            this.titleEl.addEventListener('input', () => this.pushState(this.tableBody.innerHTML));
+            this.titleEl.addEventListener('input', () => {
+    // Save the new title and the current content without adding to the table's undo history
+    const cleanContent = this.getCleanContentForSaving();
+    this.saveToLocalStorage(cleanContent);
+    this.debouncedSaveToFirestore(cleanContent);
+});
             this.tableBody.addEventListener('input', () => this.pushState(this.tableBody.innerHTML));
             if (this.isAdminView) {
                 this.element.addEventListener('contextmenu', (e) => this.handleContextMenu(e));
