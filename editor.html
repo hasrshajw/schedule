@@ -30,8 +30,9 @@
     body {
         background-color: white;
         padding: 0;
+        font-size: 10pt; /* Base font size for printing */
     }
-    #app-header, #project-header, #delete-project-btn, .row-handle, .status-indicator {
+    #app-header, #project-header, #delete-project-btn, .row-handle, .status-indicator, .schedule-header {
         display: none !important;
     }
     .master-container {
@@ -41,12 +42,12 @@
         margin: 0;
     }
     .schedule-block {
-        zoom: 70%; /* Shrink tables to fit */
-        border-bottom: 1px solid #ccc;
-        padding-bottom: 10mm;
+        border-bottom: none;
+        padding: 0 5mm; /* Left and right padding on the page */
+        margin-bottom: 10mm; /* Space between tables on the same page */
     }
     .schedule-block.print-page-break {
-        page-break-after: always; /* Force a new page after every second table */
+        page-break-after: always;
     }
     table {
         border: 2px solid #000 !important;
@@ -54,13 +55,16 @@
     }
     th, td {
         border: 1px solid #000 !important;
+        /* Allow height to be auto */
+        height: auto;
+        padding: 4px 8px;
     }
     .header-row td {
-        background-color: #ccc !important; /* Use grayscale for printing */
-        color: #000 !important;
+        -webkit-print-color-adjust: exact; /* Force background colors to print */
+        print-color-adjust: exact;
     }
-    .header-row img {
-        display: none; /* Hide icons in print view for clarity */
+    .header-row .cell-icon {
+        display: none;
     }
 </style>
 </head>
@@ -72,7 +76,6 @@
             Welcome, <span id="user-email"></span>
             <a href="./dashboard.html" style="margin-left: 20px; font-family: sans-serif;">&larr; Back to Dashboard</a>
         </div>
-        <!-- --- FIX: New Print Button --- -->
         <button id="print-button">Print</button>
         <button id="logout-button">Logout</button>
     </div>
@@ -92,7 +95,6 @@
     <div class="schedule-block">
         <div class="schedule-header">
             <h2 class="schedule-title"></h2>
-            <div class="status-indicator"></div>
         </div>
         <table>
             <colgroup><col style="width: 60%;"><col style="width: 20%;"><col style="width: 20%;"></colgroup>
@@ -174,8 +176,11 @@
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = `<table><tbody>${this.data.content}</tbody></table>`;
             tempDiv.querySelectorAll('td, th').forEach(cell => {
-                const isEssentiallyEmpty = cell.textContent.trim() === '' && !cell.querySelector('img');
-                cell.setAttribute('contenteditable', isEssentiallyEmpty ? 'true' : 'false');
+                if (cell.hasAttribute('data-user-editable')) {
+                    cell.setAttribute('contenteditable', 'true');
+                } else {
+                    cell.setAttribute('contenteditable', 'false');
+                }
             });
             this.tableBody.innerHTML = tempDiv.querySelector('tbody').innerHTML;
         }
@@ -319,16 +324,10 @@
 
         document.getElementById('confirm-template-selection').addEventListener('click', async () => {
             const newProjectName = document.getElementById('new-project-name').value.trim();
-            if (!newProjectName) {
-                alert("Please enter a name for your new project.");
-                return;
-            }
+            if (!newProjectName) { alert("Please enter a name for your new project."); return; }
             
             const selectedCheckboxes = Array.from(templateList.querySelectorAll('input:checked'));
-            if (selectedCheckboxes.length === 0) {
-                alert("Please select at least one template.");
-                return;
-            }
+            if (selectedCheckboxes.length === 0) { alert("Please select at least one template."); return; }
 
             const tablesArray = selectedCheckboxes.map(input => {
                 const rawContent = decodeURIComponent(input.dataset.content);
@@ -355,20 +354,57 @@
     // --- NEW PRINT FUNCTIONALITY ---
     function handlePrint() {
         const scheduleBlocks = schedulesWrapper.querySelectorAll('.schedule-block');
-        
-        // Add page break classes
-        scheduleBlocks.forEach((block, index) => {
-            // Add a page break after the 2nd, 4th, 6th, etc. block
-            if ((index + 1) % 2 === 0 && index < scheduleBlocks.length - 1) {
-                block.classList.add('print-page-break');
-            }
+        const A4_SAFE_HEIGHT_PX = 1000; // A conservative estimate for A4 portrait height in pixels.
+
+        // Temporarily create an off-screen container to measure content heights
+        const measureContainer = document.createElement('div');
+        measureContainer.style.position = 'absolute';
+        measureContainer.style.left = '-9999px';
+        document.body.appendChild(measureContainer);
+
+        // Reset any previous print styles
+        scheduleBlocks.forEach(block => {
+            block.classList.remove('print-page-break');
+            block.style.zoom = '';
         });
+
+        // Group blocks into pairs to check their combined height
+        for (let i = 0; i < scheduleBlocks.length; i += 2) {
+            const block1 = scheduleBlocks[i];
+            const block2 = scheduleBlocks[i + 1];
+
+            if (block1 && block2) {
+                // Measure the combined height
+                measureContainer.innerHTML = '';
+                measureContainer.appendChild(block1.cloneNode(true));
+                measureContainer.appendChild(block2.cloneNode(true));
+                
+                if (measureContainer.offsetHeight > A4_SAFE_HEIGHT_PX) {
+                    // If they don't fit, apply a smaller zoom to both
+                    block1.style.zoom = '60%';
+                    block2.style.zoom = '60%';
+                } else {
+                    // If they fit, use a larger zoom
+                    block1.style.zoom = '75%';
+                    block2.style.zoom = '75%';
+                }
+                // Add page break after the second block in the pair
+                block2.classList.add('print-page-break');
+
+            } else if (block1) {
+                 // The last block if it's an odd number
+                 block1.style.zoom = '75%';
+            }
+        }
+        
+        document.body.removeChild(measureContainer);
 
         // Trigger the browser's print dialog
         window.print();
 
-        // Clean up the classes after printing
+        // Clean up the zoom styles after printing
         scheduleBlocks.forEach(block => {
+            block.style.zoom = '';
             block.classList.remove('print-page-break');
         });
     }
