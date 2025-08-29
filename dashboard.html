@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>User Dashboard</title>
+<title>User Dashboard - Schedule Editor</title>
 
 <!-- FIREBASE SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -13,7 +13,7 @@
 <!-- Noto Sans Telugu Google Font -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@500;700&display=swap" rel="stylesheet">
 
 <style>
     :root {
@@ -27,6 +27,8 @@
         background-color: var(--background-color);
         padding: 20px;
         color: #212529;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
     }
     .hidden { display: none !important; }
 
@@ -53,12 +55,7 @@
         border-radius: 8px;
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
-    .container-header {
-        font-family: 'Noto Sans Telugu', sans-serif;
-        margin-top: 0;
-    }
-
-    /* Dashboard List Styles */
+    
     #schedule-list {
         list-style: none;
         padding: 0;
@@ -70,15 +67,14 @@
         align-items: center;
         padding: 15px;
         border-bottom: 1px solid var(--border-color);
-        transition: background-color 0.2s;
+        font-family: 'Noto Sans Telugu', sans-serif;
     }
-    #schedule-list li:last-child { border-bottom: none; }
-    #schedule-list li:hover { background-color: #f8f9fa; }
-
+    #schedule-list li:last-child {
+        border-bottom: none;
+    }
     .schedule-name {
         font-weight: 500;
         font-size: 1.1em;
-        font-family: 'Noto Sans Telugu', sans-serif;
     }
     .schedule-actions {
         display: flex;
@@ -86,18 +82,20 @@
     }
     .schedule-actions a, .schedule-actions button {
         text-decoration: none;
-        color: white;
-        padding: 8px 16px;
+        padding: 8px 12px;
         border-radius: 6px;
+        color: white;
         border: none;
         font-size: 14px;
-        font-weight: 500;
+        font-family: sans-serif;
         cursor: pointer;
         transition: opacity 0.2s;
     }
-    .schedule-actions a { background-color: var(--primary-color); }
-    .schedule-actions .delete-btn { background-color: var(--danger-color); }
-    .schedule-actions a:hover, .schedule-actions button:hover { opacity: 0.8; }
+    .schedule-actions a:hover, .schedule-actions button:hover {
+        opacity: 0.8;
+    }
+    .edit-btn { background-color: var(--primary-color); }
+    .delete-btn { background-color: var(--danger-color); }
     #empty-state {
         text-align: center;
         padding: 40px;
@@ -120,7 +118,6 @@
         justify-content: center;
         gap: 8px;
         transition: background-color 0.2s, color 0.2s;
-        font-family: 'Noto Sans Telugu', sans-serif;
     }
     .add-button:hover {
         background-color: var(--primary-color);
@@ -133,20 +130,23 @@
 
 <div id="app-container" class="hidden">
     <div id="app-header">
-        <div id="user-info">Welcome, <span id="user-email"></span></div>
+        <div id="user-info">
+            Welcome, <span id="user-email"></span>
+        </div>
         <button id="logout-button">Logout</button>
     </div>
 
     <div class="master-container">
-        <h2 class="container-header">Your Schedules</h2>
+        <h2 style="margin-top: 0; font-family: 'Noto Sans Telugu', sans-serif;">Your Schedules</h2>
         <ul id="schedule-list">
-            <li id="empty-state">You have not created any schedules yet.</li>
+            <li id="empty-state" class="hidden">You haven't created any schedules yet.</li>
+            <!-- User schedules will be populated here by JavaScript -->
         </ul>
     </div>
     
-    <div id="create-schedule-footer">
+    <div id="add-schedule-footer">
         <button id="createUserScheduleBtn" class="add-button">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/></svg>
+             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/></svg>
             Create New Schedule
         </button>
     </div>
@@ -171,7 +171,6 @@
     
     const ADMIN_EMAIL = 'harshavardhanjw@gmail.com';
     let currentUser = null;
-    let userSchedulesCollection = null;
     let currentListener = null;
 
     // --- DOM ELEMENTS ---
@@ -183,37 +182,38 @@
     // --- AUTHENTICATION ---
     auth.onAuthStateChanged(user => {
         if (user) {
+            // User is signed in, check role
             if (user.email === ADMIN_EMAIL) {
-                window.location.replace('./admin.html'); // Redirect admin away from dashboard
+                // This is an admin, redirect them to their page
+                window.location.replace('./admin.html');
                 return;
             }
+            // This is a regular user, proceed with dashboard setup
             currentUser = user;
-            userSchedulesCollection = db.collection("userSchedules").doc(currentUser.uid).collection("schedules");
-            
             appContainer.classList.remove('hidden');
             userEmailEl.textContent = user.email;
-            
-            listenForSchedules();
+            initDashboard();
         } else {
+            // No user signed in, redirect to login
             window.location.replace('./login.html');
         }
     });
 
-    // --- REAL-TIME DATA LISTENER ---
-    function listenForSchedules() {
-        if (currentListener) currentListener(); // Detach previous listener if exists
+    function initDashboard() {
+        const userSchedulesCollection = db.collection(`userSchedules/${currentUser.uid}/schedules`);
 
+        // Listen for real-time updates to the user's schedules
+        if (currentListener) currentListener(); // Detach any previous listener
         currentListener = userSchedulesCollection.orderBy("createdAt").onSnapshot(snapshot => {
             if (snapshot.empty) {
-                scheduleListEl.innerHTML = '';
+                scheduleListEl.innerHTML = ''; // Clear list
                 emptyStateEl.classList.remove('hidden');
-                scheduleListEl.appendChild(emptyStateEl);
                 return;
             }
-
+            
             emptyStateEl.classList.add('hidden');
-            scheduleListEl.innerHTML = ''; // Clear the list before re-rendering
-
+            scheduleListEl.innerHTML = ''; // Clear and rebuild list on every update
+            
             snapshot.docs.forEach(doc => {
                 const schedule = doc.data();
                 const scheduleId = doc.id;
@@ -224,39 +224,44 @@
                 li.innerHTML = `
                     <span class="schedule-name">${schedule.name}</span>
                     <div class="schedule-actions">
-                        <a href="./editor.html?id=${scheduleId}">View / Edit</a>
+                        <a href="./editor.html?id=${scheduleId}" class="edit-btn">View / Edit</a>
                         <button class="delete-btn" data-id="${scheduleId}">Delete</button>
                     </div>
                 `;
                 scheduleListEl.appendChild(li);
             });
         }, error => {
-            console.error("Error fetching schedules: ", error);
-            scheduleListEl.innerHTML = '<li>Error loading schedules. Please try again.</li>';
+            console.error("Error fetching user schedules:", error);
+            alert("Could not load your schedules. Please check your connection and try again.");
         });
     }
 
-    // --- EVENT LISTENERS ---
-    document.getElementById('logout-button').addEventListener('click', () => {
-        auth.signOut();
-    });
+    // --- GLOBAL UI EVENT LISTENERS ---
+    function setupGlobalUI() {
+        document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
 
-    document.getElementById('createUserScheduleBtn').addEventListener('click', () => {
-        window.location.href = './create.html';
-    });
+        document.getElementById('createUserScheduleBtn').addEventListener('click', () => {
+            // Redirect to the editor page without an ID to signify creation
+            window.location.href = './editor.html';
+        });
 
-    scheduleListEl.addEventListener('click', (e) => {
-        if (e.target.classList.contains('delete-btn')) {
-            const scheduleId = e.target.dataset.id;
-            const scheduleName = e.target.closest('li').querySelector('.schedule-name').textContent;
-            
-            if (confirm(`Are you sure you want to delete "${scheduleName}"? This cannot be undone.`)) {
-                userSchedulesCollection.doc(scheduleId).delete()
-                    .then(() => console.log(`Schedule ${scheduleId} deleted.`))
-                    .catch(error => console.error("Error deleting schedule:", error));
+        // Event delegation for delete buttons
+        scheduleListEl.addEventListener('click', (e) => {
+            if (e.target.classList.contains('delete-btn')) {
+                const scheduleId = e.target.dataset.id;
+                if (confirm('Are you sure you want to permanently delete this schedule?')) {
+                    const userSchedulesCollection = db.collection(`userSchedules/${currentUser.uid}/schedules`);
+                    userSchedulesCollection.doc(scheduleId).delete().catch(error => {
+                        console.error("Error deleting document: ", error);
+                        alert("Could not delete schedule. Please try again.");
+                    });
+                }
             }
-        }
-    });
+        });
+    }
+
+    // --- START THE APP ---
+    setupGlobalUI();
 
 })();
 </script>
