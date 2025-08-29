@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>User Dashboard - Schedule Editor</title>
+<title>User Dashboard</title>
 
-<!-- FIREBASE SDKs (Auth is now included) -->
+<!-- FIREBASE SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
@@ -13,7 +13,7 @@
 <!-- Noto Sans Telugu Google Font -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
     :root {
@@ -27,8 +27,6 @@
         background-color: var(--background-color);
         padding: 20px;
         color: #212529;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
     }
     .hidden { display: none !important; }
 
@@ -55,93 +53,102 @@
         border-radius: 8px;
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
-    
-    #schedule-list { list-style: none; padding: 0; margin: 0; }
-    #schedule-list li { 
-        display: flex; 
-        justify-content: space-between; 
-        align-items: center; 
-        padding: 15px; 
-        border-bottom: 1px solid var(--border-color);
+    .container-header {
         font-family: 'Noto Sans Telugu', sans-serif;
+        margin-top: 0;
+    }
+
+    /* Dashboard List Styles */
+    #schedule-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    #schedule-list li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        border-bottom: 1px solid var(--border-color);
+        transition: background-color 0.2s;
     }
     #schedule-list li:last-child { border-bottom: none; }
-    .schedule-name { font-weight: 500; font-size: 1.1em; }
-    .schedule-actions { display: flex; gap: 10px; }
+    #schedule-list li:hover { background-color: #f8f9fa; }
+
+    .schedule-name {
+        font-weight: 500;
+        font-size: 1.1em;
+        font-family: 'Noto Sans Telugu', sans-serif;
+    }
+    .schedule-actions {
+        display: flex;
+        gap: 10px;
+    }
     .schedule-actions a, .schedule-actions button {
         text-decoration: none;
         color: white;
-        padding: 8px 12px;
+        padding: 8px 16px;
         border-radius: 6px;
-        font-size: 14px;
         border: none;
+        font-size: 14px;
+        font-weight: 500;
         cursor: pointer;
+        transition: opacity 0.2s;
     }
-    .view-btn { background-color: var(--primary-color); }
-    .delete-btn { background-color: var(--danger-color); }
-
+    .schedule-actions a { background-color: var(--primary-color); }
+    .schedule-actions .delete-btn { background-color: var(--danger-color); }
+    .schedule-actions a:hover, .schedule-actions button:hover { opacity: 0.8; }
+    #empty-state {
+        text-align: center;
+        padding: 40px;
+        color: #6c757d;
+    }
 
     #add-schedule-footer { max-width: 1000px; margin: 25px auto; }
-    .add-button { 
-        width: 100%; 
-        padding: 15px; 
-        font-size: 16px; 
-        font-weight: 500; 
-        color: var(--primary-color); 
-        background-color: transparent; 
-        border: 2px dashed var(--border-color); 
-        border-radius: 8px; 
-        cursor: pointer; 
-        display: flex; 
-        align-items: center; 
-        justify-content: center; 
-        gap: 8px; 
-        transition: background-color 0.2s, color 0.2s; 
+    .add-button {
+        width: 100%;
+        padding: 15px;
+        font-size: 16px;
+        font-weight: 500;
+        color: var(--primary-color);
+        background-color: transparent;
+        border: 2px dashed var(--border-color);
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: background-color 0.2s, color 0.2s;
+        font-family: 'Noto Sans Telugu', sans-serif;
     }
-    .add-button:hover { background-color: var(--primary-color); border-color: var(--primary-color); color: white; }
-    
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; }
-    .modal-content { display:flex; flex-direction:column; gap:15px; background: white; padding: 25px; border-radius: 8px; min-width: 400px; max-height: 80vh; }
-    #template-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; font-family: 'Noto Sans Telugu', sans-serif;}
-    #template-list li { padding: 10px; border-bottom: 1px solid var(--border-color); }
-    #template-list label { display: flex; align-items: center; gap: 10px; font-size: 16px; cursor: pointer; }
+    .add-button:hover {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+    }
 </style>
 </head>
 <body>
 
 <div id="app-container" class="hidden">
     <div id="app-header">
-        <div id="user-info">
-            Welcome, <span id="user-email"></span>
-        </div>
+        <div id="user-info">Welcome, <span id="user-email"></span></div>
         <button id="logout-button">Logout</button>
     </div>
 
     <div class="master-container">
-        <h1 style="margin-top: 0;">Your Schedules</h1>
+        <h2 class="container-header">Your Schedules</h2>
         <ul id="schedule-list">
-            <!-- User schedules will be populated here by JavaScript -->
+            <li id="empty-state">You have not created any schedules yet.</li>
         </ul>
     </div>
     
-     <div id="create-schedule-footer">
+    <div id="create-schedule-footer">
         <button id="createUserScheduleBtn" class="add-button">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/></svg>
             Create New Schedule
         </button>
-    </div>
-</div>
-
-<div id="template-selection-modal" class="modal-overlay">
-    <div class="modal-content">
-        <h2>Select Templates to Create</h2>
-        <ul id="template-list">
-            <!-- Admin templates will be populated here -->
-        </ul>
-        <div style="display:flex; justify-content:flex-end; gap:10px;">
-            <button id="cancel-template-selection">Cancel</button>
-            <button id="confirm-template-selection" style="background-color:var(--primary-color); color:white; border:none; padding: 8px 12px; border-radius: 6px; cursor: pointer;">Create Selected</button>
-        </div>
     </div>
 </div>
 
@@ -161,131 +168,96 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
-    const templatesCollection = db.collection("templates");
-    const userSchedulesRootCollection = db.collection("userSchedules");
     
     const ADMIN_EMAIL = 'harshavardhanjw@gmail.com';
     let currentUser = null;
-    let currentUserSchedulesCollection = null;
+    let userSchedulesCollection = null;
     let currentListener = null;
 
     // --- DOM ELEMENTS ---
     const appContainer = document.getElementById('app-container');
     const userEmailEl = document.getElementById('user-email');
     const scheduleListEl = document.getElementById('schedule-list');
-    const templateSelectionModal = document.getElementById('template-selection-modal');
-    const templateListEl = document.getElementById('template-list');
-
+    const emptyStateEl = document.getElementById('empty-state');
+    
     // --- AUTHENTICATION ---
     auth.onAuthStateChanged(user => {
         if (user) {
             if (user.email === ADMIN_EMAIL) {
-                // If admin logs in, send them to the admin page
-                window.location.replace('./admin.html');
+                window.location.replace('./admin.html'); // Redirect admin away from dashboard
                 return;
             }
-            // Otherwise, it's a regular user, setup the dashboard
             currentUser = user;
-            currentUserSchedulesCollection = userSchedulesRootCollection.doc(currentUser.uid).collection('schedules');
+            userSchedulesCollection = db.collection("userSchedules").doc(currentUser.uid).collection("schedules");
+            
             appContainer.classList.remove('hidden');
             userEmailEl.textContent = user.email;
-            listenForUserSchedules();
+            
+            listenForSchedules();
         } else {
-            // No user, send to login page
             window.location.replace('./login.html');
         }
     });
 
-    function listenForUserSchedules() {
-        if (currentListener) currentListener(); // Detach any previous listener
+    // --- REAL-TIME DATA LISTENER ---
+    function listenForSchedules() {
+        if (currentListener) currentListener(); // Detach previous listener if exists
 
-        currentListener = currentUserSchedulesCollection.orderBy("createdAt").onSnapshot(snapshot => {
-            scheduleListEl.innerHTML = ''; // Clear the list on every update
+        currentListener = userSchedulesCollection.orderBy("createdAt").onSnapshot(snapshot => {
             if (snapshot.empty) {
-                scheduleListEl.innerHTML = '<li>You have not created any schedules yet. Click the button below to start.</li>';
+                scheduleListEl.innerHTML = '';
+                emptyStateEl.classList.remove('hidden');
+                scheduleListEl.appendChild(emptyStateEl);
                 return;
             }
-            snapshot.forEach(doc => {
+
+            emptyStateEl.classList.add('hidden');
+            scheduleListEl.innerHTML = ''; // Clear the list before re-rendering
+
+            snapshot.docs.forEach(doc => {
                 const schedule = doc.data();
                 const scheduleId = doc.id;
+                
                 const li = document.createElement('li');
+                li.dataset.id = scheduleId;
+
                 li.innerHTML = `
                     <span class="schedule-name">${schedule.name}</span>
                     <div class="schedule-actions">
-                        <a href="./editor.html?id=${scheduleId}" class="view-btn">View / Edit</a>
+                        <a href="./editor.html?id=${scheduleId}">View / Edit</a>
                         <button class="delete-btn" data-id="${scheduleId}">Delete</button>
                     </div>
                 `;
                 scheduleListEl.appendChild(li);
             });
         }, error => {
-            console.error("Error fetching user schedules:", error);
-            scheduleListEl.innerHTML = '<li>Could not load your schedules. Please try again later.</li>';
+            console.error("Error fetching schedules: ", error);
+            scheduleListEl.innerHTML = '<li>Error loading schedules. Please try again.</li>';
         });
     }
 
-    // --- GLOBAL UI EVENT LISTENERS ---
-    document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
+    // --- EVENT LISTENERS ---
+    document.getElementById('logout-button').addEventListener('click', () => {
+        auth.signOut();
+    });
 
-    // Handle clicks on the dynamic list of schedules (for delete buttons)
-    scheduleListEl.addEventListener('click', e => {
-        if (e.target && e.target.classList.contains('delete-btn')) {
+    document.getElementById('createUserScheduleBtn').addEventListener('click', () => {
+        window.location.href = './create.html';
+    });
+
+    scheduleListEl.addEventListener('click', (e) => {
+        if (e.target.classList.contains('delete-btn')) {
             const scheduleId = e.target.dataset.id;
-            if (confirm('Are you sure you want to permanently delete this schedule?')) {
-                currentUserSchedulesCollection.doc(scheduleId).delete()
+            const scheduleName = e.target.closest('li').querySelector('.schedule-name').textContent;
+            
+            if (confirm(`Are you sure you want to delete "${scheduleName}"? This cannot be undone.`)) {
+                userSchedulesCollection.doc(scheduleId).delete()
+                    .then(() => console.log(`Schedule ${scheduleId} deleted.`))
                     .catch(error => console.error("Error deleting schedule:", error));
             }
         }
     });
 
-    // Modal logic for creating new schedules from templates
-    document.getElementById('createUserScheduleBtn').addEventListener('click', async () => {
-        const snapshot = await templatesCollection.orderBy("createdAt").get();
-        templateListEl.innerHTML = '';
-        if (snapshot.empty) {
-            templateListEl.innerHTML = '<li>No templates available. Please ask an admin to create one.</li>';
-        } else {
-            snapshot.docs.forEach(doc => {
-                const li = document.createElement('li');
-                li.innerHTML = `<label><input type="checkbox" data-id="${doc.id}"> ${doc.data().name}</label>`;
-                templateListEl.appendChild(li);
-            });
-        }
-        templateSelectionModal.style.display = 'flex';
-    });
-
-    document.getElementById('cancel-template-selection').addEventListener('click', () => {
-        templateSelectionModal.style.display = 'none';
-    });
-
-    document.getElementById('confirm-template-selection').addEventListener('click', async () => {
-        const selectedIds = Array.from(templateListEl.querySelectorAll('input:checked')).map(input => input.dataset.id);
-        if (selectedIds.length === 0) {
-            alert("Please select at least one template.");
-            return;
-        }
-
-        const batch = db.batch();
-        const templateDocs = await templatesCollection.where(firebase.firestore.FieldPath.documentId(), 'in', selectedIds).get();
-        
-        templateDocs.forEach(doc => {
-            const templateData = doc.data();
-            const newUserScheduleRef = currentUserSchedulesCollection.doc(); // Create new doc in user's collection
-            batch.set(newUserScheduleRef, {
-                ...templateData,
-                name: `Copy of ${templateData.name}`, // Give it a default name
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-        });
-
-        try {
-            await batch.commit();
-            templateSelectionModal.style.display = 'none';
-        } catch (error) {
-            console.error("Error creating schedules from templates:", error);
-            alert("Could not create schedules. Please try again.");
-        }
-    });
 })();
 </script>
 </body>
