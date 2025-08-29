@@ -16,23 +16,23 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@700&display=swap" rel="stylesheet">
 
 <style>
-    :root { --primary-color: #0d6efd; --border-color: #dee2e6; --background-color: #f8f9fa; --danger-color: #dc3545; --warning-color: #ffc107; --success-color: #198754; } body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--background-color); padding: 20px; color: #212529; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; } .hidden { display: none !important; } #app-header { max-width: 1000px; margin: 0 auto 20px auto; padding: 10px 25px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: space-between; } #user-info { display: flex; align-items: center; gap: 10px; } #user-email { font-weight: bold; } #logout-button { background-color: var(--danger-color); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; } .master-container { max-width: 1000px; margin: 0 auto 25px auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); } .project-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 2px solid var(--border-color); } .project-title { font-size: 2em; font-weight: 700; margin: 0; flex-grow: 1; border: 1px solid transparent; padding: 5px; border-radius: 4px; font-family: 'Noto Sans Telugu', sans-serif; } .project-title:focus { outline: none; border-color: var(--primary-color); background-color: #f0f8ff; } .schedule-block { padding-bottom: 20px; margin-bottom: 20px; border-bottom: 1px solid #eee; } .schedule-block:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; } .schedule-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; } .schedule-title { font-size: 1.2em; font-weight: 600; margin: 0; flex-grow: 1; } .status-indicator { font-size: 14px; font-weight: bold; transition: color 0.3s; } table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.25px; } th, td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; } [contenteditable="true"]:focus { background-color: #fffbe5; } .row-handle { position: absolute; left: -30px; top: 0; width: 30px; height: 100%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #aaa; user-select: none; } .row-handle-icon { opacity: 0; transition: opacity 0.2s; font-size: 18px; } tr:hover .row-handle-icon { opacity: 1; } .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; } .cell-icon { height: 70%; max-height: 24px; object-fit: contain; flex-shrink: 0; } .header-row .cell-icon { filter: brightness(0) invert(1); } .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; } .header-row td { font-size: 14px; color: #ffffff; height: 42px; } .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; } .modal-content { display:flex; flex-direction:column; gap:15px; background: white; padding: 25px; border-radius: 8px; min-width: 400px; max-height: 80vh; } #template-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; } #template-list li { padding: 10px; border-bottom: 1px solid var(--border-color); } #template-list label { display: flex; align-items: center; gap: 10px; font-size: 16px; cursor: pointer; } #print-button { background-color: #6c757d; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; margin-left: auto; }
+    /* [ Note: This contains all the same styles as your previous definitive version ] */
+    :root { --primary-color: #0d6efd; --border-color: #dee2e6; --background-color: #f8f9fa; --danger-color: #dc3545; --warning-color: #ffc107; --success-color: #198754; } body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--background-color); padding: 20px; color: #212529; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; } .hidden { display: none !important; } #app-header { max-width: 1000px; margin: 0 auto 20px auto; padding: 10px 25px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: space-between; gap: 15px; } #user-info { display: flex; align-items: center; gap: 10px; } #user-email { font-weight: bold; } #logout-button { background-color: var(--danger-color); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; } .master-container { max-width: 1000px; margin: 0 auto 25px auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); } .project-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 2px solid var(--border-color); } .project-title { font-size: 2em; font-weight: 700; margin: 0; flex-grow: 1; border: 1px solid transparent; padding: 5px; border-radius: 4px; font-family: 'Noto Sans Telugu', sans-serif; } .project-title:focus { outline: none; border-color: var(--primary-color); background-color: #f0f8ff; } .schedule-block { padding-bottom: 20px; margin-bottom: 20px; border-bottom: 1px solid #eee; } .schedule-block:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; } .schedule-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; } .schedule-title { font-size: 1.2em; font-weight: 600; margin: 0; flex-grow: 1; } .status-indicator { font-size: 14px; font-weight: bold; transition: color 0.3s; } table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.25px; } th, td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; } [contenteditable="true"]:focus { background-color: #fffbe5; } .row-handle { position: absolute; left: -30px; top: 0; width: 30px; height: 100%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #aaa; user-select: none; } .row-handle-icon { opacity: 0; transition: opacity 0.2s; font-size: 18px; } tr:hover .row-handle-icon { opacity: 1; } .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; } .cell-icon { height: 70%; max-height: 24px; object-fit: contain; flex-shrink: 0; } .header-row .cell-icon { filter: brightness(0) invert(1); } .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; } .header-row td { font-size: 14px; color: #ffffff; height: 42px; } .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; } .modal-content { display:flex; flex-direction:column; gap:15px; background: white; padding: 25px; border-radius: 8px; min-width: 400px; max-height: 80vh; } #template-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; } #template-list li { padding: 10px; border-bottom: 1px solid var(--border-color); } #template-list label { display: flex; align-items: center; gap: 10px; font-size: 16px; cursor: pointer; }
+    #print-button { background-color: #6c757d; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; margin-left: auto; }
 </style>
 
-<!-- --- FIX: Dedicated Print Styles for A4 Landscape --- -->
+<!-- --- FIX: Dedicated Print Styles --- -->
 <style media="print">
     @page {
         size: A4 landscape;
-        margin: 10mm;
+        margin: 15mm;
     }
     body {
         background-color: #fff !important;
         padding: 0;
         margin: 0;
-        -webkit-print-color-adjust: exact !important; /* Force colors in Chrome/Safari */
-        print-color-adjust: exact !important; /* Standard */
     }
-    #app-header, #project-header, .row-handle, .status-indicator {
+    #app-header, .project-header, .row-handle, .status-indicator, .schedule-title {
         display: none !important;
     }
     .master-container {
@@ -40,39 +40,27 @@
         box-shadow: none;
         padding: 0;
         margin: 0;
+        border: none;
     }
     .schedule-block {
+        width: 100%;
+        height: 100%; /* Fill the printable area */
+        display: flex; /* Use flexbox to make the table fill the height */
+        flex-direction: column;
         page-break-after: always; /* Force a new page after each table */
         border-bottom: none;
-        padding-bottom: 0;
-        margin-bottom: 0;
-        /* Flexbox to make table fill the page height */
-        display: flex;
-        flex-direction: column;
-        height: 100vh;
-    }
-    .schedule-block:last-child {
-        page-break-after: auto;
-    }
-    .schedule-header {
-        display: none !important; /* Hide the schedule title */
+        margin: 0;
+        padding: 0;
     }
     table {
+        flex-grow: 1; /* Allow table to grow to fill the flex container */
         border: 2px solid #000 !important;
         color: #000 !important;
-        flex-grow: 1; /* Allow table to expand to fill space */
+        -webkit-print-color-adjust: exact !important; /* Force browsers to print background colors */
+        print-color-adjust: exact !important;
     }
     th, td {
         border: 1px solid #000 !important;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-    }
-    .header-row td {
-        background-color: #ccc !important; /* Use grayscale for better printing */
-        color: #000 !important;
-    }
-    .header-row img, .cell-icon {
-        display: none; /* Hide icons in print view for clarity */
     }
 </style>
 </head>
@@ -84,14 +72,18 @@
             Welcome, <span id="user-email"></span>
             <a href="./dashboard.html" style="margin-left: 20px; font-family: sans-serif;">&larr; Back to Dashboard</a>
         </div>
-        <button id="print-button">Print</button>
+        <!-- --- FIX: New Print Button --- -->
+        <button id="print-button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/><path d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2H5zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4V3zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2H5zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1z"/></svg>
+            Print
+        </button>
         <button id="logout-button">Logout</button>
     </div>
 
     <div class="master-container">
         <div id="project-header" class="project-header">
             <h1 id="project-title" contenteditable="true">Loading Project...</h1>
-            <button id="delete-project-btn" style="background-color: var(--danger-color); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer;">Delete Project</button>
+            <button id="delete-project-btn">Delete Project</button>
         </div>
         <div id="schedules-wrapper">
             <!-- Schedule blocks will be rendered here by JavaScript -->
@@ -156,7 +148,7 @@
     const schedulesWrapper = document.getElementById('schedules-wrapper');
     const templateSelectionModal = document.getElementById('template-selection-modal');
     const templateList = document.getElementById('template-list');
-
+    
     const debounce = (func, delay) => {
         let timeout;
         return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), delay); };
@@ -223,8 +215,7 @@
             this.scheduleTables = [];
             
             this.data.tables.forEach((tableData, index) => {
-                const tableInstance = new ScheduleTable(this, tableData, index);
-                this.scheduleTables.push(tableInstance);
+                this.scheduleTables.push(new ScheduleTable(this, tableData, index));
             });
         }
         
@@ -273,11 +264,8 @@
             const params = new URLSearchParams(window.location.search);
             currentProjectId = params.get('id');
             
-            if (currentProjectId) {
-                initEditor();
-            } else {
-                initCreationFlow();
-            }
+            if (currentProjectId) initEditor();
+            else initCreationFlow();
         } else {
             window.location.replace('./login.html');
         }
@@ -329,7 +317,7 @@
     // --- GLOBAL UI EVENT LISTENERS ---
     function setupGlobalUI() {
         document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
-        document.getElementById('print-button').addEventListener('click', window.print);
+        document.getElementById('print-button').addEventListener('click', handlePrint);
         
         document.getElementById('cancel-template-selection').addEventListener('click', () => {
             templateSelectionModal.style.display = 'none';
@@ -353,18 +341,13 @@
                 const rawContent = decodeURIComponent(input.dataset.content);
                 const tempDiv = document.createElement('div');
                 tempDiv.innerHTML = `<table><tbody>${rawContent}</tbody></table>`;
-                
                 tempDiv.querySelectorAll('td, th').forEach(cell => {
                     const isEssentiallyEmpty = cell.textContent.trim() === '' && !cell.querySelector('img');
                     if (isEssentiallyEmpty) {
                         cell.setAttribute('data-user-editable', 'true');
                     }
                 });
-                
-                return {
-                    title: input.dataset.name,
-                    content: tempDiv.querySelector('tbody').innerHTML
-                };
+                return { title: input.dataset.name, content: tempDiv.querySelector('tbody').innerHTML };
             });
             
             const newDocRef = await userSchedulesCollection.add({
@@ -372,9 +355,15 @@
                 tables: tablesArray,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
-
             window.location.href = `./editor.html?id=${newDocRef.id}`;
         });
+    }
+    
+    // --- NEW PRINT FUNCTIONALITY ---
+    function handlePrint() {
+        document.body.classList.add('print-view');
+        window.print();
+        document.body.classList.remove('print-view');
     }
 
     setupGlobalUI();
