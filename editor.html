@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Edit Schedule</title>
+<title>User - Schedule Editor</title>
 
-<!-- FIREBASE SDKs (Auth is now included) -->
+<!-- FIREBASE SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
@@ -16,76 +16,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@700&display=swap" rel="stylesheet">
 
 <style>
-    :root {
-        --primary-color: #0d6efd;
-        --border-color: #dee2e6;
-        --background-color: #f8f9fa;
-        --danger-color: #dc3545;
-        --warning-color: #ffc107;
-        --success-color: #198754;
-    }
-    body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        background-color: var(--background-color);
-        padding: 20px;
-        color: #212529;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-    }
-    .hidden { display: none !important; }
-
-    /* Main App Header */
-    #app-header {
-        max-width: 1000px;
-        margin: 0 auto 20px auto;
-        padding: 10px 25px;
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-    #user-info { display: flex; align-items: center; gap: 10px; }
-    #user-email { font-weight: bold; }
-    #logout-button { background-color: var(--danger-color); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
-    .back-link { margin-left: 20px; text-decoration: none; color: var(--primary-color); font-weight: 500;}
-
-    .master-container {
-        max-width: 1000px;
-        margin: 0 auto 25px auto;
-        background: white;
-        padding: 25px;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    .schedule-block:last-child { margin-bottom: 0; padding-bottom: 0; }
-    .schedule-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
-    .schedule-title { font-size: 1.75em; font-weight: 600; margin: 0; flex-grow: 1; border: 1px solid transparent; padding: 5px; border-radius: 4px; font-family: 'Noto Sans Telugu', sans-serif; }
-    .schedule-title:focus { outline: none; border-color: var(--primary-color); background-color: #f0f8ff; }
-    .status-indicator { font-size: 14px; font-weight: bold; transition: color 0.3s; }
-    .toolbar { display: flex; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 8px;}
-    .toolbar button { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; font-size: 14px; cursor: pointer; border: 1px solid #ccc; background-color: #f0f0f0; border-radius: 6px; }
-    .toolbar button:hover:not(:disabled) { background-color: #e2e6ea; }
-    .toolbar .delete-btn { margin-left: auto; border-color: var(--danger-color); }
-    .toolbar .delete-btn:hover:not(:disabled) { background-color: var(--danger-color); color: white; }
-    
-    table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.25px; }
-    th, td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; }
-    [contenteditable="true"]:focus { background-color: #fffbe5; }
-    .row-handle { display: none; } /* Hide handle for users */
-
-    .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; }
-    .cell-icon { height: 70%; max-height: 24px; object-fit: contain; flex-shrink: 0; }
-    .header-row .cell-icon { filter: brightness(0) invert(1); }
-    .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; }
-    .header-row td { font-size: 14px; color: #ffffff; height: 42px; }
-    
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; }
-    .modal-content { display:flex; flex-direction:column; gap:15px; background: white; padding: 25px; border-radius: 8px; min-width: 400px; max-height: 80vh; }
-    #template-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; }
-    #template-list li { padding: 10px; border-bottom: 1px solid var(--border-color); }
-    #template-list label { display: flex; align-items: center; gap: 10px; font-size: 16px; cursor: pointer; }
+    /* [ Note: This contains all the same styles as your previous definitive version ] */
+    :root { --primary-color: #0d6efd; --border-color: #dee2e6; --background-color: #f8f9fa; --danger-color: #dc3545; --warning-color: #ffc107; --success-color: #198754; } body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--background-color); padding: 20px; color: #212529; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; } .hidden { display: none !important; } #app-header { max-width: 1000px; margin: 0 auto 20px auto; padding: 10px 25px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: space-between; } #user-info { display: flex; align-items: center; gap: 10px; } #user-email { font-weight: bold; } #logout-button { background-color: var(--danger-color); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; } .master-container { max-width: 1000px; margin: 0 auto 25px auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); } .schedule-block { padding-bottom: 20px; margin-bottom: 20px; border-bottom: 2px solid var(--border-color); } .schedule-block:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; } .schedule-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; } .schedule-title { font-size: 1.75em; font-weight: 600; margin: 0; flex-grow: 1; border: 1px solid transparent; padding: 5px; border-radius: 4px; font-family: 'Noto Sans Telugu', sans-serif; } .schedule-title:focus { outline: none; border-color: var(--primary-color); background-color: #f0f8ff; } .status-indicator { font-size: 14px; font-weight: bold; transition: color 0.3s; } .toolbar { display: flex; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 8px;} .toolbar button { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; font-size: 14px; cursor: pointer; border: 1px solid #ccc; background-color: #f0f0f0; border-radius: 6px; } .toolbar button:hover:not(:disabled) { background-color: #e2e6ea; } .toolbar button:disabled { cursor: not-allowed; opacity: 0.5; } .toolbar button svg { width: 16px; height: 16px; } .toolbar .delete-btn { margin-left: auto; border-color: var(--danger-color); } .toolbar .delete-btn:hover:not(:disabled) { background-color: var(--danger-color); color: white; } table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.25px; } th, td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; } [contenteditable="true"]:focus { background-color: #fffbe5; } .row-handle { position: absolute; left: -30px; top: 0; width: 30px; height: 100%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #aaa; user-select: none; } .row-handle-icon { opacity: 0; transition: opacity 0.2s; font-size: 18px; } tr:hover .row-handle-icon { opacity: 1; } .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; } .cell-icon { height: 70%; max-height: 24px; object-fit: contain; flex-shrink: 0; } .header-row .cell-icon { filter: brightness(0) invert(1); } .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; } .header-row td { font-size: 14px; color: #ffffff; height: 42px; } .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; } .modal-content { display:flex; flex-direction:column; gap:15px; background: white; padding: 25px; border-radius: 8px; min-width: 400px; max-height: 80vh; } #template-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; } #template-list li { padding: 10px; border-bottom: 1px solid var(--border-color); } #template-list label { display: flex; align-items: center; gap: 10px; font-size: 16px; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -94,14 +26,14 @@
     <div id="app-header">
         <div id="user-info">
             Welcome, <span id="user-email"></span>
-            <a href="./dashboard.html" class="back-link">&larr; Back to Dashboard</a>
+            <a href="./dashboard.html" style="margin-left: 20px; font-family: sans-serif;">&larr; Back to Dashboard</a>
         </div>
         <button id="logout-button">Logout</button>
     </div>
 
     <div class="master-container">
         <div id="schedules-wrapper">
-            <!-- The user's selected schedule will be loaded here -->
+            <!-- The schedule block will be rendered here by JavaScript -->
         </div>
     </div>
 </div>
@@ -113,7 +45,8 @@
             <div class="status-indicator"></div>
         </div>
         <div class="toolbar">
-             <button class="delete-btn"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg> Delete Schedule</button>
+            <!-- User only sees delete button -->
+            <button class="delete-btn"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg> Delete Schedule</button>
         </div>
         <table>
             <colgroup><col style="width: 60%;"><col style="width: 20%;"><col style="width: 20%;"></colgroup>
@@ -124,14 +57,17 @@
 
 <div id="template-selection-modal" class="modal-overlay">
     <div class="modal-content">
-        <h2>Select Templates to Create</h2>
+        <h2>Create a New Schedule</h2>
+        <p>Give your new project a name and select the templates to include.</p>
+        <input type="text" id="new-project-name" placeholder="Enter Project Name" style="padding: 10px; font-size: 16px; border-radius: 6px; border: 1px solid var(--border-color);">
         <ul id="template-list"></ul>
         <div style="display:flex; justify-content:flex-end; gap:10px;">
             <button id="cancel-template-selection">Cancel</button>
-            <button id="confirm-template-selection" style="background-color:var(--primary-color); color:white; border:none;">Create Selected</button>
+            <button id="confirm-template-selection" style="background-color:var(--primary-color); color:white; border:none; padding: 10px 15px; border-radius: 6px; cursor: pointer;">Create Schedule</button>
         </div>
     </div>
 </div>
+
 
 <script>
 (function() {
@@ -149,11 +85,12 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
-    const templatesCollection = db.collection("templates");
     
     const ADMIN_EMAIL = 'harshavardhanjw@gmail.com';
     let currentUser = null;
-    let currentSchedule = null;
+    let currentScheduleId = null;
+    let activeSchedule = null;
+    let currentListener = null;
 
     // --- DOM ELEMENTS ---
     const appContainer = document.getElementById('app-container');
@@ -161,94 +98,87 @@
     const schedulesWrapper = document.getElementById('schedules-wrapper');
     const templateSelectionModal = document.getElementById('template-selection-modal');
     const templateList = document.getElementById('template-list');
-
+    
     const debounce = (func, delay) => {
         let timeout;
         return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), delay); };
     };
 
-    class UserSchedule {
+    class ScheduleEditor {
         constructor(id, initialData, collectionRef) {
             this.id = id;
             this.collectionRef = collectionRef;
-            this.isUpdatingFromRemote = false;
-
-            this.initDOM();
+            this.initDOM(initialData);
             this.render(initialData);
             this.setupEventListeners();
         }
 
-        initDOM() {
+        initDOM(data) {
             const templateClone = document.getElementById('schedule-template').content.cloneNode(true);
             this.element = templateClone.querySelector('.schedule-block');
             this.element.dataset.id = this.id;
             this.titleEl = this.element.querySelector('.schedule-title');
             this.tableBody = this.element.querySelector('.schedule-table-body');
             this.statusIndicator = this.element.querySelector('.status-indicator');
-            schedulesWrapper.innerHTML = ''; // Ensure only one schedule is shown
+            schedulesWrapper.innerHTML = ''; // Clear previous content
             schedulesWrapper.appendChild(this.element);
         }
 
         render(data) {
-            this.isUpdatingFromRemote = true;
             if (document.activeElement !== this.titleEl) this.titleEl.textContent = data.name;
-            
+
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = `<table><tbody>${data.content}</tbody></table>`;
             tempDiv.querySelectorAll('td, th').forEach(cell => {
-                const isEmpty = !cell.textContent.trim() && !cell.querySelector('img');
-                cell.setAttribute('contenteditable', isEmpty ? 'true' : 'false');
+                const isEssentiallyEmpty = cell.textContent.trim() === '' && !cell.querySelector('img');
+                cell.setAttribute('contenteditable', isEssentiallyEmpty ? 'true' : 'false');
             });
             const contentToRender = tempDiv.querySelector('tbody').innerHTML;
 
             if (!this.tableBody.contains(document.activeElement)) {
                 this.tableBody.innerHTML = contentToRender;
             }
-
             this.updateStatus('Synced', 'success');
-            this.isUpdatingFromRemote = false;
         }
 
         getCleanContentForSaving() {
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = `<table><tbody>${this.tableBody.innerHTML}</tbody></table>`;
-            tempDiv.querySelectorAll('[contenteditable="false"]').forEach(el => el.removeAttribute('contenteditable'));
+            tempDiv.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
             return tempDiv.querySelector('tbody').innerHTML;
         }
 
         save() {
-            const cleanContent = this.getCleanContentForSaving();
-            this.debouncedSaveToFirestore(cleanContent);
-        }
-        
-        saveToFirestore(content) {
-            if (this.isUpdatingFromRemote) return;
             this.updateStatus('Syncing...', 'warning');
+            const content = this.getCleanContentForSaving();
             const payload = { name: this.titleEl.textContent, content };
             this.collectionRef.doc(this.id).set(payload, { merge: true })
                 .catch(err => this.updateStatus('Error', 'danger'));
         }
-        
-        debouncedSaveToFirestore = debounce((content) => this.saveToFirestore(content), 1500);
+
+        debouncedSave = debounce(() => this.save(), 1500);
+
         updateStatus(text, type) { this.statusIndicator.textContent = text; this.statusIndicator.style.color = `var(--${type}-color)`; }
 
         setupEventListeners() {
-            this.element.querySelector('.delete-btn').addEventListener('click', () => this.delete());
-            this.titleEl.addEventListener('input', () => this.save());
-            this.tableBody.addEventListener('input', () => this.save());
+            this.element.addEventListener('click', e => {
+                if (e.target.closest('.delete-btn')) this.delete();
+            });
+            this.titleEl.addEventListener('input', () => this.debouncedSave());
+            this.tableBody.addEventListener('input', () => this.debouncedSave());
         }
-        
+
         delete() {
             if (confirm('Are you sure you want to permanently delete this schedule?')) {
                 this.collectionRef.doc(this.id).delete().then(() => {
                     alert('Schedule deleted.');
                     window.location.href = './dashboard.html';
-                }).catch(err => console.error(err));
+                });
             }
         }
     }
 
-    // --- AUTHENTICATION & APP INITIALIZATION ---
+    // --- AUTHENTICATION & PAGE LOGIC ---
     auth.onAuthStateChanged(user => {
         if (user) {
             if (user.email === ADMIN_EMAIL) {
@@ -259,61 +189,60 @@
             appContainer.classList.remove('hidden');
             userEmailEl.textContent = user.email;
             
-            const urlParams = new URLSearchParams(window.location.search);
-            const scheduleId = urlParams.get('id');
-
-            if (scheduleId) {
-                loadSchedule(scheduleId);
+            const params = new URLSearchParams(window.location.search);
+            currentScheduleId = params.get('id');
+            
+            if (currentScheduleId) {
+                // Edit Mode
+                initEditor();
             } else {
-                showCreateFlow();
+                // Create Mode
+                showTemplateSelection();
             }
         } else {
             window.location.replace('./login.html');
         }
     });
 
-    function loadSchedule(scheduleId) {
-        const docRef = db.collection(`userSchedules/${currentUser.uid}/schedules`).doc(scheduleId);
+    function initEditor() {
+        if (!currentUser || !currentScheduleId) return;
+        const userSchedulesCollection = db.collection(`userSchedules/${currentUser.uid}/schedules`);
         
-        docRef.onSnapshot(doc => {
+        if (currentListener) currentListener();
+        currentListener = userSchedulesCollection.doc(currentScheduleId).onSnapshot(doc => {
             if (doc.exists) {
-                if (!currentSchedule) {
-                    currentSchedule = new UserSchedule(doc.id, doc.data(), doc.ref.parent);
+                if (!activeSchedule) {
+                    activeSchedule = new ScheduleEditor(doc.id, doc.data(), userSchedulesCollection);
                 } else {
-                    currentSchedule.render(doc.data());
+                    activeSchedule.render(doc.data());
                 }
             } else {
-                alert("Schedule not found. It may have been deleted.");
+                alert("This schedule may have been deleted.");
                 window.location.href = './dashboard.html';
             }
         }, error => {
-            console.error("Error loading schedule:", error);
+            console.error("Error fetching schedule:", error);
             alert("Could not load schedule.");
             window.location.href = './dashboard.html';
         });
     }
 
-    async function showCreateFlow() {
-        try {
-            const snapshot = await templatesCollection.orderBy("createdAt").get();
-            templateList.innerHTML = '';
-            if (snapshot.empty) {
-                templateList.innerHTML = '<li>No templates available. Please ask an admin to create one.</li>';
-            } else {
-                snapshot.docs.forEach(doc => {
-                    const li = document.createElement('li');
-                    li.innerHTML = `<label><input type="checkbox" data-id="${doc.id}"> ${doc.data().name}</label>`;
-                    templateList.appendChild(li);
-                });
-            }
-            templateSelectionModal.style.display = 'flex';
-        } catch (error) {
-            console.error("Error fetching templates:", error);
-            alert("Could not load templates to create a new schedule.");
+    async function showTemplateSelection() {
+        const templatesCollection = db.collection("templates");
+        const snapshot = await templatesCollection.orderBy("createdAt").get();
+        templateList.innerHTML = '';
+        if (snapshot.empty) {
+            templateList.innerHTML = '<li>No templates available. Please ask an admin to create one.</li>';
+        } else {
+            snapshot.docs.forEach(doc => {
+                const li = document.createElement('li');
+                li.innerHTML = `<label><input type="checkbox" data-id="${doc.id}" data-name="${doc.data().name}" data-content="${encodeURIComponent(doc.data().content)}"> ${doc.data().name}</label>`;
+                templateList.appendChild(li);
+            });
         }
+        templateSelectionModal.style.display = 'flex';
     }
 
-    // --- GLOBAL UI EVENT LISTENERS ---
     function setupGlobalUI() {
         document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
         
@@ -324,29 +253,38 @@
         });
 
         document.getElementById('confirm-template-selection').addEventListener('click', async () => {
-            const selectedIds = Array.from(templateList.querySelectorAll('input:checked')).map(input => input.dataset.id);
-            if (selectedIds.length === 0) { alert("Please select at least one template."); return; }
-
-            const userSchedulesCollection = db.collection(`userSchedules/${currentUser.uid}/schedules`);
-            const batch = db.batch();
-            const templateDocs = await templatesCollection.where(firebase.firestore.FieldPath.documentId(), 'in', selectedIds).get();
+            const newProjectName = document.getElementById('new-project-name').value.trim();
+            if (!newProjectName) {
+                alert("Please enter a name for your new project.");
+                return;
+            }
             
-            let firstNewId = null;
-            templateDocs.forEach(doc => {
-                const templateData = doc.data();
-                const newUserScheduleRef = userSchedulesCollection.doc();
-                if (!firstNewId) firstNewId = newUserScheduleRef.id;
-                batch.set(newUserScheduleRef, { ...templateData, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+            const selectedCheckboxes = Array.from(templateList.querySelectorAll('input:checked'));
+            if (selectedCheckboxes.length === 0) {
+                alert("Please select at least one template.");
+                return;
+            }
+
+            // Combine content from all selected templates
+            const combinedContent = selectedCheckboxes.map(input => {
+                return `<div class="schedule-block">
+                            <div class="schedule-header"><h2 class="schedule-title">${input.dataset.name}</h2></div>
+                            <table><tbody>${decodeURIComponent(input.dataset.content)}</tbody></table>
+                        </div>`;
+            }).join('');
+            
+            const userSchedulesCollection = db.collection(`userSchedules/${currentUser.uid}/schedules`);
+            const newDocRef = await userSchedulesCollection.add({
+                name: newProjectName,
+                content: combinedContent,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
 
-            await batch.commit();
-            
-            // Redirect to the editor for the first newly created schedule
-            window.location.href = `./editor.html?id=${firstNewId}`;
+            // Redirect to edit the newly created schedule
+            window.location.href = `./editor.html?id=${newDocRef.id}`;
         });
     }
 
-    // --- START THE APP ---
     setupGlobalUI();
 
 })();
