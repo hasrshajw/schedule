@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>User Dashboard - Schedule Editor</title>
+
+<!-- FIREBASE SDKs (Auth is now included) -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+<!-- Noto Sans Telugu Google Font -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@500;700&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --primary-color: #0d6efd;
+        --border-color: #dee2e6;
+        --background-color: #f8f9fa;
+        --danger-color: #dc3545;
+    }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background-color: var(--background-color);
+        padding: 20px;
+        color: #212529;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    .hidden { display: none !important; }
+
+    #app-header {
+        max-width: 1000px;
+        margin: 0 auto 20px auto;
+        padding: 10px 25px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    #user-info { display: flex; align-items: center; gap: 10px; }
+    #user-email { font-weight: bold; }
+    #logout-button { background-color: var(--danger-color); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
+
+    .master-container {
+        max-width: 1000px;
+        margin: 0 auto 25px auto;
+        background: white;
+        padding: 25px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    #schedule-list { list-style: none; padding: 0; margin: 0; }
+    #schedule-list li { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        padding: 15px; 
+        border-bottom: 1px solid var(--border-color);
+        font-family: 'Noto Sans Telugu', sans-serif;
+    }
+    #schedule-list li:last-child { border-bottom: none; }
+    .schedule-name { font-weight: 500; font-size: 1.1em; }
+    .schedule-actions { display: flex; gap: 10px; }
+    .schedule-actions a, .schedule-actions button {
+        text-decoration: none;
+        color: white;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 14px;
+        border: none;
+        cursor: pointer;
+    }
+    .view-btn { background-color: var(--primary-color); }
+    .delete-btn { background-color: var(--danger-color); }
+
+
+    #add-schedule-footer { max-width: 1000px; margin: 25px auto; }
+    .add-button { 
+        width: 100%; 
+        padding: 15px; 
+        font-size: 16px; 
+        font-weight: 500; 
+        color: var(--primary-color); 
+        background-color: transparent; 
+        border: 2px dashed var(--border-color); 
+        border-radius: 8px; 
+        cursor: pointer; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        gap: 8px; 
+        transition: background-color 0.2s, color 0.2s; 
+    }
+    .add-button:hover { background-color: var(--primary-color); border-color: var(--primary-color); color: white; }
+    
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; }
+    .modal-content { display:flex; flex-direction:column; gap:15px; background: white; padding: 25px; border-radius: 8px; min-width: 400px; max-height: 80vh; }
+    #template-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; font-family: 'Noto Sans Telugu', sans-serif;}
+    #template-list li { padding: 10px; border-bottom: 1px solid var(--border-color); }
+    #template-list label { display: flex; align-items: center; gap: 10px; font-size: 16px; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<div id="app-container" class="hidden">
+    <div id="app-header">
+        <div id="user-info">
+            Welcome, <span id="user-email"></span>
+        </div>
+        <button id="logout-button">Logout</button>
+    </div>
+
+    <div class="master-container">
+        <h1 style="margin-top: 0;">Your Schedules</h1>
+        <ul id="schedule-list">
+            <!-- User schedules will be populated here by JavaScript -->
+        </ul>
+    </div>
+    
+     <div id="create-schedule-footer">
+        <button id="createUserScheduleBtn" class="add-button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/></svg>
+            Create New Schedule
+        </button>
+    </div>
+</div>
+
+<div id="template-selection-modal" class="modal-overlay">
+    <div class="modal-content">
+        <h2>Select Templates to Create</h2>
+        <ul id="template-list">
+            <!-- Admin templates will be populated here -->
+        </ul>
+        <div style="display:flex; justify-content:flex-end; gap:10px;">
+            <button id="cancel-template-selection">Cancel</button>
+            <button id="confirm-template-selection" style="background-color:var(--primary-color); color:white; border:none; padding: 8px 12px; border-radius: 6px; cursor: pointer;">Create Selected</button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    'use strict';
+    // --- FIREBASE SETUP ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyDLK5f4C-nfG6fz0ajqqay1q9TTN6rxgmQ",
+      authDomain: "schedule-harsha.firebaseapp.com",
+      projectId: "schedule-harsha",
+      storageBucket: "schedule-harsha.firebasestorage.app",
+      messagingSenderId: "965478014820",
+      appId: "1:965478014820:web:1c36c5d890a27e599aa471"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const templatesCollection = db.collection("templates");
+    const userSchedulesRootCollection = db.collection("userSchedules");
+    
+    const ADMIN_EMAIL = 'harshavardhanjw@gmail.com';
+    let currentUser = null;
+    let currentUserSchedulesCollection = null;
+    let currentListener = null;
+
+    // --- DOM ELEMENTS ---
+    const appContainer = document.getElementById('app-container');
+    const userEmailEl = document.getElementById('user-email');
+    const scheduleListEl = document.getElementById('schedule-list');
+    const templateSelectionModal = document.getElementById('template-selection-modal');
+    const templateListEl = document.getElementById('template-list');
+
+    // --- AUTHENTICATION ---
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            if (user.email === ADMIN_EMAIL) {
+                // If admin logs in, send them to the admin page
+                window.location.replace('./admin.html');
+                return;
+            }
+            // Otherwise, it's a regular user, setup the dashboard
+            currentUser = user;
+            currentUserSchedulesCollection = userSchedulesRootCollection.doc(currentUser.uid).collection('schedules');
+            appContainer.classList.remove('hidden');
+            userEmailEl.textContent = user.email;
+            listenForUserSchedules();
+        } else {
+            // No user, send to login page
+            window.location.replace('./login.html');
+        }
+    });
+
+    function listenForUserSchedules() {
+        if (currentListener) currentListener(); // Detach any previous listener
+
+        currentListener = currentUserSchedulesCollection.orderBy("createdAt").onSnapshot(snapshot => {
+            scheduleListEl.innerHTML = ''; // Clear the list on every update
+            if (snapshot.empty) {
+                scheduleListEl.innerHTML = '<li>You have not created any schedules yet. Click the button below to start.</li>';
+                return;
+            }
+            snapshot.forEach(doc => {
+                const schedule = doc.data();
+                const scheduleId = doc.id;
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span class="schedule-name">${schedule.name}</span>
+                    <div class="schedule-actions">
+                        <a href="./editor.html?id=${scheduleId}" class="view-btn">View / Edit</a>
+                        <button class="delete-btn" data-id="${scheduleId}">Delete</button>
+                    </div>
+                `;
+                scheduleListEl.appendChild(li);
+            });
+        }, error => {
+            console.error("Error fetching user schedules:", error);
+            scheduleListEl.innerHTML = '<li>Could not load your schedules. Please try again later.</li>';
+        });
+    }
+
+    // --- GLOBAL UI EVENT LISTENERS ---
+    document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
+
+    // Handle clicks on the dynamic list of schedules (for delete buttons)
+    scheduleListEl.addEventListener('click', e => {
+        if (e.target && e.target.classList.contains('delete-btn')) {
+            const scheduleId = e.target.dataset.id;
+            if (confirm('Are you sure you want to permanently delete this schedule?')) {
+                currentUserSchedulesCollection.doc(scheduleId).delete()
+                    .catch(error => console.error("Error deleting schedule:", error));
+            }
+        }
+    });
+
+    // Modal logic for creating new schedules from templates
+    document.getElementById('createUserScheduleBtn').addEventListener('click', async () => {
+        const snapshot = await templatesCollection.orderBy("createdAt").get();
+        templateListEl.innerHTML = '';
+        if (snapshot.empty) {
+            templateListEl.innerHTML = '<li>No templates available. Please ask an admin to create one.</li>';
+        } else {
+            snapshot.docs.forEach(doc => {
+                const li = document.createElement('li');
+                li.innerHTML = `<label><input type="checkbox" data-id="${doc.id}"> ${doc.data().name}</label>`;
+                templateListEl.appendChild(li);
+            });
+        }
+        templateSelectionModal.style.display = 'flex';
+    });
+
+    document.getElementById('cancel-template-selection').addEventListener('click', () => {
+        templateSelectionModal.style.display = 'none';
+    });
+
+    document.getElementById('confirm-template-selection').addEventListener('click', async () => {
+        const selectedIds = Array.from(templateListEl.querySelectorAll('input:checked')).map(input => input.dataset.id);
+        if (selectedIds.length === 0) {
+            alert("Please select at least one template.");
+            return;
+        }
+
+        const batch = db.batch();
+        const templateDocs = await templatesCollection.where(firebase.firestore.FieldPath.documentId(), 'in', selectedIds).get();
+        
+        templateDocs.forEach(doc => {
+            const templateData = doc.data();
+            const newUserScheduleRef = currentUserSchedulesCollection.doc(); // Create new doc in user's collection
+            batch.set(newUserScheduleRef, {
+                ...templateData,
+                name: `Copy of ${templateData.name}`, // Give it a default name
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        });
+
+        try {
+            await batch.commit();
+            templateSelectionModal.style.display = 'none';
+        } catch (error) {
+            console.error("Error creating schedules from templates:", error);
+            alert("Could not create schedules. Please try again.");
+        }
+    });
+})();
+</script>
+</body>
+</html>
