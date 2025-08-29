@@ -16,8 +16,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@700&display=swap" rel="stylesheet">
 
 <style>
-    /* [ Note: This contains all the same styles as your previous definitive version ] */
-    :root { --primary-color: #0d6efd; --border-color: #dee2e6; --background-color: #f8f9fa; --danger-color: #dc3545; --warning-color: #ffc107; --success-color: #198754; } body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--background-color); padding: 20px; color: #212529; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; } .hidden { display: none !important; } #app-header { max-width: 1000px; margin: 0 auto 20px auto; padding: 10px 25px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: space-between; } #user-info { display: flex; align-items: center; gap: 10px; } #user-email { font-weight: bold; } #logout-button { background-color: var(--danger-color); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; } .master-container { max-width: 1000px; margin: 0 auto 25px auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); } .schedule-block { padding-bottom: 20px; margin-bottom: 20px; border-bottom: 2px solid var(--border-color); } .schedule-block:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; } .schedule-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; } .schedule-title { font-size: 1.75em; font-weight: 600; margin: 0; flex-grow: 1; border: 1px solid transparent; padding: 5px; border-radius: 4px; font-family: 'Noto Sans Telugu', sans-serif; } .schedule-title:focus { outline: none; border-color: var(--primary-color); background-color: #f0f8ff; } .status-indicator { font-size: 14px; font-weight: bold; transition: color 0.3s; } .toolbar { display: flex; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 8px;} .toolbar button { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; font-size: 14px; cursor: pointer; border: 1px solid #ccc; background-color: #f0f0f0; border-radius: 6px; } .toolbar button:hover:not(:disabled) { background-color: #e2e6ea; } .toolbar button:disabled { cursor: not-allowed; opacity: 0.5; } .toolbar button svg { width: 16px; height: 16px; } .toolbar .delete-btn { margin-left: auto; border-color: var(--danger-color); } .toolbar .delete-btn:hover:not(:disabled) { background-color: var(--danger-color); color: white; } table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.25px; } th, td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; } [contenteditable="true"]:focus { background-color: #fffbe5; } .row-handle { position: absolute; left: -30px; top: 0; width: 30px; height: 100%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #aaa; user-select: none; } .row-handle-icon { opacity: 0; transition: opacity 0.2s; font-size: 18px; } tr:hover .row-handle-icon { opacity: 1; } .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; } .cell-icon { height: 70%; max-height: 24px; object-fit: contain; flex-shrink: 0; } .header-row .cell-icon { filter: brightness(0) invert(1); } .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; } .header-row td { font-size: 14px; color: #ffffff; height: 42px; } .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; } .modal-content { display:flex; flex-direction:column; gap:15px; background: white; padding: 25px; border-radius: 8px; min-width: 400px; max-height: 80vh; } #template-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; } #template-list li { padding: 10px; border-bottom: 1px solid var(--border-color); } #template-list label { display: flex; align-items: center; gap: 10px; font-size: 16px; cursor: pointer; }
+    /* [ Note: This contains all the same final styles from your previous requests ] */
+    :root { --primary-color: #0d6efd; --border-color: #dee2e6; --background-color: #f8f9fa; --danger-color: #dc3545; --warning-color: #ffc107; --success-color: #198754; } body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--background-color); padding: 20px; color: #212529; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; } .hidden { display: none !important; } #app-header { max-width: 1000px; margin: 0 auto 20px auto; padding: 10px 25px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: space-between; } #user-info { display: flex; align-items: center; gap: 10px; } #user-email { font-weight: bold; } #logout-button { background-color: var(--danger-color); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; } .master-container { max-width: 1000px; margin: 0 auto 25px auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); } .schedule-block { padding-bottom: 20px; margin-bottom: 20px; } .schedule-block:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; } .schedule-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; } .schedule-title { font-size: 1.75em; font-weight: 600; margin: 0; flex-grow: 1; border: 1px solid transparent; padding: 5px; border-radius: 4px; font-family: 'Noto Sans Telugu', sans-serif; } .schedule-title:focus { outline: none; border-color: var(--primary-color); background-color: #f0f8ff; } .status-indicator { font-size: 14px; font-weight: bold; transition: color 0.3s; } .toolbar { display: flex; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 8px;} .toolbar button { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; font-size: 14px; cursor: pointer; border: 1px solid #ccc; background-color: #f0f0f0; border-radius: 6px; } .toolbar .delete-btn { margin-left: auto; border-color: var(--danger-color); } .toolbar .delete-btn:hover:not(:disabled) { background-color: var(--danger-color); color: white; } table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.25px; } th, td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; } [contenteditable="true"]:focus { background-color: #fffbe5; } .row-handle { position: absolute; left: -30px; top: 0; width: 30px; height: 100%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #aaa; user-select: none; } .row-handle-icon { opacity: 0; transition: opacity 0.2s; font-size: 18px; } tr:hover .row-handle-icon { opacity: 1; } .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; } .cell-icon { height: 70%; max-height: 24px; object-fit: contain; flex-shrink: 0; } .header-row .cell-icon { filter: brightness(0) invert(1); } .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; } .header-row td { font-size: 14px; color: #ffffff; height: 42px; } .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; } .modal-content { display:flex; flex-direction:column; gap:15px; background: white; padding: 25px; border-radius: 8px; min-width: 400px; max-height: 80vh; } #template-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; } #template-list li { padding: 10px; border-bottom: 1px solid var(--border-color); } #template-list label { display: flex; align-items: center; gap: 10px; font-size: 16px; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -56,13 +56,12 @@
 
 <div id="template-selection-modal" class="modal-overlay">
     <div class="modal-content">
-        <h2>Create a New Schedule</h2>
-        <p>Give your new project a name and select the templates to include.</p>
-        <input type="text" id="new-project-name" placeholder="Enter Project Name" style="padding: 10px; font-size: 16px; border-radius: 6px; border: 1px solid var(--border-color);">
+        <h2>Create New Schedule(s)</h2>
+        <p>Select the templates you want to create a personal copy of.</p>
         <ul id="template-list"></ul>
         <div style="display:flex; justify-content:flex-end; gap:10px;">
             <button id="cancel-template-selection">Cancel</button>
-            <button id="confirm-template-selection" style="background-color:var(--primary-color); color:white; border:none; padding: 10px 15px; border-radius: 6px; cursor: pointer;">Create Schedule</button>
+            <button id="confirm-template-selection" style="background-color:var(--primary-color); color:white; border:none; padding: 10px 15px; border-radius: 6px; cursor: pointer;">Create Selected</button>
         </div>
     </div>
 </div>
@@ -106,6 +105,7 @@
         constructor(id, initialData, collectionRef) {
             this.id = id;
             this.collectionRef = collectionRef;
+
             this.initDOM();
             this.render(initialData);
             this.setupEventListeners();
@@ -123,29 +123,26 @@
         }
 
         render(data) {
-            if (document.activeElement !== this.titleEl) {
-                this.titleEl.textContent = data.name;
-            }
-            
-            // --- FIX: Corrected rendering and permission logic ---
-            // 1. Always set the raw HTML first.
-            if (!this.tableBody.contains(document.activeElement)) {
-                this.tableBody.innerHTML = data.content;
-            }
+            if (document.activeElement !== this.titleEl) this.titleEl.textContent = data.name;
 
-            // 2. AFTER it's in the DOM, apply permissions by querying the live elements.
-            this.tableBody.querySelectorAll('td, th').forEach(cell => {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = `<table><tbody>${data.content}</tbody></table>`;
+            tempDiv.querySelectorAll('td, th').forEach(cell => {
                 const isEssentiallyEmpty = cell.textContent.trim() === '' && !cell.querySelector('img');
                 cell.setAttribute('contenteditable', isEssentiallyEmpty ? 'true' : 'false');
             });
-            
+            const contentToRender = tempDiv.querySelector('tbody').innerHTML;
+
+            if (!this.tableBody.contains(document.activeElement)) {
+                this.tableBody.innerHTML = contentToRender;
+            }
             this.updateStatus('Synced', 'success');
         }
 
         getCleanContentForSaving() {
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = `<table><tbody>${this.tableBody.innerHTML}</tbody></table>`;
-            tempDiv.querySelectorAll('[contenteditable="false"]').forEach(el => el.removeAttribute('contenteditable'));
+            tempDiv.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
             return tempDiv.querySelector('tbody').innerHTML;
         }
 
@@ -154,14 +151,10 @@
             const content = this.getCleanContentForSaving();
             const payload = { name: this.titleEl.textContent, content };
             this.collectionRef.doc(this.id).set(payload, { merge: true })
-                .catch(err => {
-                    console.error("Save failed:", err);
-                    this.updateStatus('Error', 'danger');
-                });
+                .catch(err => this.updateStatus('Error', 'danger'));
         }
 
         debouncedSave = debounce(() => this.save(), 1500);
-
         updateStatus(text, type) { this.statusIndicator.textContent = text; this.statusIndicator.style.color = `var(--${type}-color)`; }
 
         setupEventListeners() {
@@ -174,13 +167,11 @@
 
         delete() {
             if (confirm('Are you sure you want to permanently delete this schedule?')) {
+                if(currentListener) currentListener(); // Stop listening before deleting
                 this.collectionRef.doc(this.id).delete().then(() => {
                     alert('Schedule deleted.');
                     window.location.href = './dashboard.html';
-                }).catch(err => {
-                    console.error("Delete failed:", err);
-                    alert("Could not delete schedule.");
-                });
+                }).catch(err => console.error("Deletion failed:", err));
             }
         }
     }
@@ -200,8 +191,10 @@
             currentScheduleId = params.get('id');
             
             if (currentScheduleId) {
+                // Edit Mode
                 initEditor();
             } else {
+                // Create Mode
                 showTemplateSelection();
             }
         } else {
@@ -241,7 +234,7 @@
         } else {
             snapshot.docs.forEach(doc => {
                 const li = document.createElement('li');
-                li.innerHTML = `<label><input type="checkbox" data-id="${doc.id}" data-name="${doc.data().name}" data-content="${encodeURIComponent(doc.data().content)}"> ${doc.data().name}</label>`;
+                li.innerHTML = `<label><input type="checkbox" data-id="${doc.id}"> ${doc.data().name}</label>`;
                 templateList.appendChild(li);
             });
         }
@@ -257,42 +250,35 @@
         });
 
         document.getElementById('confirm-template-selection').addEventListener('click', async () => {
-            const newProjectName = document.getElementById('new-project-name').value.trim();
-            if (!newProjectName) {
-                alert("Please enter a name for your new project.");
-                return;
-            }
-            
-            const selectedCheckboxes = Array.from(templateList.querySelectorAll('input:checked'));
-            if (selectedCheckboxes.length === 0) {
+            const selectedIds = Array.from(templateList.querySelectorAll('input:checked')).map(input => input.dataset.id);
+            if (selectedIds.length === 0) {
                 alert("Please select at least one template.");
                 return;
             }
 
-            const combinedContent = selectedCheckboxes.map((input, index) => {
-                const separator = index > 0 ? '<tr style="height: 20px;"><td colspan="3" style="border:none; background:transparent;"></td></tr>' : '';
-                const templateNameHeader = `
-                    <tr class="no-actions">
-                        <th colspan="3" style="background-color: #f0f0f0; font-size: 14px; text-align:center;">
-                            ${input.dataset.name}
-                        </th>
-                    </tr>
-                `;
-                return separator + templateNameHeader + decodeURIComponent(input.dataset.content);
-            }).join('');
-            
             const userSchedulesCollection = db.collection(`userSchedules/${currentUser.uid}/schedules`);
-            try {
-                const newDocRef = await userSchedulesCollection.add({
-                    name: newProjectName,
-                    content: combinedContent,
+            const templatesCollection = db.collection("templates");
+            const batch = db.batch();
+
+            const templateDocs = await templatesCollection.where(firebase.firestore.FieldPath.documentId(), 'in', selectedIds).get();
+            
+            let firstNewDocId = null;
+
+            templateDocs.forEach(doc => {
+                const templateData = doc.data();
+                const newUserScheduleRef = userSchedulesCollection.doc();
+                if(!firstNewDocId) firstNewDocId = newUserScheduleRef.id;
+
+                batch.set(newUserScheduleRef, {
+                    name: templateData.name, // Start with the template's name
+                    content: templateData.content,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                window.location.href = `./editor.html?id=${newDocRef.id}`;
-            } catch (error) {
-                console.error("Error creating new schedule:", error);
-                alert("Could not create the new schedule. Please try again.");
-            }
+            });
+
+            await batch.commit();
+            alert(`Successfully created ${selectedIds.length} new schedule(s)! You will now be taken to your dashboard.`);
+            window.location.href = './dashboard.html';
         });
     }
 
