@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Edit Schedule</title>
+
+<!-- FIREBASE SDKs (Auth is now included) -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+<!-- Noto Sans Telugu Google Font -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@700&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --primary-color: #0d6efd;
+        --border-color: #dee2e6;
+        --background-color: #f8f9fa;
+        --danger-color: #dc3545;
+        --warning-color: #ffc107;
+        --success-color: #198754;
+    }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background-color: var(--background-color);
+        padding: 20px;
+        color: #212529;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    .hidden { display: none !important; }
+
+    #app-header {
+        max-width: 1000px;
+        margin: 0 auto 20px auto;
+        padding: 10px 25px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    #user-info { display: flex; align-items: center; gap: 10px; }
+    #user-email { font-weight: bold; }
+    #logout-button { background-color: var(--danger-color); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
+
+    .master-container {
+        max-width: 1000px;
+        margin: 0 auto 25px auto;
+        background: white;
+        padding: 25px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .schedule-block { padding-bottom: 20px; }
+    
+    .schedule-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+    .schedule-title {
+        font-size: 1.75em;
+        font-weight: 600;
+        margin: 0;
+        flex-grow: 1;
+        border: 1px solid transparent;
+        padding: 5px;
+        border-radius: 4px;
+        font-family: 'Noto Sans Telugu', sans-serif;
+    }
+    .schedule-title:focus { outline: none; border-color: var(--primary-color); background-color: #f0f8ff; }
+    .status-indicator { font-size: 14px; font-weight: bold; transition: color 0.3s; }
+    .toolbar { display: flex; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 8px;}
+    .toolbar button { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; font-size: 14px; cursor: pointer; border: 1px solid #ccc; background-color: #f0f0f0; border-radius: 6px; }
+    .toolbar .delete-btn { margin-left: auto; border-color: var(--danger-color); }
+    .toolbar .delete-btn:hover { background-color: var(--danger-color); color: white; }
+    
+    table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.25px; }
+    th, td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; }
+    [contenteditable="true"]:focus { background-color: #fffbe5; }
+    .row-handle, [contenteditable="false"] .row-handle-icon { display: none !important; }
+
+    .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; }
+    .cell-icon { height: 70%; max-height: 24px; object-fit: contain; flex-shrink: 0; }
+    .header-row .cell-icon { filter: brightness(0) invert(1); }
+    .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; }
+    .header-row td { font-size: 14px; color: #ffffff; height: 42px; }
+</style>
+</head>
+<body>
+
+<div id="app-container" class="hidden">
+    <div id="app-header">
+        <div id="user-info">
+            Welcome, <span id="user-email"></span>
+            <a href="./dashboard.html" style="margin-left: 20px; text-decoration: none;">&larr; Back to Dashboard</a>
+        </div>
+        <button id="logout-button">Logout</button>
+    </div>
+
+    <div class="master-container">
+        <div id="schedules-wrapper">
+            <!-- The selected schedule will be loaded here by JavaScript -->
+        </div>
+    </div>
+</div>
+
+<template id="schedule-template">
+    <div class="schedule-block">
+        <div class="schedule-header">
+            <h2 class="schedule-title" contenteditable="true"></h2>
+            <div class="status-indicator"></div>
+        </div>
+        <div class="toolbar">
+            <!-- Toolbar for users is minimal -->
+            <button class="delete-btn"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg> Delete Schedule</button>
+        </div>
+        <table>
+            <colgroup><col style="width: 60%;"><col style="width: 20%;"><col style="width: 20%;"></colgroup>
+            <tbody class="schedule-table-body"></tbody>
+        </table>
+    </div>
+</template>
+
+
+<script>
+(function() {
+    'use strict';
+    // --- FIREBASE SETUP ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyDLK5f4C-nfG6fz0ajqqay1q9TTN6rxgmQ",
+      authDomain: "schedule-harsha.firebaseapp.com",
+      projectId: "schedule-harsha",
+      storageBucket: "schedule-harsha.firebasestorage.app",
+      messagingSenderId: "965478014820",
+      appId: "1:965478014820:web:1c36c5d890a27e599aa471"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const userSchedulesRootCollection = db.collection("userSchedules");
+    
+    const ADMIN_EMAIL = 'harshavardhanjw@gmail.com';
+    let currentUser = null;
+
+    // --- DOM ELEMENTS ---
+    const appContainer = document.getElementById('app-container');
+    const userEmailEl = document.getElementById('user-email');
+    const schedulesWrapper = document.getElementById('schedules-wrapper');
+    
+    let activeSchedule = null; // We only manage one schedule on this page
+    
+    const debounce = (func, delay) => {
+        let timeout;
+        return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), delay); };
+    };
+
+    class UserScheduleEditor {
+        constructor(id, initialData, docRef) {
+            this.id = id;
+            this.docRef = docRef;
+            
+            this.initDOM();
+            this.render(initialData);
+            this.setupEventListeners();
+        }
+
+        initDOM() {
+            const templateClone = document.getElementById('schedule-template').content.cloneNode(true);
+            this.element = templateClone.querySelector('.schedule-block');
+            this.titleEl = this.element.querySelector('.schedule-title');
+            this.tableBody = this.element.querySelector('.schedule-table-body');
+            this.statusIndicator = this.element.querySelector('.status-indicator');
+            schedulesWrapper.appendChild(this.element);
+        }
+
+        render(data) {
+            this.titleEl.textContent = data.name;
+            
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = `<table><tbody>${data.content}</tbody></table>`;
+            tempDiv.querySelectorAll('td, th').forEach(cell => {
+                const isEmpty = !cell.textContent.trim() && !cell.querySelector('img');
+                cell.setAttribute('contenteditable', isEmpty ? 'true' : 'false');
+            });
+            this.tableBody.innerHTML = tempDiv.querySelector('tbody').innerHTML;
+            
+            this.updateStatus('Loaded', 'success');
+        }
+        
+        save() {
+            this.updateStatus('Saving...', 'warning');
+            const payload = {
+                name: this.titleEl.textContent,
+                content: this.getCleanContentForSaving()
+            };
+            this.docRef.set(payload, { merge: true })
+                .then(() => this.updateStatus('Saved', 'success'))
+                .catch(err => this.updateStatus('Error', 'danger'));
+        }
+        
+        debouncedSave = debounce(() => this.save(), 1500);
+        
+        getCleanContentForSaving() {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = `<table><tbody>${this.tableBody.innerHTML}</tbody></table>`;
+            tempDiv.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+            return tempDiv.querySelector('tbody').innerHTML;
+        }
+
+        updateStatus(text, type) { this.statusIndicator.textContent = text; this.statusIndicator.style.color = `var(--${type}-color)`; }
+
+        setupEventListeners() {
+            this.element.querySelector('.delete-btn').addEventListener('click', () => this.delete());
+            this.titleEl.addEventListener('input', () => this.debouncedSave());
+            this.tableBody.addEventListener('input', () => this.debouncedSave());
+        }
+
+        delete() {
+            if (confirm('Are you sure you want to permanently delete this schedule?')) {
+                this.docRef.delete().then(() => {
+                    alert('Schedule deleted.');
+                    window.location.href = './dashboard.html';
+                }).catch(error => {
+                    console.error("Error deleting schedule:", error);
+                    alert("Could not delete schedule.");
+                });
+            }
+        }
+    }
+
+    // --- AUTHENTICATION & APP INITIALIZATION ---
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            if (user.email === ADMIN_EMAIL) {
+                window.location.replace('./admin.html');
+                return;
+            }
+            currentUser = user;
+            appContainer.classList.remove('hidden');
+            userEmailEl.textContent = user.email;
+            loadScheduleForUser();
+        } else {
+            window.location.replace('./login.html');
+        }
+    });
+
+    function loadScheduleForUser() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const scheduleId = urlParams.get('id');
+
+        if (!scheduleId) {
+            alert("No schedule ID provided.");
+            window.location.replace('./dashboard.html');
+            return;
+        }
+
+        const userScheduleDocRef = userSchedulesRootCollection.doc(currentUser.uid).collection('schedules').doc(scheduleId);
+        
+        userScheduleDocRef.onSnapshot(doc => {
+            if (doc.exists) {
+                if (!activeSchedule) {
+                    activeSchedule = new UserScheduleEditor(doc.id, doc.data(), userScheduleDocRef);
+                } else {
+                    activeSchedule.render(doc.data());
+                }
+            } else {
+                alert("This schedule does not exist or has been deleted.");
+                window.location.replace('./dashboard.html');
+            }
+        }, error => {
+            console.error("Error fetching schedule:", error);
+            alert("Could not load schedule.");
+            window.location.replace('./dashboard.html');
+        });
+    }
+
+    // --- GLOBAL UI LISTENERS ---
+    document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
+
+})();
+</script>
+</body>
+</html>
