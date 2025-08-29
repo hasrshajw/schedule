@@ -16,8 +16,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@700&display=swap" rel="stylesheet">
 
 <style>
-    /* [ Note: This contains all the same final styles from your previous requests ] */
-    :root { --primary-color: #0d6efd; --border-color: #dee2e6; --background-color: #f8f9fa; --danger-color: #dc3545; --warning-color: #ffc107; --success-color: #198754; } body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--background-color); padding: 20px; color: #212529; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; } .hidden { display: none !important; } #app-header { max-width: 1000px; margin: 0 auto 20px auto; padding: 10px 25px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: space-between; } #user-info { display: flex; align-items: center; gap: 10px; } #user-email { font-weight: bold; } #logout-button { background-color: var(--danger-color); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; } .master-container { max-width: 1000px; margin: 0 auto 25px auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); } .schedule-block { padding-bottom: 20px; margin-bottom: 20px; } .schedule-block:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; } .schedule-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; } .schedule-title { font-size: 1.75em; font-weight: 600; margin: 0; flex-grow: 1; border: 1px solid transparent; padding: 5px; border-radius: 4px; font-family: 'Noto Sans Telugu', sans-serif; } .schedule-title:focus { outline: none; border-color: var(--primary-color); background-color: #f0f8ff; } .status-indicator { font-size: 14px; font-weight: bold; transition: color 0.3s; } .toolbar { display: flex; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 8px;} .toolbar button { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; font-size: 14px; cursor: pointer; border: 1px solid #ccc; background-color: #f0f0f0; border-radius: 6px; } .toolbar .delete-btn { margin-left: auto; border-color: var(--danger-color); } .toolbar .delete-btn:hover:not(:disabled) { background-color: var(--danger-color); color: white; } table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.25px; } th, td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; } [contenteditable="true"]:focus { background-color: #fffbe5; } .row-handle { position: absolute; left: -30px; top: 0; width: 30px; height: 100%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #aaa; user-select: none; } .row-handle-icon { opacity: 0; transition: opacity 0.2s; font-size: 18px; } tr:hover .row-handle-icon { opacity: 1; } .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; } .cell-icon { height: 70%; max-height: 24px; object-fit: contain; flex-shrink: 0; } .header-row .cell-icon { filter: brightness(0) invert(1); } .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; } .header-row td { font-size: 14px; color: #ffffff; height: 42px; } .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; } .modal-content { display:flex; flex-direction:column; gap:15px; background: white; padding: 25px; border-radius: 8px; min-width: 400px; max-height: 80vh; } #template-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; } #template-list li { padding: 10px; border-bottom: 1px solid var(--border-color); } #template-list label { display: flex; align-items: center; gap: 10px; font-size: 16px; cursor: pointer; }
+    /* [ Note: This contains all the same styles as your previous definitive version ] */
+    :root { --primary-color: #0d6efd; --border-color: #dee2e6; --background-color: #f8f9fa; --danger-color: #dc3545; --warning-color: #ffc107; --success-color: #198754; } body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--background-color); padding: 20px; color: #212529; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; } .hidden { display: none !important; } #app-header { max-width: 1000px; margin: 0 auto 20px auto; padding: 10px 25px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: space-between; } #user-info { display: flex; align-items: center; gap: 10px; } #user-email { font-weight: bold; } #logout-button { background-color: var(--danger-color); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; } .master-container { max-width: 1000px; margin: 0 auto 25px auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); } .project-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 2px solid var(--border-color); } .project-title { font-size: 2em; font-weight: 700; margin: 0; flex-grow: 1; border: 1px solid transparent; padding: 5px; border-radius: 4px; font-family: 'Noto Sans Telugu', sans-serif; } .project-title:focus { outline: none; border-color: var(--primary-color); background-color: #f0f8ff; } .schedule-block { padding-bottom: 20px; margin-bottom: 20px; border-bottom: 1px solid #eee; } .schedule-block:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; } .schedule-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; } .schedule-title { font-size: 1.2em; font-weight: 600; margin: 0; flex-grow: 1; } .status-indicator { font-size: 14px; font-weight: bold; transition: color 0.3s; } table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.25px; } th, td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; } [contenteditable="true"]:focus { background-color: #fffbe5; } .row-handle { position: absolute; left: -30px; top: 0; width: 30px; height: 100%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #aaa; user-select: none; } .row-handle-icon { opacity: 0; transition: opacity 0.2s; font-size: 18px; } tr:hover .row-handle-icon { opacity: 1; } .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; } .cell-icon { height: 70%; max-height: 24px; object-fit: contain; flex-shrink: 0; } .header-row .cell-icon { filter: brightness(0) invert(1); } .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; } .header-row td { font-size: 14px; color: #ffffff; height: 42px; } .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; } .modal-content { display:flex; flex-direction:column; gap:15px; background: white; padding: 25px; border-radius: 8px; min-width: 400px; max-height: 80vh; } #template-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; } #template-list li { padding: 10px; border-bottom: 1px solid var(--border-color); } #template-list label { display: flex; align-items: center; gap: 10px; font-size: 16px; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -32,8 +32,12 @@
     </div>
 
     <div class="master-container">
+        <div id="project-header" class="project-header">
+            <h1 id="project-title" contenteditable="true">Loading Project...</h1>
+            <button id="delete-project-btn" style="background-color: var(--danger-color); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer;">Delete Project</button>
+        </div>
         <div id="schedules-wrapper">
-            <!-- The schedule block will be rendered here by JavaScript -->
+            <!-- Schedule blocks will be rendered here by JavaScript -->
         </div>
     </div>
 </div>
@@ -41,11 +45,8 @@
 <template id="schedule-template">
     <div class="schedule-block">
         <div class="schedule-header">
-            <h2 class="schedule-title" contenteditable="true"></h2>
+            <h2 class="schedule-title"></h2>
             <div class="status-indicator"></div>
-        </div>
-        <div class="toolbar">
-            <button class="delete-btn"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg> Delete Schedule</button>
         </div>
         <table>
             <colgroup><col style="width: 60%;"><col style="width: 20%;"><col style="width: 20%;"></colgroup>
@@ -56,15 +57,17 @@
 
 <div id="template-selection-modal" class="modal-overlay">
     <div class="modal-content">
-        <h2>Create New Schedule(s)</h2>
-        <p>Select the templates you want to create a personal copy of.</p>
+        <h2>Create a New Schedule</h2>
+        <p>Give your new project a name and select the templates to include.</p>
+        <input type="text" id="new-project-name" placeholder="Enter Project Name" style="padding: 10px; font-size: 16px; border-radius: 6px; border: 1px solid var(--border-color);">
         <ul id="template-list"></ul>
         <div style="display:flex; justify-content:flex-end; gap:10px;">
             <button id="cancel-template-selection">Cancel</button>
-            <button id="confirm-template-selection" style="background-color:var(--primary-color); color:white; border:none; padding: 10px 15px; border-radius: 6px; cursor: pointer;">Create Selected</button>
+            <button id="confirm-template-selection" style="background-color:var(--primary-color); color:white; border:none; padding: 10px 15px; border-radius: 6px; cursor: pointer;">Create Schedule</button>
         </div>
     </div>
 </div>
+
 
 <script>
 (function() {
@@ -85,96 +88,123 @@
     
     const ADMIN_EMAIL = 'harshavardhanjw@gmail.com';
     let currentUser = null;
-    let currentScheduleId = null;
-    let activeSchedule = null;
+    let currentProjectId = null;
+    let userSchedulesCollection = null;
     let currentListener = null;
 
     // --- DOM ELEMENTS ---
     const appContainer = document.getElementById('app-container');
     const userEmailEl = document.getElementById('user-email');
+    const projectTitleEl = document.getElementById('project-title');
     const schedulesWrapper = document.getElementById('schedules-wrapper');
     const templateSelectionModal = document.getElementById('template-selection-modal');
     const templateList = document.getElementById('template-list');
-    
+
     const debounce = (func, delay) => {
         let timeout;
         return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), delay); };
     };
 
-    class ScheduleEditor {
-        constructor(id, initialData, collectionRef) {
-            this.id = id;
-            this.collectionRef = collectionRef;
+    class ScheduleTable {
+        constructor(parentProject, tableData, index) {
+            this.parentProject = parentProject;
+            this.data = tableData;
+            this.index = index; // The index in the project's 'tables' array
 
             this.initDOM();
-            this.render(initialData);
+            this.render();
             this.setupEventListeners();
         }
 
         initDOM() {
             const templateClone = document.getElementById('schedule-template').content.cloneNode(true);
             this.element = templateClone.querySelector('.schedule-block');
-            this.element.dataset.id = this.id;
             this.titleEl = this.element.querySelector('.schedule-title');
             this.tableBody = this.element.querySelector('.schedule-table-body');
-            this.statusIndicator = this.element.querySelector('.status-indicator');
-            schedulesWrapper.innerHTML = '';
             schedulesWrapper.appendChild(this.element);
         }
 
-        render(data) {
-            if (document.activeElement !== this.titleEl) this.titleEl.textContent = data.name;
-
+        render() {
+            this.titleEl.textContent = this.data.title;
+            
             const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = `<table><tbody>${data.content}</tbody></table>`;
+            tempDiv.innerHTML = `<table><tbody>${this.data.content}</tbody></table>`;
             tempDiv.querySelectorAll('td, th').forEach(cell => {
                 const isEssentiallyEmpty = cell.textContent.trim() === '' && !cell.querySelector('img');
                 cell.setAttribute('contenteditable', isEssentiallyEmpty ? 'true' : 'false');
             });
-            const contentToRender = tempDiv.querySelector('tbody').innerHTML;
-
-            if (!this.tableBody.contains(document.activeElement)) {
-                this.tableBody.innerHTML = contentToRender;
-            }
-            this.updateStatus('Synced', 'success');
+            this.tableBody.innerHTML = tempDiv.querySelector('tbody').innerHTML;
         }
-
-        getCleanContentForSaving() {
+        
+        getContent() {
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = `<table><tbody>${this.tableBody.innerHTML}</tbody></table>`;
             tempDiv.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
             return tempDiv.querySelector('tbody').innerHTML;
         }
 
-        save() {
-            this.updateStatus('Syncing...', 'warning');
-            const content = this.getCleanContentForSaving();
-            const payload = { name: this.titleEl.textContent, content };
-            this.collectionRef.doc(this.id).set(payload, { merge: true })
-                .catch(err => this.updateStatus('Error', 'danger'));
+        setupEventListeners() {
+            this.tableBody.addEventListener('input', () => this.parentProject.debouncedSave());
+        }
+    }
+    
+    class Project {
+        constructor(id, initialData, collectionRef) {
+            this.id = id;
+            this.data = initialData;
+            this.collectionRef = collectionRef;
+            this.scheduleTables = [];
+            
+            this.render();
+            this.setupEventListeners();
         }
 
+        render() {
+            projectTitleEl.textContent = this.data.name;
+            schedulesWrapper.innerHTML = ''; // Clear previous tables
+            this.scheduleTables = []; // Reset instances
+            
+            this.data.tables.forEach((tableData, index) => {
+                const tableInstance = new ScheduleTable(this, tableData, index);
+                this.scheduleTables.push(tableInstance);
+            });
+        }
+        
+        save() {
+            const updatedTablesData = this.scheduleTables.map(table => {
+                return {
+                    title: table.data.title, // Title comes from original data
+                    content: table.getContent() // Content comes from the live DOM
+                };
+            });
+            
+            const payload = {
+                name: projectTitleEl.textContent,
+                tables: updatedTablesData
+            };
+
+            this.collectionRef.doc(this.id).update(payload)
+                .then(() => console.log("Project saved"))
+                .catch(err => console.error("Save failed:", err));
+        }
+        
         debouncedSave = debounce(() => this.save(), 1500);
-        updateStatus(text, type) { this.statusIndicator.textContent = text; this.statusIndicator.style.color = `var(--${type}-color)`; }
 
         setupEventListeners() {
-            this.element.addEventListener('click', e => {
-                if (e.target.closest('.delete-btn')) this.delete();
-            });
-            this.titleEl.addEventListener('input', () => this.debouncedSave());
-            this.tableBody.addEventListener('input', () => this.debouncedSave());
+            projectTitleEl.addEventListener('input', () => this.debouncedSave());
+            document.getElementById('delete-project-btn').addEventListener('click', () => this.delete());
         }
 
         delete() {
-            if (confirm('Are you sure you want to permanently delete this schedule?')) {
-                if(currentListener) currentListener(); // Stop listening before deleting
+            if (confirm('Are you sure you want to permanently delete this entire project?')) {
                 this.collectionRef.doc(this.id).delete().then(() => {
-                    alert('Schedule deleted.');
+                    alert('Project deleted.');
                     window.location.href = './dashboard.html';
-                }).catch(err => console.error("Deletion failed:", err));
+                });
             }
         }
     }
+
 
     // --- AUTHENTICATION & PAGE LOGIC ---
     auth.onAuthStateChanged(user => {
@@ -184,18 +214,17 @@
                 return;
             }
             currentUser = user;
+            userSchedulesCollection = db.collection(`userSchedules/${currentUser.uid}/schedules`);
             appContainer.classList.remove('hidden');
             userEmailEl.textContent = user.email;
             
             const params = new URLSearchParams(window.location.search);
-            currentScheduleId = params.get('id');
+            currentProjectId = params.get('id');
             
-            if (currentScheduleId) {
-                // Edit Mode
+            if (currentProjectId) {
                 initEditor();
             } else {
-                // Create Mode
-                showTemplateSelection();
+                initCreationFlow();
             }
         } else {
             window.location.replace('./login.html');
@@ -203,17 +232,12 @@
     });
 
     function initEditor() {
-        if (!currentUser || !currentScheduleId) return;
-        const userSchedulesCollection = db.collection(`userSchedules/${currentUser.uid}/schedules`);
+        if (!currentUser || !currentProjectId) return;
         
         if (currentListener) currentListener();
-        currentListener = userSchedulesCollection.doc(currentScheduleId).onSnapshot(doc => {
+        currentListener = userSchedulesCollection.doc(currentProjectId).onSnapshot(doc => {
             if (doc.exists) {
-                if (!activeSchedule) {
-                    activeSchedule = new ScheduleEditor(doc.id, doc.data(), userSchedulesCollection);
-                } else {
-                    activeSchedule.render(doc.data());
-                }
+                new Project(doc.id, doc.data(), userSchedulesCollection);
             } else {
                 alert("This schedule may have been deleted.");
                 window.location.href = './dashboard.html';
@@ -225,7 +249,7 @@
         });
     }
 
-    async function showTemplateSelection() {
+    async function initCreationFlow() {
         const templatesCollection = db.collection("templates");
         const snapshot = await templatesCollection.orderBy("createdAt").get();
         templateList.innerHTML = '';
@@ -234,13 +258,14 @@
         } else {
             snapshot.docs.forEach(doc => {
                 const li = document.createElement('li');
-                li.innerHTML = `<label><input type="checkbox" data-id="${doc.id}"> ${doc.data().name}</label>`;
+                li.innerHTML = `<label><input type="checkbox" data-id="${doc.id}" data-name="${doc.data().name}" data-content="${encodeURIComponent(doc.data().content)}"> ${doc.data().name}</label>`;
                 templateList.appendChild(li);
             });
         }
         templateSelectionModal.style.display = 'flex';
     }
 
+    // --- GLOBAL UI EVENT LISTENERS ---
     function setupGlobalUI() {
         document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
         
@@ -250,35 +275,32 @@
         });
 
         document.getElementById('confirm-template-selection').addEventListener('click', async () => {
-            const selectedIds = Array.from(templateList.querySelectorAll('input:checked')).map(input => input.dataset.id);
-            if (selectedIds.length === 0) {
+            const newProjectName = document.getElementById('new-project-name').value.trim();
+            if (!newProjectName) {
+                alert("Please enter a name for your new project.");
+                return;
+            }
+            
+            const selectedCheckboxes = Array.from(templateList.querySelectorAll('input:checked'));
+            if (selectedCheckboxes.length === 0) {
                 alert("Please select at least one template.");
                 return;
             }
 
-            const userSchedulesCollection = db.collection(`userSchedules/${currentUser.uid}/schedules`);
-            const templatesCollection = db.collection("templates");
-            const batch = db.batch();
-
-            const templateDocs = await templatesCollection.where(firebase.firestore.FieldPath.documentId(), 'in', selectedIds).get();
+            const tablesArray = selectedCheckboxes.map(input => {
+                return {
+                    title: input.dataset.name,
+                    content: decodeURIComponent(input.dataset.content)
+                };
+            });
             
-            let firstNewDocId = null;
-
-            templateDocs.forEach(doc => {
-                const templateData = doc.data();
-                const newUserScheduleRef = userSchedulesCollection.doc();
-                if(!firstNewDocId) firstNewDocId = newUserScheduleRef.id;
-
-                batch.set(newUserScheduleRef, {
-                    name: templateData.name, // Start with the template's name
-                    content: templateData.content,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
+            const newDocRef = await userSchedulesCollection.add({
+                name: newProjectName,
+                tables: tablesArray,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
 
-            await batch.commit();
-            alert(`Successfully created ${selectedIds.length} new schedule(s)! You will now be taken to your dashboard.`);
-            window.location.href = './dashboard.html';
+            window.location.href = `./editor.html?id=${newDocRef.id}`;
         });
     }
 
