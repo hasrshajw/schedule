@@ -16,7 +16,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@700&display=swap" rel="stylesheet">
 
 <style>
-    :root { --primary-color: #0d6efd; --border-color: #dee2e6; --background-color: #f8f9fa; --danger-color: #dc3545; --warning-color: #ffc107; --success-color: #198754; } body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--background-color); padding: 20px; color: #212529; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; } .hidden { display: none !important; } #app-header { max-width: 1000px; margin: 0 auto 20px auto; padding: 10px 25px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: space-between; } #user-info { display: flex; align-items: center; gap: 10px; } #user-email { font-weight: bold; } #logout-button { background-color: var(--danger-color); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; } .master-container { max-width: 1000px; margin: 0 auto 25px auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); } .project-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 2px solid var(--border-color); } .project-title { font-size: 2em; font-weight: 700; margin: 0; flex-grow: 1; border: 1px solid transparent; padding: 5px; border-radius: 4px; font-family: 'Noto Sans Telugu', sans-serif; } .project-title:focus { outline: none; border-color: var(--primary-color); background-color: #f0f8ff; } .schedule-block { padding-bottom: 20px; margin-bottom: 20px; border-bottom: 1px solid #eee; } .schedule-block:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; } .schedule-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; } .schedule-title { font-size: 1.2em; font-weight: 600; margin: 0; flex-grow: 1; } .status-indicator { font-size: 14px; font-weight: bold; transition: color 0.3s; } table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.25px; } th, td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; } [contenteditable="true"]:focus { background-color: #fffbe5; } .row-handle { position: absolute; left: -30px; top: 0; width: 30px; height: 100%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #aaa; user-select: none; } .row-handle-icon { opacity: 0; transition: opacity 0.2s; font-size: 18px; } tr:hover .row-handle-icon { opacity: 1; } .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; } .cell-icon { height: 70%; max-height: 24px; object-fit: contain; flex-shrink: 0; } .header-row .cell-icon { filter: brightness(0) invert(1); } .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; } .header-row td { font-size: 14px; color: #ffffff; height: 42px; } .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; } .modal-content { display:flex; flex-direction:column; gap:15px; background: white; padding: 25px; border-radius: 8px; min-width: 400px; max-height: 80vh; } #template-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; } #template-list li { padding: 10px; border-bottom: 1px solid var(--border-color); } #template-list label { display: flex; align-items: center; gap: 10px; font-size: 16px; cursor: pointer; } #print-button { background-color: #6c757d; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
+    /* [ Note: This contains all the same styles as your previous definitive version ] */
+    :root { --primary-color: #0d6efd; --border-color: #dee2e6; --background-color: #f8f9fa; --danger-color: #dc3545; --warning-color: #ffc107; --success-color: #198754; } body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--background-color); padding: 20px; color: #212529; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; } .hidden { display: none !important; } #app-header { max-width: 1000px; margin: 0 auto 20px auto; padding: 10px 25px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: space-between; } #user-info { display: flex; align-items: center; gap: 10px; } #user-email { font-weight: bold; } #logout-button { background-color: var(--danger-color); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; } .master-container { max-width: 1000px; margin: 0 auto 25px auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); } .project-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 2px solid var(--border-color); } .project-title { font-size: 2em; font-weight: 700; margin: 0; flex-grow: 1; border: 1px solid transparent; padding: 5px; border-radius: 4px; font-family: 'Noto Sans Telugu', sans-serif; } .project-title:focus { outline: none; border-color: var(--primary-color); background-color: #f0f8ff; } .schedule-block { padding-bottom: 20px; margin-bottom: 20px; border-bottom: 1px solid #eee; } .schedule-block:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; } .schedule-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; } .schedule-title { font-size: 1.2em; font-weight: 600; margin: 0; flex-grow: 1; } .status-indicator { font-size: 14px; font-weight: bold; transition: color 0.3s; } table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.25px; } th, td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; } [contenteditable="true"]:focus { background-color: #fffbe5; } .row-handle { position: absolute; left: -30px; top: 0; width: 30px; height: 100%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #aaa; user-select: none; } .row-handle-icon { opacity: 0; transition: opacity 0.2s; font-size: 18px; } tr:hover .row-handle-icon { opacity: 1; } .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; } .cell-icon { height: 70%; max-height: 24px; object-fit: contain; flex-shrink: 0; } .header-row .cell-icon { filter: brightness(0) invert(1); } .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; } .header-row td { font-size: 14px; color: #ffffff; height: 42px; } .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; } .modal-content { display:flex; flex-direction:column; gap:15px; background: white; padding: 25px; border-radius: 8px; min-width: 400px; max-height: 80vh; } #template-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; } #template-list li { padding: 10px; border-bottom: 1px solid var(--border-color); } #template-list label { display: flex; align-items: center; gap: 10px; font-size: 16px; cursor: pointer; }
+    #print-button { background-color: #6c757d; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -111,7 +113,6 @@
             this.parentProject = parentProject;
             this.data = tableData;
             this.index = index;
-
             this.initDOM();
             this.render();
             this.setupEventListeners();
@@ -129,7 +130,6 @@
             this.titleEl.textContent = this.data.title;
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = `<table><tbody>${this.data.content}</tbody></table>`;
-            
             tempDiv.querySelectorAll('td, th').forEach(cell => {
                 if (cell.hasAttribute('data-user-editable')) {
                     cell.setAttribute('contenteditable', 'true');
@@ -303,8 +303,8 @@
         });
     }
     
-    // --- NEW PRINT FUNCTIONALITY ---
-    function handlePrint() {
+    // --- NEW INTELLIGENT PRINT FUNCTIONALITY ---
+    async function handlePrint() {
         const printFrame = document.createElement('iframe');
         printFrame.style.position = 'absolute';
         printFrame.style.width = '0';
@@ -317,36 +317,70 @@
             .map(style => style.outerHTML)
             .join('');
 
-        const scheduleBlocks = schedulesWrapper.querySelectorAll('.schedule-block');
-        let printContent = '';
-        let pageContent = '';
+        const allScheduleBlocksHTML = Array.from(schedulesWrapper.querySelectorAll('.schedule-block'))
+            .map(block => block.outerHTML);
+
+        // A4 paper dimensions in pixels at 96 DPI (standard) minus margins
+        const A4_WIDTH_PX = 794; // 210mm
+        const A4_HEIGHT_PX = 1123; // 297mm
+        const MARGIN_PX = 38; // ~1cm
+        const PRINTABLE_HEIGHT = A4_HEIGHT_PX - (MARGIN_PX * 2);
+
+        let printPagesHTML = '';
         
-        scheduleBlocks.forEach((block, index) => {
-            pageContent += block.outerHTML;
-            if ((index + 1) % 2 === 0 || index === scheduleBlocks.length - 1) {
-                printContent += `<div class="print-page">${pageContent}</div>`;
-                pageContent = '';
+        // Group tables into pairs
+        for (let i = 0; i < allScheduleBlocksHTML.length; i += 2) {
+            const chunk = allScheduleBlocksHTML.slice(i, i + 2);
+            const pageContent = chunk.join('');
+
+            // Measure the content chunk
+            const measurer = document.createElement('div');
+            measurer.style.position = 'absolute';
+            measurer.style.width = `${A4_WIDTH_PX - (MARGIN_PX * 2)}px`;
+            measurer.style.left = '-9999px'; // Hide it off-screen
+            measurer.innerHTML = pageContent;
+            document.body.appendChild(measurer);
+            
+            // Apply table styles for accurate measurement
+            const tableInMeasurer = measurer.querySelector('table');
+            if(tableInMeasurer) {
+                tableInMeasurer.style.fontFamily = "'Noto Sans Telugu', sans-serif";
+                tableInMeasurer.style.fontSize = "12px";
+                tableInMeasurer.style.fontWeight = "700";
             }
-        });
+            
+            const contentHeight = measurer.offsetHeight;
+            document.body.removeChild(measurer);
+            
+            let scale = 1.0;
+            if (contentHeight > PRINTABLE_HEIGHT) {
+                scale = PRINTABLE_HEIGHT / contentHeight;
+            }
+            
+            // Add the scaled page to the print document
+            printPagesHTML += `<div class="print-page" style="zoom: ${scale};">${pageContent}</div>`;
+        }
 
         printDoc.open();
         printDoc.write(`
             <html>
                 <head>
-                    <title>Print Schedule</title>
+                    <title>${projectTitleEl.textContent}</title>
                     ${currentStyles}
                     <style>
                         @page { size: A4; margin: 1cm; }
                         body { background-color: white !important; -webkit-print-color-adjust: exact; color-adjust: exact; }
-                        .print-page { width: 100%; height: 100vh; display: flex; flex-direction: column; justify-content: flex-start; page-break-after: always; }
-                        .schedule-block { flex: 0 1 auto; overflow: hidden; border: none; margin: 0; padding: 0 0 1cm 0; }
+                        .print-page { width: 100%; height: 100%; page-break-after: always; }
+                        .schedule-block { border: none; margin: 0; padding: 0 0 1cm 0; }
                         .schedule-header, .row-handle { display: none !important; }
-                        table { font-size: 10px; } /* Slightly smaller for better fitting */
-                        th, td { height: 30px; }
-                        .header-row td { height: 34px; }
+                        table { border: 2px solid #000 !important; color: #000 !important; }
+                        th, td { border: 1px solid #000 !important; }
+                        .header-row td { background-color: #468499 !important; /* Preserving original colors */ }
+                        .header-row[data-section="ministry"] td { background-color: #d4a22a !important; }
+                        .header-row[data-section="living"] td { background-color: #c04235 !important; }
                     </style>
                 </head>
-                <body>${printContent}</body>
+                <body>${printPagesHTML}</body>
             </html>
         `);
         printDoc.close();
@@ -354,10 +388,7 @@
         printFrame.contentWindow.focus();
         printFrame.contentWindow.print();
 
-        // Clean up after a delay
-        setTimeout(() => {
-            document.body.removeChild(printFrame);
-        }, 500);
+        setTimeout(() => { document.body.removeChild(printFrame); }, 500);
     }
 
     setupGlobalUI();
