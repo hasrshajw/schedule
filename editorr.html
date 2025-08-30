@@ -25,6 +25,8 @@
         --danger-color: #d32f2f;
         --danger-hover: #b71c1c;
         --danger-light: #fde8e8;
+        --warning-color: #f59e0b;
+        --success-color: #2e7d32;
         --border-color: #e5e7eb;
         --background-color: #f8fafc;
         --text-primary: #1f2937;
@@ -39,188 +41,85 @@
     }
     *, *::before, *::after { box-sizing: border-box; }
     html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-    body {
-        font-family: 'Inter', sans-serif;
-        background-color: var(--background-color);
-        margin: 0;
-        padding: 88px 20px 20px 20px;
-        color: var(--text-primary);
-    }
+    body { font-family: 'Inter', sans-serif; background-color: var(--background-color); margin: 0; padding: 88px 20px 20px; color: var(--text-primary); }
     .hidden { display: none !important; }
 
     /* App Header */
-    #app-header {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        z-index: 100;
-        background-color: rgba(255, 255, 255, 0.8);
-        backdrop-filter: blur(8px);
-        border-bottom: 1px solid var(--border-color);
-        padding: 12px 20px;
-    }
-    .header-content {
-        max-width: 1100px;
-        margin: 0 auto;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
+    #app-header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border-color); padding: 12px 20px; }
+    .header-content { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
     #user-info { display: flex; align-items: center; gap: 12px; font-size: 14px; }
     #user-avatar { width: 36px; height: 36px; border-radius: 50%; background-color: var(--border-color); display: flex; align-items: center; justify-content: center; font-weight: 600; color: var(--text-secondary); }
     #user-email { font-weight: 600; color: var(--text-primary); }
+    .back-link { color: var(--text-secondary); text-decoration: none; font-weight: 500; display: flex; align-items: center; gap: 4px; transition: color 0.2s var(--ease); }
+    .back-link:hover { color: var(--primary-color); }
     .header-actions { display: flex; align-items: center; gap: 12px; }
-    .header-btn, #logout-button {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        background-color: transparent;
-        color: var(--text-secondary);
-        border: 1px solid var(--border-color);
-        padding: 8px 16px;
-        border-radius: var(--radius-md);
-        cursor: pointer;
-        font-weight: 600;
-        font-size: 14px;
-        transition: all 0.2s var(--ease);
-        text-decoration: none;
-    }
-    .header-btn .material-symbols-outlined { font-size: 20px; }
-    .header-btn:hover { background-color: #f9fafb; border-color: #d1d5db; color: var(--text-primary); }
+    .toolbar-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); transition: all 0.2s var(--ease); }
+    .toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; border-color: #d1d5db; color: var(--text-primary); }
+    #logout-button { background-color: transparent; color: var(--text-secondary); border: 1px solid var(--border-color); padding: 8px 16px; border-radius: var(--radius-md); cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s var(--ease); }
     #logout-button:hover { background-color: var(--danger-light); color: var(--danger-hover); border-color: var(--danger-hover); }
 
     /* Main Layout */
-    .master-container { max-width: 1100px; margin: 0 auto; }
-    .project-header {
-        margin-bottom: 24px;
-        padding-bottom: 24px;
-        border-bottom: 1px solid var(--border-color);
-    }
-    #project-title {
-        font-size: 2rem;
-        font-weight: 700;
-        margin: 0;
-        border: none;
-        padding: 4px 8px;
-        margin: -4px -8px;
-        border-radius: var(--radius-md);
-        font-family: 'Noto Sans Telugu', sans-serif;
-    }
-    #project-title:focus { outline: 2px solid var(--primary-color); background-color: var(--primary-light); }
-    
-    /* Schedule Block */
-    .schedule-block {
-        background: var(--surface-color);
-        padding: 24px;
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-md);
-        margin-bottom: 24px;
-    }
-    .schedule-title {
-        font-size: 1.25rem;
-        font-weight: 600;
-        margin: 0 0 20px 0;
-        font-family: 'Noto Sans Telugu', sans-serif;
-        padding-bottom: 16px;
-        border-bottom: 1px solid var(--border-color);
-    }
+    .master-container { max-width: 1100px; margin: 0 auto; background: var(--surface-color); padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
+    .project-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color); }
+    .project-title { font-size: 1.75rem; font-weight: 700; margin: 0; flex-grow: 1; border: none; padding: 4px 8px; margin: -4px -8px; border-radius: var(--radius-md); font-family: 'Noto Sans Telugu', sans-serif; }
+    .project-title:focus { outline: 2px solid var(--primary-color); background-color: var(--primary-light); }
+    #delete-project-btn { background-color: var(--danger-color); color: white; border: none; padding: 10px 16px; border-radius: var(--radius-md); font-weight: 600; cursor: pointer; transition: background-color 0.2s var(--ease); }
+    #delete-project-btn:hover { background-color: var(--danger-hover); }
 
-    /* Table Styles */
-    .schedule-block table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.25px; }
+    /* Schedule Block */
+    .schedule-block { margin-bottom: 32px; }
+    .schedule-block:last-child { margin-bottom: 0; }
+    .schedule-header { margin-bottom: 16px; }
+    .schedule-title { font-size: 1.25rem; font-weight: 600; margin: 0; color: var(--text-secondary); font-family: 'Noto Sans Telugu', sans-serif; }
+
+    /* PRESERVED TABLE STYLES */
+    .schedule-block table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.25px; }
     .schedule-block th, .schedule-block td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; }
-    .schedule-block [contenteditable="true"]:focus { background-color: #fffbe5; outline: 2px solid var(--primary-color); }
+    .schedule-block [contenteditable="true"]:focus { background-color: #fffbe5; }
     .schedule-block .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; }
     .schedule-block .cell-icon { height: 70%; max-height: 24px; object-fit: contain; flex-shrink: 0; }
     .schedule-block .header-row .cell-icon { filter: brightness(0) invert(1); }
     .schedule-block .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; }
-    .schedule-block .header-row td { font-size: 14px; color: #ffffff; height: 42px; }
-    .schedule-block .header-row[data-section="treasures"] td { background-color: rgb(70, 132, 153); }
-    .schedule-block .header-row[data-section="ministry"] td { background-color: rgb(212, 162, 42); }
-    .schedule-block .header-row[data-section="living"] td { background-color: rgb(192, 66, 53); }
-    
-    /* Creation Modal */
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(4px); }
-    .modal-content { display:flex; flex-direction:column; gap:20px; background: white; padding: 24px; border-radius: var(--radius-lg); width: 90%; max-width: 500px; box-shadow: var(--shadow-lg); }
-    .modal-content h2 { font-size: 1.5rem; margin: 0; }
-    .modal-content p { margin: 0; color: var(--text-secondary); }
-    #new-project-name { padding: 12px; font-size: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); width: 100%; }
-    #new-project-name:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px var(--primary-light); }
-    #template-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; max-height: 250px; border: 1px solid var(--border-color); border-radius: var(--radius-md); }
+    .schedule-block .header-row td { font-size: 16px; color: #ffffff; height: 42px; }
+
+    /* Modal Styles */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 16px; }
+    .modal-content { background: white; padding: 24px; border-radius: var(--radius-lg); width: 100%; max-width: 500px; max-height: 90vh; display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow-lg); }
+    .modal-content h2 { margin-top: 0; }
+    .modal-content p { margin: 0 0 16px 0; color: var(--text-secondary); }
+    #new-project-name { width: 100%; padding: 12px; font-size: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); }
+    #template-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md); }
     #template-list li { padding: 12px; border-bottom: 1px solid var(--border-color); }
     #template-list li:last-child { border-bottom: none; }
-    #template-list label { display: flex; align-items: center; gap: 12px; font-size: 16px; cursor: pointer; }
-    #template-list input[type="checkbox"] { width: 1.15em; height: 1.15em; accent-color: var(--primary-color); }
-    .modal-actions { display:flex; justify-content:flex-end; gap:12px; }
-    .modal-actions button { padding: 10px 20px; border: none; border-radius: var(--radius-md); font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s var(--ease); }
-    #cancel-template-selection { background-color: var(--surface-color); border: 1px solid var(--border-color); color: var(--text-secondary); }
-    #cancel-template-selection:hover { background-color: #f9fafb; }
-    #confirm-template-selection { background-color: var(--primary-color); color: white; }
-    #confirm-template-selection:hover { background-color: var(--primary-hover); }
+    #template-list label { display: flex; align-items: center; gap: 10px; font-size: 16px; cursor: pointer; font-weight: 500; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px; }
+    .modal-actions button { padding: 10px 20px; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); }
+    #cancel-template-selection { background-color: var(--surface-color); }
+    #confirm-template-selection { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 
-    /* Mobile Responsiveness */
+    /* PRINT STYLES (PRESERVED) */
+    @media print { @page { size: A4 landscape; margin: 10mm; } body { background-color: #fff !important; padding: 0; margin: 0; } #app-header, .project-header, .row-handle, .status-indicator, .schedule-title { display: none !important; } .master-container { width: 100%; max-width: 100%; box-shadow: none; padding: 0; margin: 0; border: none; } .schedule-block { width: 100%; height: 100%; display: flex; flex-direction: column; page-break-after: always; padding: 5mm 20mm; border: 2px solid #4B0082 !important; box-sizing: border-box; border-bottom: none !important; } table { flex-grow: 1; border: 2px solid #000 !important; color: #000 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } th, td { border: 1px solid #000 !important; } td.cell-selected, th.cell-selected { outline: none !important; } th { border-bottom: 1px solid #000 !important; } tbody tr:nth-child(2) > td { border-top: 2px solid #000 !important; } }
+
+    /* MOBILE RESPONSIVE STYLES */
     @media (max-width: 768px) {
         body { padding: 72px 0 0 0; background-color: var(--surface-color); }
         #app-header { padding: 12px 16px; }
-        .header-content { gap: 8px; }
-        #user-info #user-email { max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        #user-info #user-email { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         #user-info span:not(#user-email) { display: none; }
-        .header-btn, #logout-button { padding: 8px; font-size: 12px; }
-        .header-btn .btn-text { display: none; }
+        .master-container { padding: 0 16px 16px; border-radius: 0; box-shadow: none; }
+        .project-header { flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px 0; margin-bottom: 16px; }
+        .project-title { font-size: 1.5rem; }
+        #delete-project-btn { width: 100%; }
+        .schedule-block { margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color); }
         
-        .master-container { max-width: 100%; }
-        .project-header { padding: 16px; margin-bottom: 0; }
-        #project-title { font-size: 1.5rem; }
-        #schedules-wrapper { padding: 0; }
-        .schedule-block { border-radius: 0; box-shadow: none; padding: 16px; margin-bottom: 0; border-bottom: 8px solid var(--background-color); }
-        .schedule-title { font-size: 1.1rem; padding-bottom: 12px; margin-bottom: 16px; }
-
-        .schedule-block table { font-size: 10px; }
-        .schedule-block th, .schedule-block td { height: 32px; padding: 0 4px; }
-        .schedule-block .header-row td { font-size: 11px; height: 36px; }
+        /* Mobile table adjustments */
+        .schedule-block table { font-size: 6.5px; }
+        .schedule-block th, .schedule-block td { padding: 0 1.5px; height: 24px; }
+        .schedule-block .header-row td { height: 26px; font-size: 8px; }
+        .schedule-block .cell-icon { max-height: 14px; }
     }
 </style>
 
-<!-- --- DEDICATED PRINT STYLES --- -->
-<style media="print">
-    @page { size: A4 landscape; margin: 10mm; }
-    body { background-color: #fff !important; padding: 0; margin: 0; }
-    #app-header, .project-header, .row-handle, .status-indicator, .schedule-title { display: none !important; }
-    .master-container { width: 100%; max-width: 100%; box-shadow: none; padding: 0; margin: 0; border: none; }
-    #schedules-wrapper { padding: 0; }
-    .schedule-block {
-        width: 100%;
-        height: 100%;
-        display: flex; 
-        flex-direction: column;
-        page-break-after: always;
-        padding: 5mm 20mm; 
-        border: 2px solid #4B0082 !important;
-        box-sizing: border-box;
-        border-bottom: none !important;
-        box-shadow: none;
-        margin-bottom: 0;
-        border-radius: 0;
-    }
-    table {
-        flex-grow: 1;
-        border: 2px solid #000 !important;
-        color: #000 !important;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-    }
-    th, td { border: 1px solid #000 !important; }
-    td.cell-selected, th.cell-selected { outline: none !important; }
-    th { border-bottom: 1px solid #000 !important; }
-    tbody tr:nth-child(2) > td { border-top: 2px solid #000 !important; }
-    [contenteditable="true"]:focus { background-color: transparent !important; }
-    .header-row[data-section="treasures"] td,
-    .header-row[data-section="ministry"] td,
-    .header-row[data-section="living"] td {
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-    }
-</style>
 </head>
 <body>
 
@@ -230,10 +129,12 @@
             <div id="user-info">
                 <div id="user-avatar"></div>
                 <span>Welcome, <span id="user-email"></span></span>
+                <a href="./dashboard.html" class="back-link"><span class="material-symbols-outlined">arrow_back</span>Back to Dashboard</a>
             </div>
             <div class="header-actions">
-                <a href="./dashboard.html" class="header-btn"><span class="material-symbols-outlined">dashboard</span><span class="btn-text">Dashboard</span></a>
-                <button id="print-button" class="header-btn"><span class="material-symbols-outlined">print</span><span class="btn-text">Print</span></button>
+                <button id="print-button" class="toolbar-btn">
+                    <span class="material-symbols-outlined">print</span>Print
+                </button>
                 <button id="logout-button">Logout</button>
             </div>
         </div>
@@ -242,14 +143,19 @@
     <div class="master-container">
         <div id="project-header" class="project-header">
             <h1 id="project-title" contenteditable="true">Loading Project...</h1>
+            <button id="delete-project-btn">Delete Project</button>
         </div>
-        <div id="schedules-wrapper"></div>
+        <div id="schedules-wrapper">
+            <!-- Schedule blocks will be rendered here by JavaScript -->
+        </div>
     </div>
 </div>
 
 <template id="schedule-template">
     <div class="schedule-block">
-        <h2 class="schedule-title"></h2>
+        <div class="schedule-header">
+            <h2 class="schedule-title"></h2>
+        </div>
         <table>
             <colgroup><col style="width: 60%;"><col style="width: 20%;"><col style="width: 20%;"></colgroup>
             <tbody class="schedule-table-body"></tbody>
@@ -338,21 +244,13 @@
                 }
             });
             this.tableBody.innerHTML = tempDiv.querySelector('tbody').innerHTML;
-
-            // Apply header colors
-            this.element.querySelectorAll('.header-row[data-section="treasures"] td').forEach(td => td.style.backgroundColor = 'rgb(70, 132, 153)');
-            this.element.querySelectorAll('.header-row[data-section="ministry"] td').forEach(td => td.style.backgroundColor = 'rgb(212, 162, 42)');
-            this.element.querySelectorAll('.header-row[data-section="living"] td').forEach(td => td.style.backgroundColor = 'rgb(192, 66, 53)');
         }
         
         getContent() {
-            const tempBody = this.tableBody.cloneNode(true);
-            tempBody.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
-            // Remove hardcoded styles that might interfere with print styles or re-renders
-            tempBody.querySelectorAll('[style*="background-color"]').forEach(el => {
-                if(!el.closest('.header-row')) el.style.backgroundColor = '';
-            });
-            return tempBody.innerHTML;
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = `<table><tbody>${this.tableBody.innerHTML}</tbody></table>`;
+            tempDiv.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+            return tempDiv.querySelector('tbody').innerHTML;
         }
 
         setupEventListeners() {
@@ -398,6 +296,16 @@
 
         setupEventListeners() {
             projectTitleEl.addEventListener('input', () => this.debouncedSave());
+            document.getElementById('delete-project-btn').addEventListener('click', () => this.delete());
+        }
+
+        delete() {
+            if (confirm('Are you sure you want to permanently delete this entire project?')) {
+                this.collectionRef.doc(this.id).delete().then(() => {
+                    alert('Project deleted.');
+                    window.location.href = './dashboard.html';
+                });
+            }
         }
     }
 
@@ -436,7 +344,7 @@
                 } else {
                     const localContent = activeProject.getContentForComparison();
                     const remoteContent = JSON.stringify(remoteData.tables);
-                    if (localContent !== remoteContent && document.activeElement.getAttribute('contenteditable') !== 'true') {
+                    if (localContent !== remoteContent) {
                         activeProject.render(remoteData);
                     }
                 }
@@ -513,7 +421,10 @@
     }
     
     function handlePrint() {
-        window.print();
+        // A brief delay allows the browser to apply print styles before opening the dialog
+        setTimeout(() => {
+            window.print();
+        }, 100);
     }
 
     setupGlobalUI();
