@@ -463,7 +463,7 @@
             }
         }
         
-        // --- CORRECTED UNDO/REDO FUNCTIONS ---
+        // --- CORRECTED UNDO/REDO LOGIC ---
         undo() {
             if (this.undoHistory.length <= 1) return;
             const currentState = this.undoHistory.pop();
@@ -473,7 +473,7 @@
             this.updateUndoRedoButtons();
             this.debouncedSaveToFirestore();
         }
-        
+
         redo() {
             if (this.redoHistory.length === 0) return;
             const nextState = this.redoHistory.pop();
