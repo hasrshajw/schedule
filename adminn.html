@@ -50,7 +50,7 @@
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         background-color: var(--background-color);
         margin: 0;
-        padding: 88px 20px 20px 20px; /* Add padding for fixed header */
+        padding: 88px 20px 20px 20px;
         color: var(--text-primary);
     }
     .hidden { display: none !important; }
@@ -205,6 +205,10 @@
         #app-header {
             padding: 12px 16px;
         }
+        #logout-button {
+            padding: 6px 10px;
+            font-size: 13px;
+        }
         #user-info #user-email {
             max-width: 120px;
             overflow: hidden;
@@ -214,75 +218,69 @@
         #user-info span:not(#user-email) {
             display: none;
         }
-
         .master-container {
             max-width: 100%;
             margin: 0;
         }
         .page-title {
-            font-size: 1.25rem; /* Smaller */
+            font-size: 1.25rem;
             padding: 16px 16px 0 16px;
             margin-bottom: 16px;
         }
         .schedule-block {
             border-radius: 0;
             box-shadow: none;
-            padding: 12px; /* Reduced padding */
+            padding: 12px;
             margin-bottom: 0;
             border-bottom: 8px solid var(--background-color); 
         }
         .schedule-title {
-            font-size: 1.1rem; /* Smaller */
-        }
-        
-        /* Toolbar modifications for mobile */
-        .toolbar {
-            margin-bottom: 16px;
-            padding-bottom: 16px;
-            flex-wrap: nowrap; /* Keep buttons in one row */
-            justify-content: space-between;
-            gap: 6px;
-        }
-        .toolbar-btn {
-            padding: 8px; /* Make buttons more square */
-            gap: 0;
-        }
-        .undo-btn .toolbar-btn-text,
-        .redo-btn .toolbar-btn-text,
-        .reset-btn .toolbar-btn-text,
-        .delete-btn .toolbar-btn-text {
-            display: none; /* Hide text on all toolbar buttons */
-        }
-        .delete-btn {
-            margin-left: 0; /* Remove auto margin */
+            font-size: 1.1rem;
         }
 
+        /* Toolbar mobile styles */
+        .toolbar {
+            gap: 4px;
+            flex-wrap: nowrap;
+            justify-content: flex-start;
+        }
+        .toolbar-btn {
+            padding: 8px;
+            gap: 0;
+        }
+        .toolbar-btn .btn-text {
+            display: none;
+        }
+        
         #add-schedule-footer {
             padding: 16px;
         }
         .add-button {
-            padding: 12px; /* Smaller */
-            font-size: 14px; /* Smaller */
+            padding: 12px;
+            font-size: 14px;
         }
 
-        /* Mobile table adjustments */
+        /* Table mobile styles */
         .schedule-block table { 
-            font-size: 6.5px;
+            font-size: 6px;
         }
         .schedule-block th, .schedule-block td { 
-            padding: 0 1.5px;
-            height: 24px;
+            padding: 0 2px;
+            height: 22px;
         }
         .schedule-block .header-row td { 
-            height: 26px;
-            font-size: 8px;
+            height: 24px;
+            font-size: 7px;
         }
         .schedule-block .cell-icon { 
-            max-height: 14px;
+            max-height: 12px;
         }
         .schedule-block .row-handle { 
-            left: -20px; 
-            width: 20px; 
+            left: -18px; 
+            width: 18px; 
+        }
+        .schedule-block .row-handle-icon {
+            font-size: 14px;
         }
     }
 </style>
@@ -320,10 +318,10 @@
             <div class="status-indicator"></div>
         </div>
         <div class="toolbar">
-            <button class="toolbar-btn undo-btn" disabled><span class="material-symbols-outlined">undo</span><span class="toolbar-btn-text"> Undo</span></button>
-            <button class="toolbar-btn redo-btn" disabled><span class="material-symbols-outlined">redo</span><span class="toolbar-btn-text"> Redo</span></button>
-            <button class="toolbar-btn reset-btn"><span class="material-symbols-outlined">restart_alt</span><span class="toolbar-btn-text"> Reset</span></button>
-            <button class="toolbar-btn delete-btn"><span class="material-symbols-outlined">delete</span><span class="toolbar-btn-text"> Delete Template</span></button>
+            <button class="toolbar-btn undo-btn" disabled><span class="material-symbols-outlined">undo</span><span class="btn-text">Undo</span></button>
+            <button class="toolbar-btn redo-btn" disabled><span class="material-symbols-outlined">redo</span><span class="btn-text">Redo</span></button>
+            <button class="toolbar-btn reset-btn"><span class="material-symbols-outlined">restart_alt</span><span class="btn-text">Reset</span></button>
+            <button class="toolbar-btn delete-btn"><span class="material-symbols-outlined">delete</span><span class="btn-text">Delete Template</span></button>
         </div>
         <table>
             <colgroup><col style="width: 60%;"><col style="width: 20%;"><col style="width: 20%;"></colgroup>
