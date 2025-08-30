@@ -25,6 +25,8 @@
         --danger-color: #d32f2f;
         --danger-hover: #b71c1c;
         --danger-light: #fde8e8;
+        --warning-color: #f59e0b;
+        --success-color: #2e7d32;
         --border-color: #e5e7eb;
         --background-color: #f8fafc;
         --text-primary: #1f2937;
@@ -87,7 +89,7 @@
     }
     #logout-button:hover { background-color: var(--danger-light); color: var(--danger-hover); border-color: var(--danger-hover); }
 
-    /* Main Layout & Card */
+    /* Main Layout */
     .master-container {
         max-width: 1100px;
         margin: 0 auto;
@@ -97,14 +99,15 @@
         box-shadow: var(--shadow-md);
     }
     .page-title {
-        font-size: 2rem;
+        font-size: 1.75rem;
         font-weight: 700;
         margin: 0 0 24px 0;
         padding-bottom: 16px;
         border-bottom: 1px solid var(--border-color);
+        font-family: 'Noto Sans Telugu', sans-serif;
     }
-
-    /* Schedule List */
+    
+    /* Schedule List Styles */
     #schedule-list {
         list-style: none;
         padding: 0;
@@ -116,71 +119,56 @@
         align-items: center;
         padding: 16px 8px;
         border-bottom: 1px solid var(--border-color);
-        font-family: 'Noto Sans Telugu', sans-serif;
+        transition: background-color 0.2s var(--ease);
     }
     #schedule-list li:last-child {
         border-bottom: none;
     }
+    #schedule-list li:hover {
+        background-color: #f9fafb;
+    }
     .schedule-name {
+        font-family: 'Noto Sans Telugu', sans-serif;
         font-weight: 500;
-        font-size: 1.1em;
+        font-size: 1.1rem;
         color: var(--text-primary);
     }
     .schedule-actions {
         display: flex;
-        gap: 10px;
+        gap: 12px;
     }
-
-    /* Action Buttons */
-    .btn {
+    .schedule-actions a, .schedule-actions button {
         text-decoration: none;
-        padding: 6px 12px;
+        padding: 8px 16px;
         border-radius: var(--radius-md);
-        border: 1px solid transparent;
+        color: white;
+        border: none;
         font-size: 14px;
-        font-family: 'Inter', sans-serif;
         font-weight: 600;
+        font-family: 'Inter', sans-serif;
         cursor: pointer;
-        transition: all 0.2s var(--ease);
+        transition: background-color 0.2s var(--ease);
         display: inline-flex;
         align-items: center;
         gap: 6px;
     }
-    .btn-secondary {
-        background-color: var(--surface-color);
-        color: var(--text-secondary);
-        border-color: var(--border-color);
-    }
-    .btn-secondary:hover {
-        background-color: var(--background-color);
-        border-color: var(--text-secondary);
-        color: var(--text-primary);
-    }
-    .btn-danger-outline {
-        background-color: transparent;
-        color: var(--danger-color);
-        border-color: var(--danger-light);
-    }
-    .btn-danger-outline:hover {
-        background-color: var(--danger-color);
-        color: white;
-        border-color: var(--danger-color);
-    }
-    .btn .material-symbols-outlined { font-size: 18px; }
-
-    /* Empty State */
+    .edit-btn { background-color: var(--primary-color); }
+    .edit-btn:hover { background-color: var(--primary-hover); }
+    .delete-btn { background-color: var(--danger-color); }
+    .delete-btn:hover { background-color: var(--danger-hover); }
+    
     #empty-state {
         text-align: center;
         padding: 40px;
         color: var(--text-secondary);
         border-bottom: none !important;
     }
+    #empty-state:hover {
+        background-color: transparent !important;
+    }
 
     /* Add Button Footer */
-    #add-schedule-footer {
-        max-width: 1100px;
-        margin: 24px auto 0 auto;
-    }
+    #add-schedule-footer { max-width: 1100px; margin: 24px auto 0 auto; }
     .add-button {
         width: 100%;
         padding: 16px;
@@ -195,7 +183,7 @@
         align-items: center;
         justify-content: center;
         gap: 8px;
-        transition: all 0.2s var(--ease);
+        transition: background-color 0.2s var(--ease);
     }
     .add-button:hover {
         background-color: var(--primary-hover);
@@ -224,26 +212,34 @@
         .master-container {
             max-width: 100%;
             margin: 0;
-            box-shadow: none;
+            padding: 0 16px;
             border-radius: 0;
-            padding: 16px;
+            box-shadow: none;
         }
         .page-title {
             font-size: 1.5rem;
-            padding-bottom: 16px;
-            margin-bottom: 8px;
+            padding: 16px 0;
+            margin-bottom: 0;
         }
+        
         #schedule-list li {
-            padding: 12px 4px;
             flex-direction: column;
             align-items: flex-start;
             gap: 12px;
+            padding: 16px 0;
         }
-        .schedule-name { font-size: 1em; }
+        .schedule-name { font-size: 1rem; }
+        .schedule-actions { width: 100%; }
+        .schedule-actions a, .schedule-actions button {
+            flex-grow: 1;
+            justify-content: center;
+        }
+
         #add-schedule-footer {
             padding: 16px;
             background-color: var(--background-color);
         }
+        .add-button { padding: 14px; font-size: 15px; }
     }
 </style>
 </head>
@@ -261,16 +257,16 @@
     </header>
 
     <div class="master-container">
-        <h1 class="page-title" style="font-family: 'Noto Sans Telugu', sans-serif;">మీ షెడ్యూల్స్</h1>
+        <h1 class="page-title">Your Schedules</h1>
         <ul id="schedule-list">
-            <li id="empty-state" class="hidden">మీరు ఇంకా ఏ షెడ్యూల్‌లను సృష్టించలేదు.</li>
+            <li id="empty-state" class="hidden">You haven't created any schedules yet.</li>
         </ul>
     </div>
     
     <div id="add-schedule-footer">
         <button id="createUserScheduleBtn" class="add-button">
              <span class="material-symbols-outlined">add</span>
-            కొత్త షెడ్యూల్ సృష్టించండి
+            Create New Schedule
         </button>
     </div>
 </div>
@@ -278,7 +274,6 @@
 <script>
 (function() {
     'use strict';
-    // --- FIREBASE SETUP ---
     const firebaseConfig = {
       apiKey: "AIzaSyDLK5f4C-nfG6fz0ajqqay1q9TTN6rxgmQ",
       authDomain: "schedule-harsha.firebaseapp.com",
@@ -296,14 +291,12 @@
     let currentUser = null;
     let currentListener = null;
 
-    // --- DOM ELEMENTS ---
     const appContainer = document.getElementById('app-container');
     const userEmailEl = document.getElementById('user-email');
     const userAvatarEl = document.getElementById('user-avatar');
     const scheduleListEl = document.getElementById('schedule-list');
     const emptyStateEl = document.getElementById('empty-state');
     
-    // --- AUTHENTICATION ---
     auth.onAuthStateChanged(user => {
         if (user) {
             if (user.email === ADMIN_EMAIL) {
@@ -325,14 +318,15 @@
 
         if (currentListener) currentListener();
         currentListener = userSchedulesCollection.orderBy("createdAt").onSnapshot(snapshot => {
+            scheduleListEl.innerHTML = '';
+            
             if (snapshot.empty) {
-                scheduleListEl.innerHTML = '';
+                scheduleListEl.appendChild(emptyStateEl);
                 emptyStateEl.classList.remove('hidden');
                 return;
             }
             
             emptyStateEl.classList.add('hidden');
-            scheduleListEl.innerHTML = '';
             
             snapshot.docs.forEach(doc => {
                 const schedule = doc.data();
@@ -344,14 +338,8 @@
                 li.innerHTML = `
                     <span class="schedule-name">${schedule.name}</span>
                     <div class="schedule-actions">
-                        <a href="./editor.html?id=${scheduleId}" class="btn btn-secondary">
-                            <span class="material-symbols-outlined">edit</span>
-                            View / Edit
-                        </a>
-                        <button class="btn btn-danger-outline" data-id="${scheduleId}">
-                             <span class="material-symbols-outlined">delete</span>
-                            Delete
-                        </button>
+                        <a href="./editor.html?id=${scheduleId}" class="edit-btn">View / Edit</a>
+                        <button class="delete-btn" data-id="${scheduleId}">Delete</button>
                     </div>
                 `;
                 scheduleListEl.appendChild(li);
@@ -362,7 +350,6 @@
         });
     }
 
-    // --- GLOBAL UI EVENT LISTENERS ---
     function setupGlobalUI() {
         document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
 
@@ -371,9 +358,8 @@
         });
 
         scheduleListEl.addEventListener('click', (e) => {
-            const deleteButton = e.target.closest('.btn-danger-outline');
-            if (deleteButton) {
-                const scheduleId = deleteButton.dataset.id;
+            if (e.target.classList.contains('delete-btn')) {
+                const scheduleId = e.target.dataset.id;
                 if (confirm('Are you sure you want to permanently delete this schedule?')) {
                     const userSchedulesCollection = db.collection(`userSchedules/${currentUser.uid}/schedules`);
                     userSchedulesCollection.doc(scheduleId).delete().catch(error => {
@@ -384,7 +370,7 @@
             }
         });
     }
-
+    
     setupGlobalUI();
 
 })();
