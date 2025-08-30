@@ -98,7 +98,7 @@
     #confirm-template-selection { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 
     /* PRINT STYLES (PRESERVED) */
-   @media print {
+  @media print {
     @page {
         size: A4 landscape;
         margin: 0; /* Removes browser default print margins */
@@ -110,18 +110,18 @@
         margin: 0;
     }
 
-    /* Hide all elements that are not part of the printable schedule */
+    /* Hide ALL non-essential elements */
     #app-header,
     .project-header,
     .row-handle,
     .status-indicator,
     .schedule-title,
-    .schedule-header, /* Hiding this is crucial for centering */
-    .toolbar {
+    .schedule-header,
+    .toolbar,
+    #delete-project-btn { /* Make sure to hide the delete button too */
         display: none !important;
     }
 
-    /* Make the main container a simple wrapper */
     .master-container {
         width: 100%;
         max-width: 100%;
@@ -131,29 +131,27 @@
         border: none;
     }
 
-    /* Set each schedule block to be a full page */
+    /* Set each block to a full page GRID container for centering */
     .schedule-block {
         width: 100%;
         height: 100%;
-        display: flex; /* Use flexbox to enable centering */
-        flex-direction: column;
-        page-break-after: always; /* Creates a new page after each block */
-        padding: 5mm 20mm;
+        display: grid; /* CHANGED from flex */
+        place-items: center; /* THIS IS THE KEY: Replaces all flex centering properties */
+        page-break-after: always;
+        padding: 5mm; /* Reduced padding slightly for more space */
         border: 2px solid #4B0082 !important;
         box-sizing: border-box;
         border-bottom: none !important;
     }
 
-    /* Center the table within the schedule-block */
+    /* The table no longer needs any margin or flex properties */
     table {
-        margin: auto; /* THIS IS THE KEY: Centers the table vertically and horizontally */
         border: 2px solid #000 !important;
         color: #000 !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
     }
     
-    /* Preserve basic table cell styles for print */
     th, td {
         border: 1px solid #000 !important;
     }
