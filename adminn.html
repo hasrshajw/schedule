@@ -241,26 +241,25 @@
             font-size: 15px;
         }
 
-        /* --- CORRECTED: Mobile table adjustments --- */
-/* --- CORRECTED: Mobile table adjustments --- */
-.schedule-block table { 
-    font-size: 6.5px; /* CHANGED from 10px */
-}
-.schedule-block th, .schedule-block td { 
-    padding: 0 1.5px; /* CHANGED from 0 4px */
-    height: 24px;  /* CHANGED from 32px */
-}
-.schedule-block .header-row td { 
-    height: 26px;  /* CHANGED from 36px */
-    font-size: 8px; /* CHANGED from 11px */
-}
-.schedule-block .cell-icon { 
-    max-height: 14px; /* CHANGED from 20px */
-}
-.schedule-block .row-handle { 
-    left: -20px; 
-    width: 20px; 
-}
+        /* Mobile table adjustments */
+        .schedule-block table { 
+            font-size: 9px;
+        }
+        .schedule-block th, .schedule-block td { 
+            padding: 0 3px; 
+            height: 28px; 
+        }
+        .schedule-block .header-row td { 
+            height: 30px; 
+            font-size: 10px; 
+        }
+        .schedule-block .cell-icon { 
+            max-height: 18px; 
+        }
+        .schedule-block .row-handle { 
+            left: -24px; 
+            width: 24px; 
+        }
     }
 </style>
 </head>
@@ -333,7 +332,6 @@
     let currentUser = null;
     let isAdmin = false;
 
-    // --- JAVASCRIPT LOGIC (UNCHANGED) ---
     const DEFAULT_TABLE_HTML = `<tr class="no-actions"><th style="background-color: rgb(240, 248, 255);"><span class="row-handle"></span>బైబిలు అధ్యాయం, ప్రసంగి 11-12</th><th style="background-color: rgb(240, 248, 255);">తేదీ:</th><th style="background-color: rgb(240, 248, 255);"></th></tr><tr class="no-actions"><td><div class="cell-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/8A2BE2/FFFFFF?text=♫" class="cell-icon"><span>పాట: 155</span></div></td><td style="text-align: right;">చైర్మన్</td><td></td></tr><tr class="no-actions"><td><span class="row-handle"></span>ఆరంభ మాటలు (1 నిమి.)</td><td style="text-align: right;">ప్రార్థన:</td><td></td></tr><tr class="header-row no-actions" data-section="treasures"><td colspan="3" style="background-color: rgb(70, 132, 153);"><div class="header-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/FFFFFF/468499?text=T" class="cell-icon"><span>దేవుని వాక్యంలో ఉన్న సంపద</span></div></td></tr><tr><td colspan="3"><span class="row-handle"><span class="row-handle-icon">⠿</span></span>1. ఆరోగ్యంగా ఉండండి, లైఫ్‌ని ఎంజాయ్‌ చేయండి. (10 నిమి.)</td></tr><tr><td colspan="3"><span class="row-handle"><span class="row-handle-icon">⠿</span></span>2. దేవుని వాక్యంలో రత్నాలు (10 నిమి.)</td></tr><tr><td colspan="3"><span class="row-handle"><span class="row-handle-icon">⠿</span></span>3. చదవాల్సిన బైబిలు భాగం: (4 నిమి.)</td></tr><tr class="header-row no-actions" data-section="ministry"><td colspan="3" style="background-color: rgb(212, 162, 42);"><div class="header-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/FFFFFF/d4a22a?text=M" class="cell-icon"><span>చక్కగా సువార్త ప్రకటించాలి</span></div></td></tr><tr><td><span class="row-handle"><span class="row-handle-icon">⠿</span></span>4. మళ్ళీ కలిసినప్పుడు (3 నిమి.)</td><td colspan="2"></td></tr><tr><td><span class="row-handle"><span class="row-handle-icon">⠿</span></span>5. మళ్ళీ కలిసినప్పుడు (4 నిమి.)</td><td colspan="2"></td></tr><tr><td><span class="row-handle"><span class="row-handle-icon">⠿</span></span>6. ప్రసంగం (5 నిమి.)</td><td colspan="2"></td></tr><tr class="header-row no-actions" data-section="living"><td colspan="3" style="background-color: rgb(192, 66, 53);"><div class="header-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/FFFFFF/c04235?text=L" class="cell-icon"><span>మన క్రైస్తవ జీవితం</span></div></td></tr><tr><td><div class="cell-content-wrapper"><span class="row-handle"><span class="row-handle-icon">⠿</span></span><img src="https://via.placeholder.com/40/8A2BE2/FFFFFF?text=♫" class="cell-icon"><span>పాట: 111</span></div></td><td colspan="2"></td></tr><tr><td><span class="row-handle"><span class="row-handle-icon">⠿</span></span>7. స్థానిక అవసరాలు (15 నిమి.)</td><td colspan="2"></td></tr><tr><td><span class="row-handle"><span class="row-handle-icon">⠿</span></span>8. సంఘ బైబిలు అధ్యయనం: (30 నిమి.)</td><td colspan="2"></td></tr><tr class="no-actions"><td><span class="row-handle"></span>ముగింపు మాటలు (3 నిమి.)</td><td style="text-align: right;">చైర్మన్</td><td></td></tr><tr class="no-actions"><td><div class="cell-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/8A2BE2/FFFFFF?text=♫" class="cell-icon"><span>పాట: 8</span></div></td><td style="text-align: right;">ముగింపు ప్రార్థన:</td><td></td></tr>`.trim();
 
     const appContainer = document.getElementById('app-container');
@@ -472,10 +470,11 @@
         destroy() { this.element.remove(); }
     }
     
+    // UPDATED AUTHENTICATION LOGIC
     auth.onAuthStateChanged(user => {
         if (user) {
             if (user.email !== ADMIN_EMAIL) {
-                window.location.replace('./dashboard.html');
+                window.location.replace('./dashboard.html'); // Correct non-admin redirect
                 return;
             }
             currentUser = user;
@@ -485,7 +484,7 @@
             userAvatarEl.textContent = user.email.charAt(0).toUpperCase();
             initAdminApp();
         } else {
-            window.location.replace('./login.html');
+            window.location.replace('./login.html'); // Correct logged-out redirect
         }
     });
 
@@ -646,16 +645,6 @@
     }
     
     setupGlobalUI();
-    auth.onAuthStateChanged(user => {
-        if (!user || user.email !== ADMIN_EMAIL) {
-            window.location.replace('./index.html');
-        } else {
-            appContainer.classList.remove('hidden');
-            userEmailEl.textContent = user.email;
-            userAvatarEl.textContent = user.email.charAt(0).toUpperCase();
-            initAdminApp();
-        }
-    });
 
 })();
 </script>
