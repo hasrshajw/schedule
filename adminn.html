@@ -332,7 +332,6 @@
     let currentUser = null;
     let isAdmin = false;
 
-    // --- JAVASCRIPT LOGIC (UNCHANGED) ---
     const DEFAULT_TABLE_HTML = `<tr class="no-actions"><th style="background-color: rgb(240, 248, 255);"><span class="row-handle"></span>బైబిలు అధ్యాయం, ప్రసంగి 11-12</th><th style="background-color: rgb(240, 248, 255);">తేదీ:</th><th style="background-color: rgb(240, 248, 255);"></th></tr><tr class="no-actions"><td><div class="cell-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/8A2BE2/FFFFFF?text=♫" class="cell-icon"><span>పాట: 155</span></div></td><td style="text-align: right;">చైర్మన్</td><td></td></tr><tr class="no-actions"><td><span class="row-handle"></span>ఆరంభ మాటలు (1 నిమి.)</td><td style="text-align: right;">ప్రార్థన:</td><td></td></tr><tr class="header-row no-actions" data-section="treasures"><td colspan="3" style="background-color: rgb(70, 132, 153);"><div class="header-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/FFFFFF/468499?text=T" class="cell-icon"><span>దేవుని వాక్యంలో ఉన్న సంపద</span></div></td></tr><tr><td colspan="3"><span class="row-handle"><span class="row-handle-icon">⠿</span></span>1. ఆరోగ్యంగా ఉండండి, లైఫ్‌ని ఎంజాయ్‌ చేయండి. (10 నిమి.)</td></tr><tr><td colspan="3"><span class="row-handle"><span class="row-handle-icon">⠿</span></span>2. దేవుని వాక్యంలో రత్నాలు (10 నిమి.)</td></tr><tr><td colspan="3"><span class="row-handle"><span class="row-handle-icon">⠿</span></span>3. చదవాల్సిన బైబిలు భాగం: (4 నిమి.)</td></tr><tr class="header-row no-actions" data-section="ministry"><td colspan="3" style="background-color: rgb(212, 162, 42);"><div class="header-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/FFFFFF/d4a22a?text=M" class="cell-icon"><span>చక్కగా సువార్త ప్రకటించాలి</span></div></td></tr><tr><td><span class="row-handle"><span class="row-handle-icon">⠿</span></span>4. మళ్ళీ కలిసినప్పుడు (3 నిమి.)</td><td colspan="2"></td></tr><tr><td><span class="row-handle"><span class="row-handle-icon">⠿</span></span>5. మళ్ళీ కలిసినప్పుడు (4 నిమి.)</td><td colspan="2"></td></tr><tr><td><span class="row-handle"><span class="row-handle-icon">⠿</span></span>6. ప్రసంగం (5 నిమి.)</td><td colspan="2"></td></tr><tr class="header-row no-actions" data-section="living"><td colspan="3" style="background-color: rgb(192, 66, 53);"><div class="header-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/FFFFFF/c04235?text=L" class="cell-icon"><span>మన క్రైస్తవ జీవితం</span></div></td></tr><tr><td><div class="cell-content-wrapper"><span class="row-handle"><span class="row-handle-icon">⠿</span></span><img src="https://via.placeholder.com/40/8A2BE2/FFFFFF?text=♫" class="cell-icon"><span>పాట: 111</span></div></td><td colspan="2"></td></tr><tr><td><span class="row-handle"><span class="row-handle-icon">⠿</span></span>7. స్థానిక అవసరాలు (15 నిమి.)</td><td colspan="2"></td></tr><tr><td><span class="row-handle"><span class="row-handle-icon">⠿</span></span>8. సంఘ బైబిలు అధ్యయనం: (30 నిమి.)</td><td colspan="2"></td></tr><tr class="no-actions"><td><span class="row-handle"></span>ముగింపు మాటలు (3 నిమి.)</td><td style="text-align: right;">చైర్మన్</td><td></td></tr><tr class="no-actions"><td><div class="cell-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/8A2BE2/FFFFFF?text=♫" class="cell-icon"><span>పాట: 8</span></div></td><td style="text-align: right;">ముగింపు ప్రార్థన:</td><td></td></tr>`.trim();
 
     const appContainer = document.getElementById('app-container');
@@ -464,15 +463,26 @@
             }
         }
         
-        undo() { if (this.undoHistory.length <= 1) return; this.redoHistory.push(this.undoHistory.pop()); const prevState = this.undoHistory[this.undoHistory.length - 1]; this.tableBody.innerHTML = prevState; this.pushState(prevState); }
+        // --- CORRECTED UNDO/REDO LOGIC ---
+        undo() {
+            if (this.undoHistory.length <= 1) return;
+            const currentState = this.undoHistory.pop();
+            this.redoHistory.push(currentState);
+            const prevState = this.undoHistory[this.undoHistory.length - 1];
+            this.tableBody.innerHTML = prevState;
+            this.updateUndoRedoButtons();
+            this.debouncedSaveToFirestore();
+        }
+        
         redo() {
-    if (this.redoHistory.length === 0) return;
-    const nextState = this.redoHistory.pop();
-    this.undoHistory.push(nextState);
-    this.tableBody.innerHTML = nextState;
-    this.updateUndoRedoButtons();
-    this.debouncedSaveToFirestore();
-}
+            if (this.redoHistory.length === 0) return;
+            const nextState = this.redoHistory.pop();
+            this.undoHistory.push(nextState);
+            this.tableBody.innerHTML = nextState;
+            this.updateUndoRedoButtons();
+            this.debouncedSaveToFirestore();
+        }
+
         reset() { if (confirm('Are you sure you want to reset this template?')) { this.tableBody.innerHTML = DEFAULT_TABLE_HTML; this.pushState(this.tableBody.innerHTML); } }
         delete() { if (confirm('Are you sure you want to permanently delete this template?')) { templatesCollection.doc(this.id).delete(); } }
         destroy() { this.element.remove(); }
