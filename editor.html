@@ -25,36 +25,38 @@
 <style media="print">
     @page {
         size: A4 landscape;
-        /* This sets the physical, unprintable margins of the paper */
-        margin: 15mm 25mm; 
+        /* Set the PHYSICAL, unprintable hardware margins of the paper */
+        margin: 10mm; 
     }
+
     body {
         background-color: #fff !important;
         padding: 0;
         margin: 0;
     }
+
     /* Hide all non-essential elements */
     #app-header, .project-header, .row-handle, .status-indicator, .schedule-title {
         display: none !important;
     }
     
     /* --- THE DEFINITIVE FIX --- */
-    /* Constrain the main container to create visible left/right margins */
+
+    /* Make the master-container fill the entire printable area */
     .master-container {
-        width: 100%; /* Use full width of the printable area */
+        width: 100%;
         max-width: 100%;
-        box-shadow: none;
-        padding: 0;
-        margin: 0;
-        border: 2px solid #4B0082 !important; /* The main page border */
-        box-sizing: border-box;
         height: 100%;
-        display: flex;
-        flex-direction: column;
+        box-shadow: none;
+        border: none;
+        margin: 0;
+        /* Add PADDING to create the visual margin INSIDE the printable area */
+        padding: 0 20mm; /* This creates the 20mm left/right margin */
+        box-sizing: border-box; /* CRITICAL: Padding is included in the width/height */
     }
 
     .schedule-block {
-        width: 100%;
+        width: 100%; /* It will fill the new, narrower space */
         height: 100%; 
         display: flex; 
         flex-direction: column;
@@ -63,13 +65,15 @@
         margin: 0;
         padding: 0;
     }
+
     table {
         flex-grow: 1; 
-        border: none !important; /* Remove the table's outer border */
+        border: 2px solid #000 !important; /* Keep the table's own border */
         color: #000 !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
     }
+    
     th, td {
         border: 1px solid #000 !important;
     }
