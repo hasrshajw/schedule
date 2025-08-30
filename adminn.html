@@ -465,7 +465,14 @@
         }
         
         undo() { if (this.undoHistory.length <= 1) return; this.redoHistory.push(this.undoHistory.pop()); const prevState = this.undoHistory[this.undoHistory.length - 1]; this.tableBody.innerHTML = prevState; this.pushState(prevState); }
-        redo() { if (this.redoHistory.length === 0) return; const nextState = this.redoHistory.pop(); this.tableBody.innerHTML = nextState; this.pushState(nextState); }
+        redo() {
+    if (this.redoHistory.length === 0) return;
+    const nextState = this.redoHistory.pop();
+    this.undoHistory.push(nextState);
+    this.tableBody.innerHTML = nextState;
+    this.updateUndoRedoButtons();
+    this.debouncedSaveToFirestore();
+}
         reset() { if (confirm('Are you sure you want to reset this template?')) { this.tableBody.innerHTML = DEFAULT_TABLE_HTML; this.pushState(this.tableBody.innerHTML); } }
         delete() { if (confirm('Are you sure you want to permanently delete this template?')) { templatesCollection.doc(this.id).delete(); } }
         destroy() { this.element.remove(); }
