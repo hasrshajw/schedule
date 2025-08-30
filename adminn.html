@@ -155,20 +155,15 @@
     .delete-btn { margin-left: auto; }
     .delete-btn:hover:not(:disabled) { background-color: var(--danger-light); color: var(--danger-color); border-color: var(--danger-color); }
 
-    /* ========================================================= */
     /* === TABLE STYLES === */
-    /* ========================================================= */
     .schedule-block table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.25px; }
     .schedule-block th, .schedule-block td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; }
     .schedule-block [contenteditable="true"]:focus { background-color: #fffbe5; }
-    
     .schedule-block .row-handle { position: absolute; left: -30px; top: 0; width: 30px; height: 100%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #aaa; user-select: none; }
     .schedule-block .row-handle-icon { opacity: 0; transition: opacity 0.2s; font-size: 18px; }
     .schedule-block tr:hover .row-handle-icon { opacity: 1; }
-    
     .schedule-block td .row-handle, .schedule-block th .row-handle { display: none; }
     .schedule-block td:first-child .row-handle, .schedule-block th:first-child .row-handle { display: flex; }
-
     .schedule-block td.cell-selected, .schedule-block th.cell-selected { outline: 2px solid var(--primary-color) !important; outline-offset: -2px; background-color: var(--primary-light); }
     .schedule-block .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; }
     .schedule-block .cell-icon { height: 70%; max-height: 24px; object-fit: contain; flex-shrink: 0; }
@@ -194,9 +189,7 @@
     .add-button:hover { background-color: var(--primary-color); border-color: var(--primary-hover); color: white; }
     .add-button .material-symbols-outlined { font-size: 22px; }
 
-    /* ===================================================================== */
     /* === MOBILE RESPONSIVE STYLES === */
-    /* ===================================================================== */
     @media (max-width: 768px) {
         body {
             padding: 72px 0 0 0; 
@@ -237,7 +230,6 @@
         .schedule-title {
             font-size: 1.1rem;
         }
-
         /* Toolbar mobile styles */
         .toolbar {
             gap: 4px;
@@ -399,20 +391,27 @@
             schedulesWrapper.appendChild(this.element);
         }
 
+        // CORRECTED RENDER FUNCTION TO PRESERVE STYLES
         render(data) {
             this.isUpdatingFromRemote = true;
             if (document.activeElement !== this.titleEl) this.titleEl.textContent = data.name;
 
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = `<table><tbody>${data.content}</tbody></table>`;
-            tempDiv.querySelectorAll('td, th').forEach(cell => cell.setAttribute('contenteditable', 'true'));
-            const contentToRender = tempDiv.querySelector('tbody').innerHTML;
-
             if (!this.tableBody.contains(document.activeElement)) {
-                this.tableBody.innerHTML = contentToRender;
+                // Create a temporary tbody to parse the HTML string into DOM nodes
+                const tempBody = document.createElement('tbody');
+                tempBody.innerHTML = data.content;
+                
+                // Add contenteditable attribute to all cells within the temporary body
+                tempBody.querySelectorAll('td, th').forEach(cell => {
+                    cell.setAttribute('contenteditable', 'true');
+                });
+                
+                // Clear the actual table body and append the new, processed rows
+                this.tableBody.innerHTML = '';
+                this.tableBody.append(...tempBody.childNodes);
             }
 
-            this.pushState(data.content, false);
+            this.pushState(this.tableBody.innerHTML, false);
             this.updateStatus('Synced', 'synced');
             this.isUpdatingFromRemote = false;
         }
@@ -485,6 +484,7 @@
             }
         }
         
+        // CORRECTED UNDO FUNCTION
         undo() {
             if (this.undoHistory.length <= 1) return;
             const currentState = this.undoHistory.pop();
@@ -495,6 +495,7 @@
             this.debouncedSaveToFirestore();
         }
 
+        // CORRECTED REDO FUNCTION
         redo() {
             if (this.redoHistory.length === 0) return;
             const nextState = this.redoHistory.pop();
