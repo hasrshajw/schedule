@@ -50,7 +50,7 @@
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         background-color: var(--background-color);
         margin: 0;
-        padding: 88px 20px 20px 20px;
+        padding: 88px 20px 20px 20px; /* Add padding for fixed header */
         color: var(--text-primary);
     }
     .hidden { display: none !important; }
@@ -108,6 +108,7 @@
         border-radius: var(--radius-lg);
         box-shadow: var(--shadow-md);
         margin-bottom: 32px;
+        overflow-x: auto; /* Allow horizontal scrolling for table */
     }
     
     .schedule-header { display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 20px; }
@@ -118,7 +119,7 @@
         flex-grow: 1;
         border: none;
         padding: 4px 8px;
-        margin: -4px -8px;
+        margin: -4px -8px; /* Offset padding */
         border-radius: var(--radius-md);
         font-family: 'Noto Sans Telugu', sans-serif;
         color: var(--text-primary);
@@ -135,7 +136,13 @@
         gap: 6px;
         transition: all 0.3s var(--ease);
     }
-    .status-indicator::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background-color: currentColor; }
+    .status-indicator::before {
+        content: '';
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: currentColor;
+    }
     .status-indicator[data-status="synced"] { color: var(--success-color); background-color: #eaf5ea; }
     .status-indicator[data-status="syncing"] { color: var(--warning-color); background-color: #fffbeb; }
     .status-indicator[data-status="error"] { color: var(--danger-color); background-color: var(--danger-light); }
@@ -149,16 +156,14 @@
     .delete-btn { margin-left: auto; }
     .delete-btn:hover:not(:disabled) { background-color: var(--danger-light); color: var(--danger-color); border-color: var(--danger-color); }
 
-    /* Table Wrapper for scrolling on mobile */
-    .table-wrapper {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-    }
-
+    /* ========================================================= */
     /* === TABLE STYLES === */
-    .schedule-block table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.25px; }
+    /* ========================================================= */
+    .schedule-block table { width: 100%; min-width: 600px; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.25px; }
     .schedule-block th, .schedule-block td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; }
     .schedule-block [contenteditable="true"]:focus { background-color: #fffbe5; }
+    
+    /* Row Handle positioning and visibility */
     .schedule-block .row-handle { position: absolute; left: -30px; top: 0; width: 30px; height: 100%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #aaa; user-select: none; }
     .schedule-block .row-handle-icon { opacity: 0; transition: opacity 0.2s; font-size: 18px; }
     .schedule-block tr:hover .row-handle-icon { opacity: 1; }
@@ -167,6 +172,7 @@
     .schedule-block td .row-handle, .schedule-block th .row-handle { display: none; }
     /* Only show the handle in the very first cell of a row */
     .schedule-block td:first-child .row-handle, .schedule-block th:first-child .row-handle { display: flex; }
+
 
     .schedule-block td.cell-selected, .schedule-block th.cell-selected { outline: 2px solid var(--primary-color) !important; outline-offset: -2px; background-color: var(--primary-light); }
     .schedule-block .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; }
@@ -213,13 +219,17 @@
         #user-info span:not(#user-email) {
             display: none;
         }
+        #logout-button {
+            padding: 6px 12px;
+            font-size: 13px;
+        }
 
         .master-container {
             max-width: 100%;
             margin: 0;
         }
         .page-title {
-            font-size: 1.25rem; /* Decreased */
+            font-size: 1.25rem;
             padding: 16px 16px 0 16px;
             margin-bottom: 16px;
         }
@@ -231,21 +241,21 @@
             border-bottom: 8px solid var(--background-color); 
         }
         .schedule-title {
-            font-size: 1.1rem; /* Decreased */
+            font-size: 1.1rem;
         }
         
-        /* Toolbar adjustments for mobile */
+        /* Toolbar Mobile Styles */
+        .toolbar {
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            justify-content: flex-start; /* Line up icons from the left */
+        }
         .toolbar-btn {
-            padding: 0;
-            width: 36px;
-            height: 36px;
-            justify-content: center;
+            padding: 8px; /* Make buttons more square */
+            gap: 0;
         }
-        .toolbar-btn > span:not(.material-symbols-outlined) { /* Hide text */
-            display: none;
-        }
-        .delete-btn {
-            margin-left: auto;
+        .toolbar-btn span {
+            display: none; /* Hide text inside buttons */
         }
 
         #add-schedule-footer {
@@ -253,7 +263,7 @@
         }
         .add-button {
             padding: 12px;
-            font-size: 14px; /* Decreased */
+            font-size: 14px;
         }
     }
 </style>
@@ -296,12 +306,10 @@
             <button class="toolbar-btn reset-btn"><span class="material-symbols-outlined">restart_alt</span><span>Reset</span></button>
             <button class="toolbar-btn delete-btn"><span class="material-symbols-outlined">delete</span><span>Delete Template</span></button>
         </div>
-        <div class="table-wrapper">
-            <table>
-                <colgroup><col style="width: 60%;"><col style="width: 20%;"><col style="width: 20%;"></colgroup>
-                <tbody class="schedule-table-body"></tbody>
-            </table>
-        </div>
+        <table>
+            <colgroup><col style="width: 60%;"><col style="width: 20%;"><col style="width: 20%;"></colgroup>
+            <tbody class="schedule-table-body"></tbody>
+        </table>
     </div>
 </template>
 
@@ -379,8 +387,7 @@
             if (document.activeElement !== this.titleEl) this.titleEl.textContent = data.name;
 
             const tempDiv = document.createElement('div');
-            // Wrap in table-wrapper for consistent structure
-            tempDiv.innerHTML = `<div class="table-wrapper"><table><tbody>${data.content}</tbody></table></div>`;
+            tempDiv.innerHTML = `<table><tbody>${data.content}</tbody></table>`;
             tempDiv.querySelectorAll('td, th').forEach(cell => cell.setAttribute('contenteditable', 'true'));
             const contentToRender = tempDiv.querySelector('tbody').innerHTML;
 
