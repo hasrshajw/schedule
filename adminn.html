@@ -50,7 +50,7 @@
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         background-color: var(--background-color);
         margin: 0;
-        padding: 88px 20px 20px 20px; /* Add padding for fixed header */
+        padding: 88px 20px 20px 20px;
         color: var(--text-primary);
     }
     .hidden { display: none !important; }
@@ -148,12 +148,19 @@
     
     /* Toolbar */
     .toolbar { display: flex; align-items: center; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); flex-wrap: wrap; gap: 8px;}
-    .toolbar-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); transition: all 0.2s var(--ease); }
+    .toolbar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); transition: all 0.2s var(--ease); }
     .toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; border-color: #d1d5db; color: var(--text-primary); }
     .toolbar-btn:disabled { cursor: not-allowed; opacity: 0.5; }
     .toolbar-btn .material-symbols-outlined { font-size: 20px; }
+    .toolbar .undo-btn, .toolbar .redo-btn {
+        padding: 8px;
+    }
     .delete-btn { margin-left: auto; }
     .delete-btn:hover:not(:disabled) { background-color: var(--danger-light); color: var(--danger-color); border-color: var(--danger-color); }
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
 
     /* ========================================================= */
     /* === TABLE STYLES === */
@@ -162,16 +169,12 @@
     .schedule-block th, .schedule-block td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; }
     .schedule-block [contenteditable="true"]:focus { background-color: #fffbe5; }
     
-    /* Row Handle positioning and visibility */
     .schedule-block .row-handle { position: absolute; left: -30px; top: 0; width: 30px; height: 100%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #aaa; user-select: none; }
     .schedule-block .row-handle-icon { opacity: 0; transition: opacity 0.2s; font-size: 18px; }
     .schedule-block tr:hover .row-handle-icon { opacity: 1; }
     
-    /* CORRECTED: Hide all handles by default */
     .schedule-block td .row-handle, .schedule-block th .row-handle { display: none; }
-    /* CORRECTED: Only show the handle in the very first cell of a row */
     .schedule-block td:first-child .row-handle, .schedule-block th:first-child .row-handle { display: flex; }
-
 
     .schedule-block td.cell-selected, .schedule-block th.cell-selected { outline: 2px solid var(--primary-color) !important; outline-offset: -2px; background-color: var(--primary-light); }
     .schedule-block .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; }
@@ -224,7 +227,7 @@
             margin: 0;
         }
         .page-title {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             padding: 16px 16px 0 16px;
             margin-bottom: 16px;
         }
@@ -236,38 +239,28 @@
             border-bottom: 8px solid var(--background-color); 
         }
         .schedule-title {
-            font-size: 1.25rem;
+            font-size: 1.1rem;
         }
         .toolbar {
             margin-bottom: 16px;
             padding-bottom: 16px;
+            flex-wrap: nowrap;
+            overflow-x: auto;
         }
+        .toolbar-btn {
+            font-size: 12px;
+            padding: 6px 10px;
+        }
+        .toolbar .undo-btn, .toolbar .redo-btn {
+            padding: 6px;
+        }
+
         #add-schedule-footer {
             padding: 16px;
         }
         .add-button {
-            padding: 14px;
-            font-size: 15px;
-        }
-
-        /* --- UPDATED: Mobile table adjustments as per your request --- */
-        .schedule-block table { 
-            font-size: 6.5px;
-        }
-        .schedule-block th, .schedule-block td { 
-            padding: 0 1.5px;
-            height: 24px;
-        }
-        .schedule-block .header-row td { 
-            height: 26px;
-            font-size: 8px;
-        }
-        .schedule-block .cell-icon { 
-            max-height: 14px;
-        }
-        .schedule-block .row-handle { 
-            left: -20px; 
-            width: 20px; 
+            padding: 12px;
+            font-size: 14px;
         }
     }
 </style>
@@ -305,15 +298,17 @@
             <div class="status-indicator"></div>
         </div>
         <div class="toolbar">
-            <button class="toolbar-btn undo-btn" disabled><span class="material-symbols-outlined">undo</span> Undo</button>
-            <button class="toolbar-btn redo-btn" disabled><span class="material-symbols-outlined">redo</span> Redo</button>
+            <button class="toolbar-btn undo-btn" disabled title="Undo"><span class="material-symbols-outlined">undo</span></button>
+            <button class="toolbar-btn redo-btn" disabled title="Redo"><span class="material-symbols-outlined">redo</span></button>
             <button class="toolbar-btn reset-btn"><span class="material-symbols-outlined">restart_alt</span> Reset</button>
-            <button class="toolbar-btn delete-btn"><span class="material-symbols-outlined">delete</span> Delete Template</button>
+            <button class="toolbar-btn delete-btn"><span class="material-symbols-outlined">delete</span> Delete</button>
         </div>
-        <table>
-            <colgroup><col style="width: 60%;"><col style="width: 20%;"><col style="width: 20%;"></colgroup>
-            <tbody class="schedule-table-body"></tbody>
-        </table>
+        <div class="table-wrapper">
+            <table>
+                <colgroup><col style="width: 60%;"><col style="width: 20%;"><col style="width: 20%;"></colgroup>
+                <tbody class="schedule-table-body"></tbody>
+            </table>
+        </div>
     </div>
 </template>
 
@@ -341,7 +336,7 @@
     let currentUser = null;
     let isAdmin = false;
 
-    const DEFAULT_TABLE_HTML = `<tr class="no-actions"><th style="background-color: rgb(240, 248, 255);"><span class="row-handle"></span>బైబిలు అధ్యాయం, ప్రసంగి 11-12</th><th style="background-color: rgb(240, 248, 255);">తేదీ:</th><th style="background-color: rgb(240, 248, 255);"></th></tr><tr class="no-actions"><td><div class="cell-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/8A2BE2/FFFFFF?text=♫" class="cell-icon"><span>పాట: 155</span></div></td><td style="text-align: right;">చైర్మన్</td><td></td></tr><tr class="no-actions"><td><span class="row-handle"></span>ఆరంభ మాటలు (1 నిమి.)</td><td style="text-align: right;">ప్రార్థన:</td><td></td></tr><tr class="header-row no-actions" data-section="treasures"><td colspan="3"><div class="header-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/FFFFFF/468499?text=T" class="cell-icon"><span>దేవుని వాక్యంలో ఉన్న సంపద</span></div></td></tr><tr><td colspan="3"><span class="row-handle"><span class="row-handle-icon">⠿</span></span>1. ఆరోగ్యంగా ఉండండి, లైఫ్‌ని ఎంజాయ్‌ చేయండి. (10 నిమి.)</td></tr><tr><td colspan="3"><span class="row-handle"><span class="row-handle-icon">⠿</span></span>2. దేవుని వాక్యంలో రత్నాలు (10 నిమి.)</td></tr><tr><td colspan="3"><span class="row-handle"><span class="row-handle-icon">⠿</span></span>3. చదవాల్సిన బైబిలు భాగం: (4 నిమి.)</td></tr><tr class="header-row no-actions" data-section="ministry"><td colspan="3"><div class="header-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/FFFFFF/d4a22a?text=M" class="cell-icon"><span>చక్కగా సువార్త ప్రకటించాలి</span></div></td></tr><tr><td><span class="row-handle"><span class="row-handle-icon">⠿</span></span>4. మళ్ళీ కలిసినప్పుడు (3 నిమి.)</td><td colspan="2"></td></tr><tr><td><span class="row-handle"><span class="row-handle-icon">⠿</span></span>5. మళ్ళీ కలిసినప్పుడు (4 నిమి.)</td><td colspan="2"></td></tr><tr><td><span class="row-handle"><span class="row-handle-icon">⠿</span></span>6. ప్రసంగం (5 నిమి.)</td><td colspan="2"></td></tr><tr class="header-row no-actions" data-section="living"><td colspan="3"><div class="header-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/FFFFFF/c04235?text=L" class="cell-icon"><span>మన క్రైస్తవ జీవితం</span></div></td></tr><tr><td><div class="cell-content-wrapper"><span class="row-handle"><span class="row-handle-icon">⠿</span></span><img src="https://via.placeholder.com/40/8A2BE2/FFFFFF?text=♫" class="cell-icon"><span>పాట: 111</span></div></td><td colspan="2"></td></tr><tr><td><span class="row-handle"><span class="row-handle-icon">⠿</span></span>7. స్థానిక అవసరాలు (15 నిమి.)</td><td colspan="2"></td></tr><tr><td><span class="row-handle"><span class="row-handle-icon">⠿</span></span>8. సంఘ బైబిలు అధ్యయనం: (30 నిమి.)</td><td colspan="2"></td></tr><tr class="no-actions"><td><span class="row-handle"></span>ముగింపు మాటలు (3 నిమి.)</td><td style="text-align: right;">చైర్మన్</td><td></td></tr><tr class="no-actions"><td><div class="cell-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/8A2BE2/FFFFFF?text=♫" class="cell-icon"><span>పాట: 8</span></div></td><td style="text-align: right;">ముగింపు ప్రార్థన:</td><td></td></tr>`.trim();
+    const DEFAULT_TABLE_HTML = `<tr class="no-actions"><th style="background-color: rgb(240, 248, 255);"><span class="row-handle"></span>బైబిలు అధ్యాయం, ప్రసంగి 11-12</th><th style="background-color: rgb(240, 248, 255);">తేదీ:</th><th style="background-color: rgb(240, 248, 255);"></th></tr><tr class="no-actions"><td><div class="cell-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/8A2BE2/FFFFFF?text=♫" class="cell-icon"><span>పాట: 155</span></div></td><td style="text-align: right;">చైర్మన్</td><td></td></tr><tr class="no-actions"><td><span class="row-handle"></span>ఆరంభ మాటలు (1 నిమి.)</td><td style="text-align: right;">ప్రార్థన:</td><td></td></tr><tr class="header-row no-actions" data-section="treasures"><td colspan="3" style="background-color: rgb(70, 132, 153);"><div class="header-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/FFFFFF/468499?text=T" class="cell-icon"><span>దేవుని వాక్యంలో ఉన్న సంపద</span></div></td></tr><tr><td colspan="3"><span class="row-handle"><span class="row-handle-icon">⠿</span></span>1. ఆరోగ్యంగా ఉండండి, లైఫ్‌ని ఎంజాయ్‌ చేయండి. (10 నిమి.)</td></tr><tr><td colspan="3"><span class="row-handle"><span class="row-handle-icon">⠿</span></span>2. దేవుని వాక్యంలో రత్నాలు (10 నిమి.)</td></tr><tr><td colspan="3"><span class="row-handle"><span class="row-handle-icon">⠿</span></span>3. చదవాల్సిన బైబిలు భాగం: (4 నిమి.)</td></tr><tr class="header-row no-actions" data-section="ministry"><td colspan="3" style="background-color: rgb(212, 162, 42);"><div class="header-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/FFFFFF/d4a22a?text=M" class="cell-icon"><span>చక్కగా సువార్త ప్రకటించాలి</span></div></td></tr><tr><td><span class="row-handle"><span class="row-handle-icon">⠿</span></span>4. మళ్ళీ కలిసినప్పుడు (3 నిమి.)</td><td colspan="2"></td></tr><tr><td><span class="row-handle"><span class="row-handle-icon">⠿</span></span>5. మళ్ళీ కలిసినప్పుడు (4 నిమి.)</td><td colspan="2"></td></tr><tr><td><span class="row-handle"><span class="row-handle-icon">⠿</span></span>6. ప్రసంగం (5 నిమి.)</td><td colspan="2"></td></tr><tr class="header-row no-actions" data-section="living"><td colspan="3" style="background-color: rgb(192, 66, 53);"><div class="header-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/FFFFFF/c04235?text=L" class="cell-icon"><span>మన క్రైస్తవ జీవితం</span></div></td></tr><tr><td><div class="cell-content-wrapper"><span class="row-handle"><span class="row-handle-icon">⠿</span></span><img src="https://via.placeholder.com/40/8A2BE2/FFFFFF?text=♫" class="cell-icon"><span>పాట: 111</span></div></td><td colspan="2"></td></tr><tr><td><span class="row-handle"><span class="row-handle-icon">⠿</span></span>7. స్థానిక అవసరాలు (15 నిమి.)</td><td colspan="2"></td></tr><tr><td><span class="row-handle"><span class="row-handle-icon">⠿</span></span>8. సంఘ బైబిలు అధ్యయనం: (30 నిమి.)</td><td colspan="2"></td></tr><tr class="no-actions"><td><span class="row-handle"></span>ముగింపు మాటలు (3 నిమి.)</td><td style="text-align: right;">చైర్మన్</td><td></td></tr><tr class="no-actions"><td><div class="cell-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/8A2BE2/FFFFFF?text=♫" class="cell-icon"><span>పాట: 8</span></div></td><td style="text-align: right;">ముగింపు ప్రార్థన:</td><td></td></tr>`.trim();
 
     const appContainer = document.getElementById('app-container');
     const userEmailEl = document.getElementById('user-email');
