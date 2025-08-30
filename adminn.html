@@ -50,7 +50,7 @@
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         background-color: var(--background-color);
         margin: 0;
-        padding: 88px 20px 20px 20px;
+        padding: 88px 20px 20px 20px; /* Add padding for fixed header */
         color: var(--text-primary);
     }
     .hidden { display: none !important; }
@@ -148,18 +148,17 @@
     
     /* Toolbar */
     .toolbar { display: flex; align-items: center; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); flex-wrap: wrap; gap: 8px;}
-    .toolbar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); transition: all 0.2s var(--ease); }
+    .toolbar-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); transition: all 0.2s var(--ease); }
     .toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; border-color: #d1d5db; color: var(--text-primary); }
     .toolbar-btn:disabled { cursor: not-allowed; opacity: 0.5; }
     .toolbar-btn .material-symbols-outlined { font-size: 20px; }
-    .toolbar .undo-btn, .toolbar .redo-btn {
-        padding: 8px;
-    }
     .delete-btn { margin-left: auto; }
     .delete-btn:hover:not(:disabled) { background-color: var(--danger-light); color: var(--danger-color); border-color: var(--danger-color); }
 
-    .table-wrapper {
+    /* NEW: Table container for horizontal scrolling on mobile */
+    .table-container {
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     /* ========================================================= */
@@ -169,12 +168,16 @@
     .schedule-block th, .schedule-block td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; }
     .schedule-block [contenteditable="true"]:focus { background-color: #fffbe5; }
     
+    /* Row Handle positioning and visibility */
     .schedule-block .row-handle { position: absolute; left: -30px; top: 0; width: 30px; height: 100%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #aaa; user-select: none; }
     .schedule-block .row-handle-icon { opacity: 0; transition: opacity 0.2s; font-size: 18px; }
     .schedule-block tr:hover .row-handle-icon { opacity: 1; }
     
+    /* CORRECTED: Hide all handles by default */
     .schedule-block td .row-handle, .schedule-block th .row-handle { display: none; }
+    /* CORRECTED: Only show the handle in the very first cell of a row */
     .schedule-block td:first-child .row-handle, .schedule-block th:first-child .row-handle { display: flex; }
+
 
     .schedule-block td.cell-selected, .schedule-block th.cell-selected { outline: 2px solid var(--primary-color) !important; outline-offset: -2px; background-color: var(--primary-light); }
     .schedule-block .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; }
@@ -227,7 +230,7 @@
             margin: 0;
         }
         .page-title {
-            font-size: 1.25rem;
+            font-size: 1.25rem; /* CHANGED */
             padding: 16px 16px 0 16px;
             margin-bottom: 16px;
         }
@@ -239,29 +242,35 @@
             border-bottom: 8px solid var(--background-color); 
         }
         .schedule-title {
-            font-size: 1.1rem;
+            font-size: 1.1rem; /* CHANGED */
         }
+        
+        /* UPDATED: Mobile Toolbar Styles */
         .toolbar {
-            margin-bottom: 16px;
-            padding-bottom: 16px;
             flex-wrap: nowrap;
-            overflow-x: auto;
+            justify-content: space-between;
+            gap: 4px;
         }
         .toolbar-btn {
-            font-size: 12px;
-            padding: 6px 10px;
+            padding: 8px; /* Make buttons smaller */
+            gap: 0;
         }
-        .toolbar .undo-btn, .toolbar .redo-btn {
-            padding: 6px;
+        .toolbar-btn .btn-text {
+            display: none; /* Hide text label */
+        }
+        .delete-btn {
+            margin-left: 0; /* Remove auto margin */
         }
 
         #add-schedule-footer {
             padding: 16px;
         }
         .add-button {
-            padding: 12px;
-            font-size: 14px;
+            padding: 12px; /* CHANGED */
+            font-size: 14px; /* CHANGED */
         }
+
+        /* REMOVED: All mobile table adjustments are gone to keep original size */
     }
 </style>
 </head>
@@ -298,12 +307,12 @@
             <div class="status-indicator"></div>
         </div>
         <div class="toolbar">
-            <button class="toolbar-btn undo-btn" disabled title="Undo"><span class="material-symbols-outlined">undo</span></button>
-            <button class="toolbar-btn redo-btn" disabled title="Redo"><span class="material-symbols-outlined">redo</span></button>
-            <button class="toolbar-btn reset-btn"><span class="material-symbols-outlined">restart_alt</span> Reset</button>
-            <button class="toolbar-btn delete-btn"><span class="material-symbols-outlined">delete</span> Delete</button>
+            <button class="toolbar-btn undo-btn" disabled><span class="material-symbols-outlined">undo</span><span class="btn-text">Undo</span></button>
+            <button class="toolbar-btn redo-btn" disabled><span class="material-symbols-outlined">redo</span><span class="btn-text">Redo</span></button>
+            <button class="toolbar-btn reset-btn"><span class="material-symbols-outlined">restart_alt</span><span class="btn-text">Reset</span></button>
+            <button class="toolbar-btn delete-btn"><span class="material-symbols-outlined">delete</span><span class="btn-text">Delete Template</span></button>
         </div>
-        <div class="table-wrapper">
+        <div class="table-container">
             <table>
                 <colgroup><col style="width: 60%;"><col style="width: 20%;"><col style="width: 20%;"></colgroup>
                 <tbody class="schedule-table-body"></tbody>
