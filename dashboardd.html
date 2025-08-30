@@ -25,8 +25,6 @@
         --danger-color: #d32f2f;
         --danger-hover: #b71c1c;
         --danger-light: #fde8e8;
-        --warning-color: #f59e0b;
-        --success-color: #2e7d32;
         --border-color: #e5e7eb;
         --background-color: #f8fafc;
         --text-primary: #1f2937;
@@ -34,19 +32,13 @@
         --surface-color: #ffffff;
         --radius-md: 8px;
         --radius-lg: 16px;
-        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
         --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
         --ease: cubic-bezier(0.4, 0, 0.2, 1);
     }
-    *, *::before, *::after {
-        box-sizing: border-box;
-    }
-    html {
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
     body {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        font-family: 'Inter', sans-serif;
         background-color: var(--background-color);
         margin: 0;
         padding: 88px 20px 20px 20px;
@@ -67,7 +59,7 @@
         padding: 12px 20px;
     }
     .header-content {
-        max-width: 1100px;
+        max-width: 1000px;
         margin: 0 auto;
         display: flex;
         align-items: center;
@@ -88,157 +80,148 @@
         transition: all 0.2s var(--ease);
     }
     #logout-button:hover { background-color: var(--danger-light); color: var(--danger-hover); border-color: var(--danger-hover); }
-
+    
     /* Main Layout */
     .master-container {
-        max-width: 1100px;
+        max-width: 1000px;
         margin: 0 auto;
-        background: var(--surface-color);
-        padding: 24px;
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-md);
     }
     .page-title {
-        font-size: 1.75rem;
+        font-size: 2rem;
         font-weight: 700;
         margin: 0 0 24px 0;
-        padding-bottom: 16px;
-        border-bottom: 1px solid var(--border-color);
-        font-family: 'Noto Sans Telugu', sans-serif;
     }
     
-    /* Schedule List Styles */
+    /* Schedule List */
     #schedule-list {
         list-style: none;
         padding: 0;
         margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
     }
-    #schedule-list li {
+    .schedule-item-card {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 16px 8px;
-        border-bottom: 1px solid var(--border-color);
-        transition: background-color 0.2s var(--ease);
+        padding: 20px 24px;
+        background-color: var(--surface-color);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        transition: all 0.2s var(--ease);
     }
-    #schedule-list li:last-child {
-        border-bottom: none;
+    .schedule-item-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
     }
-    #schedule-list li:hover {
-        background-color: #f9fafb;
-    }
+
     .schedule-name {
         font-family: 'Noto Sans Telugu', sans-serif;
-        font-weight: 500;
-        font-size: 1.1rem;
-        color: var(--text-primary);
+        font-weight: 700;
+        font-size: 1.125rem;
     }
     .schedule-actions {
         display: flex;
-        gap: 12px;
+        align-items: center;
+        gap: 8px;
     }
-    .schedule-actions a, .schedule-actions button {
-        text-decoration: none;
-        padding: 8px 16px;
-        border-radius: var(--radius-md);
-        color: white;
-        border: none;
-        font-size: 14px;
-        font-weight: 600;
-        font-family: 'Inter', sans-serif;
-        cursor: pointer;
-        transition: background-color 0.2s var(--ease);
+
+    /* Buttons */
+    .btn {
         display: inline-flex;
         align-items: center;
+        justify-content: center;
         gap: 6px;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        border-radius: var(--radius-md);
+        transition: all 0.2s var(--ease);
     }
-    .edit-btn { background-color: var(--primary-color); }
-    .edit-btn:hover { background-color: var(--primary-hover); }
-    .delete-btn { background-color: var(--danger-color); }
-    .delete-btn:hover { background-color: var(--danger-hover); }
-    
+    .btn-primary {
+        background-color: var(--primary-color);
+        color: white;
+    }
+    .btn-primary:hover {
+        background-color: var(--primary-hover);
+    }
+    .btn-sm {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+    .btn-icon {
+        background-color: transparent;
+        color: var(--text-secondary);
+        padding: 8px;
+        border-radius: 50%;
+    }
+    .btn-icon:hover {
+        background-color: var(--danger-light);
+        color: var(--danger-color);
+    }
+
+    /* Empty State */
     #empty-state {
         text-align: center;
-        padding: 40px;
+        padding: 60px 20px;
         color: var(--text-secondary);
-        border-bottom: none !important;
-    }
-    #empty-state:hover {
-        background-color: transparent !important;
+        background-color: var(--surface-color);
+        border-radius: var(--radius-lg);
+        border: 2px dashed var(--border-color);
     }
 
     /* Add Button Footer */
-    #add-schedule-footer { max-width: 1100px; margin: 24px auto 0 auto; }
+    #add-schedule-footer { max-width: 1000px; margin: 32px auto; }
     .add-button {
         width: 100%;
         padding: 16px;
         font-size: 16px;
         font-weight: 600;
-        color: white;
-        background-color: var(--primary-color);
-        border: none;
-        border-radius: var(--radius-md);
+        color: var(--primary-color);
+        background-color: var(--primary-light);
+        border: 2px dashed #b3e0e0;
+        border-radius: var(--radius-lg);
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 8px;
-        transition: background-color 0.2s var(--ease);
+        transition: all 0.2s var(--ease);
     }
     .add-button:hover {
-        background-color: var(--primary-hover);
+        background-color: var(--primary-color);
+        border-color: var(--primary-hover);
+        color: white;
     }
     .add-button .material-symbols-outlined { font-size: 22px; }
 
-    /* Mobile Responsive Styles */
+    /* === MOBILE RESPONSIVE STYLES === */
     @media (max-width: 768px) {
         body {
-            padding: 72px 0 0 0;
-            background-color: var(--surface-color);
+            padding: 72px 0 0 0; 
+            background-color: var(--surface-color); 
         }
-        #app-header {
-            padding: 12px 16px;
-        }
-        #user-info #user-email {
-            max-width: 120px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        #user-info span:not(#user-email) {
-            display: none;
-        }
-
-        .master-container {
-            max-width: 100%;
-            margin: 0;
-            padding: 0 16px;
+        #app-header { padding: 12px 16px; }
+        #logout-button { padding: 6px 10px; font-size: 13px; }
+        #user-info #user-email { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        #user-info span:not(#user-email) { display: none; }
+        
+        .master-container { padding: 0 16px; }
+        .page-title { font-size: 1.5rem; margin: 16px 0; }
+        
+        #schedule-list { gap: 0; }
+        .schedule-item-card {
             border-radius: 0;
             box-shadow: none;
-        }
-        .page-title {
-            font-size: 1.5rem;
-            padding: 16px 0;
-            margin-bottom: 0;
-        }
-        
-        #schedule-list li {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 12px;
-            padding: 16px 0;
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
         }
         .schedule-name { font-size: 1rem; }
-        .schedule-actions { width: 100%; }
-        .schedule-actions a, .schedule-actions button {
-            flex-grow: 1;
-            justify-content: center;
-        }
+        .btn-sm { padding: 6px 12px; font-size: 13px; }
 
-        #add-schedule-footer {
-            padding: 16px;
-            background-color: var(--background-color);
-        }
+        #add-schedule-footer { padding: 16px; margin: 16px auto; }
         .add-button { padding: 14px; font-size: 15px; }
     }
 </style>
@@ -257,7 +240,7 @@
     </header>
 
     <div class="master-container">
-        <h1 class="page-title">Your Schedules</h1>
+        <h2 class="page-title">Your Schedules</h2>
         <ul id="schedule-list">
             <li id="empty-state" class="hidden">You haven't created any schedules yet.</li>
         </ul>
@@ -318,11 +301,10 @@
 
         if (currentListener) currentListener();
         currentListener = userSchedulesCollection.orderBy("createdAt").onSnapshot(snapshot => {
-            scheduleListEl.innerHTML = '';
-            
+            scheduleListEl.innerHTML = ''; 
             if (snapshot.empty) {
-                scheduleListEl.appendChild(emptyStateEl);
                 emptyStateEl.classList.remove('hidden');
+                scheduleListEl.appendChild(emptyStateEl);
                 return;
             }
             
@@ -333,13 +315,16 @@
                 const scheduleId = doc.id;
                 
                 const li = document.createElement('li');
+                li.className = 'schedule-item-card';
                 li.dataset.id = scheduleId;
 
                 li.innerHTML = `
                     <span class="schedule-name">${schedule.name}</span>
                     <div class="schedule-actions">
-                        <a href="./editor.html?id=${scheduleId}" class="edit-btn">View / Edit</a>
-                        <button class="delete-btn" data-id="${scheduleId}">Delete</button>
+                        <a href="./editor.html?id=${scheduleId}" class="btn btn-primary btn-sm">View / Edit</a>
+                        <button class="btn btn-icon delete-btn" data-id="${scheduleId}" title="Delete Schedule">
+                            <span class="material-symbols-outlined">delete</span>
+                        </button>
                     </div>
                 `;
                 scheduleListEl.appendChild(li);
@@ -358,8 +343,9 @@
         });
 
         scheduleListEl.addEventListener('click', (e) => {
-            if (e.target.classList.contains('delete-btn')) {
-                const scheduleId = e.target.dataset.id;
+            const deleteButton = e.target.closest('.delete-btn');
+            if (deleteButton) {
+                const scheduleId = deleteButton.dataset.id;
                 if (confirm('Are you sure you want to permanently delete this schedule?')) {
                     const userSchedulesCollection = db.collection(`userSchedules/${currentUser.uid}/schedules`);
                     userSchedulesCollection.doc(scheduleId).delete().catch(error => {
@@ -370,7 +356,7 @@
             }
         });
     }
-    
+
     setupGlobalUI();
 
 })();
