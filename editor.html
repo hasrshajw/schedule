@@ -25,27 +25,18 @@
 <style media="print">
     @page {
         size: A4 landscape;
-        margin-top: 15mm;
-        margin-bottom: 15mm;
-        margin-left: 30mm;
-        margin-right: 30mm;
+        /* --- FIX: Remove browser margins entirely to take full control --- */
+        margin: 0;
     }
     body {
         background-color: #fff !important;
         padding: 0;
         margin: 0;
     }
-    /* --- FIX: The definitive way to create a full-page border --- */
-    body.print-view::before {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        border: 2px solid #4B0082;
-        /* z-index ensures it's behind content if needed, though unlikely */
-        z-index: -1; 
+    /* --- FIX: Create our own margins using padding on the body --- */
+    body.print-view {
+        padding: 15mm 30mm; /* 15mm top/bottom, 30mm left/right */
+        box-sizing: border-box; /* CRITICAL: Ensures padding is inside the page dimensions */
     }
     
     #app-header, .project-header, .row-handle, .status-indicator, .schedule-title {
@@ -55,12 +46,14 @@
     .master-container {
         max-width: 100%;
         box-shadow: none;
-        /* --- FIX: Add padding back to create space between border and table --- */
-        padding: 10px;
+        /* --- FIX: Add a border to the container, which sits inside the body's padding --- */
+        border: 2px solid #4B0082 !important;
+        padding: 15px; /* Inner padding between border and table */
         margin: 0;
-        border: none;
         height: 100%;
-        box-sizing: border-box; /* Ensure padding is included in the height */
+        box-sizing: border-box;
+        display: flex; /* Helps inner elements fill the height */
+        flex-direction: column;
     }
     .schedule-block {
         width: 100%;
@@ -74,7 +67,7 @@
     }
     table {
         flex-grow: 1; 
-        border: 2px solid #000 !important; /* Keep the table's own border for clarity */
+        border: none !important; /* The container now has the border */
         color: #000 !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
