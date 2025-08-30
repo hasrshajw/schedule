@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>User Dashboard - Schedule Editor</title>
+
+<!-- FIREBASE SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+<!-- FONTS -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+
+<style>
+    :root {
+        --primary-color: #012726;
+        --primary-hover: #024443;
+        --primary-light: #e6f6f6;
+        --danger-color: #d32f2f;
+        --danger-hover: #b71c1c;
+        --danger-light: #fde8e8;
+        --border-color: #e5e7eb;
+        --background-color: #f8fafc;
+        --text-primary: #1f2937;
+        --text-secondary: #6b7280;
+        --surface-color: #ffffff;
+        --radius-md: 8px;
+        --radius-lg: 16px;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --ease: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+    html {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background-color: var(--background-color);
+        margin: 0;
+        padding: 88px 20px 20px 20px;
+        color: var(--text-primary);
+    }
+    .hidden { display: none !important; }
+
+    /* App Header */
+    #app-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        background-color: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(8px);
+        border-bottom: 1px solid var(--border-color);
+        padding: 12px 20px;
+    }
+    .header-content {
+        max-width: 1100px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    #user-info { display: flex; align-items: center; gap: 12px; font-size: 14px; }
+    #user-avatar { width: 36px; height: 36px; border-radius: 50%; background-color: var(--border-color); display: flex; align-items: center; justify-content: center; font-weight: 600; color: var(--text-secondary); }
+    #user-email { font-weight: 600; color: var(--text-primary); }
+    #logout-button {
+        background-color: transparent;
+        color: var(--text-secondary);
+        border: 1px solid var(--border-color);
+        padding: 8px 16px;
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.2s var(--ease);
+    }
+    #logout-button:hover { background-color: var(--danger-light); color: var(--danger-hover); border-color: var(--danger-hover); }
+
+    /* Main Layout & Card */
+    .master-container {
+        max-width: 1100px;
+        margin: 0 auto;
+        background: var(--surface-color);
+        padding: 24px;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+    }
+    .page-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0 0 24px 0;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    /* Schedule List */
+    #schedule-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    #schedule-list li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 8px;
+        border-bottom: 1px solid var(--border-color);
+        font-family: 'Noto Sans Telugu', sans-serif;
+    }
+    #schedule-list li:last-child {
+        border-bottom: none;
+    }
+    .schedule-name {
+        font-weight: 500;
+        font-size: 1.1em;
+        color: var(--text-primary);
+    }
+    .schedule-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    /* Action Buttons */
+    .btn {
+        text-decoration: none;
+        padding: 6px 12px;
+        border-radius: var(--radius-md);
+        border: 1px solid transparent;
+        font-size: 14px;
+        font-family: 'Inter', sans-serif;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s var(--ease);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .btn-secondary {
+        background-color: var(--surface-color);
+        color: var(--text-secondary);
+        border-color: var(--border-color);
+    }
+    .btn-secondary:hover {
+        background-color: var(--background-color);
+        border-color: var(--text-secondary);
+        color: var(--text-primary);
+    }
+    .btn-danger-outline {
+        background-color: transparent;
+        color: var(--danger-color);
+        border-color: var(--danger-light);
+    }
+    .btn-danger-outline:hover {
+        background-color: var(--danger-color);
+        color: white;
+        border-color: var(--danger-color);
+    }
+    .btn .material-symbols-outlined { font-size: 18px; }
+
+    /* Empty State */
+    #empty-state {
+        text-align: center;
+        padding: 40px;
+        color: var(--text-secondary);
+        border-bottom: none !important;
+    }
+
+    /* Add Button Footer */
+    #add-schedule-footer {
+        max-width: 1100px;
+        margin: 24px auto 0 auto;
+    }
+    .add-button {
+        width: 100%;
+        padding: 16px;
+        font-size: 16px;
+        font-weight: 600;
+        color: white;
+        background-color: var(--primary-color);
+        border: none;
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.2s var(--ease);
+    }
+    .add-button:hover {
+        background-color: var(--primary-hover);
+    }
+    .add-button .material-symbols-outlined { font-size: 22px; }
+
+    /* Mobile Responsive Styles */
+    @media (max-width: 768px) {
+        body {
+            padding: 72px 0 0 0;
+            background-color: var(--surface-color);
+        }
+        #app-header {
+            padding: 12px 16px;
+        }
+        #user-info #user-email {
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        #user-info span:not(#user-email) {
+            display: none;
+        }
+
+        .master-container {
+            max-width: 100%;
+            margin: 0;
+            box-shadow: none;
+            border-radius: 0;
+            padding: 16px;
+        }
+        .page-title {
+            font-size: 1.5rem;
+            padding-bottom: 16px;
+            margin-bottom: 8px;
+        }
+        #schedule-list li {
+            padding: 12px 4px;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .schedule-name { font-size: 1em; }
+        #add-schedule-footer {
+            padding: 16px;
+            background-color: var(--background-color);
+        }
+    }
+</style>
+</head>
+<body>
+
+<div id="app-container" class="hidden">
+    <header id="app-header">
+        <div class="header-content">
+            <div id="user-info">
+                <div id="user-avatar"></div>
+                <span>Welcome, <span id="user-email"></span></span>
+            </div>
+            <button id="logout-button">Logout</button>
+        </div>
+    </header>
+
+    <div class="master-container">
+        <h1 class="page-title" style="font-family: 'Noto Sans Telugu', sans-serif;">మీ షెడ్యూల్స్</h1>
+        <ul id="schedule-list">
+            <li id="empty-state" class="hidden">మీరు ఇంకా ఏ షెడ్యూల్‌లను సృష్టించలేదు.</li>
+        </ul>
+    </div>
+    
+    <div id="add-schedule-footer">
+        <button id="createUserScheduleBtn" class="add-button">
+             <span class="material-symbols-outlined">add</span>
+            కొత్త షెడ్యూల్ సృష్టించండి
+        </button>
+    </div>
+</div>
+
+<script>
+(function() {
+    'use strict';
+    // --- FIREBASE SETUP ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyDLK5f4C-nfG6fz0ajqqay1q9TTN6rxgmQ",
+      authDomain: "schedule-harsha.firebaseapp.com",
+      projectId: "schedule-harsha",
+      storageBucket: "schedule-harsha.firebasestorage.app",
+      messagingSenderId: "965478014820",
+      appId: "1:965478014820:web:1c36c5d890a27e599aa471"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    
+    const ADMIN_EMAIL = 'harshavardhanjw@gmail.com';
+    let currentUser = null;
+    let currentListener = null;
+
+    // --- DOM ELEMENTS ---
+    const appContainer = document.getElementById('app-container');
+    const userEmailEl = document.getElementById('user-email');
+    const userAvatarEl = document.getElementById('user-avatar');
+    const scheduleListEl = document.getElementById('schedule-list');
+    const emptyStateEl = document.getElementById('empty-state');
+    
+    // --- AUTHENTICATION ---
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            if (user.email === ADMIN_EMAIL) {
+                window.location.replace('./admin.html');
+                return;
+            }
+            currentUser = user;
+            appContainer.classList.remove('hidden');
+            userEmailEl.textContent = user.email;
+            userAvatarEl.textContent = user.email.charAt(0).toUpperCase();
+            initDashboard();
+        } else {
+            window.location.replace('./login.html');
+        }
+    });
+
+    function initDashboard() {
+        const userSchedulesCollection = db.collection(`userSchedules/${currentUser.uid}/schedules`);
+
+        if (currentListener) currentListener();
+        currentListener = userSchedulesCollection.orderBy("createdAt").onSnapshot(snapshot => {
+            if (snapshot.empty) {
+                scheduleListEl.innerHTML = '';
+                emptyStateEl.classList.remove('hidden');
+                return;
+            }
+            
+            emptyStateEl.classList.add('hidden');
+            scheduleListEl.innerHTML = '';
+            
+            snapshot.docs.forEach(doc => {
+                const schedule = doc.data();
+                const scheduleId = doc.id;
+                
+                const li = document.createElement('li');
+                li.dataset.id = scheduleId;
+
+                li.innerHTML = `
+                    <span class="schedule-name">${schedule.name}</span>
+                    <div class="schedule-actions">
+                        <a href="./editor.html?id=${scheduleId}" class="btn btn-secondary">
+                            <span class="material-symbols-outlined">edit</span>
+                            View / Edit
+                        </a>
+                        <button class="btn btn-danger-outline" data-id="${scheduleId}">
+                             <span class="material-symbols-outlined">delete</span>
+                            Delete
+                        </button>
+                    </div>
+                `;
+                scheduleListEl.appendChild(li);
+            });
+        }, error => {
+            console.error("Error fetching user schedules:", error);
+            alert("Could not load your schedules. Please check your connection and try again.");
+        });
+    }
+
+    // --- GLOBAL UI EVENT LISTENERS ---
+    function setupGlobalUI() {
+        document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
+
+        document.getElementById('createUserScheduleBtn').addEventListener('click', () => {
+            window.location.href = './editor.html';
+        });
+
+        scheduleListEl.addEventListener('click', (e) => {
+            const deleteButton = e.target.closest('.btn-danger-outline');
+            if (deleteButton) {
+                const scheduleId = deleteButton.dataset.id;
+                if (confirm('Are you sure you want to permanently delete this schedule?')) {
+                    const userSchedulesCollection = db.collection(`userSchedules/${currentUser.uid}/schedules`);
+                    userSchedulesCollection.doc(scheduleId).delete().catch(error => {
+                        console.error("Error deleting document: ", error);
+                        alert("Could not delete schedule. Please try again.");
+                    });
+                }
+            }
+        });
+    }
+
+    setupGlobalUI();
+
+})();
+</script>
+</body>
+</html>
