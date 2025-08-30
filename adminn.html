@@ -118,7 +118,7 @@
         flex-grow: 1;
         border: none;
         padding: 4px 8px;
-        margin: -4px -8px; /* Offset padding */
+        margin: -4px -8px;
         border-radius: var(--radius-md);
         font-family: 'Noto Sans Telugu', sans-serif;
         color: var(--text-primary);
@@ -159,18 +159,24 @@
     .schedule-block table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.25px; }
     .schedule-block th, .schedule-block td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; }
     .schedule-block [contenteditable="true"]:focus { background-color: #fffbe5; }
+    
     .schedule-block .row-handle { position: absolute; left: -30px; top: 0; width: 30px; height: 100%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #aaa; user-select: none; }
     .schedule-block .row-handle-icon { opacity: 0; transition: opacity 0.2s; font-size: 18px; }
     .schedule-block tr:hover .row-handle-icon { opacity: 1; }
+    
     .schedule-block td .row-handle, .schedule-block th .row-handle { display: none; }
     .schedule-block td:first-child .row-handle, .schedule-block th:first-child .row-handle { display: flex; }
+
     .schedule-block td.cell-selected, .schedule-block th.cell-selected { outline: 2px solid var(--primary-color) !important; outline-offset: -2px; background-color: var(--primary-light); }
     .schedule-block .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; }
     .schedule-block .cell-icon { height: 70%; max-height: 24px; object-fit: contain; flex-shrink: 0; }
     .schedule-block .header-row .cell-icon { filter: brightness(0) invert(1); }
     .schedule-block .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; }
     .schedule-block .header-row td { font-size: 14px; color: #ffffff; height: 42px; }
-    
+    .schedule-block .header-row[data-section="treasures"] td { background-color: rgb(70, 132, 153); }
+    .schedule-block .header-row[data-section="ministry"] td { background-color: rgb(212, 162, 42); }
+    .schedule-block .header-row[data-section="living"] td { background-color: rgb(192, 66, 53); }
+
     /* Context Menu */
     .context-menu { position: fixed; display: none; background: var(--surface-color); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); z-index: 1001; padding: 6px; min-width: 220px; border: 1px solid var(--border-color); }
     .context-menu-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; cursor: pointer; font-size: 14px; border-radius: 6px; }
@@ -198,10 +204,6 @@
         #app-header {
             padding: 12px 16px;
         }
-        #logout-button {
-            padding: 6px 10px;
-            font-size: 13px;
-        }
         #user-info #user-email {
             max-width: 120px;
             overflow: hidden;
@@ -211,6 +213,7 @@
         #user-info span:not(#user-email) {
             display: none;
         }
+
         .master-container {
             max-width: 100%;
             margin: 0;
@@ -231,9 +234,9 @@
             font-size: 1.1rem;
         }
         .toolbar {
-            gap: 4px;
-            flex-wrap: nowrap;
-            justify-content: flex-start;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            justify-content: space-between;
         }
         .toolbar-btn {
             padding: 8px;
@@ -242,7 +245,10 @@
         .toolbar-btn .btn-text {
             display: none;
         }
-        
+        .delete-btn {
+            margin-left: 0;
+        }
+
         #add-schedule-footer {
             padding: 16px;
         }
@@ -251,26 +257,24 @@
             font-size: 14px;
         }
 
+        /* Mobile table adjustments */
         .schedule-block table { 
-            font-size: 6px;
+            font-size: 6.5px;
         }
         .schedule-block th, .schedule-block td { 
-            padding: 0 2px;
-            height: 22px;
+            padding: 0 1.5px;
+            height: 24px;
         }
         .schedule-block .header-row td { 
-            height: 24px;
-            font-size: 7px;
+            height: 26px;
+            font-size: 8px;
         }
         .schedule-block .cell-icon { 
-            max-height: 12px;
+            max-height: 14px;
         }
         .schedule-block .row-handle { 
-            left: -18px; 
-            width: 18px; 
-        }
-        .schedule-block .row-handle-icon {
-            font-size: 14px;
+            left: -20px; 
+            width: 20px; 
         }
     }
 </style>
@@ -344,7 +348,7 @@
     let currentUser = null;
     let isAdmin = false;
 
-    const DEFAULT_TABLE_HTML = `<tr class="no-actions"><th style="background-color: rgb(240, 248, 255);"><span class="row-handle"></span>బైబిలు అధ్యాయం, ప్రసంగి 11-12</th><th style="background-color: rgb(240, 248, 255);">తేదీ:</th><th style="background-color: rgb(240, 248, 255);"></th></tr><tr class="no-actions"><td><div class="cell-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/8A2BE2/FFFFFF?text=♫" class="cell-icon"><span>పాట: 155</span></div></td><td style="text-align: right;">చైర్మన్</td><td></td></tr><tr class="no-actions"><td><span class="row-handle"></span>ఆరంభ మాటలు (1 నిమి.)</td><td style="text-align: right;">ప్రార్థన:</td><td></td></tr><tr class="header-row no-actions" data-section="treasures"><td colspan="3" style="background-color: rgb(70, 132, 153);"><div class="header-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/FFFFFF/468499?text=T" class="cell-icon"><span>దేవుని వాక్యంలో ఉన్న సంపద</span></div></td></tr><tr><td colspan="3"><span class="row-handle"><span class="row-handle-icon">⠿</span></span>1. ఆరోగ్యంగా ఉండండి, లైఫ్‌ని ఎంజాయ్‌ చేయండి. (10 నిమి.)</td></tr><tr><td colspan="3"><span class="row-handle"><span class="row-handle-icon">⠿</span></span>2. దేవుని వాక్యంలో రత్నాలు (10 నిమి.)</td></tr><tr><td colspan="3"><span class="row-handle"><span class="row-handle-icon">⠿</span></span>3. చదవాల్సిన బైబిలు భాగం: (4 నిమి.)</td></tr><tr class="header-row no-actions" data-section="ministry"><td colspan="3" style="background-color: rgb(212, 162, 42);"><div class="header-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/FFFFFF/d4a22a?text=M" class="cell-icon"><span>చక్కగా సువార్త ప్రకటించాలి</span></div></td></tr><tr><td><span class="row-handle"><span class="row-handle-icon">⠿</span></span>4. మళ్ళీ కలిసినప్పుడు (3 నిమి.)</td><td colspan="2"></td></tr><tr><td><span class="row-handle"><span class="row-handle-icon">⠿</span></span>5. మళ్ళీ కలిసినప్పుడు (4 నిమి.)</td><td colspan="2"></td></tr><tr><td><span class="row-handle"><span class="row-handle-icon">⠿</span></span>6. ప్రసంగం (5 నిమి.)</td><td colspan="2"></td></tr><tr class="header-row no-actions" data-section="living"><td colspan="3" style="background-color: rgb(192, 66, 53);"><div class="header-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/FFFFFF/c04235?text=L" class="cell-icon"><span>మన క్రైస్తవ జీవితం</span></div></td></tr><tr><td><div class="cell-content-wrapper"><span class="row-handle"><span class="row-handle-icon">⠿</span></span><img src="https://via.placeholder.com/40/8A2BE2/FFFFFF?text=♫" class="cell-icon"><span>పాట: 111</span></div></td><td colspan="2"></td></tr><tr><td><span class="row-handle"><span class="row-handle-icon">⠿</span></span>7. స్థానిక అవసరాలు (15 నిమి.)</td><td colspan="2"></td></tr><tr><td><span class="row-handle"><span class="row-handle-icon">⠿</span></span>8. సంఘ బైబిలు అధ్యయనం: (30 నిమి.)</td><td colspan="2"></td></tr><tr class="no-actions"><td><span class="row-handle"></span>ముగింపు మాటలు (3 నిమి.)</td><td style="text-align: right;">చైర్మన్</td><td></td></tr><tr class="no-actions"><td><div class="cell-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/8A2BE2/FFFFFF?text=♫" class="cell-icon"><span>పాట: 8</span></div></td><td style="text-align: right;">ముగింపు ప్రార్థన:</td><td></td></tr>`.trim();
+    const DEFAULT_TABLE_HTML = `<tr class="no-actions"><th style="background-color: rgb(240, 248, 255);"><span class="row-handle"></span>బైబిలు అధ్యాయం, ప్రసంగి 11-12</th><th style="background-color: rgb(240, 248, 255);">తేదీ:</th><th style="background-color: rgb(240, 248, 255);"></th></tr><tr class="no-actions"><td><div class="cell-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/8A2BE2/FFFFFF?text=♫" class="cell-icon"><span>పాట: 155</span></div></td><td style="text-align: right;">చైర్మన్</td><td></td></tr><tr class="no-actions"><td><span class="row-handle"></span>ఆరంభ మాటలు (1 నిమి.)</td><td style="text-align: right;">ప్రార్థన:</td><td></td></tr><tr class="header-row no-actions" data-section="treasures"><td colspan="3"><div class="header-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/FFFFFF/468499?text=T" class="cell-icon"><span>దేవుని వాక్యంలో ఉన్న సంపద</span></div></td></tr><tr><td colspan="3"><span class="row-handle"><span class="row-handle-icon">⠿</span></span>1. ఆరోగ్యంగా ఉండండి, లైఫ్‌ని ఎంజాయ్‌ చేయండి. (10 నిమి.)</td></tr><tr><td colspan="3"><span class="row-handle"><span class="row-handle-icon">⠿</span></span>2. దేవుని వాక్యంలో రత్నాలు (10 నిమి.)</td></tr><tr><td colspan="3"><span class="row-handle"><span class="row-handle-icon">⠿</span></span>3. చదవాల్సిన బైబిలు భాగం: (4 నిమి.)</td></tr><tr class="header-row no-actions" data-section="ministry"><td colspan="3"><div class="header-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/FFFFFF/d4a22a?text=M" class="cell-icon"><span>చక్కగా సువార్త ప్రకటించాలి</span></div></td></tr><tr><td><span class="row-handle"><span class="row-handle-icon">⠿</span></span>4. మళ్ళీ కలిసినప్పుడు (3 నిమి.)</td><td colspan="2"></td></tr><tr><td><span class="row-handle"><span class="row-handle-icon">⠿</span></span>5. మళ్ళీ కలిసినప్పుడు (4 నిమి.)</td><td colspan="2"></td></tr><tr><td><span class="row-handle"><span class="row-handle-icon">⠿</span></span>6. ప్రసంగం (5 నిమి.)</td><td colspan="2"></td></tr><tr class="header-row no-actions" data-section="living"><td colspan="3"><div class="header-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/FFFFFF/c04235?text=L" class="cell-icon"><span>మన క్రైస్తవ జీవితం</span></div></td></tr><tr><td><div class="cell-content-wrapper"><span class="row-handle"><span class="row-handle-icon">⠿</span></span><img src="https://via.placeholder.com/40/8A2BE2/FFFFFF?text=♫" class="cell-icon"><span>పాట: 111</span></div></td><td colspan="2"></td></tr><tr><td><span class="row-handle"><span class="row-handle-icon">⠿</span></span>7. స్థానిక అవసరాలు (15 నిమి.)</td><td colspan="2"></td></tr><tr><td><span class="row-handle"><span class="row-handle-icon">⠿</span></span>8. సంఘ బైబిలు అధ్యయనం: (30 నిమి.)</td><td colspan="2"></td></tr><tr class="no-actions"><td><span class="row-handle"></span>ముగింపు మాటలు (3 నిమి.)</td><td style="text-align: right;">చైర్మన్</td><td></td></tr><tr class="no-actions"><td><div class="cell-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/8A2BE2/FFFFFF?text=♫" class="cell-icon"><span>పాట: 8</span></div></td><td style="text-align: right;">ముగింపు ప్రార్థన:</td><td></td></tr>`.trim();
 
     const appContainer = document.getElementById('app-container');
     const userEmailEl = document.getElementById('user-email');
@@ -389,33 +393,35 @@
             schedulesWrapper.appendChild(this.element);
         }
 
-        // CORRECTED RENDER FUNCTION TO PRESERVE STYLES
         render(data) {
             this.isUpdatingFromRemote = true;
-            if (document.activeElement !== this.titleEl) {
-                this.titleEl.textContent = data.name;
-            }
+            if (document.activeElement !== this.titleEl) this.titleEl.textContent = data.name;
 
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = `<table><tbody>${data.content}</tbody></table>`;
+            tempDiv.querySelectorAll('td, th').forEach(cell => cell.setAttribute('contenteditable', 'true'));
+            
+            const contentToRender = tempDiv.querySelector('tbody').innerHTML;
+            
             if (!this.tableBody.contains(document.activeElement)) {
-                const fragment = document.createDocumentFragment();
-                const tempBody = document.createElement('tbody');
-                tempBody.innerHTML = data.content;
-
-                tempBody.querySelectorAll('td, th').forEach(cell => {
-                    cell.setAttribute('contenteditable', 'true');
-                });
-                
-                while (tempBody.firstChild) {
-                    fragment.appendChild(tempBody.firstChild);
-                }
-                
-                this.tableBody.innerHTML = '';
-                this.tableBody.appendChild(fragment);
+                this.tableBody.innerHTML = contentToRender;
             }
+            // Add background colors back to header rows after re-render
+             this.element.querySelectorAll('.header-row[data-section="treasures"] td').forEach(td => td.style.backgroundColor = 'rgb(70, 132, 153)');
+            this.element.querySelectorAll('.header-row[data-section="ministry"] td').forEach(td => td.style.backgroundColor = 'rgb(212, 162, 42)');
+            this.element.querySelectorAll('.header-row[data-section="living"] td').forEach(td => td.style.backgroundColor = 'rgb(192, 66, 53)');
 
-            this.pushState(this.tableBody.innerHTML, false);
+            this.pushState(data.content, false);
             this.updateStatus('Synced', 'synced');
             this.isUpdatingFromRemote = false;
+        }
+        
+        getContent() {
+            const tempBody = this.tableBody.cloneNode(true);
+            tempBody.querySelectorAll('[style*="background-color"]').forEach(el => {
+                if(!el.closest('.header-row')) el.style.backgroundColor = '';
+            });
+            return tempBody.innerHTML;
         }
 
         pushState(content, shouldSave = true) {
@@ -431,7 +437,7 @@
         saveToFirestore() {
             if (this.isUpdatingFromRemote) return;
             this.updateStatus('Syncing...', 'syncing');
-            const payload = { name: this.titleEl.textContent, content: this.tableBody.innerHTML };
+            const payload = { name: this.titleEl.textContent, content: this.getContent() };
             templatesCollection.doc(this.id).set(payload, { merge: true })
                 .catch(err => this.updateStatus('Error', 'error'));
         }
@@ -444,8 +450,8 @@
         setupEventListeners() {
             this.element.addEventListener('click', (e) => this.handleElementClick(e));
             this.element.addEventListener('contextmenu', (e) => this.handleContextMenu(e));
-            this.titleEl.addEventListener('input', () => this.pushState(this.tableBody.innerHTML));
-            this.tableBody.addEventListener('input', () => this.pushState(this.tableBody.innerHTML));
+            this.titleEl.addEventListener('input', () => this.pushState(this.getContent()));
+            this.tableBody.addEventListener('input', () => this.pushState(this.getContent()));
         }
 
         handleElementClick(e) {
@@ -505,7 +511,7 @@
             this.debouncedSaveToFirestore();
         }
 
-        reset() { if (confirm('Are you sure you want to reset this template?')) { this.tableBody.innerHTML = DEFAULT_TABLE_HTML; this.pushState(this.tableBody.innerHTML); } }
+        reset() { if (confirm('Are you sure you want to reset this template?')) { this.tableBody.innerHTML = DEFAULT_TABLE_HTML; this.pushState(this.getContent()); } }
         
         delete() { if (confirm('Are you sure you want to permanently delete this template?')) { templatesCollection.doc(this.id).delete(); } }
         
@@ -589,7 +595,7 @@
             else if (action === 'split') splitCell(schedule);
         }
         
-        schedule.pushState(schedule.tableBody.innerHTML);
+        schedule.pushState(schedule.getContent());
         if (newRow) newRow.cells[0].focus();
         rowContextMenu.style.display = 'none';
         cellContextMenu.style.display = 'none';
