@@ -230,7 +230,6 @@
         .schedule-title {
             font-size: 1.1rem;
         }
-        /* Toolbar mobile styles */
         .toolbar {
             gap: 4px;
             flex-wrap: nowrap;
@@ -252,7 +251,6 @@
             font-size: 14px;
         }
 
-        /* Table mobile styles */
         .schedule-block table { 
             font-size: 6px;
         }
@@ -394,21 +392,25 @@
         // CORRECTED RENDER FUNCTION TO PRESERVE STYLES
         render(data) {
             this.isUpdatingFromRemote = true;
-            if (document.activeElement !== this.titleEl) this.titleEl.textContent = data.name;
+            if (document.activeElement !== this.titleEl) {
+                this.titleEl.textContent = data.name;
+            }
 
             if (!this.tableBody.contains(document.activeElement)) {
-                // Create a temporary tbody to parse the HTML string into DOM nodes
+                const fragment = document.createDocumentFragment();
                 const tempBody = document.createElement('tbody');
                 tempBody.innerHTML = data.content;
-                
-                // Add contenteditable attribute to all cells within the temporary body
+
                 tempBody.querySelectorAll('td, th').forEach(cell => {
                     cell.setAttribute('contenteditable', 'true');
                 });
                 
-                // Clear the actual table body and append the new, processed rows
+                while (tempBody.firstChild) {
+                    fragment.appendChild(tempBody.firstChild);
+                }
+                
                 this.tableBody.innerHTML = '';
-                this.tableBody.append(...tempBody.childNodes);
+                this.tableBody.appendChild(fragment);
             }
 
             this.pushState(this.tableBody.innerHTML, false);
@@ -484,7 +486,6 @@
             }
         }
         
-        // CORRECTED UNDO FUNCTION
         undo() {
             if (this.undoHistory.length <= 1) return;
             const currentState = this.undoHistory.pop();
@@ -495,7 +496,6 @@
             this.debouncedSaveToFirestore();
         }
 
-        // CORRECTED REDO FUNCTION
         redo() {
             if (this.redoHistory.length === 0) return;
             const nextState = this.redoHistory.pop();
