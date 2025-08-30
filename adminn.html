@@ -189,65 +189,24 @@
             padding: 72px 0 0 0; 
             background-color: var(--surface-color); 
         }
-        #app-header {
-            padding: 12px 16px;
-        }
-        #user-info #user-email {
-            max-width: 120px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        #user-info span:not(#user-email) {
-            display: none;
-        }
-        #logout-button {
-            font-size: 13px;
-            padding: 6px 12px;
-        }
+        #app-header { padding: 12px 16px; }
+        #user-info #user-email { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        #user-info span:not(#user-email) { display: none; }
+        #logout-button { font-size: 13px; padding: 6px 12px; }
 
-        .master-container {
-            max-width: 100%;
-            margin: 0;
-        }
-        .page-title {
-            font-size: 1.2rem;
-            padding: 16px 16px 0 16px;
-            margin-bottom: 16px;
-        }
-        .schedule-block {
-            border-radius: 0;
-            box-shadow: none;
-            padding: 16px;
-            margin-bottom: 0;
-            border-bottom: 8px solid var(--background-color); 
-        }
-        .schedule-title {
-            font-size: 1.1rem;
-        }
-        .toolbar {
-            margin-bottom: 16px;
-            padding-bottom: 16px;
-            justify-content: space-between;
-        }
-        .toolbar-btn {
-            padding: 8px;
-        }
-        .toolbar-btn .btn-text {
-            display: none;
-        }
-        .delete-btn {
-            margin-left: 0;
-        }
+        .master-container { max-width: 100%; margin: 0; }
+        .page-title { font-size: 1.2rem; padding: 16px 16px 0 16px; margin-bottom: 16px; }
+        .schedule-block { border-radius: 0; box-shadow: none; padding: 16px; margin-bottom: 0; border-bottom: 8px solid var(--background-color); }
+        .schedule-title { font-size: 1.1rem; }
+        .toolbar { margin-bottom: 16px; padding-bottom: 16px; justify-content: space-between; }
+        .toolbar-btn { padding: 8px; }
+        .toolbar-btn .btn-text { display: none; }
+        .delete-btn { margin-left: 0; }
         
-        #add-schedule-footer {
-            padding: 16px;
-        }
-        .add-button {
-            padding: 12px;
-            font-size: 14px;
-        }
+        #add-schedule-footer { padding: 16px; }
+        .add-button { padding: 12px; font-size: 14px; }
 
+        /* Mobile table adjustments */
         .schedule-block table { font-size: 6.5px; }
         .schedule-block th, .schedule-block td { padding: 0 1.5px; height: 24px; }
         .schedule-block .header-row td { height: 26px; font-size: 8px; }
@@ -289,12 +248,12 @@
             <div class="status-indicator"></div>
         </div>
         <div class="toolbar">
-            <div>
+            <div style="display: flex; gap: 8px;"> <!-- Group for left buttons -->
                 <button class="toolbar-btn undo-btn" disabled><span class="material-symbols-outlined">undo</span><span class="btn-text">Undo</span></button>
                 <button class="toolbar-btn redo-btn" disabled><span class="material-symbols-outlined">redo</span><span class="btn-text">Redo</span></button>
                 <button class="toolbar-btn reset-btn"><span class="material-symbols-outlined">restart_alt</span><span class="btn-text">Reset</span></button>
             </div>
-            <div>
+            <div> <!-- Group for right button -->
                 <button class="toolbar-btn delete-btn"><span class="material-symbols-outlined">delete</span><span class="btn-text">Delete Template</span></button>
             </div>
         </div>
