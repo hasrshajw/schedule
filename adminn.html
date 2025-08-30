@@ -155,10 +155,13 @@
     .delete-btn { margin-left: auto; }
     .delete-btn:hover:not(:disabled) { background-color: var(--danger-light); color: var(--danger-color); border-color: var(--danger-color); }
 
-    /* ========================================================= */
     /* === TABLE STYLES === */
-    /* ========================================================= */
-    .schedule-block table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.25px; }
+    .table-scroll-wrapper {
+        overflow-x: auto;
+        margin: 0 -24px; /* Extend to card edges */
+        padding: 0 24px;
+    }
+    .schedule-block table { width: 100%; min-width: 600px; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.25px; }
     .schedule-block th, .schedule-block td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; }
     .schedule-block [contenteditable="true"]:focus { background-color: #fffbe5; }
     .schedule-block .row-handle { position: absolute; left: -30px; top: 0; width: 30px; height: 100%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #aaa; user-select: none; }
@@ -188,10 +191,11 @@
     .add-button { width: 100%; padding: 16px; font-size: 16px; font-weight: 600; color: var(--primary-color); background-color: var(--primary-light); border: 2px dashed #b3e0e0; border-radius: var(--radius-lg); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s var(--ease); }
     .add-button:hover { background-color: var(--primary-color); border-color: var(--primary-hover); color: white; }
     .add-button .material-symbols-outlined { font-size: 22px; }
-
-    /* ===================================================================== */
+    
+    /* Floating Action Button */
+    .fab-container { display: none; /* Hidden on desktop */ }
+    
     /* === MOBILE RESPONSIVE STYLES === */
-    /* ===================================================================== */
     @media (max-width: 768px) {
         body {
             padding: 72px 0 0 0; 
@@ -229,36 +233,93 @@
         .schedule-title {
             font-size: 1.25rem;
         }
+        
+        /* Toolbar Grid for Mobile */
         .toolbar {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto;
+            gap: 12px;
             margin-bottom: 16px;
             padding-bottom: 16px;
         }
-        #add-schedule-footer {
-            padding: 16px;
+        .toolbar-btn {
+            padding: 12px;
+            justify-content: center;
         }
-        .add-button {
-            padding: 14px;
-            font-size: 15px;
+        .undo-btn { grid-column: 1 / 2; grid-row: 1 / 2; }
+        .redo-btn { grid-column: 2 / 3; grid-row: 1 / 2; }
+        .reset-btn { grid-column: 1 / 2; grid-row: 2 / 3; }
+        .delete-btn { 
+            grid-column: 2 / 3; 
+            grid-row: 2 / 3;
+            margin-left: 0;
+            background-color: var(--danger-light);
+            border-color: var(--danger-light);
+            color: var(--danger-color);
+        }
+        .delete-btn:hover:not(:disabled) {
+            background-color: var(--danger-color);
+            border-color: var(--danger-color);
+            color: white;
         }
 
-        /* --- UPDATED: Mobile table adjustments as per your request --- */
+        /* Mobile table adjustments */
+        .table-scroll-wrapper {
+            margin: 0 -16px;
+            padding: 0 16px;
+            -webkit-mask-image: linear-gradient(to right, black 95%, transparent 100%);
+            mask-image: linear-gradient(to right, black 95%, transparent 100%);
+        }
         .schedule-block table { 
-            font-size: 6.5px;
+            font-size: 11px;
         }
         .schedule-block th, .schedule-block td { 
-            padding: 0 1.5px;
-            height: 24px;
+            padding: 4px 8px; 
+            height: 34px; 
         }
         .schedule-block .header-row td { 
-            height: 26px;
-            font-size: 8px;
+            height: 38px; 
+            font-size: 12px; 
         }
-        .schedule-block .cell-icon { 
-            max-height: 14px;
+
+        /* Context Menu Mobile */
+        .context-menu-item {
+            font-size: 16px;
+            padding: 12px 16px;
         }
-        .schedule-block .row-handle { 
-            left: -20px; 
-            width: 20px; 
+        
+        /* FAB for Mobile */
+        #add-schedule-footer {
+            display: none;
+        }
+        .fab-container {
+            display: block;
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 99;
+        }
+        .fab-button {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            box-shadow: var(--shadow-lg);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s var(--ease);
+        }
+        .fab-button:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+        .fab-button .material-symbols-outlined {
+            font-size: 28px;
         }
     }
 </style>
@@ -299,17 +360,26 @@
             <button class="toolbar-btn undo-btn" disabled><span class="material-symbols-outlined">undo</span> Undo</button>
             <button class="toolbar-btn redo-btn" disabled><span class="material-symbols-outlined">redo</span> Redo</button>
             <button class="toolbar-btn reset-btn"><span class="material-symbols-outlined">restart_alt</span> Reset</button>
-            <button class="toolbar-btn delete-btn"><span class="material-symbols-outlined">delete</span> Delete Template</button>
+            <button class="toolbar-btn delete-btn"><span class="material-symbols-outlined">delete</span> Delete</button>
         </div>
-        <table>
-            <colgroup><col style="width: 60%;"><col style="width: 20%;"><col style="width: 20%;"></colgroup>
-            <tbody class="schedule-table-body"></tbody>
-        </table>
+        <div class="table-scroll-wrapper">
+            <table>
+                <colgroup><col style="width: 60%;"><col style="width: 20%;"><col style="width: 20%;"></colgroup>
+                <tbody class="schedule-table-body"></tbody>
+            </table>
+        </div>
     </div>
 </template>
 
 <div id="rowContextMenu" class="context-menu"></div>
 <div id="cellContextMenu" class="context-menu"></div>
+
+<!-- ADD THIS HTML BEFORE THE CLOSING </body> TAG -->
+<div class="fab-container">
+    <button class="fab-button" id="fabAddNewScheduleBtn" aria-label="Add New Schedule">
+        <span class="material-symbols-outlined">add</span>
+    </button>
+</div>
 
 <script>
 (function() {
@@ -491,7 +561,7 @@
     auth.onAuthStateChanged(user => {
         if (user) {
             if (user.email !== ADMIN_EMAIL) {
-                window.location.replace('./dashboard.html');
+                window.location.replace('./index.html');
                 return;
             }
             currentUser = user;
@@ -528,10 +598,14 @@
     }
 
     function setupGlobalUI() {
+        const addNew = () => {
+             templatesCollection.add({ name: "New Schedule Template", content: DEFAULT_TABLE_HTML, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+        };
+        
         document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
-        document.getElementById('addNewScheduleBtn').addEventListener('click', () => {
-            templatesCollection.add({ name: "New Schedule Template", content: DEFAULT_TABLE_HTML, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-        });
+        document.getElementById('addNewScheduleBtn').addEventListener('click', addNew);
+        document.getElementById('fabAddNewScheduleBtn').addEventListener('click', addNew);
+
         document.addEventListener('click', e => {
             if (!e.target.closest('.context-menu, .row-handle, [contenteditable]')) {
                  rowContextMenu.style.display = 'none';
