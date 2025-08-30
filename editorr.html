@@ -25,8 +25,6 @@
         --danger-color: #d32f2f;
         --danger-hover: #b71c1c;
         --danger-light: #fde8e8;
-        --warning-color: #f59e0b;
-        --success-color: #2e7d32;
         --border-color: #e5e7eb;
         --background-color: #f8fafc;
         --text-primary: #1f2937;
@@ -34,120 +32,218 @@
         --surface-color: #ffffff;
         --radius-md: 8px;
         --radius-lg: 16px;
-        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
         --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
         --ease: cubic-bezier(0.4, 0, 0.2, 1);
     }
     *, *::before, *::after { box-sizing: border-box; }
     html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-    body { font-family: 'Inter', sans-serif; background-color: var(--background-color); margin: 0; padding: 88px 20px 20px; color: var(--text-primary); }
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background-color: var(--background-color);
+        margin: 0;
+        padding: 88px 20px 20px 20px;
+        color: var(--text-primary);
+    }
     .hidden { display: none !important; }
 
     /* App Header */
-    #app-header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border-color); padding: 12px 20px; }
-    .header-content { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    #app-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        background-color: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(8px);
+        border-bottom: 1px solid var(--border-color);
+        padding: 12px 20px;
+    }
+    .header-content {
+        max-width: 1100px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
     #user-info { display: flex; align-items: center; gap: 12px; font-size: 14px; }
     #user-avatar { width: 36px; height: 36px; border-radius: 50%; background-color: var(--border-color); display: flex; align-items: center; justify-content: center; font-weight: 600; color: var(--text-secondary); }
     #user-email { font-weight: 600; color: var(--text-primary); }
-    .back-link { color: var(--text-secondary); text-decoration: none; font-weight: 500; display: flex; align-items: center; gap: 4px; transition: color 0.2s var(--ease); }
-    .back-link:hover { color: var(--primary-color); }
     .header-actions { display: flex; align-items: center; gap: 12px; }
-    .toolbar-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); transition: all 0.2s var(--ease); }
-    .toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; border-color: #d1d5db; color: var(--text-primary); }
-    #logout-button { background-color: transparent; color: var(--text-secondary); border: 1px solid var(--border-color); padding: 8px 16px; border-radius: var(--radius-md); cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s var(--ease); }
+    .header-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background-color: transparent;
+        color: var(--text-secondary);
+        border: 1px solid var(--border-color);
+        padding: 8px 16px;
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 14px;
+        text-decoration: none;
+        transition: all 0.2s var(--ease);
+    }
+    .header-btn:hover { background-color: #f9fafb; border-color: #d1d5db; color: var(--text-primary); }
     #logout-button:hover { background-color: var(--danger-light); color: var(--danger-hover); border-color: var(--danger-hover); }
+    .header-btn .material-symbols-outlined { font-size: 20px; }
 
     /* Main Layout */
-    .master-container { max-width: 1100px; margin: 0 auto; background: var(--surface-color); padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
-    .project-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color); }
-    .project-title { font-size: 1.75rem; font-weight: 700; margin: 0; flex-grow: 1; border: none; padding: 4px 8px; margin: -4px -8px; border-radius: var(--radius-md); font-family: 'Noto Sans Telugu', sans-serif; }
-    .project-title:focus { outline: 2px solid var(--primary-color); background-color: var(--primary-light); }
-    #delete-project-btn { background-color: var(--danger-color); color: white; border: none; padding: 10px 16px; border-radius: var(--radius-md); font-weight: 600; cursor: pointer; transition: background-color 0.2s var(--ease); }
-    #delete-project-btn:hover { background-color: var(--danger-hover); }
+    .master-container {
+        max-width: 1100px;
+        margin: 0 auto;
+        background: var(--surface-color);
+        padding: 24px;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+    }
+    .project-header { display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color); }
+    #project-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin: 0;
+        border: none;
+        padding: 4px 8px;
+        margin: -4px -8px;
+        border-radius: var(--radius-md);
+        font-family: 'Noto Sans Telugu', sans-serif;
+    }
+    #project-title:focus { outline: 2px solid var(--primary-color); background-color: var(--primary-light); }
+    #delete-project-btn {
+        background-color: var(--danger-light);
+        color: var(--danger-color);
+        border: none;
+        padding: 10px 16px;
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.2s var(--ease);
+    }
+    #delete-project-btn:hover { background-color: var(--danger-color); color: white; }
 
     /* Schedule Block */
-    .schedule-block { margin-bottom: 32px; }
+    .schedule-block {
+        margin-bottom: 32px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+    }
     .schedule-block:last-child { margin-bottom: 0; }
-    .schedule-header { margin-bottom: 16px; }
-    .schedule-title { font-size: 1.25rem; font-weight: 600; margin: 0; color: var(--text-secondary); font-family: 'Noto Sans Telugu', sans-serif; }
+    .schedule-header { padding: 16px; background-color: #f9fafb; border-bottom: 1px solid var(--border-color); }
+    .schedule-title { font-size: 1.1rem; font-weight: 600; margin: 0; color: var(--text-primary); }
+    .table-wrapper { padding: 16px; }
 
-    /* PRESERVED TABLE STYLES */
-    .schedule-block table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.25px; }
-    .schedule-block th, .schedule-block td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; }
-    .schedule-block [contenteditable="true"]:focus { background-color: #fffbe5; }
-    .schedule-block .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; }
-    .schedule-block .cell-icon { height: 70%; max-height: 24px; object-fit: contain; flex-shrink: 0; }
-    .schedule-block .header-row .cell-icon { filter: brightness(0) invert(1); }
-    .schedule-block .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; }
-    .schedule-block .header-row td { font-size: 16px; color: #ffffff; height: 42px; }
+    /* Table Styles */
+    table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.25px; }
+    th, td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; }
+    [contenteditable="true"] { background-color: #fffbe5; }
+    [contenteditable="true"]:focus { outline: 2px solid var(--primary-color); }
+    .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; }
+    .cell-icon { height: 70%; max-height: 24px; object-fit: contain; flex-shrink: 0; }
+    .header-row .cell-icon { filter: brightness(0) invert(1); }
+    .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; }
+    .header-row td { font-size: 16px; color: #ffffff; height: 42px; }
+    .header-row[data-section="treasures"] td { background-color: rgb(70, 132, 153); }
+    .header-row[data-section="ministry"] td { background-color: rgb(212, 162, 42); }
+    .header-row[data-section="living"] td { background-color: rgb(192, 66, 53); }
 
     /* Modal Styles */
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 16px; }
-    .modal-content { background: white; padding: 24px; border-radius: var(--radius-lg); width: 100%; max-width: 500px; max-height: 90vh; display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow-lg); }
-    .modal-content h2 { margin-top: 0; }
+    .modal-content { display:flex; flex-direction:column; gap:16px; background: white; padding: 24px; border-radius: var(--radius-lg); width: 100%; max-width: 500px; max-height: 90vh; }
+    .modal-content h2 { font-size: 1.5rem; margin-top: 0; }
     .modal-content p { margin: 0 0 16px 0; color: var(--text-secondary); }
-    #new-project-name { width: 100%; padding: 12px; font-size: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); }
+    #new-project-name { width: 100%; padding: 12px; font-size: 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); }
     #template-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md); }
-    #template-list li { padding: 12px; border-bottom: 1px solid var(--border-color); }
+    #template-list li { padding: 12px 16px; border-bottom: 1px solid var(--border-color); }
     #template-list li:last-child { border-bottom: none; }
-    #template-list label { display: flex; align-items: center; gap: 10px; font-size: 16px; cursor: pointer; font-weight: 500; }
-    .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px; }
-    .modal-actions button { padding: 10px 20px; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); }
+    #template-list label { display: flex; align-items: center; gap: 12px; font-size: 1rem; cursor: pointer; }
+    #template-list input[type="checkbox"] { width: 1.25em; height: 1.25em; }
+    .modal-actions { display:flex; justify-content:flex-end; gap:12px; }
+    .modal-actions button { padding: 10px 20px; font-size: 1rem; font-weight: 600; border-radius: var(--radius-md); border: 1px solid var(--border-color); cursor: pointer; }
     #cancel-template-selection { background-color: var(--surface-color); }
-    #confirm-template-selection { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
+    #confirm-template-selection { background-color:var(--primary-color); color:white; border-color: var(--primary-color); }
 
-    /* PRINT STYLES (PRESERVED) */
-    @media print { @page { size: A4 landscape; margin: 10mm; } body { background-color: #fff !important; padding: 0; margin: 0; } #app-header, .project-header, .row-handle, .status-indicator, .schedule-title { display: none !important; } .master-container { width: 100%; max-width: 100%; box-shadow: none; padding: 0; margin: 0; border: none; } .schedule-block { width: 100%; height: 100%; display: flex; flex-direction: column; page-break-after: always; padding: 5mm 20mm; border: 2px solid #4B0082 !important; box-sizing: border-box; border-bottom: none !important; } table { flex-grow: 1; border: 2px solid #000 !important; color: #000 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } th, td { border: 1px solid #000 !important; } td.cell-selected, th.cell-selected { outline: none !important; } th { border-bottom: 1px solid #000 !important; } tbody tr:nth-child(2) > td { border-top: 2px solid #000 !important; } }
-
-    /* MOBILE RESPONSIVE STYLES */
+    /* Print Styles */
+    @media print {
+        @page { size: A4 landscape; margin: 10mm; }
+        body { background-color: #fff !important; padding: 0; margin: 0; }
+        #app-header, .project-header, .row-handle { display: none !important; }
+        .master-container { width: 100%; max-width: 100%; box-shadow: none; padding: 0; margin: 0; border: none; }
+        .schedule-block { width: 100%; height: 100%; display: flex; flex-direction: column; page-break-after: always; padding: 5mm 15mm; border: 2px solid #4B0082 !important; box-sizing: border-box; border-radius: 0; }
+        .schedule-header { display: none !important; }
+        .table-wrapper { padding: 0; }
+        table { flex-grow: 1; border: 2px solid #000 !important; color: #000 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        th, td { border: 1px solid #000 !important; }
+        td.cell-selected, th.cell-selected { outline: none !important; }
+        [contenteditable="true"] { background-color: transparent !important; }
+    }
+    
+    /* Mobile Responsive Styles */
     @media (max-width: 768px) {
-        body { padding: 72px 0 0 0; background-color: var(--surface-color); }
+        body {
+            padding: 72px 0 0 0; 
+            background-color: var(--surface-color);
+        }
         #app-header { padding: 12px 16px; }
         #user-info #user-email { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         #user-info span:not(#user-email) { display: none; }
-        .master-container { padding: 0 16px 16px; border-radius: 0; box-shadow: none; }
-        .project-header { flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px 0; margin-bottom: 16px; }
-        .project-title { font-size: 1.5rem; }
-        #delete-project-btn { width: 100%; }
-        .schedule-block { margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color); }
-        
-        /* Mobile table adjustments */
-        .schedule-block table { font-size: 6.5px; }
-        .schedule-block th, .schedule-block td { padding: 0 1.5px; height: 24px; }
-        .schedule-block .header-row td { height: 26px; font-size: 8px; }
-        .schedule-block .cell-icon { max-height: 14px; }
+        .header-btn { padding: 8px; }
+        .header-btn .btn-text { display: none; }
+
+        .master-container {
+            border-radius: 0;
+            box-shadow: none;
+            padding: 12px;
+        }
+        .project-header {
+            padding-bottom: 16px;
+            margin-bottom: 16px;
+        }
+        #project-title {
+            font-size: 1.2rem;
+        }
+        #delete-project-btn {
+            font-size: 12px;
+            padding: 8px 10px;
+        }
+        .schedule-block {
+            border-radius: var(--radius-md);
+            margin-bottom: 16px;
+        }
+        .schedule-header { padding: 12px; }
+        .schedule-title { font-size: 1rem; }
+        .table-wrapper { padding: 12px; }
+
+        table { font-size: 6.5px; }
+        th, td { padding: 0 1.5px; height: 24px; }
+        .header-row td { height: 26px; font-size: 8px; }
+        .cell-icon { max-height: 14px; }
     }
 </style>
-
 </head>
 <body>
 
 <div id="app-container" class="hidden">
-    <header id="app-header">
+    <div id="app-header">
         <div class="header-content">
             <div id="user-info">
                 <div id="user-avatar"></div>
-                <span>Welcome, <span id="user-email"></span></span>
-                <a href="./dashboard.html" class="back-link"><span class="material-symbols-outlined">arrow_back</span>Back to Dashboard</a>
+                <span>Welcome,</span> <span id="user-email"></span>
             </div>
             <div class="header-actions">
-                <button id="print-button" class="toolbar-btn">
-                    <span class="material-symbols-outlined">print</span>Print
-                </button>
-                <button id="logout-button">Logout</button>
+                <a href="./dashboard.html" class="header-btn"><span class="material-symbols-outlined">dashboard</span><span class="btn-text">Dashboard</span></a>
+                <button id="print-button" class="header-btn"><span class="material-symbols-outlined">print</span><span class="btn-text">Print</span></button>
+                <button id="logout-button" class="header-btn"><span class="material-symbols-outlined">logout</span><span class="btn-text">Logout</span></button>
             </div>
         </div>
-    </header>
+    </div>
 
     <div class="master-container">
         <div id="project-header" class="project-header">
             <h1 id="project-title" contenteditable="true">Loading Project...</h1>
             <button id="delete-project-btn">Delete Project</button>
         </div>
-        <div id="schedules-wrapper">
-            <!-- Schedule blocks will be rendered here by JavaScript -->
-        </div>
+        <div id="schedules-wrapper"></div>
     </div>
 </div>
 
@@ -156,10 +252,12 @@
         <div class="schedule-header">
             <h2 class="schedule-title"></h2>
         </div>
-        <table>
-            <colgroup><col style="width: 60%;"><col style="width: 20%;"><col style="width: 20%;"></colgroup>
-            <tbody class="schedule-table-body"></tbody>
-        </table>
+        <div class="table-wrapper">
+             <table>
+                <colgroup><col style="width: 60%;"><col style="width: 20%;"><col style="width: 20%;"></colgroup>
+                <tbody class="schedule-table-body"></tbody>
+            </table>
+        </div>
     </div>
 </template>
 
@@ -244,13 +342,20 @@
                 }
             });
             this.tableBody.innerHTML = tempDiv.querySelector('tbody').innerHTML;
+            
+            // Re-apply header colors after render
+            this.element.querySelectorAll('.header-row[data-section="treasures"] td').forEach(td => td.style.backgroundColor = 'rgb(70, 132, 153)');
+            this.element.querySelectorAll('.header-row[data-section="ministry"] td').forEach(td => td.style.backgroundColor = 'rgb(212, 162, 42)');
+            this.element.querySelectorAll('.header-row[data-section="living"] td').forEach(td => td.style.backgroundColor = 'rgb(192, 66, 53)');
         }
         
         getContent() {
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = `<table><tbody>${this.tableBody.innerHTML}</tbody></table>`;
-            tempDiv.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
-            return tempDiv.querySelector('tbody').innerHTML;
+            const tempBody = this.tableBody.cloneNode(true);
+            tempBody.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+            tempBody.querySelectorAll('[style*="background-color"]').forEach(el => {
+                if (!el.closest('.header-row')) el.style.backgroundColor = '';
+            });
+            return tempBody.innerHTML;
         }
 
         setupEventListeners() {
@@ -291,7 +396,7 @@
 
         getContentForComparison() {
             const tablesData = this.scheduleTables.map(table => ({ title: table.data.title, content: table.getContent() }));
-            return JSON.stringify(tablesData);
+            return JSON.stringify({ name: projectTitleEl.textContent, tables: tablesData });
         }
 
         setupEventListeners() {
@@ -309,7 +414,6 @@
         }
     }
 
-    // --- AUTHENTICATION & PAGE LOGIC ---
     auth.onAuthStateChanged(user => {
         if (user) {
             if (user.email === ADMIN_EMAIL) {
@@ -343,7 +447,9 @@
                     activeProject = new Project(doc.id, remoteData, userSchedulesCollection);
                 } else {
                     const localContent = activeProject.getContentForComparison();
-                    const remoteContent = JSON.stringify(remoteData.tables);
+                    const remoteContent = JSON.stringify(remoteData);
+
+                    // A simple check to avoid re-rendering if data is identical
                     if (localContent !== remoteContent) {
                         activeProject.render(remoteData);
                     }
@@ -361,24 +467,28 @@
 
     async function initCreationFlow() {
         const templatesCollection = db.collection("templates");
-        const snapshot = await templatesCollection.orderBy("createdAt").get();
-        templateList.innerHTML = '';
-        if (snapshot.empty) {
-            templateList.innerHTML = '<li>No templates available. Please ask an admin to create one.</li>';
-        } else {
-            snapshot.docs.forEach(doc => {
-                const li = document.createElement('li');
-                li.innerHTML = `<label><input type="checkbox" data-id="${doc.id}" data-name="${doc.data().name}" data-content="${encodeURIComponent(doc.data().content)}"> ${doc.data().name}</label>`;
-                templateList.appendChild(li);
-            });
+        try {
+            const snapshot = await templatesCollection.orderBy("createdAt").get();
+            templateList.innerHTML = '';
+            if (snapshot.empty) {
+                templateList.innerHTML = '<li>No templates available. Please ask an admin to create one.</li>';
+            } else {
+                snapshot.docs.forEach(doc => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<label><input type="checkbox" data-id="${doc.id}" data-name="${doc.data().name}" data-content="${encodeURIComponent(doc.data().content)}"> ${doc.data().name}</label>`;
+                    templateList.appendChild(li);
+                });
+            }
+        } catch (error) {
+            console.error("Error fetching templates: ", error);
+            templateList.innerHTML = '<li>Error loading templates.</li>';
         }
         templateSelectionModal.style.display = 'flex';
     }
 
-    // --- GLOBAL UI EVENT LISTENERS ---
     function setupGlobalUI() {
         document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
-        document.getElementById('print-button').addEventListener('click', handlePrint);
+        document.getElementById('print-button').addEventListener('click', () => window.print());
         
         document.getElementById('cancel-template-selection').addEventListener('click', () => {
             templateSelectionModal.style.display = 'none';
@@ -411,20 +521,18 @@
                 return { title: input.dataset.name, content: tempDiv.querySelector('tbody').innerHTML };
             });
             
-            const newDocRef = await userSchedulesCollection.add({
-                name: newProjectName,
-                tables: tablesArray,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            window.location.href = `./editor.html?id=${newDocRef.id}`;
+            try {
+                const newDocRef = await userSchedulesCollection.add({
+                    name: newProjectName,
+                    tables: tablesArray,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                window.location.href = `./editor.html?id=${newDocRef.id}`;
+            } catch (error) {
+                console.error("Error creating document: ", error);
+                alert("Failed to create the schedule. Please try again.");
+            }
         });
-    }
-    
-    function handlePrint() {
-        // A brief delay allows the browser to apply print styles before opening the dialog
-        setTimeout(() => {
-            window.print();
-        }, 100);
     }
 
     setupGlobalUI();
