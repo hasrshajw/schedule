@@ -101,79 +101,76 @@
     /* === DEFINITIVE PRINT STYLES FOR CENTERING === */
     /* ========================================================= */
     @media print {
-        @page {
-            size: A4 landscape;
-            margin: 0; /* Ensures NO margins on the paper edge */
-        }
-
-        html, body {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            background-color: #fff !important;
-        }
-
-        /* Hide ALL elements that are not part of the printable schedule */
-        #app-header,
-        .project-header,
-        .header-actions,
-        #delete-project-btn,
-        .schedule-header {
-            display: none !important;
-        }
-        
-        /* Make containers simple wrappers */
-        #app-container, .master-container, #schedules-wrapper {
-            display: block;
-            width: 100%;
-            height: auto;
-            padding: 0 !important;
-            margin: 0 !important;
-            box-shadow: none !important;
-            border: none !important;
-            background: none !important;
-        }
-        
-        /* Set each block to a full page GRID container for centering */
-        .schedule-block {
-            width: 100%;
-            height: 100vh; /* Use viewport height for a reliable full page */
-            display: grid;
-            align-content: center; /* Vertically center the grid's content */
-            justify-content: center; /* Horizontally center the grid's content */
-            page-break-after: always;
-            padding: 5mm;
-            border: 2px solid #4B0082 !important;
-            box-sizing: border-box;
-        }
-
-        /* The table no longer needs any margin or flex properties for centering */
-        table {
-            width: auto; /* Allow table to shrink to its content width, enabling centering */
-            border: 2px solid #000 !important;
-            color: #000 !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-        }
-        
-        /* Preserve basic table cell styles for print */
-        th, td {
-            border: 1px solid #000 !important;
-        }
-
-        td.cell-selected, th.cell-selected {
-            outline: none !important;
-        }
-
-        th {
-            border-bottom: 1px solid #000 !important;
-        }
-        
-        tbody tr:nth-child(2) > td {
-            border-top: 2px solid #000 !important;
-        }
+    @page {
+        size: A4 landscape;
+        margin: 0;
     }
+
+    html, body {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        background-color: #fff !important;
+    }
+
+    /* Hide ALL non-essential elements */
+    #app-header,
+    .project-header,
+    .header-actions,
+    #delete-project-btn,
+    .schedule-header {
+        display: none !important;
+    }
+
+    /* Make containers simple wrappers */
+    #app-container, .master-container, #schedules-wrapper {
+        display: block;
+        width: 100%;
+        height: 100%;
+        padding: 0 !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+        background: none !important;
+    }
+
+    /* Set each block to a full page GRID container for centering */
+    .schedule-block {
+        width: 100%;
+        height: 100vh;
+        display: grid;
+        place-items: center;
+        page-break-after: always;
+        padding: 5mm 20mm; /* 5mm for top/bottom, 20mm for left/right margins */
+        border: 2px solid #4B0082 !important;
+        box-sizing: border-box;
+    }
+
+    /* The table itself needs no special centering */
+    table {
+        border: 2px solid #000 !important;
+        color: #000 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    
+    th, td {
+        border: 1px solid #000 !important;
+    }
+
+    td.cell-selected, th.cell-selected {
+        outline: none !important;
+    }
+
+    th {
+        border-bottom: 1px solid #000 !important;
+    }
+    
+    tbody tr:nth-child(2) > td {
+        border-top: 2px solid #000 !important;
+    }
+}
 
     /* MOBILE RESPONSIVE STYLES */
     @media (max-width: 768px) {
