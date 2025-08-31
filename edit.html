@@ -81,6 +81,11 @@
     .schedule-block .header-row .cell-icon { filter: brightness(0) invert(1); }
     .schedule-block .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; }
     .schedule-block .header-row td { font-size: 16px; color: #ffffff; height: 42px; }
+    
+    /* THIS IS A FIX: Hide the draggable icon (⠿) completely */
+    .schedule-block .row-handle-icon {
+        display: none !important;
+    }
 
     /* Modal Styles */
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 16px; }
@@ -120,7 +125,7 @@
         .header-actions,
         #delete-project-btn,
         .schedule-header,
-        .row-handle { /* THIS IS A FIX: Hide the draggable row handle */
+        .row-handle { /* Also hide the invisible row-handle container */
             display: none !important;
         }
 
@@ -143,13 +148,14 @@
             display: grid;
             place-items: center; /* The key command for vertical and horizontal centering */
             page-break-after: always;
-            padding: 5mm 20mm; /* Vertical and horizontal padding */
+            padding: 5mm;
             border: none !important; /* THIS IS A FIX: Remove the outer border */
             box-sizing: border-box;
         }
 
-        /* The table itself needs no special centering */
+        /* The table is now auto-width to allow centering */
         table {
+            width: auto; /* THIS IS THE KEY FIX for horizontal centering */
             border: 2px solid #000 !important;
             color: #000 !important;
             -webkit-print-color-adjust: exact !important;
