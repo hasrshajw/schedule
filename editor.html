@@ -10,109 +10,156 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
-<!-- Noto Sans Telugu Google Font -->
+<!-- FONTS -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 
 <style>
-    /* [ Note: This contains all the same styles as your previous definitive version ] */
-    :root { --primary-color: #0d6efd; --border-color: #dee2e6; --background-color: #f8f9fa; --danger-color: #dc3545; --warning-color: #ffc107; --success-color: #198754; } body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--background-color); padding: 20px; color: #212529; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; } .hidden { display: none !important; } #app-header { max-width: 1000px; margin: 0 auto 20px auto; padding: 10px 25px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: space-between; gap: 15px; } #user-info { display: flex; align-items: center; gap: 10px; } #user-email { font-weight: bold; } #logout-button { background-color: var(--danger-color); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; } .master-container { max-width: 1000px; margin: 0 auto 25px auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); } .project-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 2px solid var(--border-color); } .project-title { font-size: 2em; font-weight: 700; margin: 0; flex-grow: 1; border: 1px solid transparent; padding: 5px; border-radius: 4px; font-family: 'Noto Sans Telugu', sans-serif; } .project-title:focus { outline: none; border-color: var(--primary-color); background-color: #f0f8ff; } .schedule-block { padding-bottom: 20px; margin-bottom: 20px; border-bottom: 1px solid #eee; } .schedule-block:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; } .schedule-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; } .schedule-title { font-size: 1.2em; font-weight: 600; margin: 0; flex-grow: 1; } .status-indicator { font-size: 14px; font-weight: bold; transition: color 0.3s; } table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.25px; } th, td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; } [contenteditable="true"]:focus { background-color: #fffbe5; } .row-handle { position: absolute; left: -30px; top: 0; width: 30px; height: 100%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #aaa; user-select: none; } .row-handle-icon { opacity: 0; transition: opacity 0.2s; font-size: 18px; } tr:hover .row-handle-icon { opacity: 1; } .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; } .cell-icon { height: 70%; max-height: 24px; object-fit: contain; flex-shrink: 0; } .header-row .cell-icon { filter: brightness(0) invert(1); } .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; } .header-row td { font-size: 16px; color: #ffffff; height: 42px; } .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; } .modal-content { display:flex; flex-direction:column; gap:15px; background: white; padding: 25px; border-radius: 8px; min-width: 400px; max-height: 80vh; } #template-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; } #template-list li { padding: 10px; border-bottom: 1px solid var(--border-color); } #template-list label { display: flex; align-items: center; gap: 10px; font-size: 16px; cursor: pointer; }
-    #print-button { background-color: #6c757d; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; margin-left: auto; }
+    :root {
+        --primary-color: #012726;
+        --primary-hover: #024443;
+        --primary-light: #e6f6f6;
+        --danger-color: #d32f2f;
+        --danger-hover: #b71c1c;
+        --danger-light: #fde8e8;
+        --warning-color: #f59e0b;
+        --success-color: #2e7d32;
+        --border-color: #e5e7eb;
+        --background-color: #f8fafc;
+        --text-primary: #1f2937;
+        --text-secondary: #6b7280;
+        --surface-color: #ffffff;
+        --radius-md: 8px;
+        --radius-lg: 16px;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        --ease: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    body { font-family: 'Inter', sans-serif; background-color: var(--background-color); margin: 0; padding: 88px 20px 20px; color: var(--text-primary); }
+    .hidden { display: none !important; }
+
+    /* App Header */
+    #app-header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border-color); padding: 12px 20px; }
+    .header-content { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    #user-info { display: flex; align-items: center; gap: 12px; font-size: 14px; }
+    #user-avatar { width: 36px; height: 36px; border-radius: 50%; background-color: var(--border-color); display: flex; align-items: center; justify-content: center; font-weight: 600; color: var(--text-secondary); }
+    #user-email { font-weight: 600; color: var(--text-primary); }
+    .header-actions { display: flex; align-items: center; gap: 12px; }
+    .toolbar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); transition: all 0.2s var(--ease); text-decoration: none; color: var(--text-secondary); }
+    .toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; border-color: #d1d5db; color: var(--text-primary); }
+    #logout-button { background-color: transparent; border: 1px solid var(--border-color); padding: 8px 16px; border-radius: var(--radius-md); cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s var(--ease); }
+    #logout-button:hover { background-color: var(--danger-light); color: var(--danger-hover); border-color: var(--danger-hover); }
+
+    /* Main Layout */
+    .master-container { max-width: 1100px; margin: 0 auto; background: var(--surface-color); padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
+    .project-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color); }
+    .project-title { font-size: 1.75rem; font-weight: 700; margin: 0; flex-grow: 1; border: none; padding: 4px 8px; margin: -4px -8px; border-radius: var(--radius-md); font-family: 'Noto Sans Telugu', sans-serif; }
+    .project-title:focus { outline: 2px solid var(--primary-color); background-color: var(--primary-light); }
+
+    /* Schedule Block */
+    .schedule-block { margin-bottom: 32px; }
+    .schedule-block:last-child { margin-bottom: 0; }
+    .schedule-header { margin-bottom: 16px; }
+    .schedule-title { font-size: 1.25rem; font-weight: 600; margin: 0; color: var(--text-secondary); font-family: 'Noto Sans Telugu', sans-serif; }
+
+    /* TABLE STYLES */
+    .schedule-block table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.25px; }
+    .schedule-block th, .schedule-block td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; }
+    .schedule-block [contenteditable="true"]:focus { background-color: #fffbe5; }
+    .schedule-block .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; }
+    .schedule-block .cell-icon { height: 70%; max-height: 24px; object-fit: contain; flex-shrink: 0; }
+    .schedule-block .header-row .cell-icon { filter: brightness(0) invert(1); }
+    .schedule-block .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; }
+    .schedule-block .header-row td { font-size: 16px; color: #ffffff; height: 42px; }
+    
+    .schedule-block .row-handle { display: none !important; }
+
+    /* Modal Styles */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 16px; }
+    .modal-content { background: white; padding: 24px; border-radius: var(--radius-lg); width: 100%; max-width: 500px; max-height: 90vh; display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow-lg); }
+    .modal-content h2 { margin-top: 0; }
+    .modal-content p { margin: 0 0 16px 0; color: var(--text-secondary); }
+    #new-project-name { width: 100%; padding: 12px; font-size: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); }
+    #template-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md); }
+    #template-list li { padding: 12px; border-bottom: 1px solid var(--border-color); }
+    #template-list li:last-child { border-bottom: none; }
+    #template-list label { display: flex; align-items: center; gap: 10px; font-size: 16px; cursor: pointer; font-weight: 500; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px; }
+    .modal-actions button { padding: 10px 20px; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); }
+    #cancel-template-selection { background-color: var(--surface-color); }
+    #confirm-template-selection { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
+
+    /* DEFINITIVE PRINT STYLES */
+    @media print {
+        @page { size: A4 landscape; margin: 0; }
+        html, body { height: 100%; width: 100%; margin: 0; padding: 0; background-color: #fff !important; }
+        #app-header, .project-header, .header-actions, .schedule-header, .row-handle { display: none !important; }
+        #app-container, .master-container, #schedules-wrapper { display: block; width: 100%; height: 100%; padding: 0 !important; margin: 0 !important; box-shadow: none !important; border: none !important; background: none !important; }
+        .schedule-block { width: 100%; height: 100vh; display: flex; align-items: center; justify-content: flex-start; page-break-after: always; padding: 5mm 0mm 5mm 6mm; border: none !important; box-sizing: border-box; }
+        table { width: 100%; border: 2px solid #000 !important; color: #000 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        th, td { border: 1px solid #000 !important; }
+        td.cell-selected, th.cell-selected { outline: none !important; }
+        th { border-bottom: 1px solid #000 !important; }
+        tbody tr:nth-child(2) > td { border-top: 2px solid #000 !important; }
+    }
+
+    /* MOBILE RESPONSIVE STYLES */
+    @media (max-width: 768px) {
+        body { padding: 72px 0 0 0; background-color: var(--surface-color); }
+        #app-header { padding: 12px 16px; }
+        #user-info { display: none; } /* Hide user info to make space */
+        .header-content { justify-content: center; } /* Center the actions */
+        .header-actions { width: 100%; display: flex; justify-content: space-between; gap: 8px; }
+        .header-actions .toolbar-btn, .header-actions #logout-button { flex: 1; font-size: 12px; padding: 8px 4px; }
+        .master-container { padding: 0 16px 16px; border-radius: 0; box-shadow: none; }
+        .project-header { flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px 0; margin-bottom: 16px; }
+        .project-title { font-size: 1.5rem; }
+        .schedule-block { margin-bottom: 24px; padding: 0 0 24px 0; border-bottom: 1px solid var(--border-color); }
+        .schedule-header { padding: 0; } /* Remove extra padding for mobile */
+        
+        /* Mobile table adjustments */
+        .schedule-block table { font-size: 6.5px; }
+        .schedule-block th, .schedule-block td { padding: 0 1.5px; height: 24px; }
+        .schedule-block .header-row td { height: 26px; font-size: 8px; }
+        .schedule-block .cell-icon { max-height: 14px; }
+    }
 </style>
 
-<!-- --- FIX: Dedicated Print Styles --- -->
-<style media="print">
-    @page {
-        size: A4 landscape;
-        /* Set the physical, unprintable hardware margins of the paper to be minimal */
-        margin: 10mm; 
-    }
-
-    body {
-        background-color: #fff !important;
-        padding: 0;
-        margin: 0;
-    }
-
-    /* Hide all non-essential elements for a clean printout */
-    #app-header, .project-header, .row-handle, .status-indicator, .schedule-title {
-        display: none !important;
-    }
-    
-    /* Make the master container an invisible wrapper */
-    .master-container {
-        width: 100%;
-        max-width: 100%;
-        box-shadow: none;
-        padding: 0;
-        margin: 0;
-        border: none;
-    }
-
-    /* --- THE DEFINITIVE FIX --- */
-    /* Apply border and padding to the element that repeats on EVERY page */
-    .schedule-block {
-        width: 100%;
-        height: 100%;
-        display: flex; 
-        flex-direction: column;
-        page-break-after: always; /* Force one block per page */
-        
-        /* This creates the visible margin INSIDE the printable area */
-        padding: 5mm 20mm; 
-        
-        border: 2px solid #4B0082 !important; /* The visible page border */
-        box-sizing: border-box; /* CRITICAL: Padding & border are included in the element's size */
-        border-bottom: none !important;
-    }
-
-    table {
-        flex-grow: 1; /* Make the table fill the remaining height inside the padded block */
-       border: 2px solid #000 !important
-        color: #000 !important;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-    }
-    
-    th, td {
-        border: 1px solid #000 !important;
-    }
-     td.cell-selected, th.cell-selected {
-        outline: none !important; /* Removes the blue selection outline */
-    }
-    th {
-        border-bottom: 1px solid #000 !important;
-    }
-    tbody tr:nth-child(2) > td {
-        border-top: 2px solid #000 !important;
-    }
-
-</style>
 </head>
 <body>
 
 <div id="app-container" class="hidden">
-    <div id="app-header">
-        <div id="user-info">
-            Welcome, <span id="user-email"></span>
-            <a href="./dashboard.html" style="margin-left: 20px; font-family: sans-serif;">&larr; Back to Dashboard</a>
+    <header id="app-header">
+        <div class="header-content">
+            <div id="user-info">
+                <div id="user-avatar"></div>
+                <span>Welcome, <span id="user-email"></span></span>
+            </div>
+            <div class="header-actions">
+                <a href="./dashboard.html" class="toolbar-btn">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                    <span>Dashboard</span>
+                </a>
+                <button id="print-button" class="toolbar-btn">
+                    <span class="material-symbols-outlined">print</span>
+                    <span>Print</span>
+                </button>
+                <button id="logout-button">Logout</button>
+            </div>
         </div>
-        <button id="print-button">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/><path d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2H5zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4V3zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2H5zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1z"/></svg>
-            Print
-        </button>
-        <button id="logout-button">Logout</button>
-    </div>
+    </header>
 
     <div class="master-container">
         <div id="project-header" class="project-header">
             <h1 id="project-title" contenteditable="true">Loading Project...</h1>
-            <button id="delete-project-btn">Delete Project</button>
         </div>
-        <div id="schedules-wrapper">
-            <!-- Schedule blocks will be rendered here by JavaScript -->
-        </div>
+        <div id="schedules-wrapper"></div>
     </div>
 </div>
 
@@ -132,11 +179,11 @@
     <div class="modal-content">
         <h2>Create a New Schedule</h2>
         <p>Give your new project a name and select the templates to include.</p>
-        <input type="text" id="new-project-name" placeholder="Enter Project Name" style="padding: 10px; font-size: 16px; border-radius: 6px; border: 1px solid var(--border-color);">
+        <input type="text" id="new-project-name" placeholder="Enter Project Name">
         <ul id="template-list"></ul>
-        <div style="display:flex; justify-content:flex-end; gap:10px;">
+        <div class="modal-actions">
             <button id="cancel-template-selection">Cancel</button>
-            <button id="confirm-template-selection" style="background-color:var(--primary-color); color:white; border:none; padding: 10px 15px; border-radius: 6px; cursor: pointer;">Create Schedule</button>
+            <button id="confirm-template-selection">Create Schedule</button>
         </div>
     </div>
 </div>
@@ -168,6 +215,7 @@
     // --- DOM ELEMENTS ---
     const appContainer = document.getElementById('app-container');
     const userEmailEl = document.getElementById('user-email');
+    const userAvatarEl = document.getElementById('user-avatar');
     const projectTitleEl = document.getElementById('project-title');
     const schedulesWrapper = document.getElementById('schedules-wrapper');
     const templateSelectionModal = document.getElementById('template-selection-modal');
@@ -260,16 +308,6 @@
 
         setupEventListeners() {
             projectTitleEl.addEventListener('input', () => this.debouncedSave());
-            document.getElementById('delete-project-btn').addEventListener('click', () => this.delete());
-        }
-
-        delete() {
-            if (confirm('Are you sure you want to permanently delete this entire project?')) {
-                this.collectionRef.doc(this.id).delete().then(() => {
-                    alert('Project deleted.');
-                    window.location.href = './dashboard.html';
-                });
-            }
         }
     }
 
@@ -284,12 +322,16 @@
             userSchedulesCollection = db.collection(`userSchedules/${currentUser.uid}/schedules`);
             appContainer.classList.remove('hidden');
             userEmailEl.textContent = user.email;
-            
+            userAvatarEl.textContent = user.email.charAt(0).toUpperCase();
+
             const params = new URLSearchParams(window.location.search);
             currentProjectId = params.get('id');
             
-            if (currentProjectId) initEditor();
-            else initCreationFlow();
+            if (currentProjectId) {
+                initEditor();
+            } else {
+                initCreationFlow();
+            }
         } else {
             window.location.replace('./login.html');
         }
@@ -323,6 +365,9 @@
     }
 
     async function initCreationFlow() {
+        document.getElementById('project-header').style.display = 'none';
+        document.getElementById('print-button').style.display = 'none';
+
         const templatesCollection = db.collection("templates");
         const snapshot = await templatesCollection.orderBy("createdAt").get();
         templateList.innerHTML = '';
@@ -383,13 +428,9 @@
         });
     }
     
-    // --- NEW PRINT FUNCTIONALITY ---
     function handlePrint() {
-        document.body.classList.add('print-view');
-        // A brief delay allows the browser to apply print styles before opening the dialog
         setTimeout(() => {
             window.print();
-            document.body.classList.remove('print-view');
         }, 100);
     }
 
