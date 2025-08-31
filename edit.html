@@ -127,7 +127,7 @@
         #app-container, .master-container, #schedules-wrapper {
             display: block;
             width: 100%;
-            height: 100%;
+            height: auto;
             padding: 0 !important;
             margin: 0 !important;
             box-shadow: none !important;
@@ -135,21 +135,25 @@
             background: none !important;
         }
 
-        /* Set each block to a full page GRID container for centering */
+        /* Set each block to a full page ANCHOR for positioning */
         .schedule-block {
             width: 100%;
-            height: 100%; /* For print, this refers to page height */
-            display: grid;
-            place-items: center; /* The key command for vertical and horizontal centering */
+            height: 100vh;
+            position: relative; /* THIS IS KEY: Establishes the positioning context */
             page-break-after: always;
-            padding: 5mm;
+            padding: 0;
             border: 2px solid #4B0082 !important;
             box-sizing: border-box;
+            margin: 0;
         }
 
-        /* The table no longer needs any margin or flex properties for centering */
+        /* Center the table using absolute positioning */
         table {
-            width: auto;
+            position: absolute;               /* Take the table out of normal flow */
+            top: 50%;                         /* Move its top edge to the middle of the page */
+            left: 50%;                        /* Move its left edge to the middle of the page */
+            transform: translate(-50%, -50%); /* Shift it back by half its own width and height */
+            width: auto;                      /* Allow table to be its natural width for horizontal centering */
             border: 2px solid #000 !important;
             color: #000 !important;
             -webkit-print-color-adjust: exact !important;
@@ -159,18 +163,6 @@
         /* Preserve basic table cell styles for print */
         th, td {
             border: 1px solid #000 !important;
-        }
-
-        td.cell-selected, th.cell-selected {
-            outline: none !important;
-        }
-
-        th {
-            border-bottom: 1px solid #000 !important;
-        }
-        
-        tbody tr:nth-child(2) > td {
-            border-top: 2px solid #000 !important;
         }
     }
 
