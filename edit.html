@@ -141,7 +141,7 @@
             align-items: center;
             justify-content: flex-start;
             page-break-after: always;
-            padding: 5mm 10mm 5mm 0mm; /* Top, RIGHT, Bottom, LEFT */
+            padding: 5mm 10mm 5mm 0mm;
             border: none !important;
             box-sizing: border-box;
         }
@@ -406,6 +406,7 @@
             if (doc.exists) {
                 const remoteData = doc.data();
                 if (!activeProject) {
+                    // This is where the Project is created and its listeners are set up
                     activeProject = new Project(doc.id, remoteData, userSchedulesCollection);
                 } else {
                     const localContent = activeProject.getContentForComparison();
