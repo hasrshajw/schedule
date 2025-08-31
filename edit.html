@@ -107,8 +107,8 @@
         }
 
         html, body {
-            height: 100%;
             width: 100%;
+            height: 100%;
             margin: 0;
             padding: 0;
             background-color: #fff !important;
@@ -122,8 +122,8 @@
         .schedule-header {
             display: none !important;
         }
-
-        /* Make the containers simple wrappers that don't interfere */
+        
+        /* Make containers simple wrappers */
         #app-container, .master-container, #schedules-wrapper {
             display: block;
             width: 100%;
@@ -134,26 +134,23 @@
             border: none !important;
             background: none !important;
         }
-
-        /* Set each block to a full page ANCHOR for positioning */
+        
+        /* Set each block to a full page GRID container for centering */
         .schedule-block {
             width: 100%;
-            height: 100vh;
-            position: relative; /* THIS IS KEY: Establishes the positioning context */
+            height: 100vh; /* Use viewport height for a reliable full page */
+            display: grid;
+            align-content: center; /* Vertically center the grid's content */
+            justify-content: center; /* Horizontally center the grid's content */
             page-break-after: always;
-            padding: 0;
+            padding: 5mm;
             border: 2px solid #4B0082 !important;
             box-sizing: border-box;
-            margin: 0;
         }
 
-        /* Center the table using absolute positioning */
+        /* The table no longer needs any margin or flex properties for centering */
         table {
-            position: absolute;               /* Take the table out of normal flow */
-            top: 50%;                         /* Move its top edge to the middle of the page */
-            left: 50%;                        /* Move its left edge to the middle of the page */
-            transform: translate(-50%, -50%); /* Shift it back by half its own width and height */
-            width: auto;                      /* Allow table to be its natural width for horizontal centering */
+            width: auto; /* Allow table to shrink to its content width, enabling centering */
             border: 2px solid #000 !important;
             color: #000 !important;
             -webkit-print-color-adjust: exact !important;
@@ -163,6 +160,18 @@
         /* Preserve basic table cell styles for print */
         th, td {
             border: 1px solid #000 !important;
+        }
+
+        td.cell-selected, th.cell-selected {
+            outline: none !important;
+        }
+
+        th {
+            border-bottom: 1px solid #000 !important;
+        }
+        
+        tbody tr:nth-child(2) > td {
+            border-top: 2px solid #000 !important;
         }
     }
 
