@@ -82,7 +82,7 @@
     .schedule-block .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; }
     .schedule-block .header-row td { font-size: 16px; color: #ffffff; height: 42px; }
     
-    /* THIS IS A FIX: Hide the draggable icon (⠿) completely */
+    /* THIS IS A FIX: Hide the draggable icon and handle completely */
     .schedule-block .row-handle {
         display: none !important;
     }
@@ -141,22 +141,22 @@
             background: none !important;
         }
 
-        /* Set each block to a full page FLEX container for centering */
+        /* Set each block to a full page FLEX container */
         .schedule-block {
             width: 100%;
             height: 100vh;
             display: flex;
             align-items: center; /* Vertically centers the table */
-            justify-content: flex-start; /* Aligns table to the left */
+            justify-content: flex-start; /* Aligns content to the left */
             page-break-after: always;
-            padding: 5mm 0mm 5mm 6mm; /* Top, RIGHT, Bottom, LEFT */
+            padding: 5mm 10mm 5mm 0mm; /* Top, RIGHT, Bottom, LEFT */
             border: none !important;
             box-sizing: border-box;
         }
         
         /* The table now fills the padded container */
         table {
-            width: 100%; /* Fill the container defined by the padding above */
+            width: 100%; /* Fill the container defined by padding */
             border: 2px solid #000 !important;
             color: #000 !important;
             -webkit-print-color-adjust: exact !important;
@@ -366,6 +366,20 @@
 
         setupEventListeners() {
             projectTitleEl.addEventListener('input', () => this.debouncedSave());
+            // Connect the button to this specific project's delete method
+            document.getElementById('delete-project-btn').addEventListener('click', () => this.delete());
+        }
+
+        delete() {
+            if (confirm('Are you sure you want to permanently delete this entire project?')) {
+                this.collectionRef.doc(this.id).delete().then(() => {
+                    alert('Project deleted.');
+                    window.location.href = './dashboard.html';
+                }).catch(error => {
+                    console.error("Error deleting project:", error);
+                    alert("An error occurred while deleting the project.");
+                });
+            }
         }
     }
 
@@ -385,8 +399,11 @@
             const params = new URLSearchParams(window.location.search);
             currentProjectId = params.get('id');
             
-            if (currentProjectId) initEditor();
-            else initCreationFlow();
+            if (currentProjectId) {
+                initEditor();
+            } else {
+                initCreationFlow();
+            }
         } else {
             window.location.replace('./login.html');
         }
@@ -400,6 +417,7 @@
             if (doc.exists) {
                 const remoteData = doc.data();
                 if (!activeProject) {
+                    // This is where the Project is created and the listeners are set up
                     activeProject = new Project(doc.id, remoteData, userSchedulesCollection);
                 } else {
                     const localContent = activeProject.getContentForComparison();
@@ -420,6 +438,10 @@
     }
 
     async function initCreationFlow() {
+        // Hide elements that are only for editing an existing project
+        document.getElementById('project-header').style.display = 'none';
+        document.getElementById('print-button').style.display = 'none';
+
         const templatesCollection = db.collection("templates");
         const snapshot = await templatesCollection.orderBy("createdAt").get();
         templateList.innerHTML = '';
@@ -439,23 +461,6 @@
     function setupGlobalUI() {
         document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
         document.getElementById('print-button').addEventListener('click', handlePrint);
-
-        // CORRECTED DELETE LISTENER
-        document.getElementById('delete-project-btn').addEventListener('click', () => {
-            if (currentProjectId && userSchedulesCollection) {
-                if (confirm('Are you sure you want to permanently delete this entire project?')) {
-                    userSchedulesCollection.doc(currentProjectId).delete().then(() => {
-                        alert('Project deleted.');
-                        window.location.href = './dashboard.html';
-                    }).catch(error => {
-                        console.error("Error deleting project:", error);
-                        alert("Could not delete the project. See console for details.");
-                    });
-                }
-            } else {
-                alert("Cannot delete: Project ID not found.");
-            }
-        });
         
         document.getElementById('cancel-template-selection').addEventListener('click', () => {
             templateSelectionModal.style.display = 'none';
