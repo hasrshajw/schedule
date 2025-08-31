@@ -131,10 +131,14 @@
             box-sizing: border-box;
         }
         
-        /* KEY FIX: This is the centering cell */
+        /* KEY FIX: This new wrapper will act as the table-cell for centering */
         .print-center-wrapper {
             display: table-cell;
             vertical-align: middle;
+        }
+        
+        .schedule-block:last-child {
+            page-break-after: auto;
         }
         
         table {
