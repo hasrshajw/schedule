@@ -101,12 +101,11 @@
     @media print {
         @page {
             size: A4 landscape;
-            /* KEY FIX: This controls the spacing around the page content */
-            margin: 15mm 10mm 15mm 10mm; 
+            margin: 0;
         }
 
         html, body {
-            height: auto; /* Let content determine height */
+            height: 100%;
             width: 100%;
             margin: 0;
             padding: 0;
@@ -121,17 +120,21 @@
             display: contents;
         }
 
-        /* KEY FIX: Each block now forces a page break *before* it */
+        /* KEY FIX: This is the page container */
         .schedule-block {
-            page-break-before: always;
+            width: 100%;
+            height: 100vh; /* This is buggy on mobile but required for display:table */
+            display: table;
+            page-break-after: always;
+            padding: 5mm 10mm 5mm 0mm;
             border: none !important;
-            padding: 0;
-            margin: 0;
+            box-sizing: border-box;
         }
-
-        /* KEY FIX: Prevents a blank page at the very beginning */
-        .schedule-block:first-child {
-            page-break-before: auto;
+        
+        /* KEY FIX: This is the centering cell */
+        .print-center-wrapper {
+            display: table-cell;
+            vertical-align: middle;
         }
         
         table {
@@ -208,10 +211,13 @@
         <div class="schedule-header">
             <h2 class="schedule-title"></h2>
         </div>
-        <table>
-            <colgroup><col style="width: 60%;"><col style="width: 20%;"><col style="width: 20%;"></colgroup>
-            <tbody class="schedule-table-body"></tbody>
-        </table>
+        <!-- THIS IS THE KEY HTML CHANGE -->
+        <div class="print-center-wrapper">
+            <table>
+                <colgroup><col style="width: 60%;"><col style="width: 20%;"><col style="width: 20%;"></colgroup>
+                <tbody class="schedule-table-body"></tbody>
+            </table>
+        </div>
     </div>
 </template>
 
