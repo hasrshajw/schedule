@@ -380,15 +380,7 @@
             projectTitleEl.addEventListener('input', () => this.debouncedSave());
         }
 
-        delete() {
-            if (confirm('Are you sure you want to permanently delete this entire project?')) {
-                this.collectionRef.doc(this.id).delete().then(() => {
-                    alert('Project deleted.');
-                    window.location.href = './dashboard.html';
-                });
-            }
-        }
-    }
+        
 
     // --- AUTHENTICATION & PAGE LOGIC ---
     auth.onAuthStateChanged(user => {
