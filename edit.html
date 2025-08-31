@@ -72,7 +72,7 @@
     .schedule-header { margin-bottom: 16px; }
     .schedule-title { font-size: 1.25rem; font-weight: 600; margin: 0; color: var(--text-secondary); font-family: 'Noto Sans Telugu', sans-serif; }
 
-    /* TABLE STYLES */
+    /* PRESERVED TABLE STYLES */
     .schedule-block table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.25px; }
     .schedule-block th, .schedule-block td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; }
     .schedule-block [contenteditable="true"]:focus { background-color: #fffbe5; }
@@ -97,61 +97,58 @@
     #cancel-template-selection { background-color: var(--surface-color); }
     #confirm-template-selection { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 
-    /* --- DEFINITIVE PRINT STYLES --- */
+    /* ========================================================= */
+    /* === DEFINITIVE PRINT STYLES FOR CENTERING === */
+    /* ========================================================= */
     @media print {
         @page {
             size: A4 landscape;
             margin: 0; /* Ensures NO margins on the paper edge */
         }
 
-        body {
-            background-color: #fff !important;
-            padding: 0;
+        html, body {
+            height: 100%;
+            width: 100%;
             margin: 0;
+            padding: 0;
+            background-color: #fff !important;
         }
 
-        /* Hide ALL non-essential elements for a clean print */
+        /* Hide ALL elements that are not part of the printable schedule */
         #app-header,
         .project-header,
-        .row-handle,
-        .status-indicator,
-        .schedule-header,
-        #delete-project-btn {
+        .header-actions,
+        #delete-project-btn,
+        .schedule-header {
             display: none !important;
         }
 
-        .master-container {
-            width: 100%;
-            max-width: 100%;
-            box-shadow: none;
-            padding: 0;
-            margin: 0;
-            border: none;
-        }
-
-        /* Set each block to a full page ANCHOR for positioning */
-        .schedule-block {
+        /* Make the containers simple wrappers that don't interfere */
+        #app-container, .master-container, #schedules-wrapper {
+            display: block;
             width: 100%;
             height: 100%;
-            position: relative; /* THIS IS KEY: Establishes the positioning context */
-            page-break-after: always;
-            padding: 0;
-            border: 2px solid #4B0082 !important;
-            box-sizing: border-box;
-            border-bottom: none !important; /* To avoid double borders between pages */
-            margin-bottom: 0;
-        }
-        .schedule-block:last-child {
-            page-break-after: avoid; /* Don't add a blank page at the end */
+            padding: 0 !important;
+            margin: 0 !important;
+            box-shadow: none !important;
+            border: none !important;
+            background: none !important;
         }
 
-        /* Center the table using absolute positioning */
-        .schedule-block table {
-            position: absolute; /* Take the table out of normal flow */
-            top: 50%;           /* Move its top edge to the middle of the page */
-            left: 50%;          /* Move its left edge to the middle of the page */
-            transform: translate(-50%, -50%); /* Shift it back by half its own width and height */
-            width: auto; /* Allow table to be its natural width */
+        /* Set each block to a full page GRID container for centering */
+        .schedule-block {
+            width: 100%;
+            height: 100%; /* For print, this refers to page height */
+            display: grid;
+            place-items: center; /* The key command for vertical and horizontal centering */
+            page-break-after: always;
+            padding: 5mm;
+            border: 2px solid #4B0082 !important;
+            box-sizing: border-box;
+        }
+
+        /* The table no longer needs any margin or flex properties for centering */
+        table {
             border: 2px solid #000 !important;
             color: #000 !important;
             -webkit-print-color-adjust: exact !important;
@@ -159,19 +156,19 @@
         }
         
         /* Preserve basic table cell styles for print */
-        .schedule-block th, .schedule-block td {
+        th, td {
             border: 1px solid #000 !important;
         }
 
-        .schedule-block td.cell-selected, .schedule-block th.cell-selected {
+        td.cell-selected, th.cell-selected {
             outline: none !important;
         }
 
-        .schedule-block th {
+        th {
             border-bottom: 1px solid #000 !important;
         }
         
-        .schedule-block tbody tr:nth-child(2) > td {
+        tbody tr:nth-child(2) > td {
             border-top: 2px solid #000 !important;
         }
     }
