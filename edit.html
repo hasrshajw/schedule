@@ -50,12 +50,10 @@
     #user-info { display: flex; align-items: center; gap: 12px; font-size: 14px; }
     #user-avatar { width: 36px; height: 36px; border-radius: 50%; background-color: var(--border-color); display: flex; align-items: center; justify-content: center; font-weight: 600; color: var(--text-secondary); }
     #user-email { font-weight: 600; color: var(--text-primary); }
-    .back-link { color: var(--text-secondary); text-decoration: none; font-weight: 500; display: flex; align-items: center; gap: 4px; transition: color 0.2s var(--ease); }
-    .back-link:hover { color: var(--primary-color); }
     .header-actions { display: flex; align-items: center; gap: 12px; }
-    .toolbar-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); transition: all 0.2s var(--ease); }
+    .toolbar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); transition: all 0.2s var(--ease); text-decoration: none; color: var(--text-secondary); }
     .toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; border-color: #d1d5db; color: var(--text-primary); }
-    #logout-button { background-color: transparent; color: var(--text-secondary); border: 1px solid var(--border-color); padding: 8px 16px; border-radius: var(--radius-md); cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s var(--ease); }
+    #logout-button { background-color: transparent; border: 1px solid var(--border-color); padding: 8px 16px; border-radius: var(--radius-md); cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s var(--ease); }
     #logout-button:hover { background-color: var(--danger-light); color: var(--danger-hover); border-color: var(--danger-hover); }
 
     /* Main Layout */
@@ -63,8 +61,6 @@
     .project-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color); }
     .project-title { font-size: 1.75rem; font-weight: 700; margin: 0; flex-grow: 1; border: none; padding: 4px 8px; margin: -4px -8px; border-radius: var(--radius-md); font-family: 'Noto Sans Telugu', sans-serif; }
     .project-title:focus { outline: 2px solid var(--primary-color); background-color: var(--primary-light); }
-    #delete-project-btn { background-color: var(--danger-color); color: white; border: none; padding: 10px 16px; border-radius: var(--radius-md); font-weight: 600; cursor: pointer; transition: background-color 0.2s var(--ease); }
-    #delete-project-btn:hover { background-color: var(--danger-hover); }
 
     /* Schedule Block */
     .schedule-block { margin-bottom: 32px; }
@@ -99,61 +95,14 @@
     #cancel-template-selection { background-color: var(--surface-color); }
     #confirm-template-selection { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 
-    /* ========================================================= */
-    /* === DEFINITIVE PRINT STYLES === */
-    /* ========================================================= */
+    /* DEFINITIVE PRINT STYLES */
     @media print {
-        @page {
-            size: A4 landscape;
-            margin: 0;
-        }
-
-        html, body {
-            height: 100%;
-            width: 100%;
-            margin: 0;
-            padding: 0;
-            background-color: #fff !important;
-        }
-
-        /* Hide ALL non-essential elements */
-        #app-header, .project-header, .header-actions, #delete-project-btn, .schedule-header, .row-handle {
-            display: none !important;
-        }
-
-        /* Make containers simple wrappers */
-        #app-container, .master-container, #schedules-wrapper {
-            display: block;
-            width: 100%;
-            height: 100%;
-            padding: 0 !important;
-            margin: 0 !important;
-            box-shadow: none !important;
-            border: none !important;
-            background: none !important;
-        }
-
-        /* Set each block to a full page FLEX container for spacing */
-        .schedule-block {
-            width: 100%;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            page-break-after: always;
-            padding: 5mm 10mm 5mm 0mm;
-            border: none !important;
-            box-sizing: border-box;
-        }
-        
-        table {
-            width: 100%;
-            border: 2px solid #000 !important;
-            color: #000 !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-        }
-        
+        @page { size: A4 landscape; margin: 0; }
+        html, body { height: 100%; width: 100%; margin: 0; padding: 0; background-color: #fff !important; }
+        #app-header, .project-header, .header-actions, .schedule-header, .row-handle { display: none !important; }
+        #app-container, .master-container, #schedules-wrapper { display: block; width: 100%; height: 100%; padding: 0 !important; margin: 0 !important; box-shadow: none !important; border: none !important; background: none !important; }
+        .schedule-block { width: 100%; height: 100vh; display: flex; align-items: center; justify-content: flex-start; page-break-after: always; padding: 5mm 10mm 5mm 0mm; border: none !important; box-sizing: border-box; }
+        table { width: 100%; border: 2px solid #000 !important; color: #000 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
         th, td { border: 1px solid #000 !important; }
         td.cell-selected, th.cell-selected { outline: none !important; }
         th { border-bottom: 1px solid #000 !important; }
@@ -164,15 +113,17 @@
     @media (max-width: 768px) {
         body { padding: 72px 0 0 0; background-color: var(--surface-color); }
         #app-header { padding: 12px 16px; }
-        #user-info #user-email { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        #user-info span:not(#user-email) { display: none; }
+        #user-info { display: none; } /* Hide user info to make space */
+        .header-content { justify-content: center; } /* Center the actions */
+        .header-actions { width: 100%; display: flex; justify-content: space-between; gap: 8px; }
+        .header-actions .toolbar-btn, .header-actions #logout-button { flex: 1; font-size: 12px; padding: 8px 4px; }
         .master-container { padding: 0 16px 16px; border-radius: 0; box-shadow: none; }
         .project-header { flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px 0; margin-bottom: 16px; }
         .project-title { font-size: 1.5rem; }
-        #delete-project-btn { width: 100%; }
         .schedule-block { margin-bottom: 24px; padding: 0 0 24px 0; border-bottom: 1px solid var(--border-color); }
-        .schedule-header { padding: 0 16px; }
+        .schedule-header { padding: 0; } /* Remove extra padding for mobile */
         
+        /* Mobile table adjustments */
         .schedule-block table { font-size: 6.5px; }
         .schedule-block th, .schedule-block td { padding: 0 1.5px; height: 24px; }
         .schedule-block .header-row td { height: 26px; font-size: 8px; }
@@ -189,11 +140,15 @@
             <div id="user-info">
                 <div id="user-avatar"></div>
                 <span>Welcome, <span id="user-email"></span></span>
-                <a href="./dashboard.html" class="back-link"><span class="material-symbols-outlined">arrow_back</span>Back to Dashboard</a>
             </div>
             <div class="header-actions">
+                <a href="./dashboard.html" class="toolbar-btn">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                    <span>Dashboard</span>
+                </a>
                 <button id="print-button" class="toolbar-btn">
-                    <span class="material-symbols-outlined">print</span>Print
+                    <span class="material-symbols-outlined">print</span>
+                    <span>Print</span>
                 </button>
                 <button id="logout-button">Logout</button>
             </div>
@@ -203,7 +158,6 @@
     <div class="master-container">
         <div id="project-header" class="project-header">
             <h1 id="project-title" contenteditable="true">Loading Project...</h1>
-            <button id="delete-project-btn">Delete Project</button>
         </div>
         <div id="schedules-wrapper"></div>
     </div>
@@ -352,23 +306,8 @@
             return JSON.stringify(tablesData);
         }
 
-        // CORRECTED: setupEventListeners now activates the delete button
         setupEventListeners() {
             projectTitleEl.addEventListener('input', () => this.debouncedSave());
-            document.getElementById('delete-project-btn').addEventListener('click', () => this.delete());
-        }
-
-        // CORRECTED: The delete logic belongs to the Project object
-        delete() {
-            if (confirm('Are you sure you want to permanently delete this entire project?')) {
-                this.collectionRef.doc(this.id).delete().then(() => {
-                    alert('Project deleted.');
-                    window.location.href = './dashboard.html';
-                }).catch(error => {
-                    console.error("Error deleting project:", error);
-                    alert("An error occurred while deleting the project.");
-                });
-            }
         }
     }
 
@@ -406,7 +345,6 @@
             if (doc.exists) {
                 const remoteData = doc.data();
                 if (!activeProject) {
-                    // This is where the Project is created and its listeners are set up
                     activeProject = new Project(doc.id, remoteData, userSchedulesCollection);
                 } else {
                     const localContent = activeProject.getContentForComparison();
