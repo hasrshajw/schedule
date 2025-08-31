@@ -461,11 +461,21 @@
         document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
         document.getElementById('print-button').addEventListener('click', handlePrint);
 
-        document.getElementById('delete-project-btn').addEventListener('click', () => {
-        if (activeProject) {
-            activeProject.delete();
+        // THIS IS THE CORRECTED DELETE LISTENER
+    document.getElementById('delete-project-btn').addEventListener('click', () => {
+        // Use the globally available ID, which is ready immediately.
+        if (currentProjectId && userSchedulesCollection) {
+            if (confirm('Are you sure you want to permanently delete this entire project?')) {
+                userSchedulesCollection.doc(currentProjectId).delete().then(() => {
+                    alert('Project deleted.');
+                    window.location.href = './dashboard.html';
+                }).catch(error => {
+                    console.error("Error deleting project:", error);
+                    alert("Could not delete the project. See console for details.");
+                });
+            }
         } else {
-            alert("No project is currently loaded to delete.");
+            alert("Cannot delete: Project ID not found.");
         }
     });
         
