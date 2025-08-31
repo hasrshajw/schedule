@@ -82,7 +82,7 @@
     .schedule-block .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; }
     .schedule-block .header-row td { font-size: 16px; color: #ffffff; height: 42px; }
     
-    /* THIS IS A FIX: Hide the draggable icon and handle completely */
+    /* Hide the draggable icon (⠿) completely */
     .schedule-block .row-handle {
         display: none !important;
     }
@@ -103,7 +103,7 @@
     #confirm-template-selection { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 
     /* ========================================================= */
-    /* === DEFINITIVE PRINT STYLES FOR CENTERING === */
+    /* === DEFINITIVE PRINT STYLES === */
     /* ========================================================= */
     @media print {
         @page {
@@ -141,7 +141,7 @@
             background: none !important;
         }
 
-        /* Set each block to a full page FLEX container */
+        /* Set each block to a full page FLEX container for spacing */
         .schedule-block {
             width: 100%;
             height: 100vh;
@@ -156,7 +156,7 @@
         
         /* The table now fills the padded container */
         table {
-            width: 100%; /* Fill the container defined by padding */
+            width: 100%;
             border: 2px solid #000 !important;
             color: #000 !important;
             -webkit-print-color-adjust: exact !important;
@@ -366,7 +366,7 @@
 
         setupEventListeners() {
             projectTitleEl.addEventListener('input', () => this.debouncedSave());
-            // Connect the button to this specific project's delete method
+            // THIS IS THE CORRECT PLACE FOR THE LISTENER
             document.getElementById('delete-project-btn').addEventListener('click', () => this.delete());
         }
 
@@ -417,7 +417,7 @@
             if (doc.exists) {
                 const remoteData = doc.data();
                 if (!activeProject) {
-                    // This is where the Project is created and the listeners are set up
+                    // This is where the Project is created and its listeners are set up
                     activeProject = new Project(doc.id, remoteData, userSchedulesCollection);
                 } else {
                     const localContent = activeProject.getContentForComparison();
@@ -438,7 +438,6 @@
     }
 
     async function initCreationFlow() {
-        // Hide elements that are only for editing an existing project
         document.getElementById('project-header').style.display = 'none';
         document.getElementById('print-button').style.display = 'none';
 
