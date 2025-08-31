@@ -77,6 +77,7 @@
     .schedule-block .header-row .cell-icon { filter: brightness(0) invert(1); }
     .schedule-block .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; }
     .schedule-block .header-row td { font-size: 16px; color: #ffffff; height: 42px; }
+    
     .schedule-block .row-handle { display: none !important; }
 
     /* Modal Styles */
@@ -95,7 +96,7 @@
     #confirm-template-selection { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 
     /* ========================================================= */
-    /* === DEFINITIVE PRINT STYLES FOR CENTERING === */
+    /* === DEFINITIVE PRINT STYLES === */
     /* ========================================================= */
     @media print {
         @page {
@@ -111,29 +112,32 @@
             background-color: #fff !important;
         }
 
+        /* Hide ALL non-essential elements */
         #app-header, .project-header, .header-actions, .schedule-header, .row-handle {
             display: none !important;
         }
 
+        /* THIS IS A KEY FIX: Make containers disappear from the layout tree */
         #app-container, .master-container, #schedules-wrapper {
             display: contents;
         }
 
+        /* Set each block to a full page FLEX container for spacing */
         .schedule-block {
             width: 100%;
-            height: 100%;
-            position: relative; /* Establish positioning context */
+            height: 100vh; /* Use viewport height for a reliable full page */
+            display: flex;
+            align-items: center; /* Vertically centers the table */
+            justify-content: flex-start; /* Aligns content to the left */
             page-break-after: always;
-            box-sizing: border-box;
+            padding: 5mm 10mm 5mm 0mm; /* Top, RIGHT, Bottom, LEFT */
             border: none !important;
+            box-sizing: border-box;
         }
         
+        /* The table now fills the padded container */
         table {
-            position: absolute; /* Take table out of normal flow */
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%); /* Center based on its own dimensions */
-            width: auto; /* Allow table to be its natural width */
+            width: 100%;
             border: 2px solid #000 !important;
             color: #000 !important;
             -webkit-print-color-adjust: exact !important;
@@ -154,12 +158,13 @@
         .header-content { justify-content: center; }
         .header-actions { width: 100%; display: flex; justify-content: space-between; gap: 8px; }
         .header-actions .toolbar-btn, .header-actions #logout-button { flex: 1; font-size: 12px; padding: 8px 4px; }
-        .master-container { padding: 16px; border-radius: 0; box-shadow: none; }
-        .project-header { flex-direction: column; align-items: flex-start; gap: 12px; padding-bottom: 16px; margin-bottom: 16px; }
+        .master-container { padding: 0 16px 16px; border-radius: 0; box-shadow: none; }
+        .project-header { flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px 0; margin-bottom: 16px; }
         .project-title { font-size: 1.5rem; }
-        .schedule-block { margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color); }
+        .schedule-block { margin-bottom: 24px; padding: 0 0 24px 0; border-bottom: 1px solid var(--border-color); }
         .schedule-header { padding: 0; }
         
+        /* Mobile table adjustments */
         .schedule-block table { font-size: 6.5px; }
         .schedule-block th, .schedule-block td { padding: 0 1.5px; height: 24px; }
         .schedule-block .header-row td { height: 26px; font-size: 8px; }
@@ -313,7 +318,6 @@
             this.collectionRef = collectionRef;
             this.scheduleTables = [];
             this.render();
-            this.setupEventListeners();
         }
 
         render(newData) {
@@ -340,10 +344,6 @@
         getContentForComparison() {
             const tablesData = this.scheduleTables.map(table => ({ title: table.data.title, content: table.getContent() }));
             return JSON.stringify(tablesData);
-        }
-
-        setupEventListeners() {
-            projectTitleEl.addEventListener('input', () => this.debouncedSave());
         }
     }
 
@@ -382,6 +382,7 @@
                 const remoteData = doc.data();
                 if (!activeProject) {
                     activeProject = new Project(doc.id, remoteData, userSchedulesCollection);
+                    projectTitleEl.addEventListener('input', () => activeProject.debouncedSave());
                 } else {
                     const localContent = activeProject.getContentForComparison();
                     const remoteContent = JSON.stringify(remoteData.tables);
