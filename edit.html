@@ -82,11 +82,6 @@
     .schedule-block .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; }
     .schedule-block .header-row td { font-size: 16px; color: #ffffff; height: 42px; }
 
-    /* Hides the row handle icon completely */
-    .row-handle {
-        display: none !important;
-    }
-
     /* Modal Styles */
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 16px; }
     .modal-content { background: white; padding: 24px; border-radius: var(--radius-lg); width: 100%; max-width: 500px; max-height: 90vh; display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow-lg); }
@@ -108,7 +103,7 @@
     @media print {
         @page {
             size: A4 landscape;
-            margin: 0;
+            margin: 0; /* Ensures NO margins on the paper edge */
         }
 
         html, body {
@@ -116,19 +111,22 @@
             width: 100%;
             margin: 0;
             padding: 0;
-            background: #fff !important;
+            background-color: #fff !important;
         }
 
-        /* Hide ALL non-essential elements */
+        /* Hide ALL elements that are not part of the printable schedule */
         #app-header,
         .project-header,
         .header-actions,
         #delete-project-btn,
-        .schedule-header {
+        .schedule-header,
+        .row-handle { /* THIS IS A FIX: Hide the draggable row handle */
             display: none !important;
         }
 
+        /* Make containers simple wrappers */
         #app-container, .master-container, #schedules-wrapper {
+            display: block;
             width: 100%;
             height: 100%;
             padding: 0 !important;
@@ -138,38 +136,39 @@
             background: none !important;
         }
 
-        /* Use the reliable table-cell method for centering */
+        /* Set each block to a full page GRID container for centering */
         .schedule-block {
-            display: table-cell;
-            vertical-align: middle; /* The key property for vertical centering */
-            text-align: center;     /* The key property for horizontal centering */
-            width: 100vw;
-            height: 100vh;
+            width: 100%;
+            height: 100vh; /* Use viewport height for a reliable full page */
+            display: grid;
+            place-items: center; /* The key command for vertical and horizontal centering */
             page-break-after: always;
-            border: none !important;
-            padding: 5mm 10mm;
+            padding: 5mm 20mm; /* Vertical and horizontal padding */
+            border: none !important; /* THIS IS A FIX: Remove the outer border */
             box-sizing: border-box;
         }
 
-        /* Reset the table's display and alignment */
+        /* The table itself needs no special centering */
         table {
-            display: inline-block;
-            text-align: left;
             border: 2px solid #000 !important;
             color: #000 !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
         }
         
+        /* Preserve basic table cell styles for print */
         th, td {
             border: 1px solid #000 !important;
         }
+
         td.cell-selected, th.cell-selected {
             outline: none !important;
         }
+
         th {
             border-bottom: 1px solid #000 !important;
         }
+        
         tbody tr:nth-child(2) > td {
             border-top: 2px solid #000 !important;
         }
@@ -188,6 +187,7 @@
         .schedule-block { margin-bottom: 24px; padding: 0 0 24px 0; border-bottom: 1px solid var(--border-color); }
         .schedule-header { padding: 0 16px; }
         
+        /* Mobile table adjustments */
         .schedule-block table { font-size: 6.5px; }
         .schedule-block th, .schedule-block td { padding: 0 1.5px; height: 24px; }
         .schedule-block .header-row td { height: 26px; font-size: 8px; }
