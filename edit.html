@@ -82,10 +82,7 @@
     .schedule-block .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; }
     .schedule-block .header-row td { font-size: 16px; color: #ffffff; height: 42px; }
     
-    /* Hide the draggable icon (⠿) completely */
-    .schedule-block .row-handle {
-        display: none !important;
-    }
+    .schedule-block .row-handle { display: none !important; }
 
     /* Modal Styles */
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 16px; }
@@ -120,12 +117,7 @@
         }
 
         /* Hide ALL non-essential elements */
-        #app-header,
-        .project-header,
-        .header-actions,
-        #delete-project-btn,
-        .schedule-header,
-        .row-handle {
+        #app-header, .project-header, .header-actions, #delete-project-btn, .schedule-header, .row-handle {
             display: none !important;
         }
 
@@ -146,15 +138,14 @@
             width: 100%;
             height: 100vh;
             display: flex;
-            align-items: center; /* Vertically centers the table */
-            justify-content: flex-start; /* Aligns content to the left */
+            align-items: center;
+            justify-content: flex-start;
             page-break-after: always;
             padding: 5mm 10mm 5mm 0mm; /* Top, RIGHT, Bottom, LEFT */
             border: none !important;
             box-sizing: border-box;
         }
         
-        /* The table now fills the padded container */
         table {
             width: 100%;
             border: 2px solid #000 !important;
@@ -182,7 +173,6 @@
         .schedule-block { margin-bottom: 24px; padding: 0 0 24px 0; border-bottom: 1px solid var(--border-color); }
         .schedule-header { padding: 0 16px; }
         
-        /* Mobile table adjustments */
         .schedule-block table { font-size: 6.5px; }
         .schedule-block th, .schedule-block td { padding: 0 1.5px; height: 24px; }
         .schedule-block .header-row td { height: 26px; font-size: 8px; }
@@ -215,9 +205,7 @@
             <h1 id="project-title" contenteditable="true">Loading Project...</h1>
             <button id="delete-project-btn">Delete Project</button>
         </div>
-        <div id="schedules-wrapper">
-            <!-- Schedule blocks will be rendered here by JavaScript -->
-        </div>
+        <div id="schedules-wrapper"></div>
     </div>
 </div>
 
@@ -364,12 +352,13 @@
             return JSON.stringify(tablesData);
         }
 
+        // CORRECTED: setupEventListeners now activates the delete button
         setupEventListeners() {
             projectTitleEl.addEventListener('input', () => this.debouncedSave());
-            // THIS IS THE CORRECT PLACE FOR THE LISTENER
             document.getElementById('delete-project-btn').addEventListener('click', () => this.delete());
         }
 
+        // CORRECTED: The delete logic belongs to the Project object
         delete() {
             if (confirm('Are you sure you want to permanently delete this entire project?')) {
                 this.collectionRef.doc(this.id).delete().then(() => {
@@ -417,7 +406,6 @@
             if (doc.exists) {
                 const remoteData = doc.data();
                 if (!activeProject) {
-                    // This is where the Project is created and its listeners are set up
                     activeProject = new Project(doc.id, remoteData, userSchedulesCollection);
                 } else {
                     const localContent = activeProject.getContentForComparison();
