@@ -95,7 +95,9 @@
     #cancel-template-selection { background-color: var(--surface-color); }
     #confirm-template-selection { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 
-    /* DEFINITIVE PRINT STYLES */
+    /* ========================================================= */
+    /* === DEFINITIVE PRINT STYLES === */
+    /* ========================================================= */
     @media print {
         @page {
             size: A4 landscape;
@@ -110,18 +112,21 @@
             background-color: #fff !important;
         }
 
+        /* Hide ALL non-essential elements */
         #app-header, .project-header, .header-actions, .schedule-header, .row-handle {
             display: none !important;
         }
 
+        /* KEY FIX: Make containers "disappear" from the layout tree */
         #app-container, .master-container, #schedules-wrapper {
             display: contents;
         }
 
+        /* Set each block to a full page FLEX container */
         .schedule-block {
             width: 100%;
             height: 100vh;
-            display: flex; /* Use flexbox for the container */
+            display: flex;
             flex-direction: column; /* Arrange items vertically */
             page-break-after: always;
             padding: 5mm 10mm 5mm 0mm; /* Top, RIGHT, Bottom, LEFT */
@@ -129,7 +134,7 @@
             box-sizing: border-box;
         }
 
-        /* KEY FIX: These pseudo-elements create the empty space */
+        /* KEY FIX: These pseudo-elements create the empty space for vertical centering */
         .schedule-block::before,
         .schedule-block::after {
             content: '';
