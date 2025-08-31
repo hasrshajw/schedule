@@ -461,6 +461,14 @@
     function setupGlobalUI() {
         document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
         document.getElementById('print-button').addEventListener('click', handlePrint);
+
+        document.getElementById('delete-project-btn').addEventListener('click', () => {
+        if (activeProject) {
+            activeProject.delete();
+        } else {
+            alert("No project is currently loaded to delete.");
+        }
+    });
         
         document.getElementById('cancel-template-selection').addEventListener('click', () => {
             templateSelectionModal.style.display = 'none';
