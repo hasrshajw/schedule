@@ -10,143 +10,245 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
-<!-- Noto Sans Telugu Google Font -->
+<!-- FONTS -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 
 <style>
     :root {
-        --primary-color: #0d6efd;
-        --border-color: #dee2e6;
-        --background-color: #f8f9fa;
-        --danger-color: #dc3545;
+        --primary-color: #012726;
+        --primary-hover: #024443;
+        --primary-light: #e6f6f6;
+        --danger-color: #d32f2f;
+        --danger-hover: #b71c1c;
+        --danger-light: #fde8e8;
+        --border-color: #e5e7eb;
+        --background-color: #f8fafc;
+        --text-primary: #1f2937;
+        --text-secondary: #6b7280;
+        --surface-color: #ffffff;
+        --radius-md: 8px;
+        --radius-lg: 16px;
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --ease: cubic-bezier(0.4, 0, 0.2, 1);
     }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
     body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        font-family: 'Inter', sans-serif;
         background-color: var(--background-color);
-        padding: 20px;
-        color: #212529;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
+        margin: 0;
+        padding: 88px 20px 20px 20px;
+        color: var(--text-primary);
     }
     .hidden { display: none !important; }
 
+    /* App Header */
     #app-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        background-color: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(8px);
+        border-bottom: 1px solid var(--border-color);
+        padding: 12px 20px;
+    }
+    .header-content {
         max-width: 1000px;
-        margin: 0 auto 20px auto;
-        padding: 10px 25px;
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        margin: 0 auto;
         display: flex;
         align-items: center;
         justify-content: space-between;
     }
-    #user-info { display: flex; align-items: center; gap: 10px; }
-    #user-email { font-weight: bold; }
-    #logout-button { background-color: var(--danger-color); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
-
+    #user-info { display: flex; align-items: center; gap: 12px; font-size: 14px; }
+    #user-avatar { width: 36px; height: 36px; border-radius: 50%; background-color: var(--border-color); display: flex; align-items: center; justify-content: center; font-weight: 600; color: var(--text-secondary); }
+    #user-email { font-weight: 600; color: var(--text-primary); }
+    #logout-button {
+        background-color: transparent;
+        color: var(--text-secondary);
+        border: 1px solid var(--border-color);
+        padding: 8px 16px;
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.2s var(--ease);
+    }
+    #logout-button:hover { background-color: var(--danger-light); color: var(--danger-hover); border-color: var(--danger-hover); }
+    
+    /* Main Layout */
     .master-container {
         max-width: 1000px;
-        margin: 0 auto 25px auto;
-        background: white;
-        padding: 25px;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        margin: 0 auto;
+    }
+    .page-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0 0 24px 0;
     }
     
+    /* Schedule List */
     #schedule-list {
         list-style: none;
         padding: 0;
         margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
     }
-    #schedule-list li {
+    .schedule-item-card {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 15px;
-        border-bottom: 1px solid var(--border-color);
-        font-family: 'Noto Sans Telugu', sans-serif;
+        padding: 20px 24px;
+        background-color: var(--surface-color);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        transition: all 0.2s var(--ease);
     }
-    #schedule-list li:last-child {
-        border-bottom: none;
+    .schedule-item-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
     }
+
     .schedule-name {
-        font-weight: 500;
-        font-size: 1.1em;
+        font-family: 'Noto Sans Telugu', sans-serif;
+        font-weight: 700;
+        font-size: 1.125rem;
     }
     .schedule-actions {
         display: flex;
-        gap: 10px;
-    }
-    .schedule-actions a, .schedule-actions button {
-        text-decoration: none;
-        padding: 8px 12px;
-        border-radius: 6px;
-        color: white;
-        border: none;
-        font-size: 14px;
-        font-family: sans-serif;
-        cursor: pointer;
-        transition: opacity 0.2s;
-    }
-    .schedule-actions a:hover, .schedule-actions button:hover {
-        opacity: 0.8;
-    }
-    .edit-btn { background-color: var(--primary-color); }
-    .delete-btn { background-color: var(--danger-color); }
-    #empty-state {
-        text-align: center;
-        padding: 40px;
-        color: #6c757d;
+        align-items: center;
+        gap: 8px;
     }
 
-    #add-schedule-footer { max-width: 1000px; margin: 25px auto; }
+    /* Buttons */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        border-radius: var(--radius-md);
+        transition: all 0.2s var(--ease);
+    }
+    .btn-primary {
+        background-color: var(--primary-color);
+        color: white;
+    }
+    .btn-primary:hover {
+        background-color: var(--primary-hover);
+    }
+    .btn-sm {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+    .btn-icon {
+        background-color: transparent;
+        color: var(--text-secondary);
+        padding: 8px;
+        border-radius: 50%;
+    }
+    .btn-icon:hover {
+        background-color: var(--danger-light);
+        color: var(--danger-color);
+    }
+
+    /* Empty State */
+    #empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--text-secondary);
+        background-color: var(--surface-color);
+        border-radius: var(--radius-lg);
+        border: 2px dashed var(--border-color);
+    }
+
+    /* Add Button Footer */
+    #add-schedule-footer { max-width: 1000px; margin: 32px auto; }
     .add-button {
         width: 100%;
-        padding: 15px;
+        padding: 16px;
         font-size: 16px;
-        font-weight: 500;
+        font-weight: 600;
         color: var(--primary-color);
-        background-color: transparent;
-        border: 2px dashed var(--border-color);
-        border-radius: 8px;
+        background-color: var(--primary-light);
+        border: 2px dashed #b3e0e0;
+        border-radius: var(--radius-lg);
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 8px;
-        transition: background-color 0.2s, color 0.2s;
+        transition: all 0.2s var(--ease);
     }
     .add-button:hover {
         background-color: var(--primary-color);
-        border-color: var(--primary-color);
+        border-color: var(--primary-hover);
         color: white;
+    }
+    .add-button .material-symbols-outlined { font-size: 22px; }
+
+    /* === MOBILE RESPONSIVE STYLES === */
+    @media (max-width: 768px) {
+        body {
+            padding: 72px 0 0 0; 
+            background-color: var(--surface-color); 
+        }
+        #app-header { padding: 12px 16px; }
+        #logout-button { padding: 6px 10px; font-size: 13px; }
+        #user-info #user-email { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        #user-info span:not(#user-email) { display: none; }
+        
+        .master-container { padding: 0 16px; }
+        .page-title { font-size: 1.5rem; margin: 16px 0; }
+        
+        #schedule-list { gap: 0; }
+        .schedule-item-card {
+            border-radius: 0;
+            box-shadow: none;
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .schedule-name { font-size: 1rem; }
+        .btn-sm { padding: 6px 12px; font-size: 13px; }
+
+        #add-schedule-footer { padding: 16px; margin: 16px auto; }
+        .add-button { padding: 14px; font-size: 15px; }
     }
 </style>
 </head>
 <body>
 
 <div id="app-container" class="hidden">
-    <div id="app-header">
-        <div id="user-info">
-            Welcome, <span id="user-email"></span>
+    <header id="app-header">
+        <div class="header-content">
+            <div id="user-info">
+                <div id="user-avatar"></div>
+                <span>Welcome, <span id="user-email"></span></span>
+            </div>
+            <button id="logout-button">Logout</button>
         </div>
-        <button id="logout-button">Logout</button>
-    </div>
+    </header>
 
     <div class="master-container">
-        <h2 style="margin-top: 0; font-family: 'Noto Sans Telugu', sans-serif;">Your Schedules</h2>
+        <h2 class="page-title">Your Schedules</h2>
         <ul id="schedule-list">
             <li id="empty-state" class="hidden">You haven't created any schedules yet.</li>
-            <!-- User schedules will be populated here by JavaScript -->
         </ul>
     </div>
     
     <div id="add-schedule-footer">
         <button id="createUserScheduleBtn" class="add-button">
-             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/></svg>
+             <span class="material-symbols-outlined">add</span>
             Create New Schedule
         </button>
     </div>
@@ -155,7 +257,6 @@
 <script>
 (function() {
     'use strict';
-    // --- FIREBASE SETUP ---
     const firebaseConfig = {
       apiKey: "AIzaSyDLK5f4C-nfG6fz0ajqqay1q9TTN6rxgmQ",
       authDomain: "schedule-harsha.firebaseapp.com",
@@ -173,28 +274,24 @@
     let currentUser = null;
     let currentListener = null;
 
-    // --- DOM ELEMENTS ---
     const appContainer = document.getElementById('app-container');
     const userEmailEl = document.getElementById('user-email');
+    const userAvatarEl = document.getElementById('user-avatar');
     const scheduleListEl = document.getElementById('schedule-list');
     const emptyStateEl = document.getElementById('empty-state');
     
-    // --- AUTHENTICATION ---
     auth.onAuthStateChanged(user => {
         if (user) {
-            // User is signed in, check role
             if (user.email === ADMIN_EMAIL) {
-                // This is an admin, redirect them to their page
                 window.location.replace('./admin.html');
                 return;
             }
-            // This is a regular user, proceed with dashboard setup
             currentUser = user;
             appContainer.classList.remove('hidden');
             userEmailEl.textContent = user.email;
+            userAvatarEl.textContent = user.email.charAt(0).toUpperCase();
             initDashboard();
         } else {
-            // No user signed in, redirect to login
             window.location.replace('./login.html');
         }
     });
@@ -202,30 +299,32 @@
     function initDashboard() {
         const userSchedulesCollection = db.collection(`userSchedules/${currentUser.uid}/schedules`);
 
-        // Listen for real-time updates to the user's schedules
-        if (currentListener) currentListener(); // Detach any previous listener
+        if (currentListener) currentListener();
         currentListener = userSchedulesCollection.orderBy("createdAt").onSnapshot(snapshot => {
+            scheduleListEl.innerHTML = ''; 
             if (snapshot.empty) {
-                scheduleListEl.innerHTML = ''; // Clear list
                 emptyStateEl.classList.remove('hidden');
+                scheduleListEl.appendChild(emptyStateEl);
                 return;
             }
             
             emptyStateEl.classList.add('hidden');
-            scheduleListEl.innerHTML = ''; // Clear and rebuild list on every update
             
             snapshot.docs.forEach(doc => {
                 const schedule = doc.data();
                 const scheduleId = doc.id;
                 
                 const li = document.createElement('li');
+                li.className = 'schedule-item-card';
                 li.dataset.id = scheduleId;
 
                 li.innerHTML = `
                     <span class="schedule-name">${schedule.name}</span>
                     <div class="schedule-actions">
-                        <a href="./editor.html?id=${scheduleId}" class="edit-btn">View / Edit</a>
-                        <button class="delete-btn" data-id="${scheduleId}">Delete</button>
+                        <a href="./editor.html?id=${scheduleId}" class="btn btn-primary btn-sm">View / Edit</a>
+                        <button class="btn btn-icon delete-btn" data-id="${scheduleId}" title="Delete Schedule">
+                            <span class="material-symbols-outlined">delete</span>
+                        </button>
                     </div>
                 `;
                 scheduleListEl.appendChild(li);
@@ -236,19 +335,17 @@
         });
     }
 
-    // --- GLOBAL UI EVENT LISTENERS ---
     function setupGlobalUI() {
         document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
 
         document.getElementById('createUserScheduleBtn').addEventListener('click', () => {
-            // Redirect to the editor page without an ID to signify creation
             window.location.href = './editor.html';
         });
 
-        // Event delegation for delete buttons
         scheduleListEl.addEventListener('click', (e) => {
-            if (e.target.classList.contains('delete-btn')) {
-                const scheduleId = e.target.dataset.id;
+            const deleteButton = e.target.closest('.delete-btn');
+            if (deleteButton) {
+                const scheduleId = deleteButton.dataset.id;
                 if (confirm('Are you sure you want to permanently delete this schedule?')) {
                     const userSchedulesCollection = db.collection(`userSchedules/${currentUser.uid}/schedules`);
                     userSchedulesCollection.doc(scheduleId).delete().catch(error => {
@@ -260,7 +357,6 @@
         });
     }
 
-    // --- START THE APP ---
     setupGlobalUI();
 
 })();
