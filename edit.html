@@ -72,7 +72,7 @@
     .schedule-header { margin-bottom: 16px; }
     .schedule-title { font-size: 1.25rem; font-weight: 600; margin: 0; color: var(--text-secondary); font-family: 'Noto Sans Telugu', sans-serif; }
 
-    /* PRESERVED TABLE STYLES */
+    /* TABLE STYLES */
     .schedule-block table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.25px; }
     .schedule-block th, .schedule-block td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; }
     .schedule-block [contenteditable="true"]:focus { background-color: #fffbe5; }
@@ -83,7 +83,7 @@
     .schedule-block .header-row td { font-size: 16px; color: #ffffff; height: 42px; }
     
     /* THIS IS A FIX: Hide the draggable icon (⠿) completely */
-    .schedule-block .row-handle-icon {
+    .schedule-block .row-handle {
         display: none !important;
     }
 
@@ -108,7 +108,7 @@
     @media print {
         @page {
             size: A4 landscape;
-            margin: 0; /* Ensures NO margins on the paper edge */
+            margin: 0;
         }
 
         html, body {
@@ -119,13 +119,13 @@
             background-color: #fff !important;
         }
 
-        /* Hide ALL elements that are not part of the printable schedule */
+        /* Hide ALL non-essential elements */
         #app-header,
         .project-header,
         .header-actions,
         #delete-project-btn,
         .schedule-header,
-        .row-handle { /* Also hide the invisible row-handle container */
+        .row-handle {
             display: none !important;
         }
 
@@ -141,44 +141,32 @@
             background: none !important;
         }
 
-        /* Set each block to a full page GRID container for centering */
+        /* Set each block to a full page FLEX container for centering */
         .schedule-block {
-    width: 100%;
-    height: 100vh;
-    display: flex; /* CHANGED back to flex */
-    align-items: center; /* This handles the vertical centering */
-    page-break-after: always;
-    /* THIS IS THE KEY CHANGE for spacing */
-    padding: 5mm 0mm 5mm 6mm; /* Top, Right, Bottom, Left */
-    border: none !important;
-    box-sizing: border-box;
-}
-
-        /* The table is now auto-width to allow centering */
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center; /* Vertically centers the table */
+            justify-content: flex-start; /* Aligns table to the left */
+            page-break-after: always;
+            padding: 5mm 0mm 5mm 6mm; /* Top, RIGHT, Bottom, LEFT */
+            border: none !important;
+            box-sizing: border-box;
+        }
+        
+        /* The table now fills the padded container */
         table {
-            width: auto; /* THIS IS THE KEY FIX for horizontal centering */
+            width: 100%; /* Fill the container defined by the padding above */
             border: 2px solid #000 !important;
             color: #000 !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
         }
         
-        /* Preserve basic table cell styles for print */
-        th, td {
-            border: 1px solid #000 !important;
-        }
-
-        td.cell-selected, th.cell-selected {
-            outline: none !important;
-        }
-
-        th {
-            border-bottom: 1px solid #000 !important;
-        }
-        
-        tbody tr:nth-child(2) > td {
-            border-top: 2px solid #000 !important;
-        }
+        th, td { border: 1px solid #000 !important; }
+        td.cell-selected, th.cell-selected { outline: none !important; }
+        th { border-bottom: 1px solid #000 !important; }
+        tbody tr:nth-child(2) > td { border-top: 2px solid #000 !important; }
     }
 
     /* MOBILE RESPONSIVE STYLES */
@@ -379,8 +367,7 @@
         setupEventListeners() {
             projectTitleEl.addEventListener('input', () => this.debouncedSave());
         }
-
-        
+    }
 
     // --- AUTHENTICATION & PAGE LOGIC ---
     auth.onAuthStateChanged(user => {
@@ -453,23 +440,22 @@
         document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
         document.getElementById('print-button').addEventListener('click', handlePrint);
 
-        // THIS IS THE CORRECTED DELETE LISTENER
-    document.getElementById('delete-project-btn').addEventListener('click', () => {
-        // Use the globally available ID, which is ready immediately.
-        if (currentProjectId && userSchedulesCollection) {
-            if (confirm('Are you sure you want to permanently delete this entire project?')) {
-                userSchedulesCollection.doc(currentProjectId).delete().then(() => {
-                    alert('Project deleted.');
-                    window.location.href = './dashboard.html';
-                }).catch(error => {
-                    console.error("Error deleting project:", error);
-                    alert("Could not delete the project. See console for details.");
-                });
+        // CORRECTED DELETE LISTENER
+        document.getElementById('delete-project-btn').addEventListener('click', () => {
+            if (currentProjectId && userSchedulesCollection) {
+                if (confirm('Are you sure you want to permanently delete this entire project?')) {
+                    userSchedulesCollection.doc(currentProjectId).delete().then(() => {
+                        alert('Project deleted.');
+                        window.location.href = './dashboard.html';
+                    }).catch(error => {
+                        console.error("Error deleting project:", error);
+                        alert("Could not delete the project. See console for details.");
+                    });
+                }
+            } else {
+                alert("Cannot delete: Project ID not found.");
             }
-        } else {
-            alert("Cannot delete: Project ID not found.");
-        }
-    });
+        });
         
         document.getElementById('cancel-template-selection').addEventListener('click', () => {
             templateSelectionModal.style.display = 'none';
