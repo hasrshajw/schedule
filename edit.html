@@ -135,6 +135,11 @@
             display: table-cell;
             vertical-align: middle; /* The most reliable vertical centering */
         }
+
+    /* THIS IS THE FIX: Prevents a blank page at the end */
+.schedule-block:last-child {
+    page-break-after: auto;
+}
         
         table {
             width: 100%;
