@@ -3,183 +3,366 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Advanced Schedule Application</title>
+<title>Admin - Schedule Template Editor</title>
 
 <!-- FIREBASE SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<!-- AI SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-ai-compat.js"></script>
 
-<!-- Noto Sans Telugu Google Font -->
+
+<!-- FONTS -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 
 <style>
     :root {
-        --primary-color: #0d6efd;
-        --border-color: #dee2e6;
-        --background-color: #f8f9fa;
-        --danger-color: #dc3545;
-        --warning-color: #ffc107;
-        --success-color: #198754;
+        --primary-color: #012726;
+        --primary-hover: #024443;
+        --primary-light: #e6f6f6;
+        --danger-color: #d32f2f;
+        --danger-hover: #b71c1c;
+        --danger-light: #fde8e8;
+        --warning-color: #f59e0b;
+        --success-color: #2e7d32;
+        --border-color: #e5e7eb;
+        --background-color: #f8fafc;
+        --text-primary: #1f2937;
+        --text-secondary: #6b7280;
+        --surface-color: #ffffff;
+        --radius-md: 8px;
+        --radius-lg: 16px;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        --ease: cubic-bezier(0.4, 0, 0.2, 1);
     }
-    body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        background-color: var(--background-color);
-        padding: 20px;
-        color: #212529;
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+    html {
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
     }
-    /* --- Login Screen --- */
-    #login-screen {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 80vh;
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background-color: var(--background-color);
+        margin: 0;
+        padding: 88px 20px 20px 20px;
+        color: var(--text-primary);
     }
-    #login-button {
-        display: inline-flex; align-items: center; gap: 12px; padding: 12px 24px; font-size: 16px;
-        font-weight: 500; background-color: #fff; color: #444; border: 1px solid var(--border-color);
-        border-radius: 8px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: box-shadow 0.2s;
-    }
-    #login-button:hover { box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+    .hidden { display: none !important; }
 
-    /* --- Main App Container --- */
-    #app-container { display: none; }
+    /* App Header */
     #app-header {
-        max-width: 1000px; margin: 0 auto 20px auto; padding: 10px 25px; background: white;
-        border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex;
-        align-items: center; justify-content: space-between;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        background-color: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(8px);
+        border-bottom: 1px solid var(--border-color);
+        padding: 12px 20px;
     }
-    #user-info { display: flex; align-items: center; gap: 10px; font-size: 14px; }
-    #user-pic { width: 32px; height: 32px; border-radius: 50%; }
-    #sign-out-button { background: transparent; border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 6px; cursor: pointer; }
-    
+    .header-content {
+        max-width: 1100px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    #user-info { display: flex; align-items: center; gap: 12px; font-size: 14px; }
+    #user-avatar { width: 36px; height: 36px; border-radius: 50%; background-color: var(--border-color); display: flex; align-items: center; justify-content: center; font-weight: 600; color: var(--text-secondary); }
+    #user-email { font-weight: 600; color: var(--text-primary); }
+    #logout-button {
+        background-color: transparent;
+        color: var(--text-secondary);
+        border: 1px solid var(--border-color);
+        padding: 8px 16px;
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.2s var(--ease);
+    }
+    #logout-button:hover { background-color: var(--danger-light); color: var(--danger-hover); border-color: var(--danger-hover); }
+
+    /* Main Layout */
     .master-container {
-        max-width: 1000px; margin: 0 auto 25px auto; background: white; padding: 25px;
-        border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        max-width: 1100px;
+        margin: 0 auto;
     }
+    .page-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0 0 24px 0;
+    }
+    
+    /* Schedule Block as a Card */
     .schedule-block {
-        padding-bottom: 20px; margin-bottom: 20px; border-bottom: 2px solid var(--border-color);
+        background: var(--surface-color);
+        padding: 24px;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        margin-bottom: 32px;
     }
-    .schedule-block:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-    .schedule-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+    
+    .schedule-header { display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 20px; }
     .schedule-title {
-        font-size: 1.75em; font-weight: 600; margin: 0; flex-grow: 1; border: 1px solid transparent;
-        padding: 5px; border-radius: 4px; font-family: 'Noto Sans Telugu', sans-serif;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0;
+        flex-grow: 1;
+        border: none;
+        padding: 4px 8px;
+        margin: -4px -8px;
+        border-radius: var(--radius-md);
+        font-family: 'Noto Sans Telugu', sans-serif;
+        color: var(--text-primary);
     }
-    .schedule-title:focus { outline: none; border-color: var(--primary-color); background-color: #f0f8ff; }
-    .status-indicator { font-size: 14px; font-weight: bold; transition: color 0.3s; }
-    .toolbar { display: flex; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 8px;}
-    .toolbar button {
-        display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; font-size: 14px;
-        cursor: pointer; border: 1px solid #ccc; background-color: #f0f0f0; border-radius: 6px;
-    }
-    .toolbar button:hover:not(:disabled) { background-color: #e2e6ea; }
-    .toolbar button:disabled { cursor: not-allowed; opacity: 0.5; }
-    .toolbar button svg { width: 16px; height: 16px; }
-    .toolbar .delete-btn { margin-left: auto; border-color: var(--danger-color); }
-    .toolbar .delete-btn:hover:not(:disabled) { background-color: var(--danger-color); color: white; }
+    .schedule-title:focus { outline: 2px solid var(--primary-color); background-color: var(--primary-light); }
     
-    table { 
-        width: 100%; border-collapse: collapse; border: 2px solid #4B0082; 
-        font-family: 'Noto Sans Telugu', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.25px;
+    .status-indicator {
+        font-size: 12px;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 999px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.3s var(--ease);
     }
-    th, td { 
-        border: 1px solid #333; padding: 0 8px; text-align: left; 
-        vertical-align: middle; position: relative; height: 36px;
+    .status-indicator::before {
+        content: '';
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: currentColor;
     }
-    [contenteditable="true"]:focus { background-color: #fffbe5; }
+    .status-indicator[data-status="synced"] { color: var(--success-color); background-color: #eaf5ea; }
+    .status-indicator[data-status="syncing"] { color: var(--warning-color); background-color: #fffbeb; }
+    .status-indicator[data-status="error"] { color: var(--danger-color); background-color: var(--danger-light); }
     
-    .row-handle {
-        position: absolute; left: -30px; top: 0; width: 30px; height: 100%; display: flex;
-        align-items: center; justify-content: center; cursor: pointer; color: #aaa; user-select: none;
+    /* Toolbar */
+    .toolbar { display: flex; align-items: center; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); flex-wrap: wrap; gap: 8px;}
+    .toolbar-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); transition: all 0.2s var(--ease); }
+    .toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; border-color: #d1d5db; color: var(--text-primary); }
+    .toolbar-btn:disabled { cursor: not-allowed; opacity: 0.5; }
+    .toolbar-btn .material-symbols-outlined { font-size: 20px; }
+    .delete-btn { margin-left: auto; }
+    .delete-btn:hover:not(:disabled) { background-color: var(--danger-light); color: var(--danger-color); border-color: var(--danger-color); }
+
+    /* === AI GENERATION SECTION === */
+    .ai-section {
+        margin: -4px 0 20px 0;
+        padding: 16px;
+        background-color: #f9fafb;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
     }
-    .row-handle-icon { opacity: 0; transition: opacity 0.2s; font-size: 18px; }
-    tr:hover .row-handle-icon { opacity: 1; }
-    
-    .context-menu { position: fixed; display: none; background: #fff; border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.15); z-index: 1001; padding: 6px 0; min-width: 200px; }
-    
-    .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; }
-    .cell-icon { height: 70%; max-height: 24px; object-fit: contain; flex-shrink: 0; }
-    .header-row .cell-icon { filter: brightness(0) invert(1); }
-    .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%;}
-    .header-row td { font-size: 14px; color: #ffffff; height: 46px; }
-
-    #add-schedule-footer { max-width: 1000px; margin: 25px auto; }
-    #addNewScheduleFooterBtn {
-        width: 100%; padding: 15px; font-size: 16px; font-weight: 500; color: var(--primary-color);
-        background-color: transparent; border: 2px dashed var(--border-color); border-radius: 8px;
-        cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
-        transition: background-color 0.2s, color 0.2s;
+    .ai-section h3 {
+        margin: 0 0 10px 0;
+        font-size: 1rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
-    #addNewScheduleFooterBtn:hover { background-color: var(--primary-color); border-color: var(--primary-color); color: white; }
+    .ai-section h3 .material-symbols-outlined { color: var(--primary-color); }
+    .ai-input-textarea {
+        width: 100%;
+        min-height: 100px;
+        padding: 8px 12px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        font-family: inherit;
+        font-size: 14px;
+        resize: vertical;
+        margin-bottom: 12px;
+    }
+    .ai-generate-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        background-color: var(--primary-color);
+        color: white;
+        border-radius: var(--radius-md);
+        transition: all 0.2s var(--ease);
+    }
+    .ai-generate-btn:hover:not(:disabled) { background-color: var(--primary-hover); }
+    .ai-generate-btn:disabled { background-color: #9ca3af; cursor: not-allowed; }
+    .ai-spinner {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(255,255,255,0.3);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 1s ease-in-out infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* --- User View Specific Styles --- */
-    #show-create-modal-btn { background-color: var(--primary-color); color: white; border: none; padding: 12px 24px; font-size: 18px; border-radius: 8px; cursor: pointer; }
-    .user-view-table td:not([contenteditable="true"]) { background-color: #f5f5f5; color: #555; }
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; }
-    .modal-content {display:flex;flex-direction:column;gap:15px; background: white; padding: 25px; border-radius: 8px; max-height: 80vh; overflow-y: auto; width: 90%; max-width: 500px;}
-    #schedule-checklist { list-style: none; padding: 0; }
-    #schedule-checklist li { margin-bottom: 10px; font-size: 16px; }
-    #schedule-checklist label { display: flex; align-items: center; gap: 10px; cursor: pointer;}
-    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px;}
-    .modal-actions button { padding: 10px 20px; font-size: 16px; border-radius: 6px; cursor: pointer; border: none; }
-    #generate-schedule-btn-modal { background-color: var(--primary-color); color: white; }
-    #cancel-btn { background-color: #6c757d; color: white; }
-    #print-btn { background-color: var(--success-color); color: white; border: none; padding: 10px 20px; font-size: 16px; border-radius: 6px; cursor: pointer; }
+    /* === TABLE STYLES === */
+    .schedule-block table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.25px; }
+    .schedule-block th, .schedule-block td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; }
+    .schedule-block [contenteditable="true"]:focus { background-color: #fffbe5; }
+    
+    .schedule-block .row-handle { position: absolute; left: -30px; top: 0; width: 30px; height: 100%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #aaa; user-select: none; }
+    .schedule-block .row-handle-icon { opacity: 0; transition: opacity 0.2s; font-size: 18px; }
+    .schedule-block tr:hover .row-handle-icon { opacity: 1; }
+    
+    .schedule-block td .row-handle, .schedule-block th .row-handle { display: none; }
+    .schedule-block td:first-child .row-handle, .schedule-block th:first-child .row-handle { display: flex; }
 
-    /* --- Print Styles --- */
-    @media print { /* Styles remain unchanged */ }
+    .schedule-block td.cell-selected, .schedule-block th.cell-selected { outline: 2px solid var(--primary-color) !important; outline-offset: -2px; background-color: var(--primary-light); }
+    .schedule-block .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; }
+    .schedule-block .cell-icon { height: 70%; max-height: 24px; object-fit: contain; flex-shrink: 0; }
+    .schedule-block .header-row .cell-icon { filter: brightness(0) invert(1); }
+    .schedule-block .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; }
+    .schedule-block .header-row td { font-size: 14px; color: #ffffff; height: 42px; }
+    .schedule-block .header-row[data-section="treasures"] td { background-color: rgb(70, 132, 153); }
+    .schedule-block .header-row[data-section="ministry"] td { background-color: rgb(212, 162, 42); }
+    .schedule-block .header-row[data-section="living"] td { background-color: rgb(192, 66, 53); }
 
+    /* Context Menu */
+    .context-menu { position: fixed; display: none; background: var(--surface-color); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); z-index: 1001; padding: 6px; min-width: 220px; border: 1px solid var(--border-color); }
+    .context-menu-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; cursor: pointer; font-size: 14px; border-radius: 6px; }
+    .context-menu-item:hover { background: #f9fafb; }
+    .context-menu-item.disabled { color: #9ca3af; cursor: not-allowed; background: var(--surface-color); }
+    .context-menu-item.delete { color: var(--danger-color); }
+    .context-menu-item.delete:hover { background-color: var(--danger-light); }
+    .context-menu-item.active { background-color: var(--primary-light); color: var(--primary-color); font-weight: 600; }
+    .context-menu-item .material-symbols-outlined { font-size: 20px; color: var(--text-secondary); }
+    .context-menu-item.delete .material-symbols-outlined { color: var(--danger-color); }
+    .context-menu hr { border: none; height: 1px; background-color: var(--border-color); margin: 6px 0; }
+
+    /* Add Button Footer */
+    #add-schedule-footer { max-width: 1100px; margin: 0 auto; }
+    .add-button { width: 100%; padding: 16px; font-size: 16px; font-weight: 600; color: var(--primary-color); background-color: var(--primary-light); border: 2px dashed #b3e0e0; border-radius: var(--radius-lg); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s var(--ease); }
+    .add-button:hover { background-color: var(--primary-color); border-color: var(--primary-hover); color: white; }
+    .add-button .material-symbols-outlined { font-size: 22px; }
+
+    /* === MOBILE RESPONSIVE STYLES === */
+    @media (max-width: 768px) {
+        body {
+            padding: 72px 0 0 0; 
+            background-color: var(--surface-color); 
+        }
+        #app-header {
+            padding: 12px 16px;
+        }
+        #user-info #user-email {
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        #user-info span:not(#user-email) {
+            display: none;
+        }
+
+        .master-container {
+            max-width: 100%;
+            margin: 0;
+        }
+        .page-title {
+            font-size: 1.25rem;
+            padding: 16px 16px 0 16px;
+            margin-bottom: 16px;
+        }
+        .schedule-block {
+            border-radius: 0;
+            box-shadow: none;
+            padding: 12px;
+            margin-bottom: 0;
+            border-bottom: 8px solid var(--background-color); 
+        }
+        .schedule-title {
+            font-size: 1.1rem;
+        }
+        .toolbar {
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            justify-content: space-between;
+        }
+        .toolbar-btn {
+            padding: 8px;
+            gap: 0;
+        }
+        .toolbar-btn .btn-text {
+            display: none;
+        }
+        .delete-btn {
+            margin-left: 0;
+        }
+
+        #add-schedule-footer {
+            padding: 16px;
+        }
+        .add-button {
+            padding: 12px;
+            font-size: 14px;
+        }
+
+        /* Mobile table adjustments */
+        .schedule-block table { 
+            font-size: 6.5px;
+        }
+        .schedule-block th, .schedule-block td { 
+            padding: 0 1.5px;
+            height: 24px;
+        }
+        .schedule-block .header-row td { 
+            height: 26px;
+            font-size: 8px;
+        }
+        .schedule-block .cell-icon { 
+            max-height: 14px;
+        }
+        .schedule-block .row-handle { 
+            left: -20px; 
+            width: 20px; 
+        }
+    }
 </style>
 </head>
 <body>
 
-<!-- Login Screen -->
-<div id="login-screen">
-    <h1>Schedule Editor</h1>
-    <p>Please sign in to continue</p>
-    <button id="login-button">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.574l6.19,5.238C42.022,35.245,44,30.038,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path></svg>
-        Sign in with Google
-    </button>
-</div>
+<div id="app-container" class="hidden">
+    <header id="app-header">
+        <div class="header-content">
+            <div id="user-info">
+                <div id="user-avatar"></div>
+                <span>Welcome, <span id="user-email"></span></span>
+            </div>
+            <button id="logout-button">Logout</button>
+        </div>
+    </header>
 
-<!-- Main App -->
-<div id="app-container">
-    <div id="app-header">
-        <div id="user-info"></div>
-        <button id="sign-out-button">Sign Out</button>
+    <div class="master-container">
+        <h1 class="page-title">Schedule Template Editor</h1>
+        <div id="schedules-wrapper"></div>
     </div>
-
-    <!-- Admin View -->
-    <div id="admin-view" style="display: none;">
-        <div class="master-container">
-            <div id="schedules-wrapper"></div>
-        </div>
-        <div id="add-schedule-footer">
-            <button id="addNewScheduleFooterBtn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/></svg>
-                Add New Schedule
-            </button>
-        </div>
-    </div>
-
-    <!-- User View -->
-    <div id="user-view" style="display: none;">
-        <div class="master-container">
-            <button id="show-create-modal-btn">Create</button>
-            <div id="user-schedules-content" style="margin-top: 20px;"></div>
-            <button id="print-btn" style="display: none; margin-top: 20px;">Print</button>
-        </div>
+    
+    <div id="add-schedule-footer">
+        <button id="addNewScheduleBtn" class="add-button">
+            <span class="material-symbols-outlined">add</span>
+            Add New Schedule Template
+        </button>
     </div>
 </div>
 
-<!-- Templates -->
 <template id="schedule-template">
     <div class="schedule-block">
         <div class="schedule-header">
@@ -187,11 +370,22 @@
             <div class="status-indicator"></div>
         </div>
         <div class="toolbar">
-            <button class="undo-btn" disabled><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.38 10.33 17.28 8 12.5 8z"/></svg> Undo</button>
-            <button class="redo-btn" disabled><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M18.4 10.6C16.55 8.99 14.15 8 11.5 8c-4.78 0-8.88 3.67-9.87 8.5l2.37.78C5.05 13.31 8.04 11 11.5 11c1.96 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z"/></svg> Redo</button>
-            <button class="reset-btn"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg> Reset</button>
-            <button class="delete-btn"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg> Delete Schedule</button>
+            <button class="toolbar-btn undo-btn" disabled><span class="material-symbols-outlined">undo</span><span class="btn-text">Undo</span></button>
+            <button class="toolbar-btn redo-btn" disabled><span class="material-symbols-outlined">redo</span><span class="btn-text">Redo</span></button>
+            <button class="toolbar-btn reset-btn"><span class="material-symbols-outlined">restart_alt</span><span class="btn-text">Reset</span></button>
+            <button class="toolbar-btn delete-btn"><span class="material-symbols-outlined">delete</span><span class="btn-text">Delete Template</span></button>
         </div>
+        
+        <!-- AI SECTION -->
+        <div class="ai-section">
+            <h3><span class="material-symbols-outlined">auto_awesome</span>Fill with AI</h3>
+            <textarea class="ai-input-textarea" placeholder="Paste your raw Telugu text here..."></textarea>
+            <button class="ai-generate-btn">
+                <span class="btn-text">Generate</span>
+                <div class="ai-spinner hidden"></div>
+            </button>
+        </div>
+        
         <table>
             <colgroup><col style="width: 60%;"><col style="width: 20%;"><col style="width: 20%;"></colgroup>
             <tbody class="schedule-table-body"></tbody>
@@ -201,21 +395,10 @@
 
 <div id="rowContextMenu" class="context-menu"></div>
 <div id="cellContextMenu" class="context-menu"></div>
-<div id="user-selection-modal" class="modal-overlay">
-    <div class="modal-content">
-        <h2>Select Schedules to Prepare</h2>
-        <ul id="schedule-checklist"></ul>
-        <div class="modal-actions">
-            <button id="cancel-btn">Cancel</button>
-            <button id="generate-schedule-btn-modal">Generate My Schedule</button>
-        </div>
-    </div>
-</div>
 
 <script>
 (function() {
     'use strict';
-    // --- FIREBASE SETUP ---
     const firebaseConfig = {
       apiKey: "AIzaSyDLK5f4C-nfG6fz0ajqqay1q9TTN6rxgmQ",
       authDomain: "schedule-harsha.firebaseapp.com",
@@ -228,39 +411,49 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
-    const schedulesCollection = db.collection("schedules");
-    const userAssignmentsCollection = db.collection("userAssignments");
+    // AI Initialization
+    const ai = firebase.ai();
+    const model = ai.getGenerativeModel({ model: 'gemini-2.5-flash' });
+
+    const templatesCollection = db.collection("templates");
     
     const ADMIN_EMAIL = 'harshavardhanjw@gmail.com';
-    const LOCAL_STORAGE_KEY_ADMIN = 'firebaseAdminCache_v8';
-    
-    // --- TEMPLATES & DEFAULTS ---
-    const DEFAULT_TABLE_HTML = `<tr class="no-actions"><th style="background-color: rgb(240, 248, 255);" contenteditable="true"><span class="row-handle"></span>బైబిలు అధ్యాయం, ప్రసంగి 11-12</th><th style="background-color: rgb(240, 248, 255);" contenteditable="true">తేదీ:</th><th style="background-color: rgb(240, 248, 255);" contenteditable="true">29-10-2025</th></tr><tr class="no-actions"><td contenteditable="true"><div class="cell-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/8A2BE2/FFFFFF?text=♫" class="cell-icon"><span>పాట: 155</span></div></td><td style="text-align: right;" contenteditable="true">చైర్మన్</td><td contenteditable="true"></td></tr><tr class="no-actions"><td contenteditable="true"><span class="row-handle"></span>ఆరంభ మాటలు (1 నిమి.)</td><td style="text-align: right;" contenteditable="true">ప్రార్థన:</td><td contenteditable="true"></td></tr><tr class="header-row no-actions" data-section="treasures"><td colspan="3" style="background-color: rgb(70, 132, 153);" contenteditable="true"><div class="header-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/FFFFFF/468499?text=T" class="cell-icon"><span>దేవుని వాక్యంలో ఉన్న సంపద</span></div></td></tr><tr><td colspan="3" contenteditable="true"><span class="row-handle"><span class="row-handle-icon">⠿</span></span>1. ఆరోగ్యంగా ఉండండి, లైఫ్‌ని ఎంజాయ్‌ చేయండి. (10 నిమి.)</td></tr><tr><td colspan="3" contenteditable="true"><span class="row-handle"><span class="row-handle-icon">⠿</span></span>2. దేవుని వాక్యంలో రత్నాలు (10 నిమి.)</td></tr><tr><td colspan="3" contenteditable="true"><span class="row-handle"><span class="row-handle-icon">⠿</span></span>3. చదవాల్సిన బైబిలు భాగం: (4 నిమి.)</td></tr><tr class="header-row no-actions" data-section="ministry"><td colspan="3" style="background-color: rgb(212, 162, 42);" contenteditable="true"><div class="header-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/FFFFFF/d4a22a?text=M" class="cell-icon"><span>చక్కగా సువార్త ప్రకటించాలి</span></div></td></tr><tr><td contenteditable="true"><span class="row-handle"><span class="row-handle-icon">⠿</span></span>4. మళ్ళీ కలిసినప్పుడు (3 నిమి.)</td><td colspan="2" contenteditable="true"></td></tr><tr><td contenteditable="true"><span class="row-handle"><span class="row-handle-icon">⠿</span></span>5. మళ్ళీ కలిసినప్పుడు (4 నిమి.)</td><td colspan="2" contenteditable="true"></td></tr><tr><td contenteditable="true"><span class="row-handle"><span class="row-handle-icon">⠿</span></span>6. ప్రసంగం (5 నిమి.)</td><td colspan="2" contenteditable="true"></td></tr><tr class="header-row no-actions" data-section="living"><td colspan="3" style="background-color: rgb(192, 66, 53);" contenteditable="true"><div class="header-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/FFFFFF/c04235?text=L" class="cell-icon"><span>మన క్రైస్తవ జీవితం</span></div></td></tr><tr><td contenteditable="true"><div class="cell-content-wrapper"><span class="row-handle"><span class="row-handle-icon">⠿</span></span><img src="https://via.placeholder.com/40/8A2BE2/FFFFFF?text=♫" class="cell-icon"><span>పాట: 111</span></div></td><td colspan="2" contenteditable="true"></td></tr><tr><td contenteditable="true"><span class="row-handle"><span class="row-handle-icon">⠿</span></span>7. స్థానిక అవసరాలు (15 నిమి.)</td><td colspan="2" contenteditable="true"></td></tr><tr><td contenteditable="true"><span class="row-handle"><span class="row-handle-icon">⠿</span></span>8. సంఘ బైబిలు అధ్యయనం: (30 నిమి.)</td><td colspan="2" contenteditable="true"></td></tr><tr class="no-actions"><td contenteditable="true"><span class="row-handle"></span>ముగింపు మాటలు (3 నిమి.)</td><td style="text-align: right;" contenteditable="true">చైర్మన్</td><td contenteditable="true"></td></tr><tr class="no-actions"><td contenteditable="true"><div class="cell-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/8A2BE2/FFFFFF?text=♫" class="cell-icon"><span>పాట: 8</span></div></td><td style="text-align: right;" contenteditable="true">ముగింపు ప్రార్థన:</td><td contenteditable="true"></td></tr>`.trim();
+    let currentUser = null;
+    let isAdmin = false;
 
-    // --- GLOBAL STATE & ELEMENTS ---
-    const loginScreen = document.getElementById('login-screen');
+    const DEFAULT_TABLE_HTML = `<tr class="no-actions"><th style="background-color: rgb(240, 248, 255);"><span class="row-handle"></span>బైబిలు అధ్యాయం, ప్రసంగి 11-12</th><th style="background-color: rgb(240, 248, 255);">తేదీ:</th><th style="background-color: rgb(240, 248, 255);"></th></tr><tr class="no-actions"><td><div class="cell-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/8A2BE2/FFFFFF?text=♫" class="cell-icon"><span>పాట: 155</span></div></td><td style="text-align: right;">చైర్మన్</td><td></td></tr><tr class="no-actions"><td><span class="row-handle"></span>ఆరంభ మాటలు (1 నిమి.)</td><td style="text-align: right;">ప్రార్థన:</td><td></td></tr><tr class="header-row no-actions" data-section="treasures"><td colspan="3"><div class="header-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/FFFFFF/468499?text=T" class="cell-icon"><span>దేవుని వాక్యంలో ఉన్న సంపద</span></div></td></tr><tr><td colspan="3"><span class="row-handle"><span class="row-handle-icon">⠿</span></span>1. ఆరోగ్యంగా ఉండండి, లైఫ్‌ని ఎంజాయ్‌ చేయండి. (10 నిమి.)</td></tr><tr><td colspan="3"><span class="row-handle"><span class="row-handle-icon">⠿</span></span>2. దేవుని వాక్యంలో రత్నాలు (10 నిమి.)</td></tr><tr><td colspan="3"><span class="row-handle"><span class="row-handle-icon">⠿</span></span>3. చదవాల్సిన బైబిలు భాగం: (4 నిమి.)</td></tr><tr class="header-row no-actions" data-section="ministry"><td colspan="3"><div class="header-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/FFFFFF/d4a22a?text=M" class="cell-icon"><span>చక్కగా సువార్త ప్రకటించాలి</span></div></td></tr><tr><td><span class="row-handle"><span class="row-handle-icon">⠿</span></span>4. మళ్ళీ కలిసినప్పుడు (3 నిమి.)</td><td colspan="2"></td></tr><tr><td><span class="row-handle"><span class="row-handle-icon">⠿</span></span>5. మళ్ళీ కలిసినప్పుడు (4 నిమి.)</td><td colspan="2"></td></tr><tr><td><span class="row-handle"><span class="row-handle-icon">⠿</span></span>6. ప్రసంగం (5 నిమి.)</td><td colspan="2"></td></tr><tr class="header-row no-actions" data-section="living"><td colspan="3"><div class="header-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/FFFFFF/c04235?text=L" class="cell-icon"><span>మన క్రైస్తవ జీవితం</span></div></td></tr><tr><td><div class="cell-content-wrapper"><span class="row-handle"><span class="row-handle-icon">⠿</span></span><img src="https://via.placeholder.com/40/8A2BE2/FFFFFF?text=♫" class="cell-icon"><span>పాట: 111</span></div></td><td colspan="2"></td></tr><tr><td><span class="row-handle"><span class="row-handle-icon">⠿</span></span>7. స్థానిక అవసరాలు (15 నిమి.)</td><td colspan="2"></td></tr><tr><td><span class="row-handle"><span class="row-handle-icon">⠿</span></span>8. సంఘ బైబిలు అధ్యయనం: (30 నిమి.)</td><td colspan="2"></td></tr><tr class="no-actions"><td><span class="row-handle"></span>ముగింపు మాటలు (3 నిమి.)</td><td style="text-align: right;">చైర్మన్</td><td></td></tr><tr class="no-actions"><td><div class="cell-content-wrapper"><span class="row-handle"></span><img src="https://via.placeholder.com/40/8A2BE2/FFFFFF?text=♫" class="cell-icon"><span>పాట: 8</span></div></td><td style="text-align: right;">ముగింపు ప్రార్థన:</td><td></td></tr>`.trim();
+
     const appContainer = document.getElementById('app-container');
-    const adminView = document.getElementById('admin-view');
-    const userView = document.getElementById('user-view');
+    const userEmailEl = document.getElementById('user-email');
+    const userAvatarEl = document.getElementById('user-avatar');
     const schedulesWrapper = document.getElementById('schedules-wrapper');
     const scheduleTemplate = document.getElementById('schedule-template');
     const rowContextMenu = document.getElementById('rowContextMenu');
     const cellContextMenu = document.getElementById('cellContextMenu');
+
     let activeSchedules = {};
     let activeContextScheduleId = null;
+    let currentListener = null;
 
     const debounce = (func, delay) => {
         let timeout;
         return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), delay); };
     };
-    
-    // --- THIS CLASS IS DEFINED ONLY ONCE ---
+
     class Schedule {
         constructor(id, initialData) {
-            this.id = id; this.undoHistory = []; this.redoHistory = []; this.selectedCells = [];
-            this.activeRow = null; this.isUpdatingFromRemote = false;
-            this.initDOM(); this.render(initialData); this.setupEventListeners();
+            this.id = id;
+            this.undoHistory = [];
+            this.redoHistory = [];
+            this.selectedCells = [];
+            this.activeRow = null;
+            this.isUpdatingFromRemote = false;
+
+            this.initDOM();
+            this.render(initialData);
+            this.setupEventListeners();
         }
+
         initDOM() {
             const templateClone = scheduleTemplate.content.cloneNode(true);
             this.element = templateClone.querySelector('.schedule-block');
@@ -270,59 +463,77 @@
             this.statusIndicator = this.element.querySelector('.status-indicator');
             this.undoBtn = this.element.querySelector('.undo-btn');
             this.redoBtn = this.element.querySelector('.redo-btn');
+            // AI Elements
+            this.aiTextarea = this.element.querySelector('.ai-input-textarea');
+            this.aiGenerateBtn = this.element.querySelector('.ai-generate-btn');
+            this.aiSpinner = this.element.querySelector('.ai-spinner');
+
             schedulesWrapper.appendChild(this.element);
         }
+
         render(data) {
             this.isUpdatingFromRemote = true;
             if (document.activeElement !== this.titleEl) this.titleEl.textContent = data.name;
+
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = `<table><tbody>${data.content}</tbody></table>`;
+            tempDiv.querySelectorAll('td, th').forEach(cell => cell.setAttribute('contenteditable', 'true'));
+            
+            const contentToRender = tempDiv.querySelector('tbody').innerHTML;
+            
             if (!this.tableBody.contains(document.activeElement)) {
-                this.tableBody.innerHTML = data.content;
-                this.pushState(data.content, false);
+                this.tableBody.innerHTML = contentToRender;
             }
-            this.updateStatus('Synced', 'success');
+            // Add background colors back to header rows after re-render
+             this.element.querySelectorAll('.header-row[data-section="treasures"] td').forEach(td => td.style.backgroundColor = 'rgb(70, 132, 153)');
+            this.element.querySelectorAll('.header-row[data-section="ministry"] td').forEach(td => td.style.backgroundColor = 'rgb(212, 162, 42)');
+            this.element.querySelectorAll('.header-row[data-section="living"] td').forEach(td => td.style.backgroundColor = 'rgb(192, 66, 53)');
+
+            this.pushState(data.content, false);
+            this.updateStatus('Synced', 'synced');
             this.isUpdatingFromRemote = false;
         }
+        
+        getContent() {
+            const tempBody = this.tableBody.cloneNode(true);
+            tempBody.querySelectorAll('[style*="background-color"]').forEach(el => {
+                if(!el.closest('.header-row')) el.style.backgroundColor = '';
+            });
+            return tempBody.innerHTML;
+        }
+
         pushState(content, shouldSave = true) {
             if (this.undoHistory.length > 0 && this.undoHistory[this.undoHistory.length - 1] === content) return;
-            this.undoHistory.push(content); this.redoHistory = []; this.updateUndoRedoButtons();
+            this.undoHistory.push(content);
+            this.redoHistory = [];
+            this.updateUndoRedoButtons();
             if (shouldSave) {
-                this.saveToLocalStorage();
                 this.debouncedSaveToFirestore();
             }
         }
-        saveToLocalStorage() {
-            const cache = getLocalStorageCache();
-            cache[this.id] = { name: this.titleEl.textContent, content: this.tableBody.innerHTML };
-            localStorage.setItem(LOCAL_STORAGE_KEY_ADMIN, JSON.stringify(cache));
-        }
+        
         saveToFirestore() {
             if (this.isUpdatingFromRemote) return;
-            this.updateStatus('Syncing...', 'warning');
-            const payload = { name: this.titleEl.textContent, content: this.tableBody.innerHTML };
-            schedulesCollection.doc(this.id).set(payload, { merge: true }).catch(err => this.updateStatus('Error', 'danger'));
+            this.updateStatus('Syncing...', 'syncing');
+            const payload = { name: this.titleEl.textContent, content: this.getContent() };
+            templatesCollection.doc(this.id).set(payload, { merge: true })
+                .catch(err => this.updateStatus('Error', 'error'));
         }
+        
         debouncedSaveToFirestore = debounce(() => this.saveToFirestore(), 1500);
-        updateUndoRedoButtons() {
-            this.undoBtn.disabled = this.undoHistory.length <= 1;
-            this.redoBtn.disabled = this.redoHistory.length === 0;
-        }
-        updateStatus(text, type) {
-            this.statusIndicator.textContent = text;
-            this.statusIndicator.style.color = `var(--${type}-color)`;
-        }
-        clearCellSelection() {
-            this.selectedCells.forEach(c => c.classList.remove('cell-selected'));
-            this.selectedCells = [];
-        }
+        updateUndoRedoButtons() { this.undoBtn.disabled = this.undoHistory.length <= 1; this.redoBtn.disabled = this.redoHistory.length === 0; }
+        updateStatus(text, status) { this.statusIndicator.textContent = text; this.statusIndicator.dataset.status = status; }
+        clearCellSelection() { this.selectedCells.forEach(c => c.classList.remove('cell-selected')); this.selectedCells = []; }
+
         setupEventListeners() {
-            this.element.addEventListener('click', e => this.handleElementClick(e));
-            this.element.addEventListener('contextmenu', e => this.handleContextMenu(e));
-            this.titleEl.addEventListener('input', () => {
-                this.saveToLocalStorage();
-                this.debouncedSaveToFirestore();
-            });
-            this.tableBody.addEventListener('input', () => this.pushState(this.tableBody.innerHTML));
+            this.element.addEventListener('click', (e) => this.handleElementClick(e));
+            this.element.addEventListener('contextmenu', (e) => this.handleContextMenu(e));
+            this.titleEl.addEventListener('input', () => this.pushState(this.getContent()));
+            this.tableBody.addEventListener('input', () => this.pushState(this.getContent()));
+            // AI Button Listener
+            this.aiGenerateBtn.addEventListener('click', () => this.generateWithAI());
         }
+
         handleElementClick(e) {
             const target = e.target;
             const handle = target.closest('.row-handle');
@@ -341,11 +552,12 @@
                     e.preventDefault();
                     cell.classList.toggle('cell-selected');
                     this.selectedCells = Array.from(this.tableBody.querySelectorAll('.cell-selected'));
-                } else if (cell && !cell.classList.contains('cell-selected')) {
-                    this.clearCellSelection();
+                } else if (cell) {
+                    if (!cell.classList.contains('cell-selected')) this.clearCellSelection();
                 }
             }
         }
+
         handleContextMenu(e) {
             const cell = e.target.closest('td, th');
             if (cell) {
@@ -359,260 +571,213 @@
                 showCellContextMenu(e);
             }
         }
+        
         undo() {
             if (this.undoHistory.length <= 1) return;
-            this.redoHistory.push(this.undoHistory.pop());
+            const currentState = this.undoHistory.pop();
+            this.redoHistory.push(currentState);
             const prevState = this.undoHistory[this.undoHistory.length - 1];
             this.tableBody.innerHTML = prevState;
-            this.pushState(prevState);
+            this.updateUndoRedoButtons();
+            this.debouncedSaveToFirestore();
         }
+
         redo() {
             if (this.redoHistory.length === 0) return;
             const nextState = this.redoHistory.pop();
+            this.undoHistory.push(nextState);
             this.tableBody.innerHTML = nextState;
-            this.pushState(nextState);
+            this.updateUndoRedoButtons();
+            this.debouncedSaveToFirestore();
         }
-        reset() {
-            if (confirm('Are you sure you want to reset this table?')) {
-                this.tableBody.innerHTML = DEFAULT_TABLE_HTML;
-                this.pushState(this.tableBody.innerHTML);
-            }
-        }
-        delete() {
-             if (confirm('Are you sure you want to permanently delete this schedule?')) {
-                schedulesCollection.doc(this.id).delete();
-                const cache = getLocalStorageCache();
-                delete cache[this.id];
-                localStorage.setItem(LOCAL_STORAGE_KEY_ADMIN, JSON.stringify(cache));
-            }
-        }
+
+        reset() { if (confirm('Are you sure you want to reset this template?')) { this.tableBody.innerHTML = DEFAULT_TABLE_HTML; this.pushState(this.getContent()); } }
+        
+        delete() { if (confirm('Are you sure you want to permanently delete this template?')) { templatesCollection.doc(this.id).delete(); } }
+        
         destroy() { this.element.remove(); }
-    }
 
-    // --- AUTHENTICATION & APP ROUTING ---
-    function initApp() {
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                loginScreen.style.display = 'none';
-                appContainer.style.display = 'block';
-                document.getElementById('user-info').innerHTML = `<img id="user-pic" src="${user.photoURL}" alt="User photo"><span>${user.displayName}</span>`;
-                if (user.email === ADMIN_EMAIL) {
-                    userView.style.display = 'none';
-                    adminView.style.display = 'block';
-                    initAdminApp();
-                } else {
-                    adminView.style.display = 'none';
-                    userView.style.display = 'block';
-                    initUserApp(user);
-                }
-            } else {
-                appContainer.style.display = 'none';
-                loginScreen.style.display = 'flex';
-                Object.values(activeSchedules).forEach(s => s.destroy());
-                activeSchedules = {};
+        // --- AI METHODS ---
+        async generateWithAI() {
+            const rawText = this.aiTextarea.value;
+            if (!rawText.trim()) {
+                alert('Please paste the raw text into the AI input area first.');
+                return;
             }
-        });
 
-        document.getElementById('login-button').addEventListener('click', () => {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            auth.signInWithPopup(provider).catch(error => console.error("Sign-in error", error));
-        });
+            this.aiGenerateBtn.disabled = true;
+            this.aiSpinner.classList.remove('hidden');
+            this.aiGenerateBtn.querySelector('.btn-text').textContent = "Generating...";
 
-        document.getElementById('sign-out-button').addEventListener('click', () => auth.signOut());
-        setupSharedUI();
-    }
+            const prompt = `You are a text extractor for a meeting schedule. From the Telugu text provided, extract the following information and format your response ONLY as a simple key-value list, with each item on a new line. Use the exact English keys provided below, followed by a colon and a space.
 
-    // --- ADMIN APP ---
-    function initAdminApp() {
-        loadAdminSchedulesFromCache();
-        listenForAdminScheduleChanges();
+- **Scripture:** The date range and Bible books/chapters.
+- **Opening Song:** The first song number mentioned.
+- **Numbered Items:** List all lines that start with a number (e.g., "1.", "2.", etc.). Include the full text of each item exactly as it appears.
+- **Mid-Session Song:** Any song number mentioned in the middle of the text. If there are multiple, list each one on a new line with the key "Mid-Session Song:".
+- **Closing Song:** The final song number mentioned.
+
+Example Output Format:
+Scripture: అక్టోబరు 20-26, ప్రసంగి 9-10
+Opening Song: 30
+1. సమస్యల్ని సరైన దృష్టితో చూడండి (10 నిమి.)
+2. దేవుని వాక్యంలో రత్నాలు (10 నిమి.)
+Mid-Session Song: 47
+7. జరగరానిది జరిగినప్పుడు యెహోవా తోడుంటాడు (15 నిమి.) చర్చ.
+Closing Song: 28
+
+Here is the Telugu text to process:
+"${rawText}"`;
+
+            try {
+                const result = await model.generateContent(prompt);
+                const response = await result.response;
+                const aiText = response.text();
+                this.parseAIResponseAndFillTable(aiText);
+            } catch (error) {
+                console.error("AI Generation Error:", error);
+                alert("An error occurred generating the schedule. Please check the console and ensure the Vertex AI API is enabled for your Firebase project.");
+            } finally {
+                this.aiGenerateBtn.disabled = false;
+                this.aiSpinner.classList.add('hidden');
+                this.aiGenerateBtn.querySelector('.btn-text').textContent = "Generate";
+            }
+        }
+        
+        parseAIResponseAndFillTable(aiText) {
+            const lines = aiText.split('\n').filter(line => line.trim() !== '');
+            const parsedData = {
+                scripture: '',
+                openingSong: '',
+                chairman: 'చైర్మన్',
+                treasuresItems: [],
+                ministryItems: [],
+                livingItems: [],
+                closingSong: ''
+            };
+
+            lines.forEach(line => {
+                if (line.toLowerCase().startsWith('scripture:')) {
+                    parsedData.scripture = line.substring(10).trim();
+                } else if (line.toLowerCase().startsWith('opening song:')) {
+                    parsedData.openingSong = line.substring(13).trim();
+                } else if (line.toLowerCase().startsWith('closing song:')) {
+                    parsedData.closingSong = line.substring(13).trim();
+                } else if (line.toLowerCase().startsWith('mid-session song:')) {
+                    parsedData.livingItems.push({ type: 'song', text: `పాట ${line.substring(17).trim()}` });
+                } else if (line.match(/^\d+\./)) {
+                    const itemNumber = parseInt(line.match(/^(\d+)\./)[1]);
+                    if (itemNumber >= 1 && itemNumber <= 3) {
+                        parsedData.treasuresItems.push({ type: 'item', text: line });
+                    } else if (itemNumber >= 4 && itemNumber <= 6) {
+                        parsedData.ministryItems.push({ type: 'item', text: line });
+                    } else {
+                        parsedData.livingItems.push({ type: 'item', text: line });
+                    }
+                }
+            });
+            this.buildTableFromParsedData(parsedData);
+        }
+
+        buildTableFromParsedData(data) {
+            let html = '';
+            const editable = 'contenteditable="true"';
+            const handle = `<span class="row-handle"></span>`;
+            const dragHandle = `<span class="row-handle"><span class="row-handle-icon">⠿</span></span>`;
+            const songIcon = `<img src="https://via.placeholder.com/40/8A2BE2/FFFFFF?text=♫" class="cell-icon">`;
+
+            // Scripture Row
+            html += `<tr class="no-actions"><th style="background-color: rgb(240, 248, 255);" ${editable}>${handle}${data.scripture || 'బైబిలు అధ్యాయం'}</th><th style="background-color: rgb(240, 248, 255);" ${editable}>తేదీ:</th><th style="background-color: rgb(240, 248, 255);" ${editable}></th></tr>`;
+
+            // Opening Song, Chairman, Prayer
+            html += `<tr class="no-actions"><td ${editable}><div class="cell-content-wrapper">${handle}${songIcon}<span>పాట ${data.openingSong || ''}</span></div></td><td style="text-align: right;" ${editable}>${data.chairman}</td><td ${editable}></td></tr>`;
+            html += `<tr class="no-actions"><td ${editable}>${handle}ఆరంభ మాటలు (1 నిమి.)</td><td style="text-align: right;" ${editable}>ప్రార్థన:</td><td ${editable}></td></tr>`;
+
+            // Treasures Section
+            html += `<tr class="header-row no-actions" data-section="treasures"><td colspan="3"><div class="header-content-wrapper">${handle}<img src="https://via.placeholder.com/40/FFFFFF/468499?text=T" class="cell-icon"><span>దేవుని వాక్యంలో ఉన్న సంపద</span></div></td></tr>`;
+            data.treasuresItems.forEach(item => { html += `<tr><td colspan="3" ${editable}>${dragHandle}${item.text}</td></tr>`; });
+
+            // Ministry Section
+            html += `<tr class="header-row no-actions" data-section="ministry"><td colspan="3"><div class="header-content-wrapper">${handle}<img src="https://via.placeholder.com/40/FFFFFF/d4a22a?text=M" class="cell-icon"><span>చక్కగా సువార్త ప్రకటించాలి</span></div></td></tr>`;
+            data.ministryItems.forEach(item => { html += `<tr><td colspan="3" ${editable}>${dragHandle}${item.text}</td></tr>`; });
+
+            // Living Section
+            html += `<tr class="header-row no-actions" data-section="living"><td colspan="3"><div class="header-content-wrapper">${handle}<img src="https://via.placeholder.com/40/FFFFFF/c04235?text=L" class="cell-icon"><span>మన క్రైస్తవ జీవితం</span></div></td></tr>`;
+            data.livingItems.forEach(item => {
+                if (item.type === 'song') {
+                    html += `<tr><td colspan="3" ${editable}><div class="cell-content-wrapper">${dragHandle}${songIcon}<span>${item.text}</span></div></td></tr>`;
+                } else {
+                    html += `<tr><td colspan="3" ${editable}>${dragHandle}${item.text}</td></tr>`;
+                }
+            });
+            if (!data.livingItems.find(item => item.text.includes("సంఘ బైబిలు అధ్యయనం"))) {
+                html += `<tr><td colspan="3" ${editable}>${dragHandle}సంఘ బైబిలు అధ్యయనం: (30 నిమి.)</td></tr>`;
+            }
+
+            // Closing Remarks, Song, Prayer
+            html += `<tr class="no-actions"><td ${editable}>${handle}ముగింపు మాటలు (3 నిమి.)</td><td style="text-align: right;" ${editable}>${data.chairman}</td><td ${editable}></td></tr>`;
+            html += `<tr class="no-actions"><td ${editable}><div class="cell-content-wrapper">${handle}${songIcon}<span>పాట ${data.closingSong || ''}</span></div></td><td style="text-align: right;" ${editable}>ముగింపు ప్రార్థన:</td><td ${editable}></td></tr>`;
+
+            this.tableBody.innerHTML = html;
+            this.pushState(this.getContent());
+        }
     }
     
-    function getLocalStorageCache() {
-        try { return JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_ADMIN)) || {}; } catch { return {}; }
-    }
-
-    function loadAdminSchedulesFromCache() {
-        schedulesWrapper.innerHTML = '';
-        activeSchedules = {};
-        const cache = getLocalStorageCache();
-        for (const id in cache) {
-            const schedule = new Schedule(id, cache[id]);
-            schedule.updateStatus('Cached', 'warning');
-            activeSchedules[id] = schedule;
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            if (user.email !== ADMIN_EMAIL) {
+                window.location.replace('./index.html');
+                return;
+            }
+            currentUser = user;
+            isAdmin = true;
+            appContainer.classList.remove('hidden');
+            userEmailEl.textContent = user.email;
+            userAvatarEl.textContent = user.email.charAt(0).toUpperCase();
+            initAdminApp();
+        } else {
+            window.location.replace('./login.html');
         }
-    }
+    });
 
-    function listenForAdminScheduleChanges() {
-        schedulesCollection.orderBy("createdAt").onSnapshot(snapshot => {
+    function initAdminApp() {
+        if (currentListener) currentListener();
+        currentListener = templatesCollection.orderBy("createdAt").onSnapshot(snapshot => {
             snapshot.docChanges().forEach(change => {
                 const id = change.doc.id;
                 const data = change.doc.data();
                 if (change.type === 'added') {
                     if (!activeSchedules[id]) activeSchedules[id] = new Schedule(id, data);
-                    else activeSchedules[id].render(data);
-                } else if (change.type === 'modified') {
+                }
+                if (change.type === 'modified') {
                     if (activeSchedules[id]) activeSchedules[id].render(data);
-                } else if (change.type === 'removed') {
+                }
+                if (change.type === 'removed') {
                     if (activeSchedules[id]) {
                         activeSchedules[id].destroy();
                         delete activeSchedules[id];
                     }
                 }
             });
-            const freshCache = {};
-            snapshot.docs.forEach(doc => { freshCache[doc.id] = doc.data(); });
-            localStorage.setItem(LOCAL_STORAGE_KEY_ADMIN, JSON.stringify(freshCache));
-        }, error => {
-            console.error("Firestore connection error.", error);
-            Object.values(activeSchedules).forEach(s => s.updateStatus('Offline', 'danger'));
-        });
+        }, error => console.error("Firestore connection error:", error));
     }
 
-    // --- USER APP ---
-    function initUserApp(user) {
-        const showCreateModalBtn = document.getElementById('show-create-modal-btn');
-        const userSelectionModal = document.getElementById('user-selection-modal');
-        const checklist = document.getElementById('schedule-checklist');
-        const generateBtn = document.getElementById('generate-schedule-btn-modal');
-        const cancelBtn = document.getElementById('cancel-btn');
-        const printBtn = document.getElementById('print-btn');
-        const userContentDiv = document.getElementById('user-schedules-content');
-
-        showCreateModalBtn.addEventListener('click', () => {
-            checklist.innerHTML = '<li>Loading...</li>';
-            userSelectionModal.style.display = 'flex';
-            schedulesCollection.orderBy("createdAt").get().then(snapshot => {
-                if (snapshot.empty) {
-                    checklist.innerHTML = '<li>No schedules have been created by the admin yet.</li>';
-                    return;
-                }
-                checklist.innerHTML = '';
-                snapshot.forEach(doc => {
-                    const schedule = doc.data();
-                    const li = document.createElement('li');
-                    li.innerHTML = `<label><input type="checkbox" value="${doc.id}"><span>${schedule.name}</span></label>`;
-                    checklist.appendChild(li);
-                });
-            }).catch(error => {
-                console.error("Error fetching schedules for user:", error);
-                checklist.innerHTML = '<li>Could not load schedules. Check permissions.</li>';
-            });
+    function setupGlobalUI() {
+        document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
+        document.getElementById('addNewScheduleBtn').addEventListener('click', () => {
+            templatesCollection.add({ name: "New Schedule Template", content: DEFAULT_TABLE_HTML, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
         });
-
-        cancelBtn.addEventListener('click', () => userSelectionModal.style.display = 'none');
-        userSelectionModal.addEventListener('click', e => {
-            if (e.target === userSelectionModal) userSelectionModal.style.display = 'none';
-        });
-
-        generateBtn.addEventListener('click', async () => {
-            const selectedIds = Array.from(checklist.querySelectorAll('input:checked')).map(input => input.value);
-            if (selectedIds.length === 0) {
-                alert('Please select at least one schedule.');
-                return;
-            }
-            
-            userContentDiv.innerHTML = '';
-            printBtn.style.display = 'inline-block';
-
-            for (const scheduleId of selectedIds) {
-                try {
-                    const templateDoc = await schedulesCollection.doc(scheduleId).get();
-                    if (!templateDoc.exists) continue;
-                    const assignmentDocId = `${user.uid}_${scheduleId}`;
-                    const assignmentDoc = await userAssignmentsCollection.doc(assignmentDocId).get();
-                    
-                    const templateData = templateDoc.data();
-                    const assignmentData = assignmentDoc.exists ? assignmentDoc.data().assignments : {};
-
-                    renderUserSchedule(scheduleId, templateData, assignmentData);
-                } catch (error) {
-                    console.error(`Error generating schedule ${scheduleId}:`, error);
-                    userContentDiv.innerHTML += `<p style="color:red;">Could not load schedule "${scheduleId}". Please check console for permissions errors.</p>`;
-                }
-            }
-            userSelectionModal.style.display = 'none';
-        });
-        
-        printBtn.addEventListener('click', () => window.print());
-    }
-
-    function renderUserSchedule(scheduleId, templateData, assignmentData) {
-        const userContentDiv = document.getElementById('user-schedules-content');
-        const block = document.createElement('div');
-        block.className = 'schedule-block';
-        block.innerHTML = `
-            <div class="schedule-header"><h2 class="schedule-title">${templateData.name}</h2></div>
-            <table class="user-view-table">
-                 <colgroup><col style="width: 60%;"><col style="width: 20%;"><col style="width: 20%;"></colgroup>
-                <tbody>${templateData.content}</tbody>
-            </table>`;
-        
-        const tableBody = block.querySelector('tbody');
-        const tempDiv = document.createElement('div');
-
-        tableBody.querySelectorAll('td, th').forEach((cell, index) => {
-            const cellId = `cell_${index}`;
-            tempDiv.innerHTML = cell.innerHTML;
-            const textContent = tempDiv.textContent.trim();
-            const hasOnlyHandle = cell.querySelector('.row-handle') && textContent === '';
-            
-            if (textContent === '' || textContent === '\u00a0' || hasOnlyHandle) {
-                cell.contentEditable = true;
-                cell.dataset.cellId = cellId;
-                if (assignmentData[cellId]) {
-                    cell.textContent = assignmentData[cellId];
-                }
-                cell.addEventListener('input', debounce(() => {
-                    saveUserAssignment(scheduleId, cellId, cell.textContent);
-                }, 1000));
-            } else {
-                cell.contentEditable = false;
-            }
-        });
-        userContentDiv.appendChild(block);
-    }
-    
-    async function saveUserAssignment(scheduleId, cellId, value) {
-        const user = auth.currentUser;
-        if (!user) return;
-        const assignmentDocId = `${user.uid}_${scheduleId}`;
-        const assignmentRef = userAssignmentsCollection.doc(assignmentDocId);
-        try {
-            await assignmentRef.set({
-                userId: user.uid,
-                scheduleId: scheduleId,
-                assignments: { [cellId]: value }
-            }, { merge: true });
-            console.log(`Saved assignment for ${cellId}`);
-        } catch(error) {
-            console.error(`Failed to save assignment for ${cellId}:`, error);
-        }
-    }
-
-    // --- SHARED UI & ADMIN HELPER FUNCTIONS ---
-    function setupSharedUI() {
-        document.getElementById('addNewScheduleFooterBtn').addEventListener('click', () => {
-            schedulesCollection.add({
-                name: "New Schedule",
-                content: DEFAULT_TABLE_HTML,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-        });
-        
         document.addEventListener('click', e => {
             if (!e.target.closest('.context-menu, .row-handle, [contenteditable]')) {
                  rowContextMenu.style.display = 'none';
                  cellContextMenu.style.display = 'none';
             }
-            if (!e.target.closest('.master-container') && !e.ctrlKey && !e.metaKey) {
-                Object.values(activeSchedules).forEach(s => s.clearCellSelection && s.clearCellSelection());
+            if (!e.target.closest('.schedule-block') && !e.ctrlKey && !e.metaKey) {
+                Object.values(activeSchedules).forEach(s => s.clearCellSelection());
             }
         });
-        
-        rowContextMenu.innerHTML = `<div class="context-menu-item" data-action="addAbove">Add row above</div><div class="context-menu-item" data-action="addBelow">Add row below</div><hr><div class="context-menu-item delete" data-action="delete">Delete row</div>`;
-        cellContextMenu.innerHTML = `<div class="context-menu-item" data-action="merge">Merge Cells</div><div class="context-menu-item" data-action="split">Split Cell</div><hr><div class="context-menu-item" data-action="align-left">Align Left</div><div class="context-menu-item" data-action="align-center">Align Center</div><div class="context-menu-item" data-action="align-right">Align Right</div>`;
-
+        rowContextMenu.innerHTML = `<div class="context-menu-item" data-action="addAbove"><span class="material-symbols-outlined">arrow_upward</span>Add row above</div><div class="context-menu-item" data-action="addBelow"><span class="material-symbols-outlined">arrow_downward</span>Add row below</div><hr><div class="context-menu-item delete" data-action="delete"><span class="material-symbols-outlined">delete</span>Delete row</div>`;
+        cellContextMenu.innerHTML = `<div class="context-menu-item" data-action="merge"><span class="material-symbols-outlined">merge</span>Merge Cells</div><div class="context-menu-item" data-action="split"><span class="material-symbols-outlined">call_split</span>Split Cell</div><hr><div class="context-menu-item" data-action="align-left"><span class="material-symbols-outlined">format_align_left</span>Align Left</div><div class="context-menu-item" data-action="align-center"><span class="material-symbols-outlined">format_align_center</span>Align Center</div><div class="context-menu-item" data-action="align-right"><span class="material-symbols-outlined">format_align_right</span>Align Right</div>`;
         rowContextMenu.addEventListener('click', handleContextMenuClick);
         cellContextMenu.addEventListener('click', handleContextMenuClick);
     }
@@ -635,7 +800,7 @@
             else if (action === 'split') splitCell(schedule);
         }
         
-        schedule.pushState(schedule.tableBody.innerHTML);
+        schedule.pushState(schedule.getContent());
         if (newRow) newRow.cells[0].focus();
         rowContextMenu.style.display = 'none';
         cellContextMenu.style.display = 'none';
@@ -674,26 +839,10 @@
         positionContextMenu(e, cellContextMenu);
     }
     
-    function insertNewRow (targetRow, position) {
-        const newRow = document.createElement('tr');
-        newRow.innerHTML = `<td colspan="3" contenteditable="true"><span class="row-handle"><span class="row-handle-icon">⠿</span></span>&nbsp;</td>`;
-        targetRow.insertAdjacentElement(position, newRow);
-        return newRow;
-    };
-    function setCellAlignment(schedule, alignment) {
-        schedule.selectedCells.forEach(cell => cell.style.textAlign = alignment);
-        schedule.clearCellSelection();
-    }
-    function canMerge(schedule) {
-        if (schedule.selectedCells.length < 2) return false;
-        const parentRow = schedule.selectedCells[0].parentElement;
-        const sortedCells = [...schedule.selectedCells].sort((a, b) => a.cellIndex - b.cellIndex);
-        for(let i = 0; i < sortedCells.length; i++) {
-            if (sortedCells[i].parentElement !== parentRow) return false;
-            if (i > 0 && (sortedCells[i-1].cellIndex + sortedCells[i-1].colSpan) !== sortedCells[i].cellIndex) return false;
-        }
-        return true;
-    }
+    function insertNewRow (targetRow, position) { const newRow = document.createElement('tr'); newRow.innerHTML = `<td colspan="3" contenteditable="true"><span class="row-handle"><span class="row-handle-icon">⠿</span></span>&nbsp;</td>`; targetRow.insertAdjacentElement(position, newRow); return newRow; };
+    function setCellAlignment(schedule, alignment) { schedule.selectedCells.forEach(cell => cell.style.textAlign = alignment); schedule.clearCellSelection(); }
+    function canMerge(schedule) { if (schedule.selectedCells.length < 2) return false; const parentRow = schedule.selectedCells[0].parentElement; const sortedCells = [...schedule.selectedCells].sort((a, b) => a.cellIndex - b.cellIndex); for(let i = 0; i < sortedCells.length; i++) { if (sortedCells[i].parentElement !== parentRow) return false; if (i > 0 && (sortedCells[i-1].cellIndex + sortedCells[i-1].colSpan) !== sortedCells[i].cellIndex) return false; } return true; }
+    
     function mergeCells(schedule) {
         if (!canMerge(schedule)) return;
         const sortedCells = [...schedule.selectedCells].sort((a, b) => a.cellIndex - b.cellIndex);
@@ -701,36 +850,63 @@
         let totalColSpan = 0;
         const combinedContent = sortedCells.map(cell => {
             const handle = cell.querySelector('.row-handle');
-            if(handle) handle.remove();
-            return cell.innerHTML.trim();
-        });
+            if (handle) handle.remove();
+            let content = cell.innerHTML;
+            const wrapper = cell.querySelector('.cell-content-wrapper');
+            if (wrapper) content = wrapper.innerHTML;
+            return content.trim();
+        }).join('<br>');
         sortedCells.forEach((cell, index) => {
             totalColSpan += cell.colSpan;
             if (index > 0) cell.remove();
         });
         firstCell.colSpan = totalColSpan;
-        firstCell.innerHTML = `<span class="row-handle"><span class="row-handle-icon">⠿</span></span>` + combinedContent.join('<br>');
+        const handleHTML = `<span class="row-handle"><span class="row-handle-icon">⠿</span></span>`;
+        const firstCellHasWrapper = firstCell.querySelector('.cell-content-wrapper');
+        if(firstCellHasWrapper) {
+            firstCell.querySelector('.cell-content-wrapper').innerHTML = handleHTML + combinedContent;
+        } else {
+            firstCell.innerHTML = handleHTML + combinedContent;
+        }
         schedule.clearCellSelection();
     }
+
     function splitCell(schedule) {
         if (schedule.selectedCells.length !== 1) return;
         const cell = schedule.selectedCells[0];
         const span = cell.colSpan;
         if (span <= 1) return;
+        const hasWrapper = cell.querySelector('.cell-content-wrapper');
         const handle = cell.querySelector('.row-handle');
         if(handle) handle.remove();
+        let originalContent = hasWrapper ? cell.querySelector('.cell-content-wrapper').innerHTML : cell.innerHTML;
         cell.colSpan = 1;
-        if(handle) cell.prepend(handle);
+        cell.innerHTML = '';
+        if (hasWrapper) {
+            cell.innerHTML = `<div class="cell-content-wrapper">${handle ? handle.outerHTML : ''}${originalContent}</div>`;
+        } else {
+            cell.innerHTML = (handle ? handle.outerHTML : '') + originalContent;
+        }
         for (let i = 1; i < span; i++) {
             const newCell = document.createElement(cell.tagName);
             newCell.setAttribute('contenteditable', 'true');
+            newCell.innerHTML = hasWrapper ? `<div class="cell-content-wrapper"><span>&nbsp;</span></div>` : `&nbsp;`;
             cell.insertAdjacentElement('afterend', newCell);
         }
         schedule.clearCellSelection();
     }
-
-    // --- START THE APP ---
-    initApp();
+    
+    setupGlobalUI();
+    auth.onAuthStateChanged(user => {
+        if (!user || user.email !== ADMIN_EMAIL) {
+            window.location.replace('./index.html');
+        } else {
+            appContainer.classList.remove('hidden');
+            userEmailEl.textContent = user.email;
+            userAvatarEl.textContent = user.email.charAt(0).toUpperCase();
+            initAdminApp();
+        }
+    });
 
 })();
 </script>
