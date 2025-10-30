@@ -50,7 +50,7 @@
     /* Main Layout */
     .master-container { max-width: 1100px; margin: 0 auto; background: var(--surface-color); padding: 40px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
     
-    /* Header from Static Example */
+    /* STYLES FROM STATIC EXAMPLE */
     .schedule-display-header { text-align: center; margin-bottom: 24px; }
     .title-block { text-align: center; }
     .title-block h1 { margin: 0; font-size: 1.8em; font-weight: 700; color: rgb(97, 40, 0); }
@@ -77,8 +77,8 @@
     /* Modal Styles */
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 16px; }
     .modal-content { background: white; padding: 24px; border-radius: var(--radius-lg); width: 100%; max-width: 500px; max-height: 90vh; display: flex; flex-direction: column; gap: 16px; }
-    .modal-content h2 { margin-top: 0; font-family: 'Inter', sans-serif; }
-    #new-schedule-name { width: 100%; padding: 12px; font-size: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); font-family: 'Inter', sans-serif; }
+    .modal-content h2 { margin-top: 0; }
+    #new-schedule-name { width: 100%; padding: 12px; font-size: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); }
     #date-checklist { list-style: none; padding: 0; margin: 0; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md); max-height: 40vh; }
     #date-checklist li { padding: 10px 12px; border-bottom: 1px solid var(--border-color); }
     #date-checklist li:last-child { border-bottom: none; }
@@ -88,41 +88,17 @@
     #cancel-creation { background-color: var(--surface-color); }
     #confirm-creation { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 
-    /* --- PRINT STYLES --- */
+    /* Print Styles */
     @media print {
-        @page {
-            size: A4 landscape;
-            margin: 40px; /* Consistent padding on all sides for every page */
-        }
-        body {
-            background-color: #ffffff !important;
-            padding: 0;
-            margin: 0;
-        }
-        /* Instruct browser to print background graphics */
+        @page { size: A4 landscape; margin: 0; }
+        body { background-color: #ffffff !important; padding: 0; }
+        #app-header, .actions-col { display: none !important; }
+        .master-container { margin: 0; border: none; box-shadow: none; width: 100%; height: 100%; padding: 40px; }
+        
+        /* Force printing of background graphics */
         .schedule-table thead th, .svg-divider rect {
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
-        }
-        /* Hide non-essential elements */
-        #app-header, .actions-col {
-            display: none !important;
-        }
-        /* Reset container for seamless print flow */
-        .master-container {
-            margin: 0;
-            border: none;
-            box-shadow: none;
-            width: 100%;
-            padding: 0;
-        }
-        /* Ensure table headers repeat on new pages */
-        .schedule-table thead {
-            display: table-header-group;
-        }
-        /* Attempt to prevent rows from breaking mid-way */
-        .schedule-table tr {
-            page-break-inside: avoid;
         }
     }
 </style>
@@ -163,7 +139,7 @@
 <div id="date-selection-modal" class="modal-overlay">
     <div class="modal-content">
         <h2>Create New Sunday Schedule</h2>
-        <p style="font-family: 'Inter', sans-serif;">Give your new schedule a name and select the weeks to include.</p>
+        <p>Give your new schedule a name and select the weeks to include.</p>
         <input type="text" id="new-schedule-name" placeholder="E.g., Nov & Dec 2025 Schedule">
         <ul id="date-checklist"></ul>
         <div class="modal-actions">
@@ -234,7 +210,7 @@
     }
 
     function renderSchedule(data) {
-        document.title = data.name; 
+        document.title = data.name;
         scheduleWrapper.innerHTML = `
             <header class="schedule-display-header">
                 <div class="title-block">
@@ -373,13 +349,12 @@
         const topicCell = cells[1];
         const otherCells = cells.slice(2, 5);
 
-        // First, reset the row to its normal state
         topicCell.colSpan = 1;
         topicCell.classList.remove('special-event');
         topicCell.setAttribute('contenteditable', 'true');
         if(topicCell.dataset.originalContent) {
            topicCell.innerHTML = topicCell.dataset.originalContent;
-        } else if(eventType !== 'normal') { // Clear only if it was a special event before
+        } else if (eventType !== 'normal') {
            topicCell.innerHTML = '';
         }
         otherCells.forEach((cell, index) => {
@@ -395,11 +370,9 @@
         };
 
         if (eventType !== 'normal') {
-            // Save current content before overwriting if it's not already saved
-            if(!topicCell.hasAttribute('data-original-content')) topicCell.dataset.originalContent = topicCell.innerHTML;
-            otherCells.forEach(cell => { if(!cell.hasAttribute('data-original-content')) cell.dataset.originalContent = cell.innerHTML; });
+            topicCell.dataset.originalContent = topicCell.innerHTML;
+            otherCells.forEach(cell => cell.dataset.originalContent = cell.innerHTML);
             
-            // Apply special event styles
             topicCell.colSpan = 4;
             topicCell.classList.add('special-event');
             topicCell.setAttribute('contenteditable', 'false');
@@ -408,10 +381,6 @@
                 cell.style.display = 'none';
                 cell.setAttribute('contenteditable', 'false');
             });
-        } else {
-             // If switching back to normal, clear the stored original content
-             topicCell.removeAttribute('data-original-content');
-             otherCells.forEach(cell => cell.removeAttribute('data-original-content'));
         }
         
         debouncedSave();
