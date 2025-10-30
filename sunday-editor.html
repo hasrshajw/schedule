@@ -67,6 +67,15 @@
     .schedule-table [contenteditable="true"]:focus { background-color: #fffbe5; outline: 1px solid #f59e0b; }
     .special-event { color: red; font-weight: 700; text-align: center; padding-left: 5px; }
     
+    /* --- NEW --- Style for the empty top row */
+    .schedule-table .top-empty-row {
+        background-color: #ffffff !important;
+        border-top: none;
+        border-left: none;
+        border-right: none;
+        height: 25px; /* Adjust height as needed */
+    }
+
     /* Event Button & Menu */
     .event-btn { background: none; border: none; cursor: pointer; padding: 4px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
     .event-btn:hover { background-color: #f0f0f0; }
@@ -88,7 +97,7 @@
     #cancel-creation { background-color: var(--surface-color); }
     #confirm-creation { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 
-    /* --- PRINT STYLES --- */
+    /* Print Styles */
     @media print {
         @page { size: A4 landscape; margin: 0; }
         html, body {
@@ -111,22 +120,6 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-        }
-        
-        /* --- NEW: Repeat Header, Add Space, and Prevent Row Breaks --- */
-        .schedule-table thead {
-            display: table-header-group;
-        }
-        .schedule-table tbody {
-            display: table-row-group;
-        }
-        .schedule-table tr {
-            page-break-inside: avoid;
-            break-inside: avoid;
-        }
-        .schedule-table thead th {
-            /* This adds extra space below the repeated header, simulating an empty row */
-            padding-bottom: 20px; 
         }
     }
 </style>
@@ -260,6 +253,9 @@
             <main>
                 <table class="schedule-table">
                     <thead>
+                        <tr>
+                            <th class="top-empty-row" colspan="6">&nbsp;</th>
+                        </tr>
                         <tr>
                             <th>తేదీ</th>
                             <th>ప్రసంగ అంశం</th>
