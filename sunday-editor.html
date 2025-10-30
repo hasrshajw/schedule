@@ -91,17 +91,15 @@
     /* Print Footer */
     .print-footer { display: none; }
 
-    /* --- PRINT STYLES --- */
+    /* --- UPDATED PRINT STYLES --- */
     @media print {
         @page {
             size: A4 landscape;
-            margin: 40px; /* MODIFIED: Set margin for every page */
+            margin: 40px; /* This creates a consistent border on EVERY page */
         }
-        html { height: 100%; }
-        body {
-            height: auto;
+        html, body {
             background-color: #ffffff !important;
-            padding: 0 !important; /* REMOVED: Padding is now handled by @page margin */
+            padding: 0 !important; /* Remove padding from body */
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
         }
@@ -112,13 +110,12 @@
             border: none;
             box-shadow: none;
             width: 100%;
-            height: auto;
         }
         .print-footer {
             display: block;
             position: fixed;
             bottom: 10px;
-            left: 40px; /* Align with the page margin */
+            left: 40px;
             font-size: 8pt;
             font-family: 'Inter', sans-serif;
             color: #666;
@@ -444,4 +441,4 @@
 })();
 </script>
 </body>
-</html>```
+</html>
