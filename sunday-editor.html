@@ -89,39 +89,24 @@
     #confirm-creation { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 
     /* --- PRINT STYLES --- */
-    .print-spacer-row {
-        display: none; /* Hide on screen by default */
-    }
-
     @media print {
         @page { size: A4 landscape; margin: 0; }
         html { height: 100%; }
         body {
             height: auto;
             background-color: #ffffff !important;
-            padding: 0 40px 40px 40px !important; /* Apply horizontal and bottom padding */
+            padding: 40px !important; /* Apply padding to the body for every page */
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
         }
         #app-header, .actions-col { display: none !important; }
         .master-container {
             margin: 0;
-            padding: 0;
+            padding: 0; /* Remove padding from container to avoid double padding */
             border: none;
             box-shadow: none;
             width: 100%;
             height: auto;
-        }
-        thead {
-            display: table-header-group; /* Crucial for repeating headers */
-        }
-        .print-spacer-row {
-            display: table-row !important; /* Show spacer row on print */
-            height: 40px; /* This creates the top margin */
-        }
-        .print-spacer-row td {
-            border: none;
-            padding: 0;
         }
     }
 </style>
@@ -255,9 +240,6 @@
             <main>
                 <table class="schedule-table">
                     <thead>
-                        <tr class="print-spacer-row">
-                           <td colspan="6"></td>
-                        </tr>
                         <tr>
                             <th>తేదీ</th>
                             <th>ప్రసంగ అంశం</th>
