@@ -92,24 +92,22 @@
     @media print {
         @page {
             size: A4 landscape;
-            margin: 40px; /* Defines the margin FOR EVERY PAGE */
+            margin: 40px; /* CORRECT METHOD: Apply margin to every page */
         }
-        html, body {
+        body {
             background-color: #ffffff !important;
-            padding: 0 !important; /* Remove any body padding */
+            padding: 0 !important; /* Reset body padding */
+            margin: 0 !important; /* Reset body margin */
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
         }
         #app-header, .actions-col { display: none !important; }
         .master-container {
             margin: 0;
-            padding: 0; /* Remove container padding to prevent extra space */
+            padding: 0; /* Reset container padding */
             border: none;
             box-shadow: none;
             width: 100%;
-        }
-        .schedule-table thead {
-             display: table-header-group; /* Ensures header repeats on each page */
         }
     }
 </style>
