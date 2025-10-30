@@ -3,18 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>User - Schedule Editor</title>
+<title>Sunday Schedule Editor</title>
 
 <!-- FIREBASE SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
-<!-- FONTS -->
+<!-- FONTS AND ICONS -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fonts.gstatic" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 
 <style>
@@ -22,6 +22,8 @@
         --primary-color: #012726;
         --primary-hover: #024443;
         --primary-light: #e6f6f6;
+        --danger-color: #d32f2f;
+        --danger-hover: #b71c1c;
         --border-color: #e5e7eb;
         --background-color: #f8fafc;
         --text-primary: #1f2937;
@@ -33,72 +35,88 @@
     }
     *, *::before, *::after { box-sizing: border-box; }
     html { -webkit-font-smoothing: antialiased; }
-    body { font-family: 'Inter', sans-serif; background-color: var(--background-color); margin: 0; padding: 88px 20px 20px; color: var(--text-primary); }
+    body { font-family: 'Noto Sans Telugu', sans-serif; background-color: var(--background-color); margin: 0; padding: 88px 20px 20px; color: var(--text-primary); }
     .hidden { display: none !important; }
 
-    /* App Header */
+    /* Header */
     #app-header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border-color); padding: 12px 20px; }
-    .header-content { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .header-content { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
     .header-actions { display: flex; align-items: center; gap: 12px; }
-    .toolbar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); text-decoration: none; color: var(--text-secondary); }
-    .toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; color: var(--text-primary); }
-    #logout-button { background-color: transparent; border: 1px solid var(--border-color); padding: 8px 16px; border-radius: var(--radius-md); cursor: pointer; font-weight: 600; font-size: 14px; }
-    
+    .toolbar-btn { font-family: 'Inter', sans-serif; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); text-decoration: none; color: var(--text-secondary); }
+    .toolbar-btn:hover { background-color: #f9fafb; color: var(--text-primary); }
+    #logout-button { font-family: 'Inter', sans-serif; background: transparent; border: 1px solid var(--border-color); padding: 8px 16px; border-radius: var(--radius-md); cursor: pointer; font-weight: 600; font-size: 14px; }
+    #logout-button:hover { background-color: var(--danger-light); color: var(--danger-hover); border-color: var(--danger-hover); }
+
     /* Main Layout */
-    .master-container { max-width: 1100px; margin: 0 auto; background: var(--surface-color); padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
-    .project-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color); }
-    .project-title { font-size: 1.75rem; font-weight: 700; margin: 0; flex-grow: 1; border: none; padding: 4px 8px; border-radius: var(--radius-md); font-family: 'Noto Sans Telugu', sans-serif; }
-    .project-title:focus { outline: 2px solid var(--primary-color); background-color: var(--primary-light); }
-
-    /* Schedule Block */
-    .schedule-block { margin-bottom: 32px; }
-    .schedule-block:last-child { margin-bottom: 0; }
-    .schedule-title { font-size: 1.25rem; font-weight: 600; margin: 0; color: var(--text-secondary); font-family: 'Noto Sans Telugu', sans-serif; }
-
-    /* TABLE STYLES */
-    .schedule-block table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 14px; font-weight: 700; }
-    .schedule-block th, .schedule-block td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; height: 36px; }
-    .schedule-block [contenteditable="true"]:focus { background-color: #fffbe5; }
-    .schedule-block .cell-icon { height: 70%; max-height: 24px; }
-    .schedule-block .header-row td { font-size: 16px; color: #ffffff; height: 42px; background-color: #ccc;}
-    .schedule-block .header-row[data-section="treasures"] td { background-color: rgb(70, 132, 153); }
-    .schedule-block .header-row[data-section="ministry"] td { background-color: rgb(212, 162, 42); }
-    .schedule-block .header-row[data-section="living"] td { background-color: rgb(192, 66, 53); }
+    .master-container { max-width: 1100px; margin: 0 auto; background: var(--surface-color); padding: 40px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
+    
+    /* STYLES FROM STATIC EXAMPLE */
+    .schedule-display-header { text-align: center; margin-bottom: 24px; }
+    .title-block { text-align: center; }
+    .title-block h1 { margin: 0; font-size: 1.8em; font-weight: 700; color: rgb(97, 40, 0); }
+    .subtitle-svg-container { position: relative; display: inline-block; margin-top: 0; }
+    .subtitle { margin: 0; font-size: 1.0em; font-weight: 500; color: #333; background-color: #ffffff; padding: 2px 8px; display: inline-block; position: relative; z-index: 2; white-space: nowrap; border-radius: var(--radius-md); }
+    .subtitle:focus { outline: 2px solid var(--primary-color); background-color: #f0f0f0; }
+    .svg-divider { width: 400px; height: 5px; display: block; position: absolute; left: 50%; transform: translateX(-50%); top: 50%; margin-top: -2.5px; z-index: 1; }
+    
+    /* Table Styling */
+    .schedule-table { width: 100%; border-collapse: collapse; border: 2px solid #000; font-size: 0.9em; }
+    .schedule-table th, .schedule-table td { border: 1px solid #000; padding: 8px 5px; text-align: center; vertical-align: middle; font-weight: 700; }
+    .schedule-table tbody td:not(:first-child):not(.special-event) { text-align: left; padding-left: 10px; }
+    .schedule-table thead th { background-color: #F3E5D7; font-size: 1.0em; padding: 10px 5px; }
+    .schedule-table [contenteditable="true"]:focus { background-color: #fffbe5; outline: 1px solid #f59e0b; }
+    .special-event { color: red; font-weight: 700; text-align: center; padding-left: 5px; }
+    
+    /* Event Button & Menu */
+    .event-btn { background: none; border: none; cursor: pointer; padding: 4px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
+    .event-btn:hover { background-color: #f0f0f0; }
+    #event-context-menu { position: fixed; display: none; background: var(--surface-color); border-radius: var(--radius-md); box-shadow: var(--shadow-md); z-index: 1001; padding: 6px; min-width: 180px; border: 1px solid var(--border-color); }
+    .context-menu-item { font-family: 'Inter', sans-serif; display: block; width: 100%; padding: 8px 12px; cursor: pointer; font-size: 14px; border-radius: 6px; background: none; border: none; text-align: left; }
+    .context-menu-item:hover { background: #f9fafb; }
 
     /* Modal Styles */
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 16px; }
-    /* ... other modal styles remain the same ... */
+    .modal-content { background: white; padding: 24px; border-radius: var(--radius-lg); width: 100%; max-width: 500px; max-height: 90vh; display: flex; flex-direction: column; gap: 16px; }
+    .modal-content h2 { margin-top: 0; }
+    #new-schedule-name { width: 100%; padding: 12px; font-size: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); }
+    #date-checklist { list-style: none; padding: 0; margin: 0; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md); max-height: 40vh; }
+    #date-checklist li { padding: 10px 12px; border-bottom: 1px solid var(--border-color); }
+    #date-checklist li:last-child { border-bottom: none; }
+    #date-checklist label { display: flex; align-items: center; gap: 10px; font-size: 16px; cursor: pointer; font-weight: 500; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px; }
+    .modal-actions button { font-family: 'Inter', sans-serif; padding: 10px 20px; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); }
+    #cancel-creation { background-color: var(--surface-color); }
+    #confirm-creation { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 
-    /* --- UPDATED PRINT STYLES --- */
+    /* --- PRINT STYLES --- */
     @media print {
+        /* This is the key fix for multi-page padding */
         @page {
             size: A4 landscape;
-            margin: 40px; /* Consistent padding on ALL pages */
+            margin: 40px; /* Enforces a 40px margin on ALL printed pages */
         }
+
         body {
             background-color: #ffffff !important;
             padding: 0;
             margin: 0;
         }
-        #app-header, .project-header, .schedule-title {
+
+        /* Hide UI elements and remove screen-only styling */
+        #app-header, .actions-col {
             display: none !important;
         }
         .master-container {
             margin: 0;
-            padding: 0;
             border: none;
             box-shadow: none;
             width: 100%;
             height: auto;
+            padding: 0; /* Remove padding to rely on @page margin */
         }
-        .schedule-block {
-            page-break-after: always; /* Each template gets its own page */
-        }
-        .schedule-block:last-child {
-            page-break-after: auto;
-        }
-        /* Force printing of background colors */
-        .schedule-block th, .schedule-block .header-row td {
+        
+        /* This is the key fix for enabling background graphics */
+        .schedule-table thead th, .svg-divider rect {
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
         }
@@ -106,8 +124,309 @@
 </style>
 </head>
 <body>
+
+<div id="app-container" class="hidden">
+    <header id="app-header">
+        <div class="header-content">
+             <div class="header-actions">
+                <a href="./sunday-dashboard.html" class="toolbar-btn">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                    <span>Dashboard</span>
+                </a>
+                <button id="print-button" class="toolbar-btn">
+                    <span class="material-symbols-outlined">print</span>
+                    <span>Print</span>
+                </button>
+            </div>
+            <button id="logout-button">Logout</button>
+        </div>
+    </header>
+
+    <div class="master-container">
+        <div id="schedule-content-wrapper">
+            <!-- Schedule will be rendered here -->
+        </div>
+    </div>
+</div>
+
+<div id="event-context-menu">
+    <button class="context-menu-item" data-event-type="normal">Normal</button>
+    <button class="context-menu-item" data-event-type="co-visit">CO Visit</button>
+    <button class="context-menu-item" data-event-type="assembly">Assembly</button>
+    <button class="context-menu-item" data-event-type="convention">Convention</button>
+</div>
+
+<div id="date-selection-modal" class="modal-overlay">
+    <div class="modal-content">
+        <h2>Create New Sunday Schedule</h2>
+        <p>Give your new schedule a name and select the weeks to include.</p>
+        <input type="text" id="new-schedule-name" placeholder="E.g., Nov & Dec 2025 Schedule">
+        <ul id="date-checklist"></ul>
+        <div class="modal-actions">
+            <button id="cancel-creation">Cancel</button>
+            <button id="confirm-creation">Create Schedule</button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    'use strict';
+    const firebaseConfig = {
+      apiKey: "AIzaSyDLK5f4C-nfG6fz0ajqqay1q9TTN6rxgmQ",
+      authDomain: "schedule-harsha.firebaseapp.com",
+      projectId: "schedule-harsha",
+      storageBucket: "schedule-harsha.firebasestorage.app",
+      messagingSenderId: "965478014820",
+      appId: "1:965478014820:web:1c36c5d890a27e599aa471"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
     
-    <!-- HTML and SCRIPT content remains the same as your original 'editor.html' file -->
+    let currentUser = null;
+    let currentScheduleId = null;
+    let userSchedulesCollection = null;
+    let currentListener = null;
+    let activeRowForEvents = null;
+
+    const appContainer = document.getElementById('app-container');
+    const scheduleWrapper = document.getElementById('schedule-content-wrapper');
+    const dateSelectionModal = document.getElementById('date-selection-modal');
+    const eventContextMenu = document.getElementById('event-context-menu');
+
+    const debounce = (func, delay) => {
+        let timeout;
+        return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), delay); };
+    };
+
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            currentUser = user;
+            userSchedulesCollection = db.collection(`userSundaySchedules/${currentUser.uid}/schedules`);
+            appContainer.classList.remove('hidden');
+            const params = new URLSearchParams(window.location.search);
+            currentScheduleId = params.get('id');
+            if (currentScheduleId) initEditor(); else initCreationFlow();
+        } else {
+            window.location.replace('./login.html');
+        }
+    });
+
+    function initEditor() {
+        if (currentListener) currentListener();
+        currentListener = userSchedulesCollection.doc(currentScheduleId).onSnapshot(doc => {
+            if (doc.exists) {
+                const scheduleData = doc.data();
+                if (!document.activeElement || document.activeElement.tagName === 'BODY' || !scheduleWrapper.contains(document.activeElement)) {
+                    renderSchedule(scheduleData);
+                }
+            } else {
+                alert("This schedule may have been deleted.");
+                window.location.href = './sunday-dashboard.html';
+            }
+        });
+    }
+
+    function renderSchedule(data) {
+        document.title = data.name; 
+        scheduleWrapper.innerHTML = `
+            <header class="schedule-display-header">
+                <div class="title-block">
+                    <h1>బహిరంగ ప్రసంగాల పట్టిక</h1>
+                    <div class="subtitle-svg-container">
+                        <p class="subtitle" contenteditable="true">${data.dateRange || ''}</p>
+                        <svg class="svg-divider" role="presentation" viewBox="0 0 24039.797 260" preserveAspectRatio="xMidYMid slice">
+                            <defs>
+                                <radialGradient id="__id9__id4" gradientUnits="userSpaceOnUse" r="12020.601" cx="12019.898" cy="130" fx="12019.898" fy="130">
+                                    <stop stop-color="#093261" stop-opacity="1" offset="0"></stop>
+                                    <stop stop-color="#ffffff" stop-opacity="1" offset="1"></stop>
+                                </radialGradient>
+                            </defs>
+                            <rect x="0" y="0" width="24039.797" height="260" fill="url(#__id9__id4)"></rect>
+                        </svg>
+                    </div>
+                </div>
+            </header>
+            <main>
+                <table class="schedule-table">
+                    <thead>
+                        <tr>
+                            <th>తేదీ</th>
+                            <th>ప్రసంగ అంశం</th>
+                            <th>ప్రసంగీకుడు</th>
+                            <th>చైర్మన్</th>
+                            <th>కావలికోట రీడర్</th>
+                            <th class="actions-col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.tableHTML}
+                    </tbody>
+                </table>
+            </main>
+        `;
+        scheduleWrapper.addEventListener('input', debouncedSave);
+        scheduleWrapper.querySelectorAll('.event-btn').forEach(btn => {
+            btn.addEventListener('click', openEventMenu);
+        });
+    }
+
+    const debouncedSave = debounce(() => {
+        const subtitleEl = scheduleWrapper.querySelector('.subtitle');
+        const tableBodyEl = scheduleWrapper.querySelector('.schedule-table tbody');
+        if (!subtitleEl || !tableBodyEl) return;
+
+        const payload = {
+            dateRange: subtitleEl.textContent,
+            tableHTML: tableBodyEl.innerHTML
+        };
+        userSchedulesCollection.doc(currentScheduleId).update(payload)
+            .catch(err => console.error("Save failed:", err));
+    }, 1500);
+
+    function initCreationFlow() {
+        const dateList = document.getElementById('date-checklist');
+        const upcomingSundays = generateNextSundays(30);
+        dateList.innerHTML = '';
+        upcomingSundays.forEach(dateStr => {
+            const li = document.createElement('li');
+            li.innerHTML = `<label><input type="checkbox" value="${dateStr}"> ${dateStr}</label>`;
+            dateList.appendChild(li);
+        });
+        dateSelectionModal.style.display = 'flex';
+    }
     
+    function generateNextSundays(count) {
+        const sundays = [];
+        let currentDate = new Date();
+        let dayOfWeek = currentDate.getDay();
+        if (dayOfWeek !== 0) {
+            currentDate.setDate(currentDate.getDate() + (7 - dayOfWeek));
+        }
+        for (let i = 0; i < count; i++) {
+            const day = String(currentDate.getDate()).padStart(2, '0');
+            const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+            const year = currentDate.getFullYear();
+            sundays.push(`${day}-${month}-${year}`);
+            currentDate.setDate(currentDate.getDate() + 7);
+        }
+        return sundays;
+    }
+
+    async function handleCreateSchedule() {
+        const scheduleName = document.getElementById('new-schedule-name').value.trim();
+        if (!scheduleName) return alert("Please enter a name for the schedule.");
+        const selectedCheckboxes = Array.from(document.querySelectorAll('#date-checklist input:checked'));
+        if (selectedCheckboxes.length === 0) return alert("Please select at least one Sunday.");
+        
+        const selectedDates = selectedCheckboxes.map(cb => cb.value);
+        const dateRange = `${selectedDates[0]} నుండి ${selectedDates[selectedDates.length - 1]}`;
+
+        const tableBodyHTML = selectedDates.map(date => `
+            <tr>
+                <td>${date}</td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+                <td class="actions-col">
+                    <button class="event-btn">
+                        <span class="material-symbols-outlined">more_vert</span>
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+
+        try {
+            const newDocRef = await userSchedulesCollection.add({
+                name: scheduleName,
+                dateRange: dateRange,
+                tableHTML: tableBodyHTML,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            window.location.href = `./sunday-editor.html?id=${newDocRef.id}`;
+        } catch (error) {
+            console.error("Error creating new schedule:", error);
+            alert("Could not create schedule. Please try again.");
+        }
+    }
+    
+    function openEventMenu(e) {
+        const btn = e.currentTarget;
+        activeRowForEvents = btn.closest('tr');
+        const rect = btn.getBoundingClientRect();
+        eventContextMenu.style.display = 'block';
+        eventContextMenu.style.top = `${rect.bottom}px`;
+        eventContextMenu.style.left = `${rect.left - eventContextMenu.offsetWidth + rect.width}px`;
+    }
+    
+    function applyEventType(eventType) {
+        if (!activeRowForEvents) return;
+
+        const cells = Array.from(activeRowForEvents.cells);
+        const topicCell = cells[1];
+        const otherCells = cells.slice(2, 5);
+
+        // Reset to normal first
+        topicCell.colSpan = 1;
+        topicCell.classList.remove('special-event');
+        topicCell.setAttribute('contenteditable', 'true');
+        if(topicCell.dataset.originalContent) {
+           topicCell.innerHTML = topicCell.dataset.originalContent;
+        } else {
+           topicCell.innerHTML = '';
+        }
+        otherCells.forEach((cell, index) => {
+            cell.style.display = '';
+            cell.setAttribute('contenteditable', 'true');
+            if(cell.dataset.originalContent) cell.innerHTML = cell.dataset.originalContent;
+        });
+
+        const eventTexts = {
+            'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం',
+            'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో',
+            'convention': 'ప్రాదేశిక సమావేశం'
+        };
+
+        if (eventType !== 'normal') {
+            topicCell.dataset.originalContent = topicCell.innerHTML;
+            otherCells.forEach(cell => cell.dataset.originalContent = cell.innerHTML);
+            
+            topicCell.colSpan = 4;
+            topicCell.classList.add('special-event');
+            topicCell.setAttribute('contenteditable', 'false');
+            topicCell.textContent = eventTexts[eventType];
+            otherCells.forEach(cell => {
+                cell.style.display = 'none';
+                cell.setAttribute('contenteditable', 'false');
+            });
+        }
+        
+        debouncedSave();
+    }
+
+    document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
+    document.getElementById('print-button').addEventListener('click', () => window.print());
+    document.getElementById('cancel-creation').addEventListener('click', () => window.location.href = './sunday-dashboard.html');
+    document.getElementById('confirm-creation').addEventListener('click', handleCreateSchedule);
+
+    eventContextMenu.addEventListener('click', (e) => {
+        const target = e.target.closest('.context-menu-item');
+        if (target) {
+            applyEventType(target.dataset.eventType);
+            eventContextMenu.style.display = 'none';
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!eventContextMenu.contains(e.target) && !e.target.closest('.event-btn')) {
+            eventContextMenu.style.display = 'none';
+        }
+    });
+
+})();
+</script>
 </body>
 </html>
