@@ -66,6 +66,7 @@
     .schedule-table thead th { background-color: #F3E5D7; font-size: 1.0em; padding: 10px 5px; }
     .schedule-table [contenteditable="true"]:focus { background-color: #fffbe5; outline: 1px solid #f59e0b; }
     .special-event { color: red; font-weight: 700; text-align: center; padding-left: 5px; }
+    .empty-page-row td { height: 25px; } /* Style for the empty row */
     
     /* Event Button & Menu */
     .event-btn { background: none; border: none; cursor: pointer; padding: 4px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
@@ -88,7 +89,7 @@
     #cancel-creation { background-color: var(--surface-color); }
     #confirm-creation { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 
-    /* --- PRINT STYLES --- */
+    /* Print Styles */
     @media print {
         @page { size: A4 landscape; margin: 0; }
         html, body {
@@ -107,7 +108,6 @@
             width: 100%;
             height: 100%;
             padding: 40px;
-            /* Flexbox properties for centering */
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -183,6 +183,9 @@
     let userSchedulesCollection = null;
     let currentListener = null;
     let activeRowForEvents = null;
+
+    // --- CONFIGURATION ---
+    const ROWS_PER_PAGE = 10; // Adjust this number to change how many weeks appear before an empty row
 
     const appContainer = document.getElementById('app-container');
     const scheduleWrapper = document.getElementById('schedule-content-wrapper');
@@ -317,20 +320,29 @@
         const selectedDates = selectedCheckboxes.map(cb => cb.value);
         const dateRange = `${selectedDates[0]} నుండి ${selectedDates[selectedDates.length - 1]}`;
 
-        const tableBodyHTML = selectedDates.map(date => `
-            <tr>
-                <td>${date}</td>
-                <td contenteditable="true"></td>
-                <td contenteditable="true"></td>
-                <td contenteditable="true"></td>
-                <td contenteditable="true"></td>
-                <td class="actions-col">
-                    <button class="event-btn">
-                        <span class="material-symbols-outlined">more_vert</span>
-                    </button>
-                </td>
-            </tr>
-        `).join('');
+        const tableBodyHTML = selectedDates.reduce((html, date, index) => {
+            const dataRow = `
+                <tr>
+                    <td>${date}</td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td class="actions-col">
+                        <button class="event-btn">
+                            <span class="material-symbols-outlined">more_vert</span>
+                        </button>
+                    </td>
+                </tr>`;
+            html += dataRow;
+
+            // Add an empty row after every ROWS_PER_PAGE, but not after the very last item
+            if ((index + 1) % ROWS_PER_PAGE === 0 && (index + 1) < selectedDates.length) {
+                const emptyRow = `<tr class="empty-page-row" aria-hidden="true"><td colspan="6">&nbsp;</td></tr>`;
+                html += emptyRow;
+            }
+            return html;
+        }, '');
 
         try {
             const newDocRef = await userSchedulesCollection.add({
