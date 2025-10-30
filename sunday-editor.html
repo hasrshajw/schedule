@@ -89,6 +89,7 @@
     #confirm-creation { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 
     /* --- PRINT STYLES --- */
+   /* --- PRINT STYLES --- */
     @media print {
         /* This is the key fix for multi-page padding */
         @page {
@@ -99,7 +100,7 @@
         body {
             background-color: #ffffff !important;
             padding: 0;
-            margin: 0;
+            margin: 0; /* Body margin must be 0 to respect @page margin */
         }
 
         /* Hide UI elements and remove screen-only styling */
@@ -112,7 +113,7 @@
             box-shadow: none;
             width: 100%;
             height: auto;
-            padding: 0; /* Remove padding to rely on @page margin */
+            padding: 0; /* Container padding must be 0 to respect @page margin */
         }
         
         /* This is the key fix for enabling background graphics */
