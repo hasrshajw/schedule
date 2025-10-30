@@ -95,13 +95,13 @@
     @media print {
         @page {
             size: A4 landscape;
-            /* Default margins are now used, showing browser header/footer */
+            margin: 40px; /* MODIFIED: Set margin for every page */
         }
         html { height: 100%; }
         body {
             height: auto;
             background-color: #ffffff !important;
-            padding: 40px !important; /* Keep a consistent content padding */
+            padding: 0 !important; /* REMOVED: Padding is now handled by @page margin */
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
         }
@@ -118,7 +118,7 @@
             display: block;
             position: fixed;
             bottom: 10px;
-            left: 40px; /* Align with body padding */
+            left: 40px; /* Align with the page margin */
             font-size: 8pt;
             font-family: 'Inter', sans-serif;
             color: #666;
@@ -420,7 +420,6 @@
     document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
     
     document.getElementById('print-button').addEventListener('click', () => {
-        // Populate the URL just before printing
         printUrlSpan.textContent = window.location.href;
         window.print();
     });
@@ -445,4 +444,4 @@
 })();
 </script>
 </body>
-</html>
+</html>```
