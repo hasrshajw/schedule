@@ -10,7 +10,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
-<!-- FONTS -->
+<!-- FONTS AND ICONS -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -24,7 +24,6 @@
         --primary-light: #e6f6f6;
         --danger-color: #d32f2f;
         --danger-hover: #b71c1c;
-        --danger-light: #fde8e8;
         --border-color: #e5e7eb;
         --background-color: #f8fafc;
         --text-primary: #1f2937;
@@ -33,20 +32,19 @@
         --radius-md: 8px;
         --radius-lg: 16px;
         --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-        --ease: cubic-bezier(0.4, 0, 0.2, 1);
     }
     *, *::before, *::after { box-sizing: border-box; }
-    html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    html { -webkit-font-smoothing: antialiased; }
     body { font-family: 'Inter', sans-serif; background-color: var(--background-color); margin: 0; padding: 88px 20px 20px; color: var(--text-primary); }
     .hidden { display: none !important; }
 
-    /* App Header */
+    /* Header */
     #app-header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border-color); padding: 12px 20px; }
-    .header-content { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .header-content { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
     .header-actions { display: flex; align-items: center; gap: 12px; }
-    .toolbar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); transition: all 0.2s var(--ease); text-decoration: none; color: var(--text-secondary); }
-    .toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; color: var(--text-primary); }
-    #logout-button { background-color: transparent; border: 1px solid var(--border-color); padding: 8px 16px; border-radius: var(--radius-md); cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s var(--ease); }
+    .toolbar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); text-decoration: none; color: var(--text-secondary); }
+    .toolbar-btn:hover { background-color: #f9fafb; color: var(--text-primary); }
+    #logout-button { background: transparent; border: 1px solid var(--border-color); padding: 8px 16px; border-radius: var(--radius-md); cursor: pointer; font-weight: 600; font-size: 14px; }
     #logout-button:hover { background-color: var(--danger-light); color: var(--danger-hover); border-color: var(--danger-hover); }
 
     /* Main Layout */
@@ -55,13 +53,20 @@
     .schedule-title { font-family: 'Noto Sans Telugu', sans-serif; font-size: 2rem; font-weight: 700; color: rgb(97, 40, 0); margin: 0; border: none; padding: 4px 8px; border-radius: var(--radius-md); }
     .schedule-title:focus { outline: 2px solid var(--primary-color); background-color: var(--primary-light); }
     
-    /* Table styling from static example */
+    /* Table Styling */
     .schedule-table { width: 100%; border-collapse: collapse; border: 2px solid #000; font-size: 0.9em; font-family: 'Noto Sans Telugu', sans-serif; }
     .schedule-table th, .schedule-table td { border: 1px solid #000; padding: 8px 5px; text-align: center; vertical-align: middle; font-weight: 700; }
-    .schedule-table tbody td:not(:first-child) { text-align: left; padding-left: 10px; }
+    .schedule-table tbody td:not(:first-child):not(.special-event) { text-align: left; padding-left: 10px; }
     .schedule-table thead th { background-color: #F3E5D7; font-size: 1.0em; padding: 10px 5px; }
     .schedule-table [contenteditable="true"]:focus { background-color: #fffbe5; outline: 1px solid #f59e0b; }
-    .special-event { color: red; font-weight: 700; text-align: center; }
+    .special-event { color: red; font-weight: 700; text-align: center; padding-left: 5px; }
+    
+    /* Event Button & Menu */
+    .event-btn { background: none; border: none; cursor: pointer; padding: 4px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
+    .event-btn:hover { background-color: #f0f0f0; }
+    #event-context-menu { position: fixed; display: none; background: var(--surface-color); border-radius: var(--radius-md); box-shadow: var(--shadow-md); z-index: 1001; padding: 6px; min-width: 180px; border: 1px solid var(--border-color); }
+    .context-menu-item { display: block; width: 100%; padding: 8px 12px; cursor: pointer; font-size: 14px; border-radius: 6px; background: none; border: none; text-align: left; }
+    .context-menu-item:hover { background: #f9fafb; }
 
     /* Modal Styles */
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 16px; }
@@ -77,11 +82,11 @@
     #cancel-creation { background-color: var(--surface-color); }
     #confirm-creation { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 
-    /* --- MEDIA QUERY FOR PRINTING --- */
+    /* Print Styles */
     @media print {
         @page { size: A4 landscape; margin: 0; }
         body { background-color: #ffffff !important; padding: 0; font-family: 'Noto Sans Telugu', sans-serif;}
-        #app-header { display: none !important; }
+        #app-header, .actions-col { display: none !important; }
         .master-container { margin: 0; border: none; box-shadow: none; width: 100%; height: 100%; padding: 40px; }
     }
 </style>
@@ -112,6 +117,13 @@
     </div>
 </div>
 
+<div id="event-context-menu">
+    <button class="context-menu-item" data-event-type="normal">Normal</button>
+    <button class="context-menu-item" data-event-type="co-visit">CO Visit</button>
+    <button class="context-menu-item" data-event-type="assembly">Assembly</button>
+    <button class="context-menu-item" data-event-type="convention">Convention</button>
+</div>
+
 <div id="date-selection-modal" class="modal-overlay">
     <div class="modal-content">
         <h2>Create New Sunday Schedule</h2>
@@ -128,7 +140,6 @@
 <script>
 (function() {
     'use strict';
-    // --- FIREBASE SETUP ---
     const firebaseConfig = {
       apiKey: "AIzaSyDLK5f4C-nfG6fz0ajqqay1q9TTN6rxgmQ",
       authDomain: "schedule-harsha.firebaseapp.com",
@@ -146,45 +157,36 @@
     let currentScheduleId = null;
     let userSchedulesCollection = null;
     let currentListener = null;
+    let activeRowForEvents = null;
 
-    // --- DOM ELEMENTS ---
     const appContainer = document.getElementById('app-container');
     const scheduleWrapper = document.getElementById('schedule-content-wrapper');
     const dateSelectionModal = document.getElementById('date-selection-modal');
+    const eventContextMenu = document.getElementById('event-context-menu');
 
     const debounce = (func, delay) => {
         let timeout;
         return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), delay); };
     };
 
-    // --- AUTHENTICATION & PAGE LOGIC ---
     auth.onAuthStateChanged(user => {
         if (user) {
             currentUser = user;
             userSchedulesCollection = db.collection(`userSundaySchedules/${currentUser.uid}/schedules`);
             appContainer.classList.remove('hidden');
-
             const params = new URLSearchParams(window.location.search);
             currentScheduleId = params.get('id');
-            
-            if (currentScheduleId) {
-                initEditor();
-            } else {
-                initCreationFlow();
-            }
+            if (currentScheduleId) initEditor(); else initCreationFlow();
         } else {
             window.location.replace('./login.html');
         }
     });
 
-    // --- EDITOR LOGIC ---
     function initEditor() {
         if (currentListener) currentListener();
-        
         currentListener = userSchedulesCollection.doc(currentScheduleId).onSnapshot(doc => {
             if (doc.exists) {
                 const scheduleData = doc.data();
-                // Avoid re-rendering if an input field is active, preventing data loss
                 if (!document.activeElement || document.activeElement.tagName === 'BODY') {
                     renderSchedule(scheduleData);
                 }
@@ -192,9 +194,6 @@
                 alert("This schedule may have been deleted.");
                 window.location.href = './sunday-dashboard.html';
             }
-        }, error => {
-            console.error("Error fetching schedule:", error);
-            window.location.href = './sunday-dashboard.html';
         });
     }
 
@@ -212,6 +211,7 @@
                             <th>ప్రసంగీకుడు</th>
                             <th>చైర్మన్</th>
                             <th>కావలికోట రీడర్</th>
+                            <th class="actions-col">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -220,78 +220,66 @@
                 </table>
             </main>
         `;
-        // Attach event listener after rendering
         scheduleWrapper.addEventListener('input', debouncedSave);
+        scheduleWrapper.querySelectorAll('.event-btn').forEach(btn => {
+            btn.addEventListener('click', openEventMenu);
+        });
     }
 
     const debouncedSave = debounce(() => {
         const titleEl = scheduleWrapper.querySelector('.schedule-title');
         const tableBodyEl = scheduleWrapper.querySelector('.schedule-table tbody');
         if (!titleEl || !tableBodyEl) return;
-
-        const payload = {
-            name: titleEl.textContent,
-            tableHTML: tableBodyEl.innerHTML
-        };
+        const payload = { name: titleEl.textContent, tableHTML: tableBodyEl.innerHTML };
         userSchedulesCollection.doc(currentScheduleId).update(payload)
             .catch(err => console.error("Save failed:", err));
     }, 1500);
 
-
-    // --- CREATION FLOW LOGIC ---
     function initCreationFlow() {
         const dateList = document.getElementById('date-checklist');
         const upcomingSundays = generateNextSundays(30);
-        
         dateList.innerHTML = '';
         upcomingSundays.forEach(dateStr => {
             const li = document.createElement('li');
             li.innerHTML = `<label><input type="checkbox" value="${dateStr}"> ${dateStr}</label>`;
             dateList.appendChild(li);
         });
-
         dateSelectionModal.style.display = 'flex';
     }
 
     function generateNextSundays(count) {
         const sundays = [];
         let currentDate = new Date();
-        while (sundays.length < count) {
-            // Move to the next day until we find a Sunday (day 0)
-            currentDate.setDate(currentDate.getDate() + 1);
-            if (currentDate.getDay() === 0) {
-                 const day = String(currentDate.getDate()).padStart(2, '0');
-                 const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-                 const year = currentDate.getFullYear();
-                 sundays.push(`${day}-${month}-${year}`);
-            }
+        // Adjust to find the *next* Sunday, not today if today is Sunday
+        currentDate.setDate(currentDate.getDate() + (7 - currentDate.getDay()) % 7);
+        for (let i = 0; i < count; i++) {
+            const day = String(currentDate.getDate()).padStart(2, '0');
+            const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+            const year = currentDate.getFullYear();
+            sundays.push(`${day}-${month}-${year}`);
+            currentDate.setDate(currentDate.getDate() + 7);
         }
         return sundays;
     }
 
     async function handleCreateSchedule() {
         const scheduleName = document.getElementById('new-schedule-name').value.trim();
-        if (!scheduleName) {
-            alert("Please enter a name for the schedule.");
-            return;
-        }
-
+        if (!scheduleName) return alert("Please enter a name for the schedule.");
         const selectedCheckboxes = Array.from(document.querySelectorAll('#date-checklist input:checked'));
-        if (selectedCheckboxes.length === 0) {
-            alert("Please select at least one Sunday.");
-            return;
-        }
-
-        const selectedDates = selectedCheckboxes.map(cb => cb.value);
-
-        // Generate the initial HTML for the table body
-        const tableBodyHTML = selectedDates.map(date => `
+        if (selectedCheckboxes.length === 0) return alert("Please select at least one Sunday.");
+        
+        const tableBodyHTML = selectedCheckboxes.map(cb => `
             <tr>
-                <td>${date}</td>
+                <td>${cb.value}</td>
                 <td contenteditable="true"></td>
                 <td contenteditable="true"></td>
                 <td contenteditable="true"></td>
                 <td contenteditable="true"></td>
+                <td class="actions-col">
+                    <button class="event-btn">
+                        <span class="material-symbols-outlined">more_vert</span>
+                    </button>
+                </td>
             </tr>
         `).join('');
 
@@ -301,21 +289,80 @@
                 tableHTML: tableBodyHTML,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
-            // Redirect to the editor page for the newly created schedule
             window.location.href = `./sunday-editor.html?id=${newDocRef.id}`;
         } catch (error) {
             console.error("Error creating new schedule:", error);
             alert("Could not create schedule. Please try again.");
         }
     }
+    
+    // --- SPECIAL EVENT LOGIC ---
+    function openEventMenu(e) {
+        const btn = e.currentTarget;
+        activeRowForEvents = btn.closest('tr');
+        const rect = btn.getBoundingClientRect();
+        eventContextMenu.style.display = 'block';
+        eventContextMenu.style.top = `${rect.bottom}px`;
+        eventContextMenu.style.left = `${rect.left - eventContextMenu.offsetWidth + rect.width}px`;
+    }
+    
+    function applyEventType(eventType) {
+        if (!activeRowForEvents) return;
 
-    // --- GLOBAL UI EVENT LISTENERS ---
+        const cells = Array.from(activeRowForEvents.cells);
+        const dateCell = cells[0];
+        const topicCell = cells[1];
+        const otherCells = cells.slice(2, 5); // Speaker, Chairman, Reader
+
+        // Reset to normal first
+        topicCell.colSpan = 1;
+        topicCell.classList.remove('special-event');
+        topicCell.setAttribute('contenteditable', 'true');
+        topicCell.innerHTML = ''; // Clear content
+        otherCells.forEach(cell => {
+            cell.style.display = '';
+            cell.setAttribute('contenteditable', 'true');
+        });
+
+        const eventTexts = {
+            'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం',
+            'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో',
+            'convention': 'ప్రాదేశిక సమావేశం'
+        };
+
+        if (eventType !== 'normal') {
+            topicCell.colSpan = 4;
+            topicCell.classList.add('special-event');
+            topicCell.setAttribute('contenteditable', 'false');
+            topicCell.textContent = eventTexts[eventType];
+            otherCells.forEach(cell => {
+                cell.style.display = 'none';
+                cell.setAttribute('contenteditable', 'false');
+            });
+        }
+        
+        debouncedSave(); // Trigger save after modification
+    }
+
+    // Global click listeners
     document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
     document.getElementById('print-button').addEventListener('click', () => window.print());
-    document.getElementById('cancel-creation').addEventListener('click', () => {
-        window.location.href = './sunday-dashboard.html';
-    });
+    document.getElementById('cancel-creation').addEventListener('click', () => window.location.href = './sunday-dashboard.html');
     document.getElementById('confirm-creation').addEventListener('click', handleCreateSchedule);
+
+    eventContextMenu.addEventListener('click', (e) => {
+        const target = e.target.closest('.context-menu-item');
+        if (target) {
+            applyEventType(target.dataset.eventType);
+            eventContextMenu.style.display = 'none';
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!eventContextMenu.contains(e.target) && !e.target.closest('.event-btn')) {
+            eventContextMenu.style.display = 'none';
+        }
+    });
 
 })();
 </script>
