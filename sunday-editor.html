@@ -50,8 +50,8 @@
     /* Main Layout */
     .master-container { max-width: 1100px; margin: 0 auto; background: var(--surface-color); padding: 40px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
     
-    /* STYLES FROM STATIC EXAMPLE */
-    .schedule-display-header { text-align: center; margin-bottom: 24px; } /* Increased margin */
+    /* Static Header Styles */
+    .schedule-display-header { text-align: center; margin-bottom: 24px; }
     .title-block { text-align: center; }
     .title-block h1 { margin: 0; font-size: 1.8em; font-weight: 700; color: rgb(97, 40, 0); }
     .subtitle-svg-container { position: relative; display: inline-block; margin-top: 0; }
@@ -88,17 +88,39 @@
     #cancel-creation { background-color: var(--surface-color); }
     #confirm-creation { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 
-    /* Print Styles */
+    /* --- UPDATED PRINT STYLES --- */
     @media print {
-        @page { size: A4 landscape; margin: 0; }
+        @page {
+            size: A4 landscape;
+            margin: 0;
+        }
         body {
             background-color: #ffffff !important;
             padding: 0;
+            margin: 0;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
         }
-        #app-header, .actions-col { display: none !important; }
-        .master-container { margin: 0; border: none; box-shadow: none; width: 100%; height: 100%; padding: 40px; }
+        #app-header, .actions-col {
+            display: none !important;
+        }
+        .master-container {
+            margin: 0;
+            border: none;
+            box-shadow: none;
+            width: 100vw;
+            height: 100vh;
+            padding: 40px;
+            box-sizing: border-box;
+
+            /* Flexbox for perfect centering */
+            display: flex;
+            justify-content: center; /* Vertical centering */
+            align-items: center;     /* Horizontal centering */
+        }
+        #schedule-content-wrapper {
+            width: 100%; /* Ensure content takes full width inside padding */
+        }
     }
 </style>
 </head>
@@ -410,4 +432,4 @@
 })();
 </script>
 </body>
-</html>```
+</html>
