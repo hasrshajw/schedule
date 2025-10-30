@@ -91,19 +91,22 @@
     /* --- PRINT STYLES --- */
    /* --- PRINT STYLES --- */
    /* --- PRINT STYLES (FINAL VERSION) --- */
+   /* --- PRINT STYLES (FINAL & BULLETPROOF VERSION) --- */
     @media print {
         /* This rule controls the actual paper margins for EVERY page. */
         @page {
             size: A4 landscape;
-            margin: 40px !important; /* Use !important to strongly suggest the browser use this. */
+            margin: 40px !important; /* Use !important as a final measure. */
         }
 
-        body, html {
-            background-color: #ffffff !important;
-            padding: 0;
-            margin: 0; /* Body MUST have 0 margin to respect the @page rule. */
+        /* Ensure the body and html elements don't interfere. */
+        html, body {
             width: 100%;
-            height: auto;
+            height: auto; /* IMPORTANT: Let content flow naturally, don't force a height. */
+            margin: 0;
+            padding: 0;
+            background: #fff !important;
+            font-size: 10pt; /* Explicitly set a base font size for print. */
         }
 
         /* Hide UI elements and remove screen-only styling */
@@ -111,11 +114,11 @@
             display: none !important;
         }
         .master-container {
+            padding: 0; /* MUST be 0 to respect the @page margin. */
             margin: 0;
-            border: none;
             box-shadow: none;
-            width: 100%;
-            padding: 0; /* Container padding MUST be 0. */
+            border: none;
+            width: auto; /* Let the container be as wide as the page content area. */
         }
         
         /* Ensures background colors and graphics are printed */
