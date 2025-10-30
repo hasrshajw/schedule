@@ -91,27 +91,22 @@
     /* --- PRINT STYLES --- */
     @media print {
         @page { size: A4 landscape; margin: 0; }
-        html, body {
-            width: 100%;
-            height: 100%;
+        html { height: 100%; }
+        body {
+            height: auto;
             background-color: #ffffff !important;
-            padding: 0;
+            padding: 40px !important; /* Apply padding to the body for every page */
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
         }
         #app-header, .actions-col { display: none !important; }
         .master-container {
             margin: 0;
+            padding: 0; /* Remove padding from container to avoid double padding */
             border: none;
             box-shadow: none;
             width: 100%;
-            height: 100%;
-            padding: 40px;
-            /* Flexbox properties for centering */
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            height: auto;
         }
     }
 </style>
