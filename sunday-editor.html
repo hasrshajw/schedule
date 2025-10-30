@@ -90,23 +90,26 @@
 
     /* --- PRINT STYLES --- */
     @media print {
-        @page { size: A4 landscape; margin: 0; }
-        html { height: 100%; }
-        body {
-            height: auto;
+        @page {
+            size: A4 landscape;
+            margin: 40px; /* Defines the margin FOR EVERY PAGE */
+        }
+        html, body {
             background-color: #ffffff !important;
-            padding: 40px !important; /* Apply padding to the body for every page */
+            padding: 0 !important; /* Remove any body padding */
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
         }
         #app-header, .actions-col { display: none !important; }
         .master-container {
             margin: 0;
-            padding: 0; /* Remove padding from container to avoid double padding */
+            padding: 0; /* Remove container padding to prevent extra space */
             border: none;
             box-shadow: none;
             width: 100%;
-            height: auto;
+        }
+        .schedule-table thead {
+             display: table-header-group; /* Ensures header repeats on each page */
         }
     }
 </style>
