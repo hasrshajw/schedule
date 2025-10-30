@@ -51,7 +51,7 @@
     .master-container { max-width: 1100px; margin: 0 auto; background: var(--surface-color); padding: 40px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
     
     /* STYLES FROM STATIC EXAMPLE */
-    .schedule-display-header { text-align: center; margin-bottom: 24px; }
+    .schedule-display-header { text-align: center; margin-bottom: 24px; } /* Increased margin */
     .title-block { text-align: center; }
     .title-block h1 { margin: 0; font-size: 1.8em; font-weight: 700; color: rgb(97, 40, 0); }
     .subtitle-svg-container { position: relative; display: inline-block; margin-top: 0; }
@@ -88,42 +88,17 @@
     #cancel-creation { background-color: var(--surface-color); }
     #confirm-creation { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 
-    /* --- UPDATED PRINT STYLES --- */
+    /* Print Styles */
     @media print {
-        @page { 
-            size: A4 landscape; 
-            margin: 0; 
-        }
-        html, body {
-            height: 100%;
-            margin: 0;
+        @page { size: A4 landscape; margin: 0; }
+        body {
+            background-color: #ffffff !important;
             padding: 0;
-        }
-        body { 
-            background-color: #ffffff !important; 
-            /* Use Flexbox for centering */
-            display: flex;
-            align-items: center;       /* Vertical center */
-            justify-content: center; /* Horizontal center */
-        }
-        #app-header, .actions-col { 
-            display: none !important; 
-        }
-        .master-container { 
-            margin: 0; 
-            border: none; 
-            box-shadow: none; 
-            width: auto;      /* Let content define width */
-            max-width: 98%;   /* Prevent overflow */
-            height: auto;     /* Let content define height */
-            padding: 40px;    /* This provides the top/bottom padding */
-        }
-        
-        /* Force printing of background graphics */
-        .schedule-table thead th, .svg-divider rect {
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
         }
+        #app-header, .actions-col { display: none !important; }
+        .master-container { margin: 0; border: none; box-shadow: none; width: 100%; height: 100%; padding: 40px; }
     }
 </style>
 </head>
@@ -306,7 +281,7 @@
         const sundays = [];
         let currentDate = new Date();
         let dayOfWeek = currentDate.getDay();
-        if (dayOfWeek !== 0) {
+        if (dayOfWeek !== 0) { 
             currentDate.setDate(currentDate.getDate() + (7 - dayOfWeek));
         }
         for (let i = 0; i < count; i++) {
@@ -381,10 +356,13 @@
         } else if (eventType !== 'normal') {
            topicCell.innerHTML = '';
         }
-        otherCells.forEach((cell, index) => {
+        topicCell.removeAttribute('data-original-content');
+
+        otherCells.forEach((cell) => {
             cell.style.display = '';
             cell.setAttribute('contenteditable', 'true');
             if(cell.dataset.originalContent) cell.innerHTML = cell.dataset.originalContent;
+            cell.removeAttribute('data-original-content');
         });
 
         const eventTexts = {
@@ -432,4 +410,4 @@
 })();
 </script>
 </body>
-</html>
+</html>```
