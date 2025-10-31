@@ -83,7 +83,22 @@
     .menu-links li a { display: flex; align-items: center; color: var(--menu-new-text); background-color: var(--menu-new-bg); height: 50px; padding: 12px 5px 12px 12px; box-sizing: border-box; text-decoration: none; font-size: 1rem; transition: background-color 0.2s; border-top: 1px dotted #a7a7a7; cursor: pointer; }
     .menu-links li:first-child a { border-top: none; }
     .menu-links li a:hover { background-color: var(--menu-new-hover); }
-    
+    /* --- FIX: ADDED IMAGE SIZING RULES --- */
+.schedule-block td .cell-content-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 100%;
+}
+.schedule-block td img {
+    height: 70%;
+    max-height: 24px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+.schedule-block .header-row td img {
+    filter: brightness(0) invert(1);
+}
     .profile-section { padding: 16px; border-top: 1px solid var(--menu-new-border); flex-shrink: 0; background-color: #fafafa; margin-top: auto; }
     .profile-info { display: flex; align-items: center; }
     .profile-name { font-weight: bold; font-size: 1.1rem; color: #333; }
