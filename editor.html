@@ -106,7 +106,7 @@
 
     #print-container { position: absolute; left: -9999px; top: auto; width: 1100px; background: white; }
     
-    .mobile-view-container { display: none; } /* Hidden by default */
+    .mobile-view-container { display: none; }
 
     @media (max-width: 768px) {
         body { padding: 56px 0 0 0; background-color: var(--surface-color); }
@@ -206,7 +206,7 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
-    const ADMIN_EMAIL = 'harshavardhanjw@gmail.com';
+    
     let currentUser = null;
     let currentProjectId = null;
     let userSchedulesCollection = null;
@@ -223,6 +223,7 @@
     const projectTitleEl = document.getElementById('project-title');
     const schedulesWrapper = document.getElementById('schedules-wrapper');
     const templateSelectionModal = document.getElementById('template-selection-modal');
+    const templateList = document.getElementById('template-list');
     const eventContextMenu = document.getElementById('event-context-menu');
     const memberDropdown = document.getElementById('member-dropdown');
     const statusIndicator = document.querySelector('.project-header .status-indicator');
@@ -295,22 +296,22 @@
                 const tempDiv = document.createElement('div');
                 tempDiv.innerHTML = primaryCell.innerHTML;
                 let primaryText = tempDiv.textContent.trim();
+                
+                let hasEditableCells = Array.from(row.cells).some(c => c.hasAttribute('data-user-editable'));
+                if (!hasEditableCells) return;
 
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'mobile-item';
                 
-                let hasEditableCells = false;
                 const inputsContainer = document.createElement('div');
                 
                 Array.from(row.cells).forEach((cell, cellIndex) => {
                     if (cell.hasAttribute('data-user-editable')) {
-                        hasEditableCells = true;
-                        
                         let subLabelText = '';
                         if (cellIndex > 0 && row.cells[cellIndex - 1] && !row.cells[cellIndex - 1].hasAttribute('data-user-editable')) {
                             subLabelText = row.cells[cellIndex - 1].textContent.trim();
                         } else if (cellIndex === 0) {
-                            primaryText = ''; // The primary cell IS the input, so no main label
+                            primaryText = '';
                         }
                         
                         const inputWrapper = document.createElement('div');
@@ -332,10 +333,8 @@
                     itemDiv.innerHTML = `<div class="item-label">${primaryText}</div>`;
                 }
                 
-                if (hasEditableCells) {
-                    itemDiv.appendChild(inputsContainer);
-                    this.mobileViewContainer.appendChild(itemDiv);
-                }
+                itemDiv.appendChild(inputsContainer);
+                this.mobileViewContainer.appendChild(itemDiv);
             });
         }
         
@@ -381,7 +380,7 @@
                 `;
             }
 
-            this._createMobileView(); // Re-render mobile view after changing state
+            this._createMobileView();
             if (shouldSave) {
                 this.parentProject.triggerSave();
             }
@@ -466,6 +465,9 @@
             appContainer.classList.remove('hidden');
             userEmailEl.textContent = user.email;
             userAvatarEl.textContent = user.email.charAt(0).toUpperCase();
+            
+            setupGlobalUI();
+
             const params = new URLSearchParams(window.location.search);
             currentProjectId = params.get('id');
             if (currentProjectId) { initEditor(); } else { initCreationFlow(); }
@@ -554,7 +556,7 @@
             const targetElement = e.target.closest('.editable-cell');
             if (!targetElement) return;
 
-            if (targetElement.hasAttribute('contenteditable')) {
+            if (targetElement.hasAttribute('contenteditable') && targetElement.getAttribute('contenteditable') === 'true') {
                 return; 
             }
             
@@ -631,11 +633,7 @@
             const item = document.createElement('button');
             item.className = 'member-dropdown-item';
             item.dataset.name = member.name;
-            let nameHtml = `<span>${member.name}</span>`;
-            if (member.isServant) {
-                nameHtml += '<span class="servant-tag">Servant</span>';
-            }
-            item.innerHTML = nameHtml;
+            item.innerHTML = `<span>${member.name}</span>` + (member.isServant ? '<span class="servant-tag">Servant</span>' : '');
             memberDropdown.appendChild(item);
         });
 
@@ -670,10 +668,11 @@
         for (const block of originalBlocks) {
             const clone = block.cloneNode(true);
             clone.querySelector('.event-btn').style.display = 'none';
-            clone.querySelector('.mobile-view-container').style.display = 'none'; // Ensure mobile view is not captured
-            clone.querySelector('table').style.display = 'table'; // Ensure table is visible
+            clone.querySelector('.mobile-view-container').style.display = 'none';
+            clone.querySelector('table').style.display = 'table';
             printContainer.appendChild(clone);
-            const canvas = await html2canvas(clone.querySelector('table'), { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+
+            const canvas = await html2canvas(clone, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
             const imgData = canvas.toDataURL('image/jpeg', 0.8);
             const imgProps = pdf.getImageProperties(imgData);
             const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
