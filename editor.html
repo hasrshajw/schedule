@@ -120,8 +120,9 @@
         .schedule-block table { display: none; }
         .mobile-view-container { display: flex; flex-direction: column; gap: 1.5rem; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 16px; }
         .mobile-item .item-label { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; font-family: 'Noto Sans Telugu', sans-serif; }
-        .mobile-item .item-input { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-md); background-color: #f9fafb; font-size: 1rem; font-weight: 500; color: var(--text-secondary); margin-top: 4px;}
-        .mobile-item-group { display: flex; flex-direction: column; gap: 1rem; }
+        .mobile-item .item-input { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-md); background-color: #f9fafb; font-size: 1rem; font-weight: 500; color: var(--text-secondary); margin-top: 4px; }
+        .mobile-item .input-group { margin-bottom: 12px; }
+        .mobile-item .input-group:last-child { margin-bottom: 0; }
     }
 </style>
 </head>
@@ -223,6 +224,7 @@
     const projectTitleEl = document.getElementById('project-title');
     const schedulesWrapper = document.getElementById('schedules-wrapper');
     const templateSelectionModal = document.getElementById('template-selection-modal');
+    const templateList = document.getElementById('template-list');
     const eventContextMenu = document.getElementById('event-context-menu');
     const memberDropdown = document.getElementById('member-dropdown');
     const statusIndicator = document.querySelector('.project-header .status-indicator');
@@ -286,63 +288,65 @@
 
         _createMobileView() {
             this.mobileViewContainer.innerHTML = '';
-
+            
             if (this.data.eventType && this.data.eventType !== 'normal') {
-                const eventTexts = {
-                    'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం',
-                    'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో',
-                    'convention': 'ప్రాదేశిక సమావేశం'
-                };
-                const eventDiv = document.createElement('div');
-                eventDiv.className = 'mobile-item';
-                eventDiv.innerHTML = `<div class="item-label special-event-text">${eventTexts[this.data.eventType]}</div>`;
-                this.mobileViewContainer.appendChild(eventDiv);
+                const eventTexts = { 'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం', 'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో', 'convention': 'ప్రాదేశిక సమావేశం' };
+                const firstRow = this.tableBody.rows[0];
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'mobile-item';
+                itemDiv.innerHTML = `
+                    <div class="item-label special-event-text">${eventTexts[this.data.eventType]}</div>
+                    <div class="input-group">
+                        <div class="item-label">తేదీ:</div>
+                        <div class="item-input editable-cell" contenteditable="true" data-row-index="0" data-cell-index="2">${firstRow.cells[2] ? firstRow.cells[2].textContent : ''}</div>
+                    </div>
+                `;
+                this.mobileViewContainer.appendChild(itemDiv);
                 return;
             }
 
             Array.from(this.tableBody.rows).forEach((row, rowIndex) => {
-                if (row.classList.contains('header-row') || !Array.from(row.cells).some(c => c.hasAttribute('data-user-editable'))) {
-                    return;
-                }
-                
-                const itemGroup = document.createElement('div');
-                itemGroup.className = 'mobile-item-group';
+                if (row.classList.contains('header-row') || !Array.from(row.cells).some(c => c.hasAttribute('data-user-editable'))) return;
 
-                let primaryLabel = '';
-                const primaryCell = row.cells[0];
-                if (primaryCell && !primaryCell.hasAttribute('data-user-editable')) {
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = primaryCell.innerHTML;
-                    primaryLabel = tempDiv.textContent.trim().replace('⠿', '').trim();
-                }
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'mobile-item';
                 
-                if (primaryLabel) {
-                    itemGroup.innerHTML = `<div class="item-label">${primaryLabel}</div>`;
-                }
+                const inputsContainer = document.createElement('div');
                 
                 Array.from(row.cells).forEach((cell, cellIndex) => {
                     if (cell.hasAttribute('data-user-editable')) {
-                        const inputWrapper = document.createElement('div');
-                        
-                        let subLabelText = '';
-                        if (cellIndex > 0 && row.cells[cellIndex - 1] && !row.cells[cellIndex - 1].hasAttribute('data-user-editable')) {
-                            subLabelText = row.cells[cellIndex - 1].textContent.trim();
-                        }
+                        const tempDiv = document.createElement('div');
+                        let labelText = '';
 
-                        if (subLabelText) {
-                            inputWrapper.innerHTML = `<div class="item-label">${subLabelText}</div>`;
+                        if (cellIndex > 0 && row.cells[cellIndex - 1] && !row.cells[cellIndex - 1].hasAttribute('data-user-editable')) {
+                            tempDiv.innerHTML = row.cells[cellIndex - 1].innerHTML;
+                            labelText = tempDiv.textContent.trim().replace('⠿', '').replace(':', '');
+                        } else {
+                            tempDiv.innerHTML = row.cells[0].innerHTML;
+                            labelText = tempDiv.textContent.trim().replace('⠿', '');
                         }
+                        
+                        const inputWrapper = document.createElement('div');
+                        inputWrapper.className = 'input-group';
+                        inputWrapper.innerHTML = `<div class="item-label">${labelText}</div>`;
 
                         const inputDiv = document.createElement('div');
-                        inputDiv.className = 'item-input editable-cell';
+                        inputDiv.className = `item-input ${cell.hasAttribute('contenteditable') ? '' : 'editable-cell'}`;
+                        if (cell.hasAttribute('contenteditable')) {
+                            inputDiv.setAttribute('contenteditable', 'true');
+                        }
                         inputDiv.textContent = cell.textContent.trim() || 'Select Name';
                         inputDiv.dataset.rowIndex = rowIndex;
                         inputDiv.dataset.cellIndex = cellIndex;
                         inputWrapper.appendChild(inputDiv);
-                        itemGroup.appendChild(inputWrapper);
+                        inputsContainer.appendChild(inputWrapper);
                     }
                 });
-                this.mobileViewContainer.appendChild(itemGroup);
+                
+                if (inputsContainer.hasChildNodes()) {
+                    itemDiv.appendChild(inputsContainer);
+                    this.mobileViewContainer.appendChild(itemDiv);
+                }
             });
         }
         
@@ -395,7 +399,14 @@
         }
 
         setupEventListeners() {
-            this.element.addEventListener('input', () => this.parentProject.triggerSave());
+            this.element.addEventListener('input', (e) => {
+                if(e.target.classList.contains('item-input') && e.target.hasAttribute('contenteditable')) {
+                    const rowIndex = e.target.dataset.rowIndex;
+                    const cellIndex = e.target.dataset.cellIndex;
+                    this.tableBody.rows[rowIndex].cells[cellIndex].textContent = e.target.textContent;
+                }
+                this.parentProject.triggerSave();
+            });
             this.eventBtn.addEventListener('click', (e) => {
                 activeEventScheduleTable = this;
                 const rect = e.currentTarget.getBoundingClientRect();
@@ -568,15 +579,11 @@
                 return; 
             }
             
-            if (targetElement.tagName === 'DIV') {
-                const rowIndex = targetElement.dataset.rowIndex;
-                const cellIndex = targetElement.dataset.cellIndex;
-                const tableBody = targetElement.closest('.schedule-block').querySelector('.schedule-table-body');
-                const realCell = tableBody.rows[rowIndex].cells[cellIndex];
-                openMemberDropdown(realCell, targetElement);
-            } else {
-                openMemberDropdown(targetElement);
-            }
+            const rowIndex = targetElement.dataset.rowIndex;
+            const cellIndex = targetElement.dataset.cellIndex;
+            const tableBody = targetElement.closest('.schedule-block').querySelector('.schedule-table-body');
+            const realCell = tableBody.rows[rowIndex].cells[cellIndex];
+            openMemberDropdown(realCell, targetElement);
         });
 
         memberDropdown.addEventListener('click', e => {
