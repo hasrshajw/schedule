@@ -5,13 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>User - Schedule Editor</title>
 
+<!-- FIREBASE SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoVBL5gI9kDXINERMhaDuLyPdCLTmw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<!-- PDF Generation Libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
+<!-- FONTS -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -50,7 +53,7 @@
     .header-actions { display: flex; align-items: center; gap: 12px; }
     .toolbar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); transition: all 0.2s; text-decoration: none; color: var(--text-secondary); }
     .toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; border-color: #d1d5db; color: var(--text-primary); }
-    .toolbar-btn:disabled { cursor: not-allowed; opacity: 0.5; background-color: #f9fafb;}
+    .toolbar-btn:disabled { cursor: not-allowed; opacity: 0.5; }
     #logout-button { background-color: transparent; border: 1px solid var(--border-color); padding: 8px 16px; border-radius: var(--radius-md); cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s; }
     #logout-button:hover { background-color: var(--danger-light); color: var(--danger-hover); border-color: var(--danger-hover); }
 
@@ -63,7 +66,7 @@
     .schedule-block:last-child { margin-bottom: 0; }
     .schedule-header { margin-bottom: 16px; }
     .schedule-title { font-size: 1.25rem; font-weight: 600; margin: 0; color: var(--text-secondary); font-family: 'Noto Sans Telugu', sans-serif; }
-
+    
     .schedule-block table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.25px; }
     .schedule-block th, .schedule-block td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; }
     .schedule-block [contenteditable="true"]:focus { background-color: #fffbe5; }
@@ -73,7 +76,7 @@
     .schedule-block .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; }
     .schedule-block .header-row td { font-size: 16px; color: #ffffff; height: 42px; }
     .schedule-block .row-handle { display: none !important; }
-
+    
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 16px; }
     .modal-content { background: white; padding: 24px; border-radius: var(--radius-lg); width: 100%; max-width: 500px; max-height: 90vh; display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow-lg); }
     .modal-content h2 { margin-top: 0; }
@@ -87,50 +90,6 @@
     .modal-actions button { padding: 10px 20px; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); }
     #cancel-template-selection { background-color: var(--surface-color); }
     #confirm-template-selection { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
-
-    body.pdf-export-mode .master-container {
-        width: 794px;
-        margin: 0;
-        padding: 0;
-        box-shadow: none;
-        border-radius: 0;
-    }
-    body.pdf-export-mode .schedule-block {
-        width: 100%;
-        padding: 20px;
-        box-sizing: border-box;
-        height: 550px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
-    body.pdf-export-mode #app-header,
-    body.pdf-export-mode .project-header,
-    body.pdf-export-mode .header-actions {
-        display: none !important;
-    }
-    body.pdf-export-mode table { font-size: 12px; }
-    body.pdf-export-mode .schedule-block th, 
-    body.pdf-export-mode .schedule-block td { height: 32px; }
-    body.pdf-export-mode .schedule-block .header-row td { height: 38px; }
-
-    @media (max-width: 768px) {
-        body { padding: 72px 0 0 0; background-color: var(--surface-color); }
-        #app-header { padding: 12px 16px; }
-        #user-info { display: none; }
-        .header-content { justify-content: center; }
-        .header-actions { width: 100%; display: flex; justify-content: space-between; gap: 8px; }
-        .header-actions .toolbar-btn, .header-actions #logout-button { flex: 1; font-size: 12px; padding: 8px 4px; }
-        .master-container { padding: 0 16px 16px; border-radius: 0; box-shadow: none; }
-        .project-header { flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px 0; margin-bottom: 16px; }
-        .project-title { font-size: 1.5rem; }
-        .schedule-block { margin-bottom: 24px; padding: 0 0 24px 0; border-bottom: 1px solid var(--border-color); }
-        .schedule-header { padding: 0; }
-        .schedule-block table { font-size: 6.5px; }
-        .schedule-block th, .schedule-block td { padding: 0 1.5px; height: 24px; }
-        .schedule-block .header-row td { height: 26px; font-size: 8px; }
-        .schedule-block .cell-icon { max-height: 14px; }
-    }
 </style>
 
 </head>
@@ -148,7 +107,7 @@
                     <span class="material-symbols-outlined">arrow_back</span>
                     <span>Dashboard</span>
                 </a>
-                <button id="download-pdf-button" class="toolbar-btn">
+                <button id="print-button" class="toolbar-btn">
                     <span class="material-symbols-outlined">picture_as_pdf</span>
                     <span>Download PDF</span>
                 </button>
@@ -321,10 +280,8 @@
             appContainer.classList.remove('hidden');
             userEmailEl.textContent = user.email;
             userAvatarEl.textContent = user.email.charAt(0).toUpperCase();
-
             const params = new URLSearchParams(window.location.search);
             currentProjectId = params.get('id');
-            
             if (currentProjectId) {
                 initEditor();
             } else {
@@ -337,7 +294,6 @@
 
     function initEditor() {
         if (!currentUser || !currentProjectId) return;
-        
         if (currentListener) currentListener();
         currentListener = userSchedulesCollection.doc(currentProjectId).onSnapshot(doc => {
             if (doc.exists) {
@@ -356,7 +312,6 @@
                 window.location.href = './dashboard.html';
             }
         }, error => {
-            console.error("Error fetching schedule:", error);
             alert("Could not load schedule.");
             window.location.href = './dashboard.html';
         });
@@ -364,8 +319,7 @@
 
     async function initCreationFlow() {
         document.getElementById('project-header').style.display = 'none';
-        document.getElementById('download-pdf-button').style.display = 'none';
-
+        document.getElementById('print-button').style.display = 'none';
         const templatesCollection = db.collection("templates");
         const snapshot = await templatesCollection.orderBy("createdAt").get();
         templateList.innerHTML = '';
@@ -381,71 +335,24 @@
         templateSelectionModal.style.display = 'flex';
     }
 
-    async function handlePdfDownload() {
-        const downloadBtn = document.getElementById('download-pdf-button');
-        const originalBtnText = downloadBtn.innerHTML;
-        downloadBtn.disabled = true;
-        downloadBtn.innerHTML = `<span class="material-symbols-outlined">hourglass_top</span><span>Generating...</span>`;
-
-        document.body.classList.add('pdf-export-mode');
-
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF({
-            orientation: 'p',
-            unit: 'px',
-            format: 'a4'
-        });
-
-        const scheduleBlocks = Array.from(document.querySelectorAll('.schedule-block'));
-        const a4Width = 794; 
-        const a4Height = 1123;
-        const margin = 20;
-
-        for (let i = 0; i < scheduleBlocks.length; i++) {
-            const element = scheduleBlocks[i];
-            const canvas = await html2canvas(element, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
-            const imgData = canvas.toDataURL('image/png');
-            const imgProps = pdf.getImageProperties(imgData);
-            const pdfWidth = a4Width - (margin * 2);
-            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-            const yPos = (i % 2 === 0) ? margin : (a4Height / 2) + (margin / 2);
-
-            if (i > 0 && i % 2 === 0) {
-                pdf.addPage();
-            }
-
-            pdf.addImage(imgData, 'PNG', margin, yPos, pdfWidth, pdfHeight);
-        }
-
-        pdf.save(`${activeProject.data.name || 'schedule'}.pdf`);
-        document.body.classList.remove('pdf-export-mode');
-        downloadBtn.disabled = false;
-        downloadBtn.innerHTML = originalBtnText;
-    }
-
     function setupGlobalUI() {
         document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
-        document.getElementById('download-pdf-button').addEventListener('click', handlePdfDownload);
-        
+        document.getElementById('print-button').addEventListener('click', generatePdf);
         document.getElementById('cancel-template-selection').addEventListener('click', () => {
             templateSelectionModal.style.display = 'none';
             window.location.href = './dashboard.html';
         });
-
         document.getElementById('confirm-template-selection').addEventListener('click', async () => {
             const newProjectName = document.getElementById('new-project-name').value.trim();
             if (!newProjectName) {
                 alert("Please enter a name for your new project.");
                 return;
             }
-            
             const selectedCheckboxes = Array.from(templateList.querySelectorAll('input:checked'));
             if (selectedCheckboxes.length === 0) {
                 alert("Please select at least one template.");
                 return;
             }
-
             const tablesArray = selectedCheckboxes.map(input => {
                 const rawContent = decodeURIComponent(input.dataset.content);
                 const tempDiv = document.createElement('div');
@@ -458,7 +365,6 @@
                 });
                 return { title: input.dataset.name, content: tempDiv.querySelector('tbody').innerHTML };
             });
-            
             const newDocRef = await userSchedulesCollection.add({
                 name: newProjectName,
                 tables: tablesArray,
@@ -467,9 +373,57 @@
             window.location.href = `./editor.html?id=${newDocRef.id}`;
         });
     }
-    
-    setupGlobalUI();
 
+    async function generatePdf() {
+        const printButton = document.getElementById('print-button');
+        printButton.disabled = true;
+        printButton.querySelector('span:last-child').textContent = 'Generating...';
+
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const scheduleBlocks = document.querySelectorAll('.schedule-block');
+        const A4_WIDTH_MM = 210;
+        const A4_HEIGHT_MM = 297;
+        const MARGIN_MM = 10;
+        const USABLE_WIDTH = A4_WIDTH_MM - (MARGIN_MM * 2);
+
+        for (let i = 0; i < scheduleBlocks.length; i++) {
+            const block = scheduleBlocks[i];
+            
+            const isTopPosition = i % 2 === 0;
+
+            if (i > 0 && isTopPosition) {
+                pdf.addPage();
+            }
+
+            const canvas = await html2canvas(block, {
+                scale: 3,
+                useCORS: true,
+                backgroundColor: '#ffffff'
+            });
+
+            const imgData = canvas.toDataURL('image/png');
+            const imgProps = pdf.getImageProperties(imgData);
+            const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
+
+            let yPosition;
+            if (isTopPosition) {
+                yPosition = MARGIN_MM;
+            } else {
+                yPosition = A4_HEIGHT_MM / 2;
+            }
+
+            pdf.addImage(imgData, 'PNG', MARGIN_MM, yPosition, USABLE_WIDTH, imgHeight);
+        }
+
+        const fileName = `${projectTitleEl.textContent.trim() || 'schedule'}.pdf`;
+        pdf.save(fileName);
+
+        printButton.disabled = false;
+        printButton.querySelector('span:last-child').textContent = 'Download PDF';
+    }
+
+    setupGlobalUI();
 })();
 </script>
 </body>
