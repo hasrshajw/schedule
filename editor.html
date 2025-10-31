@@ -286,17 +286,32 @@ expand_less
 
         render() {
             this.titleEl.textContent = this.data.title;
-            this.tableBody.innerHTML = this.data.content;
             
-            this.tableBody.querySelectorAll('td[data-user-editable], th[data-user-editable]').forEach(cell => {
-                if (cell.closest('tr') === this.tableBody.rows[0]) {
-                    cell.setAttribute('contenteditable', 'true');
+            // Create a temporary document fragment to parse the content
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = `<table><tbody>${this.data.content}</tbody></table>`;
+
+            // Process editable status BEFORE adding to the page
+            tempDiv.querySelectorAll('td, th').forEach(cell => {
+                if (cell.hasAttribute('data-user-editable')) {
+                    // Check if it's the date cell in the first row
+                    if (cell.closest('tr') === tempDiv.querySelector('tbody').rows[0]) {
+                        cell.setAttribute('contenteditable', 'true');
+                    } else {
+                        // It's a dropdown cell for names
+                        cell.classList.add('editable-cell');
+                        cell.removeAttribute('contenteditable');
+                    }
                 } else {
-                    cell.classList.add('editable-cell');
-                    cell.removeAttribute('contenteditable');
+                    // Not a user-editable cell, so lock it down.
+                    cell.setAttribute('contenteditable', 'false');
                 }
             });
 
+            // Now, set the innerHTML of the actual table body with the processed content
+            this.tableBody.innerHTML = tempDiv.querySelector('tbody').innerHTML;
+
+            // Finally, create the mobile view based on the corrected table structure
             this._createMobileView();
         }
 
