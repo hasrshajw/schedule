@@ -6,21 +6,15 @@
 <title>User - Schedule Editor</title>
 
 <!-- FIREBASE SDKs -->
-
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
 <!-- PDF Generation Libraries -->
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-<!-- FONTS -->
-
+<!-- FONTS & ICONS -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -29,45 +23,82 @@
 
 <style>
     :root {
-        --primary-color: #012726;
-        --primary-hover: #024443;
-        --primary-light: #e6f6f6;
-        --danger-color: #d32f2f;
-        --danger-hover: #b71c1c;
+        --header-bg: #292929;
+        --text-light: #fff;
+        --body-bg: #f8fafc;
+        --surface-color: #ffffff;
+        --menu-new-text: #4a6da7;
+        --menu-new-bg: #ffffff;
+        --menu-new-border: #eeeeee;
+        --menu-new-hover: #f5f5f5;
+        --primary-color: #4a6da7;
+        --primary-light: #eef2f9;
         --border-color: #e5e7eb;
-        --background-color: #f8fafc;
         --text-primary: #1f2937;
         --text-secondary: #6b7280;
-        --surface-color: #ffffff;
+        --danger-color: #d32f2f;
+        --danger-light: #fde8e8;
         --radius-md: 8px;
         --radius-lg: 16px;
         --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
         --warning-color: #f59e0b;
         --success-color: #2e7d32;
     }
+    
+    @font-face {
+        font-family: "jw-icons-external";
+        src: url("./jw-icons-external-d876da3.woff") format("woff");
+        font-weight: normal; font-style: normal;
+    }
+    
     *, *::before, *::after { box-sizing: border-box; }
     html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-    body { font-family: 'Inter', sans-serif; background-color: var(--background-color); margin: 0; padding: 88px 20px 20px; color: var(--text-primary); }
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--body-bg);
+        margin: 0;
+        padding: 0;
+        color: var(--text-primary);
+        visibility: hidden; opacity: 0;
+        transition: opacity 0.3s ease-in;
+    }
+    body.auth-ready { visibility: visible; opacity: 1; }
+    body.menu-open { overflow: hidden; }
     .hidden { display: none !important; }
 
-    #app-header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border-color); padding: 12px 20px; }
-    .header-content { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-    #user-info { display: flex; align-items: center; gap: 12px; font-size: 14px; }
-    #user-avatar { width: 36px; height: 36px; border-radius: 50%; background-color: var(--border-color); display: flex; align-items: center; justify-content: center; font-weight: 600; color: var(--text-secondary); }
-    #user-email { font-weight: 600; color: var(--text-primary); }
-    .header-actions { display: flex; align-items: center; gap: 12px; }
-    .toolbar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); transition: all 0.2s; text-decoration: none; color: var(--text-secondary); }
-    .toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; border-color: #d1d5db; color: var(--text-primary); }
-    .toolbar-btn:disabled { cursor: not-allowed; opacity: 0.5; }
-    #logout-button { background-color: transparent; border: 1px solid var(--border-color); padding: 8px 16px; border-radius: var(--radius-md); cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s; }
-    #logout-button:hover { background-color: var(--danger-light); color: var(--danger-hover); border-color: var(--danger-hover); }
+    /* Header & Menu */
+    .site-header { background-color: var(--header-bg); padding: 0; color: var(--text-light); position: fixed; top: 0; left: 0; width: 100%; z-index: 900; }
+    .top-bar { display: flex; justify-content: space-between; align-items: center; height: 56px; padding: 0 15px 0 0; max-width: 1200px; margin: 0 auto; }
+    #mobileNavTopBar .mobileLogo { display: block; width: 75px; height: 56px; background-image: url(https://www.jw.org/assets/ct/46605f23da/images/siteLogo-jworg-mobile.svg), none; background-repeat: no-repeat; background-size: contain; background-position: center left; flex-shrink: 0; }
+    .header-right-controls { display: flex; align-items: center; gap: 15px; }
+    .header-icons { display: flex; align-items: center; height: 56px; cursor: pointer; }
+    .header-icons svg { height: 24px; width: 24px; color: var(--text-light); }
+    .header-icons .close-icon { display: none; }
+    body.menu-open .header-icons .hamburger-icon { display: none; }
+    body.menu-open .header-icons .close-icon { display: block; }
+    .menu-overlay { position: fixed; top: 56px; left: 0; width: 100%; height: calc(100% - 56px); background-color: rgba(0, 0, 0, 0.6); z-index: 998; opacity: 0; visibility: hidden; transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; }
+    .menu-overlay.is-open { opacity: 1; visibility: visible; }
+    .slide-menu { position: fixed; top: 56px; right: 0; height: calc(100dvh - 56px); width: 320px; max-width: 90%; background-color: var(--menu-new-bg); z-index: 999; transform: translateX(100%); transition: transform 0.3s ease-in-out; display: flex; flex-direction: column; border-left: 1px solid var(--menu-new-border); }
+    .slide-menu.is-open { transform: translateX(0); }
+    .menu-links { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex-grow: 1; }
+    .menu-links li a { display: flex; align-items: center; color: var(--menu-new-text); background-color: var(--menu-new-bg); height: 50px; padding: 12px 5px 12px 12px; box-sizing: border-box; text-decoration: none; font-size: 1rem; transition: background-color 0.2s; border-top: 1px dotted #a7a7a7; }
+    .menu-links li:first-child a { border-top: none; }
+    .menu-links li a:hover { background-color: var(--menu-new-hover); }
+    .profile-section { padding: 16px; border-top: 1px solid var(--menu-new-border); flex-shrink: 0; background-color: #fafafa; margin-top: auto; }
+    .profile-info { display: flex; align-items: center; }
+    .profile-name { font-weight: bold; font-size: 1.1rem; color: #333; }
+    .iconLink-icon { font-family: "jw-icons-external"; font-size: 24px; display: inline-block; color: #757575; width: 30px; margin-right: 10px; text-align: center; }
+    .home-icon::before { content: "\e661"; }
+    .midweek-icon::before { content: "\e625"; }
+    .sunday-icon::before { content: "\e610"; }
+    .members-icon::before { content: "\e695"; }
 
-    .master-container { max-width: 1100px; margin: 0 auto; background: var(--surface-color); padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
+    .master-container { max-width: 1100px; margin: 0 auto; padding: calc(56px + 1.5rem) 1.5rem 1.5rem; }
     .project-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color); }
     .project-title { font-size: 1.75rem; font-weight: 700; margin: 0; flex-grow: 1; border: none; padding: 4px 8px; margin: -4px -8px; border-radius: var(--radius-md); font-family: 'Noto Sans Telugu', sans-serif; }
     .project-title:focus { outline: 2px solid var(--primary-color); background-color: var(--primary-light); }
     
-    .schedule-block { margin-bottom: 32px; }
+    .schedule-block { margin-bottom: 32px; background: var(--surface-color); padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
     .schedule-block:last-child { margin-bottom: 0; }
     .schedule-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
     .schedule-title { font-size: 1.25rem; font-weight: 600; margin: 0; color: var(--text-secondary); font-family: 'Noto Sans Telugu', sans-serif; }
@@ -77,19 +108,12 @@
     .status-indicator[data-status="synced"] { color: var(--success-color); background-color: #eaf5ea; }
     .status-indicator[data-status="syncing"] { color: var(--warning-color); background-color: #fffbeb; }
     .status-indicator[data-status="error"] { color: var(--danger-color); background-color: #fde8e8; }
-
-    .schedule-block table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.25px; }
+    
+    .schedule-block table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 14px; font-weight: 700; }
     .schedule-block th, .schedule-block td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; }
     .schedule-block .editable-cell:not([contenteditable="true"]) { cursor: pointer; }
     .schedule-block .editable-cell:not([contenteditable="true"]):hover { background-color: #f9fafb; }
     .schedule-block [contenteditable="true"]:focus { background-color: #fffbe5; }
-    .schedule-block .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; }
-    .schedule-block .cell-icon { height: 70%; max-height: 24px; object-fit: contain; flex-shrink: 0; }
-    .schedule-block .header-row .cell-icon { filter: brightness(0) invert(1); }
-    .schedule-block .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; }
-    .schedule-block .header-row td { font-size: 16px; color: #ffffff; height: 42px; }
-    .schedule-block .row-handle { display: none !important; }
-    
     .special-event-text { color: red; text-align: center !important; font-weight: 700; }
 
     #event-context-menu, #member-dropdown { position: fixed; display: none; background: var(--surface-color); border-radius: var(--radius-md); box-shadow: var(--shadow-md); z-index: 1001; padding: 6px; min-width: 180px; border: 1px solid var(--border-color); }
@@ -99,81 +123,66 @@
     #member-dropdown { max-height: 300px; overflow-y: auto; }
     .servant-tag { font-size: 0.75rem; font-weight: 600; color: var(--primary-color); background-color: var(--primary-light); padding: 2px 6px; border-radius: 4px; }
 
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 16px; }
-    .modal-content { background: white; padding: 24px; border-radius: var(--radius-lg); width: 100%; max-width: 500px; max-height: 90vh; display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow-lg); }
-    #new-project-name { width: 100%; padding: 12px; font-size: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); }
-    #template-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md); }
-    #template-list li { padding: 12px; border-bottom: 1px solid var(--border-color); }
-    #template-list label { display: flex; align-items: center; gap: 10px; font-size: 16px; cursor: pointer; font-weight: 500; }
-    .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px; }
-    .modal-actions button { padding: 10px 20px; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); }
-    #cancel-template-selection { background-color: var(--surface-color); }
-    #confirm-template-selection { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
-
     #print-container { position: absolute; left: -9999px; top: auto; width: 1100px; background: white; }
-    
     .mobile-view-container { display: none; }
-    
-/* Add this new rule for the date input */
-    .date-input {
-        cursor: pointer;
-        -webkit-appearance: none; /* Hides default UI on some browsers */
-        -moz-appearance: none;
-        appearance: none;
-        background-color: transparent;
-        border: none;
-        width: 100%;
-        height: 100%;
-        font-family: inherit;
-        font-size: inherit;
-        font-weight: inherit;
-        text-align: left;
-        padding-left: 8px;
-    }
-    
+    .date-input { cursor: pointer; appearance: none; background-color: transparent; border: none; width: 100%; height: 100%; font-family: inherit; font-size: inherit; font-weight: inherit; text-align: left; padding-left: 8px; }
+
     @media (max-width: 768px) {
         body { padding: 56px 0 0 0; background-color: var(--surface-color); }
-        #app-header { padding: 0 16px; }
         .master-container { padding: 16px; border-radius: 0; box-shadow: none; }
         .project-header { flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px 0; margin-bottom: 16px; }
         .project-title { font-size: 1.5rem; }
-        .schedule-block { margin-bottom: 24px; padding: 0 0 24px 0; border-bottom: 8px solid var(--background-color); }
+        .schedule-block { margin-bottom: 24px; padding: 16px; border-radius: var(--radius-lg); border: 1px solid var(--border-color); box-shadow: none; }
         .schedule-block:last-child { border-bottom: none; }
-
         .schedule-block table { display: none; }
-        .mobile-view-container { display: flex; flex-direction: column; gap: 1.5rem; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 16px; }
-        .mobile-item .item-label { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; font-family: 'Noto Sans Telugu', sans-serif; }
-        .mobile-item .item-input { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-md); background-color: #f9fafb; font-size: 1rem; font-weight: 500; color: var(--text-secondary); margin-top: 4px; }
+        .mobile-view-container { display: flex; flex-direction: column; gap: 1.5rem; }
+        .mobile-item .item-label { font-size: 1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; font-family: 'Noto Sans Telugu', sans-serif; }
+        .mobile-item .item-input { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-md); background-color: #f9fafb; font-size: 1rem; font-weight: 500; color: var(--text-secondary); margin-top: 4px;}
         .mobile-item .input-group { margin-bottom: 12px; }
         .mobile-item .input-group:last-child { margin-bottom: 0; }
     }
 </style>
-
 </head>
 <body>
 
-<div id="app-container" class="hidden">
-    <header id="app-header">
-        <div class="header-content">
-            <div id="user-info">
-                <div id="user-avatar"></div>
-                <span>Welcome, <span id="user-email"></span></span>
-            </div>
-            <div class="header-actions">
-                <a href="./dashboard.html" class="toolbar-btn"><span class="material-symbols-outlined">dashboard</span><span>Dashboard</span></a>
-                <a href="./members.html" class="toolbar-btn"><span class="material-symbols-outlined">group</span><span>Members</span></a>
-                <button id="print-button" class="toolbar-btn"><span class="material-symbols-outlined">picture_as_pdf</span><span>Download PDF</span></button>
-                <button id="logout-button">Logout</button>
+<header class="site-header">
+    <div class="top-bar" id="mobileNavTopBar">
+        <a href="./home.html" class="mobileLogo" title="Home"></a>
+        <div class="header-right-controls">
+            <button id="print-button" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.9rem;">
+                <span class="material-symbols-outlined">picture_as_pdf</span> Download
+            </button>
+            <div class="header-icons" id="menu-toggle-button">
+                <svg class="hamburger-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M22.5 7h-21a.5.5 0 010-1h21a.5.5 0 010 1zM22.5 13h-21a.5.5 0 010-1h21a.5.5 0 010 1zM22.5 19h-21a.5.5 0 010-1h21a.5.5 0 010 1z"></path></svg>
+                <svg class="close-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12.707 12l6.146-6.146a.5.5 0 00-.707-.707L12 11.293 5.854 5.146a.5.5 0 00-.707.707L11.293 12l-6.147 6.146a.5.5 0 10.707.707L12 12.707l6.146 6.146a.5.5 0 00.707-.707z"></path></svg>
             </div>
         </div>
-    </header>
-<div class="master-container">
-    <div id="project-header" class="project-header">
-        <h1 id="project-title" contenteditable="true">Loading Project...</h1>
-        <div class="status-indicator" data-status="synced">Synced</div>
     </div>
-    <div id="schedules-wrapper"></div>
+</header>
+
+<div class="menu-overlay" id="menu-overlay"></div>
+<div class="slide-menu" id="slide-menu">
+    <ul class="menu-links">
+        <li><a href="./home.html"><span class="iconLink-icon home-icon"></span><span>Home</span></a></li>
+        <li><a href="./mid-week.html"><span class="iconLink-icon midweek-icon"></span><span>Mid-Week Schedules</span></a></li>
+        <li><a href="./sunday-dashboard.html"><span class="iconLink-icon sunday-icon"></span><span>Sunday Schedules</span></a></li>
+        <li><a href="./members.html"><span class="iconLink-icon members-icon"></span><span>Members</span></a></li>
+    </ul>
+    <div class="profile-section">
+        <div class="profile-info">
+             <div class="profile-name">Loading...</div>
+        </div>
+    </div>
 </div>
+
+<div id="app-container">
+    <div class="master-container">
+        <div id="project-header" class="project-header">
+            <h1 id="project-title" contenteditable="true">Loading Project...</h1>
+            <div class="status-indicator" data-status="synced">Synced</div>
+        </div>
+        <div id="schedules-wrapper"></div>
+    </div>
 </div>
 
 <template id="schedule-template">
@@ -230,7 +239,7 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
-    const ADMIN_EMAIL = 'harshavardhanjw@gmail.com';
+    
     let currentUser = null;
     let currentProjectId = null;
     let userSchedulesCollection = null;
@@ -241,9 +250,6 @@
     let activeEventScheduleTable = null;
     let activeCellForDropdown = null;
 
-    const appContainer = document.getElementById('app-container');
-    const userEmailEl = document.getElementById('user-email');
-    const userAvatarEl = document.getElementById('user-avatar');
     const projectTitleEl = document.getElementById('project-title');
     const schedulesWrapper = document.getElementById('schedules-wrapper');
     const templateSelectionModal = document.getElementById('template-selection-modal');
@@ -253,8 +259,10 @@
     const statusIndicator = document.querySelector('.project-header .status-indicator');
     
     function updateStatus(text, status) {
-        statusIndicator.textContent = text;
-        statusIndicator.dataset.status = status;
+        if(statusIndicator) {
+            statusIndicator.textContent = text;
+            statusIndicator.dataset.status = status;
+        }
     }
 
     async function fetchMembers() {
@@ -319,8 +327,7 @@
 
         _createMobileView() {
             this.mobileViewContainer.innerHTML = '';
-
-            // Handle Special Event view
+            
             if (this.data.eventType && this.data.eventType !== 'normal') {
                 const eventTexts = { 'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం', 'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో', 'convention': 'ప్రాదేశిక సమావేశం' };
                 const firstRow = this.tableBody.rows[0];
@@ -341,111 +348,85 @@
                 return;
             }
 
-            // Handle Normal view
             Array.from(this.tableBody.rows).forEach((row, rowIndex) => {
                 if (row.classList.contains('header-row')) return;
-
                 const editableCellsInRow = Array.from(row.cells).filter(c => c.hasAttribute('data-user-editable'));
                 if (editableCellsInRow.length === 0) return;
 
-                const groupedInputs = {};
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'mobile-item';
 
-                editableCellsInRow.forEach(cell => {
-                    const cellIndex = cell.cellIndex;
-                    let labelText = '';
-                    
-                    // Search backwards for the first non-empty, non-editable cell
-                    for (let i = cellIndex - 1; i >= 0; i--) {
-                        const potentialLabelCell = row.cells[i];
-                        if (potentialLabelCell && !potentialLabelCell.hasAttribute('data-user-editable') && potentialLabelCell.textContent.trim() !== '') {
-                            const tempDiv = document.createElement('div');
-                            tempDiv.innerHTML = potentialLabelCell.innerHTML;
-                            labelText = tempDiv.textContent.trim().replace('⠿', '').replace(':', '');
-                            break;
-                        }
-                    }
-
-                    // Fallback to the first cell of the row if no other label is found
-                    if (!labelText && row.cells[0] && !row.cells[0].hasAttribute('data-user-editable')) {
-                        const tempDiv = document.createElement('div');
-                        tempDiv.innerHTML = row.cells[0].innerHTML;
-                        labelText = tempDiv.textContent.trim().replace('⠿', '').replace(':', '');
-                    }
-                    
-                    // Group inputs by their found label
-                    if (!groupedInputs[labelText]) {
-                        groupedInputs[labelText] = [];
-                    }
-                    groupedInputs[labelText].push(cell);
-                });
-
-                // Render the grouped inputs
-                for (const label in groupedInputs) {
-                    const itemDiv = document.createElement('div');
-                    itemDiv.className = 'mobile-item';
-
-                    if (label) {
+                const firstCell = row.cells[0];
+                const isFirstCellEditable = firstCell.hasAttribute('data-user-editable');
+                
+                if (!isFirstCellEditable) {
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = firstCell.innerHTML;
+                    const mainLabelText = tempDiv.textContent.trim().replace('⠿', '');
+                    if (mainLabelText) {
                         const labelDiv = document.createElement('div');
                         labelDiv.className = 'item-label';
-                        labelDiv.textContent = label;
+                        labelDiv.textContent = mainLabelText;
                         itemDiv.appendChild(labelDiv);
                     }
-                    
-                    const inputsContainer = document.createElement('div');
-                    groupedInputs[label].forEach(cell => {
-                        const cellIndex = cell.cellIndex;
-                        const inputWrapper = document.createElement('div');
-                        inputWrapper.className = 'input-group';
+                }
+                
+                editableCellsInRow.forEach(cell => {
+                    const cellIndex = cell.cellIndex;
+                    const inputWrapper = document.createElement('div');
+                    inputWrapper.className = 'input-group';
 
-                        if (rowIndex === 0) { // Date cell
-                            const dateInput = cell.querySelector('.date-input');
-                            const dateValue = dateInput ? dateInput.value : '';
-                            const inputEl = document.createElement('input');
-                            inputEl.type = 'date';
-                            inputEl.className = 'item-input';
-                            inputEl.value = dateValue;
-                            inputEl.dataset.rowIndex = rowIndex;
-                            inputEl.dataset.cellIndex = cellIndex;
-                            inputWrapper.appendChild(inputEl);
-                        } else { // Name selection cell
-                            const inputDiv = document.createElement('div');
-                            inputDiv.className = 'item-input editable-cell';
-                            inputDiv.textContent = cell.textContent.trim() || 'Select Name';
-                            inputDiv.dataset.rowIndex = rowIndex;
-                            inputDiv.dataset.cellIndex = cellIndex;
-                            inputWrapper.appendChild(inputDiv);
+                    if (isFirstCellEditable) {
+                        const tempDiv = document.createElement('div');
+                        const labelCell = (cellIndex > 0 && row.cells[cellIndex - 1]) ? row.cells[cellIndex - 1] : cell;
+                        tempDiv.innerHTML = labelCell.innerHTML;
+                        const labelText = tempDiv.textContent.trim().replace('⠿', '').replace(':', '');
+                        if(labelText) {
+                            const labelDiv = document.createElement('div');
+                            labelDiv.className = 'item-label';
+                            labelDiv.textContent = labelText;
+                            inputWrapper.appendChild(labelDiv);
                         }
-                        inputsContainer.appendChild(inputWrapper);
-                    });
-                    itemDiv.appendChild(inputsContainer);
+                    }
+                    
+                    if (rowIndex === 0) {
+                         const dateInput = cell.querySelector('.date-input');
+                         const dateValue = dateInput ? dateInput.value : '';
+                         const inputEl = document.createElement('input');
+                         inputEl.type = 'date';
+                         inputEl.className = 'item-input';
+                         inputEl.value = dateValue;
+                         inputEl.dataset.rowIndex = rowIndex;
+                         inputEl.dataset.cellIndex = cellIndex;
+                         inputWrapper.appendChild(inputEl);
+                    } else {
+                        const inputDiv = document.createElement('div');
+                        inputDiv.className = 'item-input editable-cell';
+                        inputDiv.textContent = cell.textContent.trim() || 'Select Name';
+                        inputDiv.dataset.rowIndex = rowIndex;
+                        inputDiv.dataset.cellIndex = cellIndex;
+                        inputWrapper.appendChild(inputDiv);
+                    }
+                    itemDiv.appendChild(inputWrapper);
+                });
+
+                if (itemDiv.hasChildNodes()) {
                     this.mobileViewContainer.appendChild(itemDiv);
                 }
             });
         }
         
         getContent() {
-            // This is the single source of truth for saving.
-            // First, we clone the master table body.
             const tempBody = this.tableBody.cloneNode(true);
-
-            // Now, find any date inputs within it and sync their value to the cell's text content.
             const dateInput = tempBody.querySelector('.date-input');
             if (dateInput && dateInput.value) {
                 const cell = dateInput.parentElement;
-                // Convert YYYY-MM-DD back to DD-MM-YYYY for display and saving.
                 cell.textContent = dateInput.value.split('-').reverse().join('-');
             }
-
-            // Clean up attributes for a clean save.
             tempBody.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
             tempBody.querySelectorAll('.editable-cell').forEach(el => el.classList.remove('editable-cell'));
-            
             return tempBody.innerHTML;
         }
-
-
-
-
 
         applyEventType(eventType, shouldSave = true) {
             this.data.eventType = eventType;
@@ -488,7 +469,7 @@
                 `;
             }
 
-            this.render(); // Re-run render to apply all attributes and create mobile view correctly
+            this.render();
             if (shouldSave) {
                 this.parentProject.triggerSave();
             }
@@ -496,15 +477,12 @@
 
         setupEventListeners() {
             this.element.addEventListener('input', (e) => {
-                // This handles syncing from mobile inputs back to the hidden table
                 const input = e.target;
-                if(input.classList.contains('item-input')) {
+                if(input.classList.contains('item-input') || input.classList.contains('date-input')) {
                     const rowIndex = input.dataset.rowIndex;
                     const cellIndex = input.dataset.cellIndex;
                     const targetCell = this.tableBody.rows[rowIndex].cells[cellIndex];
-                    
                     if(input.type === 'date') {
-                        // Find the date input inside the hidden table cell and update its value
                         const tableInput = targetCell.querySelector('.date-input');
                         if(tableInput) tableInput.value = input.value;
                     } else {
@@ -513,7 +491,6 @@
                 }
                 this.parentProject.triggerSave();
             });
-
             this.eventBtn.addEventListener('click', (e) => {
                 activeEventScheduleTable = this;
                 const rect = e.currentTarget.getBoundingClientRect();
@@ -557,12 +534,11 @@
         save() {
             this.isSaving = true;
             updateStatus('Syncing...', 'syncing');
-            // Before saving, update the table cells with the values from any date inputs
+            
             this.scheduleTables.forEach(table => {
                 const dateInput = table.tableBody.querySelector('.date-input');
                 if (dateInput && dateInput.value) {
                     const cell = dateInput.parentElement;
-                    // Convert YYYY-MM-DD back to DD-MM-YYYY for display
                     cell.textContent = dateInput.value.split('-').reverse().join('-');
                 }
             });
@@ -596,9 +572,9 @@
             currentUser = user;
             await fetchMembers(); 
             userSchedulesCollection = db.collection(`userSchedules/${currentUser.uid}/schedules`);
-            appContainer.classList.remove('hidden');
-            userEmailEl.textContent = user.email;
-            userAvatarEl.textContent = user.email.charAt(0).toUpperCase();
+            document.body.classList.add('auth-ready');
+            const profileNameEl = document.querySelector('.profile-name');
+            if(profileNameEl && user.displayName) profileNameEl.textContent = user.displayName;
             
             setupGlobalUI();
 
@@ -633,9 +609,10 @@
 
     async function initCreationFlow() {
         document.getElementById('project-header').style.display = 'none';
-        document.getElementById('print-button').style.display = 'none';
         const templatesCollection = db.collection("templates");
         const snapshot = await templatesCollection.orderBy("createdAt").get();
+        const templateSelectionModal = document.getElementById('template-selection-modal');
+        const templateList = document.getElementById('template-list');
         templateList.innerHTML = '';
         if (snapshot.empty) {
             templateList.innerHTML = '<li>No templates available.</li>';
@@ -650,7 +627,28 @@
     }
 
     function setupGlobalUI() {
-        document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
+        const menuToggleButton = document.getElementById('menu-toggle-button');
+        const slideMenu = document.getElementById('slide-menu');
+        const menuOverlay = document.getElementById('menu-overlay');
+        const body = document.body;
+    
+        function closeMenu() {
+            slideMenu.classList.remove('is-open');
+            menuOverlay.classList.remove('is-open');
+            body.classList.remove('menu-open');
+        }
+
+        menuToggleButton.addEventListener('click', () => {
+            if (body.classList.contains('menu-open')) {
+                closeMenu();
+            } else {
+                slideMenu.classList.add('is-open');
+                menuOverlay.classList.add('is-open');
+                body.classList.add('menu-open');
+            }
+        });
+        menuOverlay.addEventListener('click', closeMenu);
+
         document.getElementById('print-button').addEventListener('click', generatePdf);
         document.getElementById('cancel-template-selection').addEventListener('click', () => window.location.href = './dashboard.html');
         document.getElementById('confirm-template-selection').addEventListener('click', async () => {
@@ -687,29 +685,19 @@
         });
 
         schedulesWrapper.addEventListener('click', e => {
-            const targetElement = e.target.closest('.editable-cell, [contenteditable="true"]');
-            if (!targetElement) return;
-
-            // If the element is specifically marked as contenteditable, it's for typing. Do nothing.
-            if (targetElement.getAttribute('contenteditable') === 'true') {
-                return;
+            const targetElement = e.target.closest('.editable-cell');
+            if (targetElement) {
+                let realCell;
+                let mobileDiv = null;
+                if (targetElement.tagName === 'DIV') {
+                    mobileDiv = targetElement;
+                    const tableBody = mobileDiv.closest('.schedule-block').querySelector('.schedule-table-body');
+                    realCell = tableBody.rows[mobileDiv.dataset.rowIndex].cells[mobileDiv.dataset.cellIndex];
+                } else {
+                    realCell = targetElement;
+                }
+                openMemberDropdown(realCell, mobileDiv);
             }
-
-            // If we are here, it must be a dropdown cell (desktop or mobile).
-            let realCell;
-            let mobileDiv = null;
-
-            if (targetElement.tagName === 'DIV') { // It's a mobile input
-                mobileDiv = targetElement;
-                const rowIndex = mobileDiv.dataset.rowIndex;
-                const cellIndex = mobileDiv.dataset.cellIndex;
-                const tableBody = mobileDiv.closest('.schedule-block').querySelector('.schedule-table-body');
-                realCell = tableBody.rows[rowIndex].cells[cellIndex];
-            } else { // It's a desktop table cell (TD)
-                realCell = targetElement;
-            }
-            
-            openMemberDropdown(realCell, mobileDiv);
         });
 
         memberDropdown.addEventListener('click', e => {
@@ -839,9 +827,9 @@
         printButton.querySelector('span:last-child').textContent = 'Download PDF';
     }
 
-    setupGlobalUI();
 })();
 </script>
 
 </body>
 </html>
+just say where to change what
