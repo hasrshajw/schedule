@@ -611,18 +611,29 @@ expand_less
         });
 
         schedulesWrapper.addEventListener('click', e => {
-            const targetElement = e.target.closest('.editable-cell');
+            const targetElement = e.target.closest('.editable-cell, [contenteditable="true"]');
             if (!targetElement) return;
 
-            if (targetElement.hasAttribute('contenteditable') && targetElement.getAttribute('contenteditable') === 'true') {
-                return; 
+            // If the element is specifically marked as contenteditable, it's for typing. Do nothing.
+            if (targetElement.getAttribute('contenteditable') === 'true') {
+                return;
+            }
+
+            // If we are here, it must be a dropdown cell (desktop or mobile).
+            let realCell;
+            let mobileDiv = null;
+
+            if (targetElement.tagName === 'DIV') { // It's a mobile input
+                mobileDiv = targetElement;
+                const rowIndex = mobileDiv.dataset.rowIndex;
+                const cellIndex = mobileDiv.dataset.cellIndex;
+                const tableBody = mobileDiv.closest('.schedule-block').querySelector('.schedule-table-body');
+                realCell = tableBody.rows[rowIndex].cells[cellIndex];
+            } else { // It's a desktop table cell (TD)
+                realCell = targetElement;
             }
             
-            const rowIndex = targetElement.dataset.rowIndex;
-            const cellIndex = targetElement.dataset.cellIndex;
-            const tableBody = targetElement.closest('.schedule-block').querySelector('.schedule-table-body');
-            const realCell = tableBody.rows[rowIndex].cells[cellIndex];
-            openMemberDropdown(realCell, targetElement);
+            openMemberDropdown(realCell, mobileDiv);
         });
 
         memberDropdown.addEventListener('click', e => {
