@@ -21,7 +21,7 @@
         --primary-light: #e6f6f6;
         --danger-color: #d32f2f;
         --danger-hover: #b71c1c;
-        --danger-light: #fde8e8; /* Added for hover */
+        --danger-light: #fde8e8; /* Added for logout hover */
         --border-color: #e5e7eb;
         --background-color: #f8fafc;
         --text-primary: #1f2937;
@@ -32,35 +32,164 @@
         --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
         --warning-color: #f59e0b;
         --success-color: #2e7d32;
+
+        /* VARS FROM NEW NAVBAR */
+        --header-bg: #292929;
+        --text-light: #fff;
+        --menu-new-text: #4a6da7;
+        --menu-new-bg: #ffffff;
+        --menu-new-border: #eeeeee;
+        --menu-new-hover: #f5f5f5;
     }
+
+    /* FONT FACE FOR NEW NAVBAR ICONS */
+    @font-face {
+        font-family: "jw-icons-external";
+        /* Using a public URL for the font */
+        src: url("https://s.assets.jw.org/fonts/jw-icons-external-d876da3.woff") format("woff");
+        font-weight: normal; font-style: normal;
+    }
+
+    /* CSS FROM NEW NAVBAR */
+    body.menu-open { overflow: hidden; }
+    .site-header { background-color: var(--header-bg); padding: 0; color: var(--text-light); position: fixed; top: 0; left: 0; width: 100%; z-index: 900; }
+    .top-bar { display: flex; justify-content: space-between; align-items: center; height: 56px; padding: 0 15px 0 0; max-width: 1200px; margin: 0 auto; }
+    #mobileNavTopBar .mobileLogo { display: block; width: 75px; height: 56px; background-image: url(https://www.jw.org/assets/ct/46605f23da/images/siteLogo-jworg-mobile.svg), none; background-repeat: no-repeat; background-size: contain; background-position: center left; flex-shrink: 0; }
+    .header-right-controls { display: flex; align-items: center; gap: 15px; }
+    .header-icons { display: flex; align-items: center; height: 56px; cursor: pointer; }
+    .header-icons svg { height: 24px; width: 24px; color: var(--text-light); }
+    .header-icons .close-icon { display: none; }
+    body.menu-open .header-icons .hamburger-icon { display: none; }
+    body.menu-open .header-icons .close-icon { display: block; }
+    .menu-overlay { position: fixed; top: 56px; left: 0; width: 100%; height: calc(100% - 56px); background-color: rgba(0, 0, 0, 0.6); z-index: 998; opacity: 0; visibility: hidden; transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; }
+    .menu-overlay.is-open { opacity: 1; visibility: visible; }
+    .slide-menu { position: fixed; top: 56px; right: 0; height: calc(100dvh - 56px); width: 320px; max-width: 90%; background-color: var(--menu-new-bg); z-index: 999; transform: translateX(100%); transition: transform 0.3s ease-in-out; display: flex; flex-direction: column; border-left: 1px solid var(--menu-new-border); }
+    .slide-menu.is-open { transform: translateX(0); }
+    .menu-links { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex-grow: 1; }
+    .menu-links li a { display: flex; align-items: center; color: var(--menu-new-text); background-color: var(--menu-new-bg); height: 50px; padding: 12px 5px 12px 12px; box-sizing: border-box; text-decoration: none; font-size: 1rem; transition: background-color 0.2s; border-top: 1px dotted #a7a7a7; }
+    .menu-links li:first-child a { border-top: none; }
+    .menu-links li a:hover { background-color: var(--menu-new-hover); }
+    .profile-section { padding: 16px; border-top: 1px solid var(--menu-new-border); flex-shrink: 0; background-color: #fafafa; margin-top: auto; }
+    .profile-info { display: flex; align-items: center; }
+    .profile-name { font-weight: bold; font-size: 1.1rem; color: #333; word-break: break-all; }
+    .iconLink-icon { font-family: "jw-icons-external"; font-size: 24px; display: inline-block; color: #757575; width: 30px; margin-right: 10px; text-align: center; }
+    .home-icon::before { content: "\e661"; }
+    .midweek-icon::before { content: "\e625"; }
+    .sunday-icon::before { content: "\e610"; }
+    .members-icon::before { content: "\e695"; }
+
+    /* STYLING FOR MOVED LOGOUT BUTTON */
+    .profile-section #logout-button {
+        width: 100%;
+        margin-top: 12px;
+        padding: 8px 16px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        border-radius: var(--radius-md);
+        background-color: transparent; 
+        border: 1px solid var(--border-color); 
+        transition: all 0.2s;
+        text-align: center;
+        color: var(--text-primary);
+    }
+    .profile-section #logout-button:hover {
+        background-color: var(--danger-light);
+        color: var(--danger-hover);
+        border-color: var(--danger-hover);
+    }
+
+    /* --- ORIGINAL EDITOR CSS (with body padding updated) --- */
     *, *::before, *::after { box-sizing: border-box; }
     html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-    body { font-family: 'Inter', sans-serif; background-color: var(--background-color); margin: 0; padding: 88px 20px 20px; color: var(--text-primary); }
+    
+    /* Body padding-top updated from 88px to 76px (56px header + 20px space) */
+    body { 
+        font-family: 'Inter', sans-serif; 
+        background-color: var(--background-color); 
+        margin: 0; 
+        padding: 76px 20px 20px; 
+        color: var(--text-primary); 
+    }
     .hidden { display: none !important; }
-    #app-header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border-color); padding: 12px 20px; }.header-content { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; }#user-info { display: flex; align-items: center; gap: 12px; font-size: 14px; }#user-avatar { width: 36px; height: 36px; border-radius: 50%; background-color: var(--border-color); display: flex; align-items: center; justify-content: center; font-weight: 600; color: var(--text-secondary); }#user-email { font-weight: 600; color: var(--text-primary); }.header-actions { display: flex; align-items: center; gap: 12px; }.toolbar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); transition: all 0.2s; text-decoration: none; color: var(--text-secondary); }.toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; border-color: #d1d5db; color: var(--text-primary); }.toolbar-btn:disabled { cursor: not-allowed; opacity: 0.5; }#logout-button { background-color: transparent; border: 1px solid var(--border-color); padding: 8px 16px; border-radius: var(--radius-md); cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s; }#logout-button:hover { background-color: var(--danger-light); color: var(--danger-hover); border-color: var(--danger-hover); }.master-container { max-width: 1100px; margin: 0 auto; background: var(--surface-color); padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }.project-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color); }.project-title { font-size: 1.75rem; font-weight: 700; margin: 0; flex-grow: 1; border: none; padding: 4px 8px; margin: -4px -8px; border-radius: var(--radius-md); font-family: 'Noto Sans Telugu', sans-serif; }.project-title:focus { outline: 2px solid var(--primary-color); background-color: var(--primary-light); }.schedule-block { margin-bottom: 32px; }.schedule-block:last-child { margin-bottom: 0; }.schedule-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }.schedule-title { font-size: 1.25rem; font-weight: 600; margin: 0; color: var(--text-secondary); font-family: 'Noto Sans Telugu', sans-serif; }.status-indicator { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; display: flex; align-items: center; gap: 6px; }.status-indicator::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background-color: currentColor; }.status-indicator[data-status="synced"] { color: var(--success-color); background-color: #eaf5ea; }.status-indicator[data-status="syncing"] { color: var(--warning-color); background-color: #fffbeb; }.status-indicator[data-status="error"] { color: var(--danger-color); background-color: #fde8e8; }.schedule-block table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.25px; }.schedule-block th, .schedule-block td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; }.schedule-block .editable-cell:not([contenteditable="true"]) { cursor: pointer; }.schedule-block .editable-cell:not([contenteditable="true"]):hover { background-color: #f9fafb; }.schedule-block [contenteditable="true"]:focus { background-color: #fffbe5; }.schedule-block .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; }.schedule-block .cell-icon { height: 70%; max-height: 24px; object-fit: contain; flex-shrink: 0; }.schedule-block .header-row .cell-icon { filter: brightness(0) invert(1); }.schedule-block .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; }.schedule-block .header-row td { font-size: 16px; color: #ffffff; height: 42px; }.schedule-block .row-handle { display: none !important; }.special-event-text { color: red; text-align: center !important; font-weight: 700; }#event-context-menu, #member-dropdown { position: fixed; display: none; background: var(--surface-color); border-radius: var(--radius-md); box-shadow: var(--shadow-md); z-index: 1001; padding: 6px; min-width: 180px; border: 1px solid var(--border-color); }.context-menu-item, .member-dropdown-item { font-family: 'Inter', sans-serif; display: block; width: 100%; padding: 8px 12px; cursor: pointer; font-size: 14px; border-radius: 6px; background: none; border: none; text-align: left; }.context-menu-item:hover, .member-dropdown-item:hover { background: #f9fafb; }.member-dropdown-item { display: flex; justify-content: space-between; align-items: center; }#member-dropdown { max-height: 300px; overflow-y: auto; }.servant-tag { font-size: 0.75rem; font-weight: 600; color: var(--primary-color); background-color: var(--primary-light); padding: 2px 6px; border-radius: 4px; }.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 16px; }.modal-content { background: white; padding: 24px; border-radius: var(--radius-lg); width: 100%; max-width: 500px; max-height: 90vh; display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow-lg); }#new-project-name { width: 100%; padding: 12px; font-size: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); }#template-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md); }#template-list li { padding: 12px; border-bottom: 1px solid var(--border-color); }#template-list label { display: flex; align-items: center; gap: 10px; font-size: 16px; cursor: pointer; font-weight: 500; }.modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px; }.modal-actions button { padding: 10px 20px; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); }#cancel-template-selection { background-color: var(--surface-color); }#confirm-template-selection { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }#print-container { position: absolute; left: -9999px; top: auto; width: 1100px; background: white; }.mobile-view-container { display: none; }
+
+    /* Old header CSS is removed */
+    
+    .toolbar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); transition: all 0.2s; text-decoration: none; color: var(--text-secondary); }
+    .toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; border-color: #d1d5db; color: var(--text-primary); }
+    .toolbar-btn:disabled { cursor: not-allowed; opacity: 0.5; }
+    
+    .master-container { max-width: 1100px; margin: 0 auto; background: var(--surface-color); padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
+    .project-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color); }
+    .project-title { font-size: 1.75rem; font-weight: 700; margin: 0; flex-grow: 1; border: none; padding: 4px 8px; margin: -4px -8px; border-radius: var(--radius-md); font-family: 'Noto Sans Telugu', sans-serif; }
+    .project-title:focus { outline: 2px solid var(--primary-color); background-color: var(--primary-light); }
+    .schedule-block { margin-bottom: 32px; }
+    .schedule-block:last-child { margin-bottom: 0; }
+    .schedule-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .schedule-title { font-size: 1.25rem; font-weight: 600; margin: 0; color: var(--text-secondary); font-family: 'Noto Sans Telugu', sans-serif; }
+    
+    /* Status indicator CSS remains, it will be used by the element in the new header */
+    .status-indicator { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; display: flex; align-items: center; gap: 6px; }
+    .status-indicator::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background-color: currentColor; }
+    .status-indicator[data-status="synced"] { color: var(--success-color); background-color: #eaf5ea; }
+    .status-indicator[data-status="syncing"] { color: var(--warning-color); background-color: #fffbeb; }
+    .status-indicator[data-status="error"] { color: var(--danger-color); background-color: #fde8e8; }
+    
+    .schedule-block table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.25px; }
+    .schedule-block th, .schedule-block td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; }
+    .schedule-block .editable-cell:not([contenteditable="true"]) { cursor: pointer; }
+    .schedule-block .editable-cell:not([contenteditable="true"]):hover { background-color: #f9fafb; }
+    .schedule-block [contenteditable="true"]:focus { background-color: #fffbe5; }
+    .schedule-block .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; }
+    .schedule-block .cell-icon { height: 70%; max-height: 24px; object-fit: contain; flex-shrink: 0; }
+    .schedule-block .header-row .cell-icon { filter: brightness(0) invert(1); }
+    .schedule-block .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; }
+    .schedule-block .header-row td { font-size: 16px; color: #ffffff; height: 42px; }
+    .schedule-block .row-handle { display: none !important; }
+    .special-event-text { color: red; text-align: center !important; font-weight: 700; }
+    #event-context-menu, #member-dropdown { position: fixed; display: none; background: var(--surface-color); border-radius: var(--radius-md); box-shadow: var(--shadow-md); z-index: 1001; padding: 6px; min-width: 180px; border: 1px solid var(--border-color); }
+    .context-menu-item, .member-dropdown-item { font-family: 'Inter', sans-serif; display: block; width: 100%; padding: 8px 12px; cursor: pointer; font-size: 14px; border-radius: 6px; background: none; border: none; text-align: left; }
+    .context-menu-item:hover, .member-dropdown-item:hover { background: #f9fafb; }
+    .member-dropdown-item { display: flex; justify-content: space-between; align-items: center; }
+    #member-dropdown { max-height: 300px; overflow-y: auto; }
+    .servant-tag { font-size: 0.75rem; font-weight: 600; color: var(--primary-color); background-color: var(--primary-light); padding: 2px 6px; border-radius: 4px; }
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 16px; }
+    .modal-content { background: white; padding: 24px; border-radius: var(--radius-lg); width: 100%; max-width: 500px; max-height: 90vh; display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow-lg); }
+    #new-project-name { width: 100%; padding: 12px; font-size: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); }
+    #template-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md); }
+    #template-list li { padding: 12px; border-bottom: 1px solid var(--border-color); }
+    #template-list label { display: flex; align-items: center; gap: 10px; font-size: 16px; cursor: pointer; font-weight: 500; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px; }
+    .modal-actions button { padding: 10px 20px; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); }
+    #cancel-template-selection { background-color: var(--surface-color); }
+    #confirm-template-selection { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
+    #print-container { position: absolute; left: -9999px; top: auto; width: 1100px; background: white; }
+    .mobile-view-container { display: none; }
   
-/* Add this new rule for the date input */
-.date-input {
-    cursor: pointer;
-    -webkit-appearance: none; /* Hides default UI on some browsers */
-    -moz-appearance: none;
-    appearance: none;
-    background-color: transparent;
-    border: none;
-    width: 100%;
-    height: 100%;
-    font-family: inherit;
-    font-size: inherit;
-    font-weight: inherit;
-    text-align: left;
-    padding-left: 8px;
-}
+    /* Add this new rule for the date input */
+    .date-input {
+        cursor: pointer;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-color: transparent;
+        border: none;
+        width: 100%;
+        height: 100%;
+        font-family: inherit;
+        font-size: inherit;
+        font-weight: inherit;
+        text-align: left;
+        padding-left: 8px;
+    }
 
     @media (max-width: 768px) {
+    /* This padding-top is 56px, which is correct for the new header */
     body { padding: 56px 0 0 0; background-color: var(--surface-color); }
-    #app-header { padding: 0 16px; }
     .master-container { padding: 16px; border-radius: 0; box-shadow: none; }
     .project-header { flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px 0; margin-bottom: 16px; }
+    /* Make sure print button looks good on mobile */
+    .project-header #print-button { width: 100%; }
     .project-title { font-size: 1.5rem; }
     .schedule-block { margin-bottom: 24px; padding: 0 0 24px 0; border-bottom: 8px solid var(--background-color); }
     .schedule-block:last-child { border-bottom: none; }
@@ -76,29 +205,47 @@
 </style>
 </head>
 <body>
-<div id="app-container" class="hidden">
-    <header id="app-header">
-        <div class="header-content">
-            <div id="user-info">
-                <div id="user-avatar"></div>
-                <span>Welcome, <span id="user-email"></span></span>
-            </div>
-            <div class="header-actions">
-                <a href="./dashboard.html" class="toolbar-btn"><span class="material-symbols-outlined">dashboard</span><span>Dashboard</span></a>
-                <a href="./members.html" class="toolbar-btn"><span class="material-symbols-outlined">group</span><span>Members</span></a>
-                <button id="print-button" class="toolbar-btn"><span class="material-symbols-outlined">picture_as_pdf</span><span>Download PDF</span></button>
-                <button id="logout-button">Logout</button>
+
+<header class="site-header">
+    <div class="top-bar" id="mobileNavTopBar">
+        <a href="./home.html" class="mobileLogo" title="Home"></a>
+        <div class="header-right-controls">
+            <div class="status-indicator" data-status="synced">Synced</div>
+            <div class="header-icons" id="menu-toggle-button">
+                <svg class="hamburger-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M22.5 7h-21a.5.5 0 010-1h21a.5.5 0 010 1zM22.5 13h-21a.5.5 0 010-1h21a.5.5 0 010 1zM22.5 19h-21a.5.5 0 010-1h21a.5.5 0 010 1z"></path></svg>
+                <svg class="close-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12.707 12l6.146-6.146a.5.5 0 00-.707-.707L12 11.293 5.854 5.146a.5.5 0 00-.707.707L11.293 12l-6.147 6.146a.5.5 0 10.707.707L12 12.707l6.146 6.146a.5.5 0 00.707-.707z"></path></svg>
             </div>
         </div>
-    </header>
-<div class="master-container">
-    <div id="project-header" class="project-header">
-        <h1 id="project-title" contenteditable="true">Loading Project...</h1>
-        <div class="status-indicator" data-status="synced">Synced</div>
     </div>
-    <div id="schedules-wrapper"></div>
+</header>
+<div class="menu-overlay" id="menu-overlay"></div>
+<div class="slide-menu" id="slide-menu">
+    <ul class="menu-links">
+        <li><a href="./home.html"><span class="iconLink-icon home-icon"></span><span>Home</span></a></li>
+        <li><a href="./mid-week.html"><span class="iconLink-icon midweek-icon"></span><span>Mid-Week Schedules</span></a></li>
+        <li><a href="./sunday-dashboard.html"><span class="iconLink-icon sunday-icon"></span><span>Sunday Schedules</span></a></li>
+        <li><a href="./members.html"><span class="iconLink-icon members-icon"></span><span>Members</span></a></li>
+    </ul>
+    <div class="profile-section">
+        <div class="profile-info">
+             <div class="profile-name">Loading...</div>
+        </div>
+        <button id="logout-button">Logout</button>
+    </div>
 </div>
+<div id="app-container" class="hidden">
+    <div class="master-container">
+        <div id="project-header" class="project-header">
+            <h1 id="project-title" contenteditable="true">Loading Project...</h1>
+            <button id="print-button" class="toolbar-btn">
+                <span class="material-symbols-outlined">picture_as_pdf</span>
+                <span>Download PDF</span>
+            </button>
+            </div>
+        <div id="schedules-wrapper"></div>
+    </div>
 </div>
+
 <template id="schedule-template">
     <div class="schedule-block">
         <div class="schedule-header">
@@ -115,13 +262,16 @@
         <div class="mobile-view-container"></div>
     </div>
 </template>
+
 <div id="event-context-menu">
     <button class="context-menu-item" data-event-type="normal">Normal</button>
     <button class="context-menu-item" data-event-type="co-visit">CO Visit</button>
     <button class="context-menu-item" data-event-type="assembly">Assembly</button>
     <button class="context-menu-item" data-event-type="convention">Convention</button>
 </div>
+
 <div id="member-dropdown"></div>
+
 <div id="template-selection-modal" class="modal-overlay">
     <div class="modal-content">
         <h2>Create a New Schedule</h2>
@@ -134,6 +284,7 @@
         </div>
     </div>
 </div>
+
 <script>
 (function() {
     'use strict';
@@ -146,650 +297,717 @@
       appId: "1:965478014820:web:1c36c5d890a27e599aa471"
     };
     
-    firebase.initializeApp(firebaseConfig);const auth = firebase.auth();const db = firebase.firestore();const ADMIN_EMAIL = 'harshavardhanjw@gmail.com';let currentUser = null;let currentProjectId = null;let userSchedulesCollection = null;let membersCollection = null;let members = { brothers: [], sisters: [] };let currentListener = null;let activeProject = null;let activeEventScheduleTable = null;let activeCellForDropdown = null;const appContainer = document.getElementById('app-container');const userEmailEl = document.getElementById('user-email');const userAvatarEl = document.getElementById('user-avatar');const projectTitleEl = document.getElementById('project-title');const schedulesWrapper = document.getElementById('schedules-wrapper');const templateSelectionModal = document.getElementById('template-selection-modal');const templateList = document.getElementById('template-list');const eventContextMenu = document.getElementById('event-context-menu');const memberDropdown = document.getElementById('member-dropdown');const statusIndicator = document.querySelector('.project-header .status-indicator');function updateStatus(text, status) {
-    statusIndicator.textContent = text;
-    statusIndicator.dataset.status = status;
-}async function fetchMembers() {
-    if (!currentUser) return;
-    membersCollection = db.collection(`users/${currentUser.uid}/members`);
-    const snapshot = await membersCollection.orderBy("name").get();
-    members = { brothers: [], sisters: [] };
-    snapshot.forEach(doc => {
-        const member = { id: doc.id, ...doc.data() };
-        if (member.type === 'brother') {
-            members.brothers.push(member);
-        } else {
-            members.sisters.push(member);
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const ADMIN_EMAIL = 'harshavardhanjw@gmail.com';
+    let currentUser = null;
+    let currentProjectId = null;
+    let userSchedulesCollection = null;
+    let membersCollection = null;
+    let members = { brothers: [], sisters: [] };
+    let currentListener = null;
+    let activeProject = null;
+    let activeEventScheduleTable = null;
+    let activeCellForDropdown = null;
+
+    const appContainer = document.getElementById('app-container');
+    
+    // References to old header elements are removed
+    
+    const projectTitleEl = document.getElementById('project-title');
+    const schedulesWrapper = document.getElementById('schedules-wrapper');
+    const templateSelectionModal = document.getElementById('template-selection-modal');
+    const templateList = document.getElementById('template-list');
+    const eventContextMenu = document.getElementById('event-context-menu');
+    const memberDropdown = document.getElementById('member-dropdown');
+    
+    // This query now finds the status indicator in the *new* header
+    const statusIndicator = document.querySelector('.header-right-controls .status-indicator');
+
+    function updateStatus(text, status) {
+        if (statusIndicator) { // Check if it exists
+            statusIndicator.textContent = text;
+            statusIndicator.dataset.status = status;
         }
-    });
-}class ScheduleTable {
-    constructor(parentProject, tableData, index) {
-        this.parentProject = parentProject;
-        this.data = tableData;
-        this.index = index;
-        this.initDOM();
-        this.render();
-        this.setupEventListeners();
-        this.applyEventType(this.data.eventType || 'normal', false);
     }
 
-    initDOM() {
-        const templateClone = document.getElementById('schedule-template').content.cloneNode(true);
-        this.element = templateClone.querySelector('.schedule-block');
-        this.titleEl = this.element.querySelector('.schedule-title');
-        this.tableBody = this.element.querySelector('.schedule-table-body');
-        this.mobileViewContainer = this.element.querySelector('.mobile-view-container');
-        this.eventBtn = this.element.querySelector('.event-btn');
-        schedulesWrapper.appendChild(this.element);
-    }
-
-    render() {
-        this.titleEl.textContent = this.data.title;
-        this.tableBody.innerHTML = this.data.content;
-        
-        this.tableBody.querySelectorAll('td, th').forEach(cell => {
-            if (cell.hasAttribute('data-user-editable')) {
-                const isFirstRow = cell.closest('tr') === this.tableBody.rows[0];
-                if (isFirstRow) {
-                    const originalText = cell.textContent.trim();
-                    const dateValue = originalText.split('-').reverse().join('-');
-                    cell.innerHTML = `<input type="date" class="date-input" value="${dateValue || ''}">`;
-                    cell.removeAttribute('contenteditable');
-                } else {
-                    cell.classList.add('editable-cell');
-                    cell.removeAttribute('contenteditable');
-                }
+    async function fetchMembers() {
+        if (!currentUser) return;
+        membersCollection = db.collection(`users/${currentUser.uid}/members`);
+        const snapshot = await membersCollection.orderBy("name").get();
+        members = { brothers: [], sisters: [] };
+        snapshot.forEach(doc => {
+            const member = { id: doc.id, ...doc.data() };
+            if (member.type === 'brother') {
+                members.brothers.push(member);
             } else {
-                cell.setAttribute('contenteditable', 'false');
+                members.sisters.push(member);
             }
         });
-
-        this._createMobileView();
     }
 
-    _createMobileView() {
-        this.mobileViewContainer.innerHTML = '';
-
-        // Handle Special Event view
-        if (this.data.eventType && this.data.eventType !== 'normal') {
-            const eventTexts = { 'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం', 'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో', 'convention': 'ప్రాదేశిక సమావేశం' };
-            const firstRow = this.tableBody.rows[0];
-            const dateCell = firstRow.cells[2];
-            const dateInput = dateCell ? dateCell.querySelector('.date-input') : null;
-            const dateValue = dateInput ? dateInput.value : '';
-
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'mobile-item';
-            itemDiv.innerHTML = `
-                <div class="item-label special-event-text">${eventTexts[this.data.eventType]}</div>
-                <div class="input-group">
-                    <div class="item-label">తేదీ:</div>
-                    <input type="date" class="item-input date-input" data-row-index="0" data-cell-index="2" value="${dateValue}">
-                </div>
-            `;
-            this.mobileViewContainer.appendChild(itemDiv);
-            return;
+    class ScheduleTable {
+        constructor(parentProject, tableData, index) {
+            this.parentProject = parentProject;
+            this.data = tableData;
+            this.index = index;
+            this.initDOM();
+            this.render();
+            this.setupEventListeners();
+            // This is the correct way to initialize the view
+            this.applyEventType(this.data.eventType || 'normal', false);
         }
 
-        // Handle Normal view
-        Array.from(this.tableBody.rows).forEach((row, rowIndex) => {
-            if (row.classList.contains('header-row')) return;
+        initDOM() {
+            const templateClone = document.getElementById('schedule-template').content.cloneNode(true);
+            this.element = templateClone.querySelector('.schedule-block');
+            this.titleEl = this.element.querySelector('.schedule-title');
+            this.tableBody = this.element.querySelector('.schedule-table-body');
+            this.mobileViewContainer = this.element.querySelector('.mobile-view-container');
+            this.eventBtn = this.element.querySelector('.event-btn');
+            schedulesWrapper.appendChild(this.element);
+        }
 
-            const editableCellsInRow = Array.from(row.cells).filter(c => c.hasAttribute('data-user-editable'));
-            if (editableCellsInRow.length === 0) return;
+        render() {
+            this.titleEl.textContent = this.data.title;
+            // Set the content *before* applying the event type
+            this.tableBody.innerHTML = this.data.content;
+            
+            // This applyEventType call will now correctly modify the view
+            // *after* the content is loaded, but *before* the mobile view is built.
+            // We call it here *again* to ensure the *correct* DOM state is set up
+            // before we build the mobile view and add date inputs.
+            this.applyEventType(this.data.eventType || 'normal', false);
+        }
 
-            const groupedInputs = {};
+        _createMobileView() {
+            this.mobileViewContainer.innerHTML = '';
 
-            editableCellsInRow.forEach(cell => {
-                const cellIndex = cell.cellIndex;
-                let labelText = '';
-                
-                // Search backwards for the first non-empty, non-editable cell
-                for (let i = cellIndex - 1; i >= 0; i--) {
-                    const potentialLabelCell = row.cells[i];
-                    if (potentialLabelCell && !potentialLabelCell.hasAttribute('data-user-editable') && potentialLabelCell.textContent.trim() !== '') {
-                        const tempDiv = document.createElement('div');
-                        tempDiv.innerHTML = potentialLabelCell.innerHTML;
-                        labelText = tempDiv.textContent.trim().replace('⠿', '').replace(':', '');
-                        break;
-                    }
-                }
+            // Handle Special Event view
+            if (this.data.eventType && this.data.eventType !== 'normal') {
+                const eventTexts = { 'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం', 'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో', 'convention': 'ప్రాదేశిక సమావేశం' };
+                const firstRow = this.tableBody.rows[0];
+                const dateInput = firstRow ? firstRow.querySelector('.date-input') : null;
+                const dateValue = dateInput ? dateInput.value : '';
 
-                // Fallback to the first cell of the row if no other label is found
-                if (!labelText && row.cells[0] && !row.cells[0].hasAttribute('data-user-editable')) {
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = row.cells[0].innerHTML;
-                    labelText = tempDiv.textContent.trim().replace('⠿', '').replace(':', '');
-                }
-                
-                // Group inputs by their found label
-                if (!groupedInputs[labelText]) {
-                    groupedInputs[labelText] = [];
-                }
-                groupedInputs[labelText].push(cell);
-            });
-
-            // Render the grouped inputs
-            for (const label in groupedInputs) {
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'mobile-item';
-
-                if (label) {
-                    const labelDiv = document.createElement('div');
-                    labelDiv.className = 'item-label';
-                    labelDiv.textContent = label;
-                    itemDiv.appendChild(labelDiv);
-                }
-                
-                const inputsContainer = document.createElement('div');
-                groupedInputs[label].forEach(cell => {
-                    const cellIndex = cell.cellIndex;
-                    const inputWrapper = document.createElement('div');
-                    inputWrapper.className = 'input-group';
-
-                    if (rowIndex === 0) { // Date cell
-                        const dateInput = cell.querySelector('.date-input');
-                        const dateValue = dateInput ? dateInput.value : '';
-                        const inputEl = document.createElement('input');
-                        inputEl.type = 'date';
-                        inputEl.className = 'item-input';
-                        inputEl.value = dateValue;
-                        inputEl.dataset.rowIndex = rowIndex;
-                        inputEl.dataset.cellIndex = cellIndex;
-                        inputWrapper.appendChild(inputEl);
-                    } else { // Name selection cell
-                        const inputDiv = document.createElement('div');
-                        inputDiv.className = 'item-input editable-cell';
-                        inputDiv.textContent = cell.textContent.trim() || 'Select Name';
-                        inputDiv.dataset.rowIndex = rowIndex;
-                        inputDiv.dataset.cellIndex = cellIndex;
-                        inputWrapper.appendChild(inputDiv);
-                    }
-                    inputsContainer.appendChild(inputWrapper);
-                });
-                itemDiv.appendChild(inputsContainer);
+                itemDiv.innerHTML = `
+                    <div class="item-label special-event-text">${eventTexts[this.data.eventType]}</div>
+                    <div class="input-group">
+                        <div class="item-label">తేదీ:</div>
+                        <input type="date" class="item-input date-input" data-row-index="0" data-cell-index="2" value="${dateValue}">
+                    </div>
+                `;
                 this.mobileViewContainer.appendChild(itemDiv);
+                return;
             }
-        });
-    }
-    
-    getContent() {
-        // This is the single source of truth for saving.
-        // First, we clone the master table body.
-        const tempBody = this.tableBody.cloneNode(true);
 
-        // Now, find any date inputs within it and sync their value to the cell's text content.
-        // NOTE: This is now handled in the save() function, but we keep it
-        // here as a cleanup step for the 'normal' view.
-        const dateInput = tempBody.querySelector('.date-input');
-        if (dateInput && dateInput.value) {
-            const cell = dateInput.parentElement;
-            // Convert YYYY-MM-DD back to DD-MM-YYYY for display and saving.
-            cell.textContent = dateInput.value.split('-').reverse().join('-');
+            // Handle Normal view
+            Array.from(this.tableBody.rows).forEach((row, rowIndex) => {
+                if (row.classList.contains('header-row')) return;
+
+                const editableCellsInRow = Array.from(row.cells).filter(c => c.hasAttribute('data-user-editable'));
+                if (editableCellsInRow.length === 0) return;
+
+                const groupedInputs = {};
+
+                editableCellsInRow.forEach(cell => {
+                    const cellIndex = cell.cellIndex;
+                    let labelText = '';
+                    
+                    for (let i = cellIndex - 1; i >= 0; i--) {
+                        const potentialLabelCell = row.cells[i];
+                        if (potentialLabelCell && !potentialLabelCell.hasAttribute('data-user-editable') && potentialLabelCell.textContent.trim() !== '') {
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = potentialLabelCell.innerHTML;
+                            labelText = tempDiv.textContent.trim().replace('⠿', '').replace(':', '');
+                            break;
+                        }
+                    }
+
+                    if (!labelText && row.cells[0] && !row.cells[0].hasAttribute('data-user-editable')) {
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = row.cells[0].innerHTML;
+                        labelText = tempDiv.textContent.trim().replace('⠿', '').replace(':', '');
+                    }
+                    
+                    if (!groupedInputs[labelText]) {
+                        groupedInputs[labelText] = [];
+                    }
+                    groupedInputs[labelText].push(cell);
+                });
+
+                for (const label in groupedInputs) {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'mobile-item';
+
+                    if (label) {
+                        const labelDiv = document.createElement('div');
+                        labelDiv.className = 'item-label';
+                        labelDiv.textContent = label;
+                        itemDiv.appendChild(labelDiv);
+                    }
+                    
+                    const inputsContainer = document.createElement('div');
+                    groupedInputs[label].forEach(cell => {
+                        const cellIndex = cell.cellIndex;
+                        const inputWrapper = document.createElement('div');
+                        inputWrapper.className = 'input-group';
+
+                        if (rowIndex === 0) { // Date cell
+                            const dateInput = cell.querySelector('.date-input');
+                            const dateValue = dateInput ? dateInput.value : '';
+                            const inputEl = document.createElement('input');
+                            inputEl.type = 'date';
+                            inputEl.className = 'item-input';
+                            inputEl.value = dateValue;
+                            inputEl.dataset.rowIndex = rowIndex;
+                            inputEl.dataset.cellIndex = cellIndex;
+                            inputWrapper.appendChild(inputEl);
+                        } else { // Name selection cell
+                            const inputDiv = document.createElement('div');
+                            inputDiv.className = 'item-input editable-cell';
+                            inputDiv.textContent = cell.textContent.trim() || 'Select Name';
+                            inputDiv.dataset.rowIndex = rowIndex;
+                            inputDiv.dataset.cellIndex = cellIndex;
+                            inputWrapper.appendChild(inputDiv);
+                        }
+                        inputsContainer.appendChild(inputWrapper);
+                    });
+                    itemDiv.appendChild(inputsContainer);
+                    this.mobileViewContainer.appendChild(itemDiv);
+                }
+            });
+        }
+        
+        getContent() {
+            const tempBody = this.tableBody.cloneNode(true);
+            const dateInput = tempBody.querySelector('.date-input');
+            if (dateInput && dateInput.value) {
+                const cell = dateInput.parentElement;
+                cell.textContent = dateInput.value.split('-').reverse().join('-');
+            }
+            tempBody.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+            tempBody.querySelectorAll('.editable-cell').forEach(el => el.classList.remove('editable-cell'));
+            return tempBody.innerHTML;
         }
 
-        // Clean up attributes for a clean save.
-        tempBody.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
-        tempBody.querySelectorAll('.editable-cell').forEach(el => el.classList.remove('editable-cell'));
-        
-        return tempBody.innerHTML;
-    }
+        // **FIXED: SPECIAL EVENT LOGIC**
+        applyEventType(eventType, shouldSave = true) {
+            this.data.eventType = eventType;
+            const allRows = this.tableBody.querySelectorAll('tr');
+            const firstRow = this.tableBody.rows[0];
+            
+            if (!firstRow) return; // Safety check
 
-    applyEventType(eventType, shouldSave = true) {
-        this.data.eventType = eventType;
-        const allRows = this.tableBody.querySelectorAll('tr');
-        const firstRow = this.tableBody.rows[0];
-
-        if (eventType === 'normal') {
-            allRows.forEach(row => row.style.display = '');
-            if (firstRow && firstRow.dataset.originalContent) {
-                firstRow.innerHTML = firstRow.dataset.originalContent;
-                delete firstRow.dataset.originalContent;
-                // Re-add the date input that was removed
-                const dateCell = firstRow.querySelector('[data-user-editable]');
-                if (dateCell) {
-                     const originalText = dateCell.textContent.trim();
-                    const dateValue = originalText.split('-').reverse().join('-');
-                    dateCell.innerHTML = `<input type="date" class="date-input" value="${dateValue || ''}">`;
+            if (eventType === 'normal') {
+                // Restore normal view
+                allRows.forEach(row => row.style.display = '');
+                if (firstRow.dataset.originalContent) {
+                    firstRow.innerHTML = firstRow.dataset.originalContent;
+                    delete firstRow.dataset.originalContent;
                 }
-            }
-        } else {
-            const eventTexts = {
-                'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం',
-                'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో',
-                'convention': 'ప్రాదేశిక సమావేశం'
-            };
-            allRows.forEach((row, index) => {
-                row.style.display = (index === 0) ? '' : 'none';
-            });
+            } else {
+                // Apply special event view
+                const eventTexts = {
+                    'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం',
+                    'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో',
+                    'convention': 'ప్రాదేశిక సమావేశం'
+                };
+                allRows.forEach((row, index) => {
+                    row.style.display = (index === 0) ? '' : 'none';
+                });
 
-            let existingDateValue = '';
-            if (firstRow) {
+                let existingDateValue = '';
                 if (!firstRow.dataset.originalContent) {
+                    // Save the original content if it's not already saved
                     firstRow.dataset.originalContent = firstRow.innerHTML;
                 }
-                // Find the date value from the live input
-                const dateInput = firstRow.querySelector('.date-input');
-                if (dateInput) {
-                    existingDateValue = dateInput.value; // Already in YYYY-MM-DD
+                
+                // Get date from *original* content
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = firstRow.dataset.originalContent;
+                const originalDateCell = tempDiv.querySelector('[data-user-editable]');
+                if (originalDateCell) {
+                    existingDateValue = originalDateCell.textContent.trim().split('-').reverse().join('-');
+                }
+                
+                firstRow.innerHTML = `
+                    <th colspan="1" class="special-event-text">${eventTexts[eventType]}</th>
+                    <td style="text-align: right; font-weight: 700;">తేదీ:</td>
+                    <td data-user-editable="true"><input type="date" class="date-input" value="${existingDateValue}"></td>
+                `;
+            }
+
+            // Now, apply attributes and date inputs to the *current* view
+            this.tableBody.querySelectorAll('td, th').forEach(cell => {
+                if (cell.hasAttribute('data-user-editable')) {
+                    const isFirstRow = cell.closest('tr') === this.tableBody.rows[0];
+                    if (isFirstRow) {
+                        // This handles both normal and special event date cells
+                        const originalText = cell.textContent.trim();
+                        const dateValue = cell.querySelector('.date-input') ? cell.querySelector('.date-input').value : originalText.split('-').reverse().join('-');
+                        cell.innerHTML = `<input type="date" class="date-input" value="${dateValue || ''}">`;
+                        cell.removeAttribute('contenteditable');
+                    } else {
+                        cell.classList.add('editable-cell');
+                        cell.removeAttribute('contenteditable');
+                    }
                 } else {
-                    // Fallback if input isn't there
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = firstRow.dataset.originalContent;
-                    const originalDateCell = tempDiv.querySelector('[data-user-editable]');
+                    cell.setAttribute('contenteditable', 'false');
+                }
+            });
+
+            // **FIXED:** Re-run _createMobileView to update the mobile UI
+            this._createMobileView(); 
+            
+            if (shouldSave) {
+                this.parentProject.triggerSave();
+            }
+        }
+
+        setupEventListeners() {
+            this.element.addEventListener('input', (e) => {
+                const input = e.target;
+                if(input.classList.contains('item-input') || input.classList.contains('date-input')) {
+                    const rowIndex = input.dataset.rowIndex || 0;
+                    const cellIndex = input.dataset.cellIndex || 2; // Default to date cell
+                    
+                    // Find the corresponding cell in the *live* desktop table
+                    const targetCell = this.tableBody.rows[rowIndex].cells[cellIndex];
+                    if (!targetCell) return;
+                    
+                    if(input.type === 'date') {
+                        const tableInput = targetCell.querySelector('.date-input');
+                        if(tableInput) tableInput.value = input.value;
+                    } else {
+                         targetCell.textContent = input.textContent;
+                    }
+                }
+                this.parentProject.triggerSave();
+            });
+
+            this.eventBtn.addEventListener('click', (e) => {
+                activeEventScheduleTable = this;
+                const rect = e.currentTarget.getBoundingClientRect();
+                eventContextMenu.style.display = 'block';
+                eventContextMenu.style.top = `${rect.bottom}px`;
+                eventContextMenu.style.left = `${rect.left}px`;
+            });
+        }
+    }
+
+    class Project {
+        constructor(id, initialData, collectionRef) {
+            this.id = id;
+            this.data = initialData;
+            this.collectionRef = collectionRef;
+            this.scheduleTables = [];
+            this.isSaving = false;
+            this.saveTimeout = null;
+            this.render();
+            this.setupEventListeners();
+        }
+
+        render(newData) {
+            if (newData) this.data = newData;
+            if (document.activeElement !== projectTitleEl) projectTitleEl.textContent = this.data.name;
+            schedulesWrapper.innerHTML = '';
+            this.scheduleTables = [];
+            
+            this.data.tables.forEach((tableData, index) => {
+                this.scheduleTables.push(new ScheduleTable(this, tableData, index));
+            });
+        }
+
+        triggerSave() {
+            clearTimeout(this.saveTimeout);
+            if (!this.isSaving) {
+                this.saveTimeout = setTimeout(() => this.save(), 500);
+            }
+        }
+        
+        // **FIXED:** Rewrote the save function to handle special events
+        // and prevent data loss.
+        save() {
+            this.isSaving = true;
+            updateStatus('Syncing...', 'syncing');
+
+            const updatedTablesData = this.scheduleTables.map(table => {
+                const dateInput = table.tableBody.querySelector('.date-input'); // Finds the *live* input
+                const newDate = dateInput ? dateInput.value : ''; // YYYY-MM-DD
+                const newDateDDMMYYYY = newDate.split('-').reverse().join('-');
+
+                let finalContent;
+                let originalContent = table.data.content;
+
+                // Check if original content is stored on the DOM element
+                const firstRow = table.tableBody.rows[0];
+                if (firstRow && firstRow.dataset.originalContent) {
+                    originalContent = firstRow.dataset.originalContent;
+                }
+
+                if (table.data.eventType !== 'normal') {
+                    // Special event. Update date in original content.
+                    const tempBody = document.createElement('tbody');
+                    // Use the *saved* original content, not the live DOM
+                    tempBody.innerHTML = table.data.content; 
+                    
+                    const originalDateCell = tempBody.querySelector('tr:first-child [data-user-editable]');
                     if (originalDateCell) {
-                         existingDateValue = originalDateCell.textContent.trim().split('-').reverse().join('-');
+                        originalDateCell.textContent = newDateDDMMYYYY;
+                    }
+                    finalContent = tempBody.innerHTML;
+                } else {
+                    // Normal event. Update the live DOM, then call getContent.
+                    if (dateInput && newDate) {
+                        dateInput.parentElement.textContent = newDateDDMMYYYY;
+                    }
+                    finalContent = table.getContent();
+                }
+
+                return {
+                    title: table.data.title,
+                    content: finalContent,
+                    eventType: table.data.eventType || 'normal'
+                };
+            });
+
+            const payload = { name: projectTitleEl.textContent, tables: updatedTablesData };
+
+            this.collectionRef.doc(this.id).update(payload)
+                .then(() => {
+                    // After saving, update the internal data to match
+                    this.data.tables = updatedTablesData;
+                    // Re-render to restore date inputs that were removed by getContent()
+                    this.render(this.data);
+                    updateStatus('Synced', 'synced');
+                    this.isSaving = false;
+                })
+                .catch(err => {
+                    console.error("Save failed:", err);
+                    updateStatus('Error', 'error');
+                    this.isSaving = false;
+                });
+        }
+
+        setupEventListeners() {
+            projectTitleEl.addEventListener('input', () => this.triggerSave());
+        }
+    }
+
+    auth.onAuthStateChanged(async user => {
+        if (user) {
+            if (user.email === ADMIN_EMAIL) { window.location.replace('./admin.html'); return; }
+            currentUser = user;
+            await fetchMembers(); 
+            userSchedulesCollection = db.collection(`userSchedules/${currentUser.uid}/schedules`);
+            appContainer.classList.remove('hidden');
+            
+            // UPDATED: Populate new profile name in slide-out menu
+            const profileNameEl = document.querySelector('.profile-name');
+            if (profileNameEl) {
+                profileNameEl.textContent = user.email; // Use email as name
+            }
+            
+            setupGlobalUI();
+
+            const params = new URLSearchParams(window.location.search);
+            currentProjectId = params.get('id');
+            if (currentProjectId) { initEditor(); } else { initCreationFlow(); }
+        } else {
+            window.location.replace('./login.html');
+        }
+    });
+
+    function initEditor() {
+        if (!currentUser || !currentProjectId) return;
+        if (currentListener) currentListener();
+        currentListener = userSchedulesCollection.doc(currentProjectId).onSnapshot(doc => {
+            if (doc.exists) {
+                const remoteData = doc.data();
+                if (!activeProject) {
+                    activeProject = new Project(doc.id, remoteData, userSchedulesCollection);
+                } else if (!activeProject.isSaving) {
+                    activeProject.render(remoteData);
+                }
+                 updateStatus('Synced', 'synced');
+            } else {
+                alert("This schedule may have been deleted.");
+                window.location.href = './home.html'; // Go to new home
+            }
+        }, error => {
+             updateStatus('Error', 'error');
+        });
+    }
+
+    async function initCreationFlow() {
+        document.getElementById('project-header').style.display = 'none';
+        
+        const printButton = document.getElementById('print-button');
+        if (printButton) printButton.style.display = 'none';
+
+        const templatesCollection = db.collection("templates");
+        const snapshot = await templatesCollection.orderBy("createdAt").get();
+        templateList.innerHTML = '';
+        if (snapshot.empty) {
+            templateList.innerHTML = '<li>No templates available.</li>';
+        } else {
+            snapshot.docs.forEach(doc => {
+                const li = document.createElement('li');
+                li.innerHTML = `<label><input type="checkbox" data-id="${doc.id}" data-name="${doc.data().name}" data-content="${encodeURIComponent(doc.data().content)}"> ${doc.data().name}</label>`;
+                templateList.appendChild(li);
+            });
+        }
+        templateSelectionModal.style.display = 'flex';
+    }
+
+    function setupGlobalUI() {
+        document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
+        
+        const printButton = document.getElementById('print-button');
+        if (printButton) {
+            printButton.addEventListener('click', generatePdf);
+        }
+
+        document.getElementById('cancel-template-selection').addEventListener('click', () => window.location.href = './home.html'); // Go to new home
+        document.getElementById('confirm-template-selection').addEventListener('click', async () => {
+            const newProjectName = document.getElementById('new-project-name').value.trim();
+            if (!newProjectName) return alert("Please enter a name for your new project.");
+            const selectedCheckboxes = Array.from(templateList.querySelectorAll('input:checked'));
+            if (selectedCheckboxes.length === 0) return alert("Please select at least one template.");
+
+            const tablesArray = selectedCheckboxes.map(input => {
+                const rawContent = decodeURIComponent(input.dataset.content);
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = `<table><tbody>${rawContent}</tbody></table>`;
+                tempDiv.querySelectorAll('td, th').forEach(cell => {
+                    const isEssentiallyEmpty = cell.textContent.trim() === '' && !cell.querySelector('img');
+                    if (isEssentiallyEmpty) cell.setAttribute('data-user-editable', 'true');
+                });
+                return { title: input.dataset.name, content: tempDiv.querySelector('tbody').innerHTML, eventType: 'normal' };
+            });
+            const newDocRef = await userSchedulesCollection.add({
+                name: newProjectName,
+                tables: tablesArray,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            window.location.href = `./editor.html?id=${newDocRef.id}`;
+        });
+        
+        eventContextMenu.addEventListener('click', (e) => {
+            const target = e.target.closest('.context-menu-item');
+            if (target && activeEventScheduleTable) {
+                activeEventScheduleTable.applyEventType(target.dataset.eventType);
+            }
+            eventContextMenu.style.display = 'none';
+            activeEventScheduleTable = null;
+        });
+
+        schedulesWrapper.addEventListener('click', e => {
+            const targetElement = e.target.closest('.editable-cell, [contenteditable="true"]');
+            if (!targetElement) return;
+
+            if (targetElement.getAttribute('contenteditable') === 'true') {
+                return;
+            }
+
+            let realCell;
+            let mobileDiv = null;
+
+            if (targetElement.tagName === 'DIV' && targetElement.classList.contains('item-input')) { // Mobile input
+                mobileDiv = targetElement;
+                const rowIndex = mobileDiv.dataset.rowIndex;
+                const cellIndex = mobileDiv.dataset.cellIndex;
+                const tableBody = mobileDiv.closest('.schedule-block').querySelector('.schedule-table-body');
+                realCell = tableBody.rows[rowIndex].cells[cellIndex];
+            } else if (targetElement.tagName === 'TD') { // Desktop table cell
+                realCell = targetElement;
+            } else {
+                return; // Not a cell we care about
+            }
+            
+            openMemberDropdown(realCell, mobileDiv);
+        });
+
+        memberDropdown.addEventListener('click', e => {
+            const item = e.target.closest('.member-dropdown-item');
+            if (item && activeCellForDropdown.realCell) {
+                const newName = item.dataset.name;
+                activeCellForDropdown.realCell.textContent = newName;
+                if (activeCellForDropdown.mobileDiv) {
+                    activeCellForDropdown.mobileDiv.textContent = newName;
+                }
+                activeProject.triggerSave();
+            }
+            memberDropdown.style.display = 'none';
+            activeCellForDropdown = null;
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!eventContextMenu.contains(e.target) && !e.target.closest('.event-btn')) { eventContextMenu.style.display = 'none'; }
+            if (!memberDropdown.contains(e.target) && !e.target.closest('.editable-cell')) { memberDropdown.style.display = 'none'; }
+        });
+    }
+
+    // **FIXED: MALE/FEMALE LOGIC**
+    function isCellInMinistrySection(cell) {
+        const table = cell.closest('table');
+        if (!table) return false;
+        const allRows = Array.from(table.querySelectorAll('tbody > tr'));
+        const cellRow = cell.closest('tr');
+        const cellRowIndex = allRows.indexOf(cellRow);
+        
+        let ministryHeaderIndex = -1;
+        let nextHeaderIndex = allRows.length;
+
+        allRows.forEach((row, index) => {
+            if(row.classList.contains('header-row')) {
+                const headerText = row.textContent.trim().toUpperCase();
+                
+                // Check for the "MINISTRY" section header
+                if (headerText.includes('APPLY YOURSELF') || headerText.includes('FIELD MINISTRY')) {
+                    ministryHeaderIndex = index;
+                } else if (ministryHeaderIndex !== -1 && index > ministryHeaderIndex) {
+                    // This is the *next* header after the ministry one
+                    if (index < nextHeaderIndex) {
+                        nextHeaderIndex = index;
                     }
                 }
             }
-            
-            firstRow.innerHTML = `
-                <th colspan="1" class="special-event-text">${eventTexts[eventType]}</th>
-                <td style="text-align: right; font-weight: 700;">తేదీ:</td>
-                <td data-user-editable="true"><input type="date" class="date-input" value="${existingDateValue}"></td>
-            `;
+        });
+        
+        if (ministryHeaderIndex === -1) {
+            return false; 
         }
-
-        // **FIXED:** Re-run _createMobileView to update the mobile UI
-        // instead of render(), which was wiping out the changes.
-        this._createMobileView(); 
         
-        if (shouldSave) {
-            this.parentProject.triggerSave();
-        }
+        // Check if the cell's row is between the ministry header and the next header
+        return cellRowIndex > ministryHeaderIndex && cellRowIndex < nextHeaderIndex;
     }
 
-    setupEventListeners() {
-        this.element.addEventListener('input', (e) => {
-            // This handles syncing from mobile inputs back to the hidden table
-            const input = e.target;
-            if(input.classList.contains('item-input')) {
-                const rowIndex = input.dataset.rowIndex;
-                const cellIndex = input.dataset.cellIndex;
-                const targetCell = this.tableBody.rows[rowIndex].cells[cellIndex];
-                
-                if(input.type === 'date') {
-                    // Find the date input inside the hidden table cell and update its value
-                    const tableInput = targetCell.querySelector('.date-input');
-                    if(tableInput) tableInput.value = input.value;
-                } else {
-                     targetCell.textContent = input.textContent;
-                }
-            }
-            this.parentProject.triggerSave();
-        });
-
-        this.eventBtn.addEventListener('click', (e) => {
-            activeEventScheduleTable = this;
-            const rect = e.currentTarget.getBoundingClientRect();
-            eventContextMenu.style.display = 'block';
-            eventContextMenu.style.top = `${rect.bottom}px`;
-            eventContextMenu.style.left = `${rect.left}px`;
-        });
-    }
-}class Project {
-    constructor(id, initialData, collectionRef) {
-        this.id = id;
-        this.data = initialData;
-        this.collectionRef = collectionRef;
-        this.scheduleTables = [];
-        this.isSaving = false;
-        this.saveTimeout = null;
-        this.render();
-        this.setupEventListeners();
-    }
-
-    render(newData) {
-        if (newData) this.data = newData;
-        if (document.activeElement !== projectTitleEl) projectTitleEl.textContent = this.data.name;
-        schedulesWrapper.innerHTML = '';
-        this.scheduleTables = [];
-        
-        this.data.tables.forEach((tableData, index) => {
-            this.scheduleTables.push(new ScheduleTable(this, tableData, index));
-        });
-    }
-
-    triggerSave() {
-        clearTimeout(this.saveTimeout);
-        if (!this.isSaving) {
-            this.saveTimeout = setTimeout(() => this.save(), 500);
-        }
-    }
-    
-    // **FIXED:** Rewrote the save function to handle special events
-    // and prevent data loss.
-    save() {
-        this.isSaving = true;
-        updateStatus('Syncing...', 'syncing');
-
-        // This logic is now *inside* the map function.
-        // The old forEach loop is removed.
-        
-        const updatedTablesData = this.scheduleTables.map(table => {
-            const dateInput = table.tableBody.querySelector('.date-input'); // Finds the *live* input
-            const newDate = dateInput ? dateInput.value : ''; // YYYY-MM-DD
-            const newDateDDMMYYYY = newDate.split('-').reverse().join('-');
-
-            let finalContent;
-
-            if (table.data.eventType !== 'normal') {
-                // Special event. Update date in original content.
-                const tempBody = document.createElement('tbody');
-                tempBody.innerHTML = table.data.content; // Load original full content
-                
-                // Find the date cell *in the original content* and update it.
-                // This assumes the date is the first data-user-editable cell in the first row.
-                const originalDateCell = tempBody.querySelector('tr:first-child [data-user-editable]');
-                if (originalDateCell) {
-                    originalDateCell.textContent = newDateDDMMYYYY;
-                }
-                finalContent = tempBody.innerHTML;
-            } else {
-                // Normal event. Update the live DOM, then call getContent.
-                if (dateInput && newDate) {
-                    // This replaces the input with text, so getContent() works
-                    dateInput.parentElement.textContent = newDateDDMMYYYY;
-                }
-                finalContent = table.getContent();
-            }
-
-            return {
-                title: table.data.title,
-                content: finalContent,
-                eventType: table.data.eventType || 'normal'
-            };
-        });
-
-        const payload = { name: projectTitleEl.textContent, tables: updatedTablesData };
-
-        this.collectionRef.doc(this.id).update(payload)
-            .then(() => {
-                updateStatus('Synced', 'synced');
-                this.isSaving = false;
-            })
-            .catch(err => {
-                console.error("Save failed:", err);
-                updateStatus('Error', 'error');
-                this.isSaving = false;
-            });
-    }
-
-    setupEventListeners() {
-        projectTitleEl.addEventListener('input', () => this.triggerSave());
-    }
-}
-
-auth.onAuthStateChanged(async user => {
-    if (user) {
-        if (user.email === ADMIN_EMAIL) { window.location.replace('./admin.html'); return; }
-        currentUser = user;
-        await fetchMembers(); 
-        userSchedulesCollection = db.collection(`userSchedules/${currentUser.uid}/schedules`);
-        appContainer.classList.remove('hidden');
-        userEmailEl.textContent = user.email;
-        userAvatarEl.textContent = user.email.charAt(0).toUpperCase();
-        
-        setupGlobalUI();
-
-        const params = new URLSearchParams(window.location.search);
-        currentProjectId = params.get('id');
-        if (currentProjectId) { initEditor(); } else { initCreationFlow(); }
-    } else {
-        window.location.replace('./login.html');
-    }
-});function initEditor() {
-    if (!currentUser || !currentProjectId) return;
-    if (currentListener) currentListener();
-    currentListener = userSchedulesCollection.doc(currentProjectId).onSnapshot(doc => {
-        if (doc.exists) {
-            const remoteData = doc.data();
-            if (!activeProject) {
-                activeProject = new Project(doc.id, remoteData, userSchedulesCollection);
-            } else if (!activeProject.isSaving) {
-                // When we re-render, the constructor will call render()
-                // which calls applyEventType() and _createMobileView()
-                // ensuring the correct view is always shown on reload.
-                activeProject.render(remoteData);
-            }
-             updateStatus('Synced', 'synced');
+    function openMemberDropdown(cell, mobileDiv = null) {
+        const isInMinistry = isCellInMinistrySection(cell);
+        memberDropdown.innerHTML = '';
+        let listToShow;
+        if (isInMinistry) {
+            const sortedSisters = [...members.sisters].sort((a, b) => a.name.localeCompare(b.name));
+            const sortedBrothers = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
+            listToShow = [...sortedSisters, ...sortedBrothers];
         } else {
-            alert("This schedule may have been deleted.");
-            window.location.href = './dashboard.html';
+            listToShow = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
         }
-    }, error => {
-         updateStatus('Error', 'error');
-    });
-}async function initCreationFlow() {
-    document.getElementById('project-header').style.display = 'none';
-    document.getElementById('print-button').style.display = 'none';
-    const templatesCollection = db.collection("templates");
-    const snapshot = await templatesCollection.orderBy("createdAt").get();
-    templateList.innerHTML = '';
-    if (snapshot.empty) {
-        templateList.innerHTML = '<li>No templates available.</li>';
-    } else {
-        snapshot.docs.forEach(doc => {
-            const li = document.createElement('li');
-            li.innerHTML = `<label><input type="checkbox" data-id="${doc.id}" data-name="${doc.data().name}" data-content="${encodeURIComponent(doc.data().content)}"> ${doc.data().name}</label>`;
-            templateList.appendChild(li);
+
+        listToShow.forEach(member => { 
+            const item = document.createElement('button');
+            item.className = 'member-dropdown-item';
+            item.dataset.name = member.name;
+            item.innerHTML = `<span>${member.name}</span>` + (member.isServant ? '<span class="servant-tag">Servant</span>' : '');
+            memberDropdown.appendChild(item);
         });
+
+        const rect = (mobileDiv || cell).getBoundingClientRect();
+        memberDropdown.style.display = 'block';
+        memberDropdown.style.top = `${rect.bottom}px`;
+        memberDropdown.style.left = `${rect.left}px`;
+        memberDropdown.style.width = `${rect.width}px`;
+        activeCellForDropdown = { realCell: cell, mobileDiv: mobileDiv };
     }
-    templateSelectionModal.style.display = 'flex';
-}function setupGlobalUI() {
-    document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
-    document.getElementById('print-button').addEventListener('click', generatePdf);
-    document.getElementById('cancel-template-selection').addEventListener('click', () => window.location.href = './dashboard.html');
-    document.getElementById('confirm-template-selection').addEventListener('click', async () => {
-        const newProjectName = document.getElementById('new-project-name').value.trim();
-        if (!newProjectName) return alert("Please enter a name for your new project.");
-        const selectedCheckboxes = Array.from(templateList.querySelectorAll('input:checked'));
-        if (selectedCheckboxes.length === 0) return alert("Please select at least one template.");
 
-        const tablesArray = selectedCheckboxes.map(input => {
-            const rawContent = decodeURIComponent(input.dataset.content);
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = `<table><tbody>${rawContent}</tbody></table>`;
-            tempDiv.querySelectorAll('td, th').forEach(cell => {
-                const isEssentiallyEmpty = cell.textContent.trim() === '' && !cell.querySelector('img');
-                if (isEssentiallyEmpty) cell.setAttribute('data-user-editable', 'true');
-            });
-            return { title: input.dataset.name, content: tempDiv.querySelector('tbody').innerHTML, eventType: 'normal' };
-        });
-        const newDocRef = await userSchedulesCollection.add({
-            name: newProjectName,
-            tables: tablesArray,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        window.location.href = `./editor.html?id=${newDocRef.id}`;
-    });
-    
-    eventContextMenu.addEventListener('click', (e) => {
-        const target = e.target.closest('.context-menu-item');
-        if (target && activeEventScheduleTable) {
-            activeEventScheduleTable.applyEventType(target.dataset.eventType);
-        }
-        eventContextMenu.style.display = 'none';
-        activeEventScheduleTable = null;
-    });
+    // **FIXED: PDF GENERATION**
+    async function generatePdf() {
+        const printButton = document.getElementById('print-button');
+        printButton.disabled = true;
+        printButton.querySelector('span:last-child').textContent = 'Generating...';
 
-    schedulesWrapper.addEventListener('click', e => {
-        const targetElement = e.target.closest('.editable-cell, [contenteditable="true"]');
-        if (!targetElement) return;
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const originalBlocks = document.querySelectorAll('.schedule-block');
+        const A4_WIDTH_MM = 210;
+        const A4_HEIGHT_MM = 297;
+        const MARGIN_MM = 10;
+        const PAGE_SPACING_MM = 5; 
+        const USABLE_WIDTH = A4_WIDTH_MM - (MARGIN_MM * 2);
+        const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_MM * 2);
 
-        // If the element is specifically marked as contenteditable, it's for typing. Do nothing.
-        if (targetElement.getAttribute('contenteditable') === 'true') {
-            return;
-        }
+        const printContainer = document.createElement('div');
+        printContainer.id = 'print-container';
+        document.body.appendChild(printContainer);
 
-        // If we are here, it must be a dropdown cell (desktop or mobile).
-        let realCell;
-        let mobileDiv = null;
+        const itemsToPrint = [];
+        for (const block of originalBlocks) {
+            const clone = block.cloneNode(true);
+            clone.querySelector('.event-btn').style.display = 'none';
+            clone.querySelector('.mobile-view-container').style.display = 'none';
+            clone.querySelector('table').style.display = 'table';
 
-        if (targetElement.tagName === 'DIV') { // It's a mobile input
-            mobileDiv = targetElement;
-            const rowIndex = mobileDiv.dataset.rowIndex;
-            const cellIndex = mobileDiv.dataset.cellIndex;
-            const tableBody = mobileDiv.closest('.schedule-block').querySelector('.schedule-table-body');
-            realCell = tableBody.rows[rowIndex].cells[cellIndex];
-        } else { // It's a desktop table cell (TD)
-            realCell = targetElement;
-        }
-        
-        openMemberDropdown(realCell, mobileDiv);
-    });
-
-    memberDropdown.addEventListener('click', e => {
-        const item = e.target.closest('.member-dropdown-item');
-        if (item && activeCellForDropdown.realCell) {
-            const newName = item.dataset.name;
-            activeCellForDropdown.realCell.textContent = newName;
-            if (activeCellForDropdown.mobileDiv) {
-                activeCellForDropdown.mobileDiv.textContent = newName;
+            // Before capturing, ensure any date inputs are shown as text
+            const dateInput = clone.querySelector('.date-input');
+            if (dateInput && dateInput.value) {
+                dateInput.parentElement.textContent = dateInput.value.split('-').reverse().join('-');
             }
-            activeProject.triggerSave();
-        }
-        memberDropdown.style.display = 'none';
-        activeCellForDropdown = null;
-    });
 
-    document.addEventListener('click', (e) => {
-        if (!eventContextMenu.contains(e.target) && !e.target.closest('.event-btn')) { eventContextMenu.style.display = 'none'; }
-        if (!memberDropdown.contains(e.target) && !e.target.closest('.editable-cell')) { memberDropdown.style.display = 'none'; }
-    });
-}
-
-// **FIXED:** Rewrote this function to find sections by text content
-// instead of a missing data-attribute.
-function isCellInMinistrySection(cell) {
-    const table = cell.closest('table');
-    if (!table) return false;
-    const allRows = Array.from(table.querySelectorAll('tbody > tr'));
-    const cellRow = cell.closest('tr');
-    const cellRowIndex = allRows.indexOf(cellRow);
-    
-    let ministryHeaderIndex = -1;
-    let nextHeaderIndex = allRows.length;
-
-    allRows.forEach((row, index) => {
-        if(row.classList.contains('header-row')) {
-            const headerText = row.textContent.trim().toUpperCase();
+            printContainer.appendChild(clone);
             
-            // Check for the "MINISTRY" section header
-            // You can make these keywords more specific if needed
-            if (headerText.includes('APPLY YOURSELF') || headerText.includes('FIELD MINISTRY')) {
-                ministryHeaderIndex = index;
-            } else if (ministryHeaderIndex !== -1 && index > ministryHeaderIndex) {
-                // This is the *next* header after the ministry one
-                if (index < nextHeaderIndex) {
-                    nextHeaderIndex = index;
-                }
-            }
+            const canvas = await html2canvas(clone, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+            const imgData = canvas.toDataURL('image/jpeg', 0.8);
+            const imgProps = pdf.getImageProperties(imgData);
+            const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
+            itemsToPrint.push({ imgData, width: USABLE_WIDTH, height: imgHeight });
         }
-    });
-    
-    if (ministryHeaderIndex === -1) {
-        // Fallback or default behavior if no header is found
-        // For now, we'll assume not in ministry section
-        return false; 
-    }
-    
-    // Check if the cell's row is between the ministry header and the next header
-    return cellRowIndex > ministryHeaderIndex && cellRowIndex < nextHeaderIndex;
-}
-
-function openMemberDropdown(cell, mobileDiv = null) {
-    const isInMinistry = isCellInMinistrySection(cell);
-    memberDropdown.innerHTML = '';
-    let listToShow;
-    if (isInMinistry) {
-        const sortedSisters = [...members.sisters].sort((a, b) => a.name.localeCompare(b.name));
-        const sortedBrothers = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
-        listToShow = [...sortedSisters, ...sortedBrothers];
-    } else {
-        listToShow = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
-    }
-
-    listToShow.forEach(member => { 
-        const item = document.createElement('button');
-        item.className = 'member-dropdown-item';
-        item.dataset.name = member.name;
-        item.innerHTML = `<span>${member.name}</span>` + (member.isServant ? '<span class="servant-tag">Servant</span>' : '');
-        memberDropdown.appendChild(item);
-    });
-
-    const rect = (mobileDiv || cell).getBoundingClientRect();
-    memberDropdown.style.display = 'block';
-    memberDropdown.style.top = `${rect.bottom}px`;
-    memberDropdown.style.left = `${rect.left}px`;
-    memberDropdown.style.width = `${rect.width}px`;
-    activeCellForDropdown = { realCell: cell, mobileDiv: mobileDiv };
-}async function generatePdf() {
-    const printButton = document.getElementById('print-button');
-    printButton.disabled = true;
-    printButton.querySelector('span:last-child').textContent = 'Generating...';
-
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    const originalBlocks = document.querySelectorAll('.schedule-block');
-    const A4_WIDTH_MM = 210;
-    const A4_HEIGHT_MM = 297;
-    const MARGIN_MM = 10;
-    const PAGE_SPACING_MM = 5; 
-    const USABLE_WIDTH = A4_WIDTH_MM - (MARGIN_MM * 2);
-    const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_MM * 2);
-
-    const printContainer = document.createElement('div');
-    printContainer.id = 'print-container';
-    document.body.appendChild(printContainer);
-
-    const itemsToPrint = [];
-    for (const block of originalBlocks) {
-        const clone = block.cloneNode(true);
-        clone.querySelector('.event-btn').style.display = 'none';
-        clone.querySelector('.mobile-view-container').style.display = 'none';
-        clone.querySelector('table').style.display = 'table';
-
-        // Before capturing, ensure any date inputs are shown as text
-        const dateInput = clone.querySelector('.date-input');
-        if (dateInput && dateInput.value) {
-            dateInput.parentElement.textContent = dateInput.value.split('-').reverse().join('-');
-        }
-
-        printContainer.appendChild(clone);
         
-        const canvas = await html2canvas(clone, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
-        const imgData = canvas.toDataURL('image/jpeg', 0.8);
-        const imgProps = pdf.getImageProperties(imgData);
-        const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
-        itemsToPrint.push({ imgData, width: USABLE_WIDTH, height: imgHeight });
-    }
-    
-    document.body.removeChild(printContainer);
+        document.body.removeChild(printContainer);
 
-    let currentY = MARGIN_MM;
-    itemsToPrint.forEach((item, index) => {
-        if (index > 0 && currentY + item.height > USABLE_HEIGHT + MARGIN_MM) {
-            pdf.addPage();
-            currentY = MARGIN_MM;
+        let currentY = MARGIN_MM;
+        itemsToPrint.forEach((item, index) => {
+            if (index > 0 && currentY + item.height > USABLE_HEIGHT + MARGIN_MM) {
+                pdf.addPage();
+                currentY = MARGIN_MM;
+            }
+            pdf.addImage(item.imgData, 'JPEG', MARGIN_MM, currentY, item.width, item.height);
+            currentY += item.height + PAGE_SPACING_MM;
+        });
+
+        const fileName = `${projectTitleEl.textContent.trim() || 'schedule'}.pdf`;
+        pdf.save(fileName);
+
+        printButton.disabled = false;
+        printButton.querySelector('span:last-child').textContent = 'Download PDF';
+        
+        // We must re-render the project to restore the inputs that PDF generation removed
+        if(activeProject) {
+            activeProject.render();
         }
-        pdf.addImage(item.imgData, 'JPEG', MARGIN_MM, currentY, item.width, item.height);
-        currentY += item.height + PAGE_SPACING_MM;
-    });
-
-    const fileName = `${projectTitleEl.textContent.trim() || 'schedule'}.pdf`;
-    pdf.save(fileName);
-
-    printButton.disabled = false;
-    printButton.querySelector('span:last-child').textContent = 'Download PDF';
-    
-    // We must re-render the project to restore the inputs that PDF generation removed
-    if(activeProject) {
-        activeProject.render();
     }
-}
 
-setupGlobalUI();
+    // --- NEW MENU TOGGLE JAVASCRIPT ---
+    const menuToggleButton = document.getElementById('menu-toggle-button');
+    const slideMenu = document.getElementById('slide-menu');
+    const menuOverlay = document.getElementById('menu-overlay');
+    const body = document.body;
+    
+    function closeMenu() {
+        if (!slideMenu || !menuOverlay) return;
+        slideMenu.classList.remove('is-open');
+        menuOverlay.classList.remove('is-open');
+        body.classList.remove('menu-open');
+    }
+
+    if (menuToggleButton) {
+        menuToggleButton.addEventListener('click', () => {
+            if (body.classList.contains('menu-open')) {
+                closeMenu();
+            } else {
+                slideMenu.classList.add('is-open');
+                menuOverlay.classList.add('is-open');
+                body.classList.add('menu-open');
+            }
+        });
+    }
+    if (menuOverlay) {
+        menuOverlay.addEventListener('click', closeMenu);
+    }
   
 })();
 </script>
