@@ -4,24 +4,34 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>User - Schedule Editor</title>
+<!-- FIREBASE SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<!-- PDF Generation Libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- FONTS AND ICONS -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 <style>
+    /* START: NEW NAVBAR STYLES */
     :root {
+        --header-bg: #292929;
+        --text-light: #fff;
+        --body-bg: #f8fafc;
+        --menu-new-text: #4a6da7;
+        --menu-new-bg: #ffffff;
+        --menu-new-border: #eeeeee;
+        --menu-new-hover: #f5f5f5;
         --primary-color: #012726;
         --primary-hover: #024443;
         --primary-light: #e6f6f6;
         --danger-color: #d32f2f;
         --danger-hover: #b71c1c;
-        --danger-light: #fde8e8; /* Added for logout hover */
         --border-color: #e5e7eb;
         --background-color: #f8fafc;
         --text-primary: #1f2937;
@@ -32,108 +42,88 @@
         --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
         --warning-color: #f59e0b;
         --success-color: #2e7d32;
-
-        /* VARS FROM NEW NAVBAR */
-        --header-bg: #292929;
-        --text-light: #fff;
-        --menu-new-text: #4a6da7;
-        --menu-new-bg: #ffffff;
-        --menu-new-border: #eeeeee;
-        --menu-new-hover: #f5f5f5;
     }
-
-    /* FONT FACE FOR NEW NAVBAR ICONS */
+    
     @font-face {
         font-family: "jw-icons-external";
-        /* Using a public URL for the font */
-        src: url("https://s.assets.jw.org/fonts/jw-icons-external-d876da3.woff") format("woff");
+        src: url("https://www.jw.org/assets/css/fonts/jw-icons-external/jw-icons-external-d876da3.woff") format("woff");
         font-weight: normal; font-style: normal;
     }
 
-    /* CSS FROM NEW NAVBAR */
+    body {
+        margin: 0; padding: 0;
+        font-family: 'Inter', sans-serif;
+        background-color: var(--body-bg);
+        color: var(--text-primary);
+        visibility: hidden; opacity: 0;
+        transition: opacity 0.3s ease-in;
+    }
+    body.auth-ready { visibility: visible; opacity: 1; }
     body.menu-open { overflow: hidden; }
+
     .site-header { background-color: var(--header-bg); padding: 0; color: var(--text-light); position: fixed; top: 0; left: 0; width: 100%; z-index: 900; }
     .top-bar { display: flex; justify-content: space-between; align-items: center; height: 56px; padding: 0 15px 0 0; max-width: 1200px; margin: 0 auto; }
-    #mobileNavTopBar .mobileLogo { display: block; width: 75px; height: 56px; background-image: url(https://www.jw.org/assets/ct/46605f23da/images/siteLogo-jworg-mobile.svg), none; background-repeat: no-repeat; background-size: contain; background-position: center left; flex-shrink: 0; }
+    .top-bar .mobileLogo { display: block; width: 75px; height: 56px; background-image: url(https://www.jw.org/assets/ct/46605f23da/images/siteLogo-jworg-mobile.svg), none; background-repeat: no-repeat; background-size: contain; background-position: center left; flex-shrink: 0; margin-left: 15px; }
     .header-right-controls { display: flex; align-items: center; gap: 15px; }
     .header-icons { display: flex; align-items: center; height: 56px; cursor: pointer; }
     .header-icons svg { height: 24px; width: 24px; color: var(--text-light); }
     .header-icons .close-icon { display: none; }
     body.menu-open .header-icons .hamburger-icon { display: none; }
     body.menu-open .header-icons .close-icon { display: block; }
+    
     .menu-overlay { position: fixed; top: 56px; left: 0; width: 100%; height: calc(100% - 56px); background-color: rgba(0, 0, 0, 0.6); z-index: 998; opacity: 0; visibility: hidden; transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; }
     .menu-overlay.is-open { opacity: 1; visibility: visible; }
     .slide-menu { position: fixed; top: 56px; right: 0; height: calc(100dvh - 56px); width: 320px; max-width: 90%; background-color: var(--menu-new-bg); z-index: 999; transform: translateX(100%); transition: transform 0.3s ease-in-out; display: flex; flex-direction: column; border-left: 1px solid var(--menu-new-border); }
     .slide-menu.is-open { transform: translateX(0); }
+    
     .menu-links { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex-grow: 1; }
     .menu-links li a { display: flex; align-items: center; color: var(--menu-new-text); background-color: var(--menu-new-bg); height: 50px; padding: 12px 5px 12px 12px; box-sizing: border-box; text-decoration: none; font-size: 1rem; transition: background-color 0.2s; border-top: 1px dotted #a7a7a7; }
     .menu-links li:first-child a { border-top: none; }
     .menu-links li a:hover { background-color: var(--menu-new-hover); }
+    
     .profile-section { padding: 16px; border-top: 1px solid var(--menu-new-border); flex-shrink: 0; background-color: #fafafa; margin-top: auto; }
     .profile-info { display: flex; align-items: center; }
-    .profile-name { font-weight: bold; font-size: 1.1rem; color: #333; word-break: break-all; }
+    .profile-name { font-weight: bold; font-size: 1rem; color: #333; word-break: break-all; }
+    
     .iconLink-icon { font-family: "jw-icons-external"; font-size: 24px; display: inline-block; color: #757575; width: 30px; margin-right: 10px; text-align: center; }
-    .home-icon::before { content: "\e661"; }
-    .midweek-icon::before { content: "\e625"; }
-    .sunday-icon::before { content: "\e610"; }
+    .dashboard-icon::before { content: "\e661"; }
     .members-icon::before { content: "\e695"; }
+    .logout-icon::before { content: "\e628"; }
 
-    /* STYLING FOR MOVED LOGOUT BUTTON */
-    .profile-section #logout-button {
-        width: 100%;
-        margin-top: 12px;
-        padding: 8px 16px;
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        border-radius: var(--radius-md);
-        background-color: transparent; 
-        border: 1px solid var(--border-color); 
-        transition: all 0.2s;
-        text-align: center;
-        color: var(--text-primary);
-    }
-    .profile-section #logout-button:hover {
-        background-color: var(--danger-light);
-        color: var(--danger-hover);
-        border-color: var(--danger-hover);
-    }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; border-radius: var(--radius-md); font-size: 1rem; font-weight: 600; cursor: pointer; border: none; text-decoration: none; background-color: var(--primary-color); color: white; transition: background-color 0.2s; }
+    .btn:hover:not(:disabled) { background-color: var(--primary-hover); }
+    .btn:disabled { cursor: not-allowed; opacity: 0.6; }
+    /* END: NEW NAVBAR STYLES */
 
-    /* --- ORIGINAL EDITOR CSS (with body padding updated) --- */
+    /* START: ORIGINAL EDITOR STYLES */
     *, *::before, *::after { box-sizing: border-box; }
     html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
     
-    /* Body padding-top updated from 88px to 76px (56px header + 20px space) */
-    body { 
-        font-family: 'Inter', sans-serif; 
-        background-color: var(--background-color); 
-        margin: 0; 
-        padding: 76px 20px 20px; 
-        color: var(--text-primary); 
-    }
     .hidden { display: none !important; }
 
-    /* Old header CSS is removed */
+    main { padding: calc(56px + 20px) 20px 20px; }
+    .editor-main { max-width: 1100px; margin: 0 auto; }
+    .page-controls { margin-bottom: 24px; }
     
-    .toolbar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); transition: all 0.2s; text-decoration: none; color: var(--text-secondary); }
-    .toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; border-color: #d1d5db; color: var(--text-primary); }
-    .toolbar-btn:disabled { cursor: not-allowed; opacity: 0.5; }
-    
-    .master-container { max-width: 1100px; margin: 0 auto; background: var(--surface-color); padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
+    .master-container { background: var(--surface-color); padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
     .project-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color); }
     .project-title { font-size: 1.75rem; font-weight: 700; margin: 0; flex-grow: 1; border: none; padding: 4px 8px; margin: -4px -8px; border-radius: var(--radius-md); font-family: 'Noto Sans Telugu', sans-serif; }
     .project-title:focus { outline: 2px solid var(--primary-color); background-color: var(--primary-light); }
+    
     .schedule-block { margin-bottom: 32px; }
     .schedule-block:last-child { margin-bottom: 0; }
     .schedule-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
     .schedule-title { font-size: 1.25rem; font-weight: 600; margin: 0; color: var(--text-secondary); font-family: 'Noto Sans Telugu', sans-serif; }
     
-    /* Status indicator CSS remains, it will be used by the element in the new header */
     .status-indicator { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; display: flex; align-items: center; gap: 6px; }
     .status-indicator::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background-color: currentColor; }
     .status-indicator[data-status="synced"] { color: var(--success-color); background-color: #eaf5ea; }
     .status-indicator[data-status="syncing"] { color: var(--warning-color); background-color: #fffbeb; }
     .status-indicator[data-status="error"] { color: var(--danger-color); background-color: #fde8e8; }
+    
+    .toolbar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); transition: all 0.2s; text-decoration: none; color: var(--text-secondary); }
+    .toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; border-color: #d1d5db; color: var(--text-primary); }
+    .toolbar-btn:disabled { cursor: not-allowed; opacity: 0.5; }
     
     .schedule-block table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.25px; }
     .schedule-block th, .schedule-block td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; }
@@ -165,50 +155,31 @@
     #confirm-template-selection { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
     #print-container { position: absolute; left: -9999px; top: auto; width: 1100px; background: white; }
     .mobile-view-container { display: none; }
-  
-    /* Add this new rule for the date input */
-    .date-input {
-        cursor: pointer;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-        background-color: transparent;
-        border: none;
-        width: 100%;
-        height: 100%;
-        font-family: inherit;
-        font-size: inherit;
-        font-weight: inherit;
-        text-align: left;
-        padding-left: 8px;
-    }
-
+    .date-input { cursor: pointer; -webkit-appearance: none; -moz-appearance: none; appearance: none; background-color: transparent; border: none; width: 100%; height: 100%; font-family: inherit; font-size: inherit; font-weight: inherit; text-align: left; padding-left: 8px; }
+    
     @media (max-width: 768px) {
-    /* This padding-top is 56px, which is correct for the new header */
-    body { padding: 56px 0 0 0; background-color: var(--surface-color); }
-    .master-container { padding: 16px; border-radius: 0; box-shadow: none; }
-    .project-header { flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px 0; margin-bottom: 16px; }
-    /* Make sure print button looks good on mobile */
-    .project-header #print-button { width: 100%; }
-    .project-title { font-size: 1.5rem; }
-    .schedule-block { margin-bottom: 24px; padding: 0 0 24px 0; border-bottom: 8px solid var(--background-color); }
-    .schedule-block:last-child { border-bottom: none; }
-
-    .schedule-block table { display: none; }
-    .mobile-view-container { display: flex; flex-direction: column; gap: 1.5rem; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 16px; }
-    .mobile-item .item-label { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; font-family: 'Noto Sans Telugu', sans-serif; }
-    .mobile-item .item-input { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-md); background-color: #f9fafb; font-size: 1rem; font-weight: 500; color: var(--text-secondary); margin-top: 4px; }
-    .mobile-item .input-group { margin-bottom: 12px; }
-    .mobile-item .input-group:last-child { margin-bottom: 0; }
-}
-  
+        main { padding: 56px 0 0 0; }
+        .master-container { padding: 16px; border-radius: 0; box-shadow: none; }
+        .page-controls { padding: 0 16px; margin-bottom: 16px; }
+        .project-header { flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px 0; margin-bottom: 16px; }
+        .project-title { font-size: 1.5rem; }
+        .schedule-block { margin-bottom: 24px; padding: 0 0 24px 0; border-bottom: 8px solid var(--background-color); }
+        .schedule-block:last-child { border-bottom: none; }
+        .schedule-block table { display: none; }
+        .mobile-view-container { display: flex; flex-direction: column; gap: 1.5rem; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 16px; }
+        .mobile-item .item-label { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; font-family: 'Noto Sans Telugu', sans-serif; }
+        .mobile-item .item-input { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-md); background-color: #f9fafb; font-size: 1rem; font-weight: 500; color: var(--text-secondary); margin-top: 4px; }
+        .mobile-item .input-group { margin-bottom: 12px; }
+        .mobile-item .input-group:last-child { margin-bottom: 0; }
+    }
+    /* END: ORIGINAL EDITOR STYLES */
 </style>
 </head>
 <body>
 
 <header class="site-header">
-    <div class="top-bar" id="mobileNavTopBar">
-        <a href="./home.html" class="mobileLogo" title="Home"></a>
+    <div class="top-bar">
+        <a href="./dashboard.html" class="mobileLogo" title="Dashboard"></a>
         <div class="header-right-controls">
             <div class="status-indicator" data-status="synced">Synced</div>
             <div class="header-icons" id="menu-toggle-button">
@@ -221,30 +192,32 @@
 <div class="menu-overlay" id="menu-overlay"></div>
 <div class="slide-menu" id="slide-menu">
     <ul class="menu-links">
-        <li><a href="./home.html"><span class="iconLink-icon home-icon"></span><span>Home</span></a></li>
-        <li><a href="./mid-week.html"><span class="iconLink-icon midweek-icon"></span><span>Mid-Week Schedules</span></a></li>
-        <li><a href="./sunday-dashboard.html"><span class="iconLink-icon sunday-icon"></span><span>Sunday Schedules</span></a></li>
+        <li><a href="./dashboard.html"><span class="iconLink-icon dashboard-icon"></span><span>Dashboard</span></a></li>
         <li><a href="./members.html"><span class="iconLink-icon members-icon"></span><span>Members</span></a></li>
+        <li><a href="#" id="logout-link"><span class="iconLink-icon logout-icon"></span><span>Logout</span></a></li>
     </ul>
     <div class="profile-section">
         <div class="profile-info">
              <div class="profile-name">Loading...</div>
         </div>
-        <button id="logout-button">Logout</button>
     </div>
 </div>
-<div id="app-container" class="hidden">
+
+<main id="app-container" class="editor-main hidden">
+    <div class="page-controls">
+        <button id="print-button" class="btn">
+            <span class="material-symbols-outlined">picture_as_pdf</span>
+            <span>Download PDF</span>
+        </button>
+    </div>
     <div class="master-container">
         <div id="project-header" class="project-header">
             <h1 id="project-title" contenteditable="true">Loading Project...</h1>
-            <button id="print-button" class="toolbar-btn">
-                <span class="material-symbols-outlined">picture_as_pdf</span>
-                <span>Download PDF</span>
-            </button>
-            </div>
+            <!-- Status indicator was here, now moved to header -->
+        </div>
         <div id="schedules-wrapper"></div>
     </div>
-</div>
+</main>
 
 <template id="schedule-template">
     <div class="schedule-block">
@@ -296,7 +269,7 @@
       messagingSenderId: "965478014820",
       appId: "1:965478014820:web:1c36c5d890a27e599aa471"
     };
-    
+
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
@@ -312,24 +285,17 @@
     let activeCellForDropdown = null;
 
     const appContainer = document.getElementById('app-container');
-    
-    // References to old header elements are removed
-    
     const projectTitleEl = document.getElementById('project-title');
     const schedulesWrapper = document.getElementById('schedules-wrapper');
     const templateSelectionModal = document.getElementById('template-selection-modal');
     const templateList = document.getElementById('template-list');
     const eventContextMenu = document.getElementById('event-context-menu');
     const memberDropdown = document.getElementById('member-dropdown');
+    const statusIndicator = document.querySelector('.status-indicator');
     
-    // This query now finds the status indicator in the *new* header
-    const statusIndicator = document.querySelector('.header-right-controls .status-indicator');
-
     function updateStatus(text, status) {
-        if (statusIndicator) { // Check if it exists
-            statusIndicator.textContent = text;
-            statusIndicator.dataset.status = status;
-        }
+        statusIndicator.textContent = text;
+        statusIndicator.dataset.status = status;
     }
 
     async function fetchMembers() {
@@ -355,7 +321,6 @@
             this.initDOM();
             this.render();
             this.setupEventListeners();
-            // This is the correct way to initialize the view
             this.applyEventType(this.data.eventType || 'normal', false);
         }
 
@@ -371,24 +336,35 @@
 
         render() {
             this.titleEl.textContent = this.data.title;
-            // Set the content *before* applying the event type
             this.tableBody.innerHTML = this.data.content;
             
-            // This applyEventType call will now correctly modify the view
-            // *after* the content is loaded, but *before* the mobile view is built.
-            // We call it here *again* to ensure the *correct* DOM state is set up
-            // before we build the mobile view and add date inputs.
-            this.applyEventType(this.data.eventType || 'normal', false);
+            this.tableBody.querySelectorAll('td, th').forEach(cell => {
+                if (cell.hasAttribute('data-user-editable')) {
+                    const isFirstRow = cell.closest('tr') === this.tableBody.rows[0];
+                    if (isFirstRow) {
+                        const originalText = cell.textContent.trim();
+                        const dateValue = originalText.split('-').reverse().join('-');
+                        cell.innerHTML = `<input type="date" class="date-input" value="${dateValue || ''}">`;
+                        cell.removeAttribute('contenteditable');
+                    } else {
+                        cell.classList.add('editable-cell');
+                        cell.removeAttribute('contenteditable');
+                    }
+                } else {
+                    cell.setAttribute('contenteditable', 'false');
+                }
+            });
+
+            this._createMobileView();
         }
 
         _createMobileView() {
             this.mobileViewContainer.innerHTML = '';
-
-            // Handle Special Event view
             if (this.data.eventType && this.data.eventType !== 'normal') {
                 const eventTexts = { 'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం', 'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో', 'convention': 'ప్రాదేశిక సమావేశం' };
                 const firstRow = this.tableBody.rows[0];
-                const dateInput = firstRow ? firstRow.querySelector('.date-input') : null;
+                const dateCell = firstRow.cells[2];
+                const dateInput = dateCell ? dateCell.querySelector('.date-input') : null;
                 const dateValue = dateInput ? dateInput.value : '';
 
                 const itemDiv = document.createElement('div');
@@ -404,19 +380,15 @@
                 return;
             }
 
-            // Handle Normal view
             Array.from(this.tableBody.rows).forEach((row, rowIndex) => {
                 if (row.classList.contains('header-row')) return;
-
                 const editableCellsInRow = Array.from(row.cells).filter(c => c.hasAttribute('data-user-editable'));
                 if (editableCellsInRow.length === 0) return;
-
                 const groupedInputs = {};
 
                 editableCellsInRow.forEach(cell => {
                     const cellIndex = cell.cellIndex;
                     let labelText = '';
-                    
                     for (let i = cellIndex - 1; i >= 0; i--) {
                         const potentialLabelCell = row.cells[i];
                         if (potentialLabelCell && !potentialLabelCell.hasAttribute('data-user-editable') && potentialLabelCell.textContent.trim() !== '') {
@@ -426,37 +398,30 @@
                             break;
                         }
                     }
-
                     if (!labelText && row.cells[0] && !row.cells[0].hasAttribute('data-user-editable')) {
                         const tempDiv = document.createElement('div');
                         tempDiv.innerHTML = row.cells[0].innerHTML;
                         labelText = tempDiv.textContent.trim().replace('⠿', '').replace(':', '');
                     }
-                    
-                    if (!groupedInputs[labelText]) {
-                        groupedInputs[labelText] = [];
-                    }
+                    if (!groupedInputs[labelText]) groupedInputs[labelText] = [];
                     groupedInputs[labelText].push(cell);
                 });
 
                 for (const label in groupedInputs) {
                     const itemDiv = document.createElement('div');
                     itemDiv.className = 'mobile-item';
-
                     if (label) {
                         const labelDiv = document.createElement('div');
                         labelDiv.className = 'item-label';
                         labelDiv.textContent = label;
                         itemDiv.appendChild(labelDiv);
                     }
-                    
                     const inputsContainer = document.createElement('div');
                     groupedInputs[label].forEach(cell => {
                         const cellIndex = cell.cellIndex;
                         const inputWrapper = document.createElement('div');
                         inputWrapper.className = 'input-group';
-
-                        if (rowIndex === 0) { // Date cell
+                        if (rowIndex === 0) {
                             const dateInput = cell.querySelector('.date-input');
                             const dateValue = dateInput ? dateInput.value : '';
                             const inputEl = document.createElement('input');
@@ -466,7 +431,7 @@
                             inputEl.dataset.rowIndex = rowIndex;
                             inputEl.dataset.cellIndex = cellIndex;
                             inputWrapper.appendChild(inputEl);
-                        } else { // Name selection cell
+                        } else {
                             const inputDiv = document.createElement('div');
                             inputDiv.className = 'item-input editable-cell';
                             inputDiv.textContent = cell.textContent.trim() || 'Select Name';
@@ -494,23 +459,18 @@
             return tempBody.innerHTML;
         }
 
-        // **FIXED: SPECIAL EVENT LOGIC**
         applyEventType(eventType, shouldSave = true) {
             this.data.eventType = eventType;
             const allRows = this.tableBody.querySelectorAll('tr');
             const firstRow = this.tableBody.rows[0];
-            
-            if (!firstRow) return; // Safety check
 
             if (eventType === 'normal') {
-                // Restore normal view
                 allRows.forEach(row => row.style.display = '');
-                if (firstRow.dataset.originalContent) {
+                if (firstRow && firstRow.dataset.originalContent) {
                     firstRow.innerHTML = firstRow.dataset.originalContent;
                     delete firstRow.dataset.originalContent;
                 }
             } else {
-                // Apply special event view
                 const eventTexts = {
                     'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం',
                     'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో',
@@ -519,21 +479,14 @@
                 allRows.forEach((row, index) => {
                     row.style.display = (index === 0) ? '' : 'none';
                 });
-
                 let existingDateValue = '';
-                if (!firstRow.dataset.originalContent) {
-                    // Save the original content if it's not already saved
-                    firstRow.dataset.originalContent = firstRow.innerHTML;
+                if (firstRow) {
+                    if (!firstRow.dataset.originalContent) firstRow.dataset.originalContent = firstRow.innerHTML;
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = firstRow.dataset.originalContent;
+                    const originalDateCell = tempDiv.querySelector('[data-user-editable]');
+                    if (originalDateCell) existingDateValue = originalDateCell.textContent.trim().split('-').reverse().join('-');
                 }
-                
-                // Get date from *original* content
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = firstRow.dataset.originalContent;
-                const originalDateCell = tempDiv.querySelector('[data-user-editable]');
-                if (originalDateCell) {
-                    existingDateValue = originalDateCell.textContent.trim().split('-').reverse().join('-');
-                }
-                
                 firstRow.innerHTML = `
                     <th colspan="1" class="special-event-text">${eventTexts[eventType]}</th>
                     <td style="text-align: right; font-weight: 700;">తేదీ:</td>
@@ -541,44 +494,17 @@
                 `;
             }
 
-            // Now, apply attributes and date inputs to the *current* view
-            this.tableBody.querySelectorAll('td, th').forEach(cell => {
-                if (cell.hasAttribute('data-user-editable')) {
-                    const isFirstRow = cell.closest('tr') === this.tableBody.rows[0];
-                    if (isFirstRow) {
-                        // This handles both normal and special event date cells
-                        const originalText = cell.textContent.trim();
-                        const dateValue = cell.querySelector('.date-input') ? cell.querySelector('.date-input').value : originalText.split('-').reverse().join('-');
-                        cell.innerHTML = `<input type="date" class="date-input" value="${dateValue || ''}">`;
-                        cell.removeAttribute('contenteditable');
-                    } else {
-                        cell.classList.add('editable-cell');
-                        cell.removeAttribute('contenteditable');
-                    }
-                } else {
-                    cell.setAttribute('contenteditable', 'false');
-                }
-            });
-
-            // **FIXED:** Re-run _createMobileView to update the mobile UI
-            this._createMobileView(); 
-            
-            if (shouldSave) {
-                this.parentProject.triggerSave();
-            }
+            this.render();
+            if (shouldSave) this.parentProject.triggerSave();
         }
 
         setupEventListeners() {
             this.element.addEventListener('input', (e) => {
                 const input = e.target;
-                if(input.classList.contains('item-input') || input.classList.contains('date-input')) {
-                    const rowIndex = input.dataset.rowIndex || 0;
-                    const cellIndex = input.dataset.cellIndex || 2; // Default to date cell
-                    
-                    // Find the corresponding cell in the *live* desktop table
+                if(input.classList.contains('item-input')) {
+                    const rowIndex = input.dataset.rowIndex;
+                    const cellIndex = input.dataset.cellIndex;
                     const targetCell = this.tableBody.rows[rowIndex].cells[cellIndex];
-                    if (!targetCell) return;
-                    
                     if(input.type === 'date') {
                         const tableInput = targetCell.querySelector('.date-input');
                         if(tableInput) tableInput.value = input.value;
@@ -598,7 +524,7 @@
             });
         }
     }
-
+    
     class Project {
         constructor(id, initialData, collectionRef) {
             this.id = id;
@@ -616,7 +542,6 @@
             if (document.activeElement !== projectTitleEl) projectTitleEl.textContent = this.data.name;
             schedulesWrapper.innerHTML = '';
             this.scheduleTables = [];
-            
             this.data.tables.forEach((tableData, index) => {
                 this.scheduleTables.push(new ScheduleTable(this, tableData, index));
             });
@@ -629,60 +554,25 @@
             }
         }
         
-        // **FIXED:** Rewrote the save function to handle special events
-        // and prevent data loss.
         save() {
             this.isSaving = true;
             updateStatus('Syncing...', 'syncing');
-
-            const updatedTablesData = this.scheduleTables.map(table => {
-                const dateInput = table.tableBody.querySelector('.date-input'); // Finds the *live* input
-                const newDate = dateInput ? dateInput.value : ''; // YYYY-MM-DD
-                const newDateDDMMYYYY = newDate.split('-').reverse().join('-');
-
-                let finalContent;
-                let originalContent = table.data.content;
-
-                // Check if original content is stored on the DOM element
-                const firstRow = table.tableBody.rows[0];
-                if (firstRow && firstRow.dataset.originalContent) {
-                    originalContent = firstRow.dataset.originalContent;
+            this.scheduleTables.forEach(table => {
+                const dateInput = table.tableBody.querySelector('.date-input');
+                if (dateInput && dateInput.value) {
+                    const cell = dateInput.parentElement;
+                    cell.textContent = dateInput.value.split('-').reverse().join('-');
                 }
-
-                if (table.data.eventType !== 'normal') {
-                    // Special event. Update date in original content.
-                    const tempBody = document.createElement('tbody');
-                    // Use the *saved* original content, not the live DOM
-                    tempBody.innerHTML = table.data.content; 
-                    
-                    const originalDateCell = tempBody.querySelector('tr:first-child [data-user-editable]');
-                    if (originalDateCell) {
-                        originalDateCell.textContent = newDateDDMMYYYY;
-                    }
-                    finalContent = tempBody.innerHTML;
-                } else {
-                    // Normal event. Update the live DOM, then call getContent.
-                    if (dateInput && newDate) {
-                        dateInput.parentElement.textContent = newDateDDMMYYYY;
-                    }
-                    finalContent = table.getContent();
-                }
-
-                return {
-                    title: table.data.title,
-                    content: finalContent,
-                    eventType: table.data.eventType || 'normal'
-                };
             });
-
+            const updatedTablesData = this.scheduleTables.map(table => ({
+                title: table.data.title,
+                content: table.getContent(),
+                eventType: table.data.eventType || 'normal'
+            }));
             const payload = { name: projectTitleEl.textContent, tables: updatedTablesData };
 
             this.collectionRef.doc(this.id).update(payload)
                 .then(() => {
-                    // After saving, update the internal data to match
-                    this.data.tables = updatedTablesData;
-                    // Re-render to restore date inputs that were removed by getContent()
-                    this.render(this.data);
                     updateStatus('Synced', 'synced');
                     this.isSaving = false;
                 })
@@ -705,12 +595,9 @@
             await fetchMembers(); 
             userSchedulesCollection = db.collection(`userSchedules/${currentUser.uid}/schedules`);
             appContainer.classList.remove('hidden');
-            
-            // UPDATED: Populate new profile name in slide-out menu
+            document.body.classList.add('auth-ready');
             const profileNameEl = document.querySelector('.profile-name');
-            if (profileNameEl) {
-                profileNameEl.textContent = user.email; // Use email as name
-            }
+            if (profileNameEl) profileNameEl.textContent = user.email;
             
             setupGlobalUI();
 
@@ -736,7 +623,7 @@
                  updateStatus('Synced', 'synced');
             } else {
                 alert("This schedule may have been deleted.");
-                window.location.href = './home.html'; // Go to new home
+                window.location.href = './dashboard.html';
             }
         }, error => {
              updateStatus('Error', 'error');
@@ -745,10 +632,7 @@
 
     async function initCreationFlow() {
         document.getElementById('project-header').style.display = 'none';
-        
-        const printButton = document.getElementById('print-button');
-        if (printButton) printButton.style.display = 'none';
-
+        document.getElementById('print-button').style.display = 'none';
         const templatesCollection = db.collection("templates");
         const snapshot = await templatesCollection.orderBy("createdAt").get();
         templateList.innerHTML = '';
@@ -765,14 +649,36 @@
     }
 
     function setupGlobalUI() {
-        document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
+        // Menu Toggle Logic
+        const menuToggleButton = document.getElementById('menu-toggle-button');
+        const slideMenu = document.getElementById('slide-menu');
+        const menuOverlay = document.getElementById('menu-overlay');
+        const body = document.body;
         
-        const printButton = document.getElementById('print-button');
-        if (printButton) {
-            printButton.addEventListener('click', generatePdf);
+        function closeMenu() {
+            slideMenu.classList.remove('is-open');
+            menuOverlay.classList.remove('is-open');
+            body.classList.remove('menu-open');
         }
 
-        document.getElementById('cancel-template-selection').addEventListener('click', () => window.location.href = './home.html'); // Go to new home
+        menuToggleButton.addEventListener('click', () => {
+            if (body.classList.contains('menu-open')) {
+                closeMenu();
+            } else {
+                slideMenu.classList.add('is-open');
+                menuOverlay.classList.add('is-open');
+                body.classList.add('menu-open');
+            }
+        });
+        menuOverlay.addEventListener('click', closeMenu);
+
+        // App-specific UI
+        document.getElementById('logout-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            auth.signOut()
+        });
+        document.getElementById('print-button').addEventListener('click', generatePdf);
+        document.getElementById('cancel-template-selection').addEventListener('click', () => window.location.href = './dashboard.html');
         document.getElementById('confirm-template-selection').addEventListener('click', async () => {
             const newProjectName = document.getElementById('new-project-name').value.trim();
             if (!newProjectName) return alert("Please enter a name for your new project.");
@@ -808,27 +714,16 @@
 
         schedulesWrapper.addEventListener('click', e => {
             const targetElement = e.target.closest('.editable-cell, [contenteditable="true"]');
-            if (!targetElement) return;
+            if (!targetElement || targetElement.getAttribute('contenteditable') === 'true') return;
 
-            if (targetElement.getAttribute('contenteditable') === 'true') {
-                return;
-            }
-
-            let realCell;
-            let mobileDiv = null;
-
-            if (targetElement.tagName === 'DIV' && targetElement.classList.contains('item-input')) { // Mobile input
+            let realCell, mobileDiv = null;
+            if (targetElement.tagName === 'DIV') { // Mobile input
                 mobileDiv = targetElement;
-                const rowIndex = mobileDiv.dataset.rowIndex;
-                const cellIndex = mobileDiv.dataset.cellIndex;
                 const tableBody = mobileDiv.closest('.schedule-block').querySelector('.schedule-table-body');
-                realCell = tableBody.rows[rowIndex].cells[cellIndex];
-            } else if (targetElement.tagName === 'TD') { // Desktop table cell
+                realCell = tableBody.rows[mobileDiv.dataset.rowIndex].cells[mobileDiv.dataset.cellIndex];
+            } else { // Desktop cell
                 realCell = targetElement;
-            } else {
-                return; // Not a cell we care about
             }
-            
             openMemberDropdown(realCell, mobileDiv);
         });
 
@@ -851,40 +746,26 @@
             if (!memberDropdown.contains(e.target) && !e.target.closest('.editable-cell')) { memberDropdown.style.display = 'none'; }
         });
     }
-
-    // **FIXED: MALE/FEMALE LOGIC**
+    
     function isCellInMinistrySection(cell) {
         const table = cell.closest('table');
         if (!table) return false;
         const allRows = Array.from(table.querySelectorAll('tbody > tr'));
         const cellRow = cell.closest('tr');
-        const cellRowIndex = allRows.indexOf(cellRow);
-        
+        const cellIndex = allRows.indexOf(cellRow);
         let ministryHeaderIndex = -1;
         let nextHeaderIndex = allRows.length;
-
         allRows.forEach((row, index) => {
             if(row.classList.contains('header-row')) {
-                const headerText = row.textContent.trim().toUpperCase();
-                
-                // Check for the "MINISTRY" section header
-                if (headerText.includes('APPLY YOURSELF') || headerText.includes('FIELD MINISTRY')) {
+                if (row.dataset.section === 'ministry') {
                     ministryHeaderIndex = index;
                 } else if (ministryHeaderIndex !== -1 && index > ministryHeaderIndex) {
-                    // This is the *next* header after the ministry one
-                    if (index < nextHeaderIndex) {
-                        nextHeaderIndex = index;
-                    }
+                    if (index < nextHeaderIndex) nextHeaderIndex = index;
                 }
             }
         });
-        
-        if (ministryHeaderIndex === -1) {
-            return false; 
-        }
-        
-        // Check if the cell's row is between the ministry header and the next header
-        return cellRowIndex > ministryHeaderIndex && cellRowIndex < nextHeaderIndex;
+        if (ministryHeaderIndex === -1) return false;
+        return cellIndex > ministryHeaderIndex && cellIndex < nextHeaderIndex;
     }
 
     function openMemberDropdown(cell, mobileDiv = null) {
@@ -915,7 +796,6 @@
         activeCellForDropdown = { realCell: cell, mobileDiv: mobileDiv };
     }
 
-    // **FIXED: PDF GENERATION**
     async function generatePdf() {
         const printButton = document.getElementById('print-button');
         printButton.disabled = true;
@@ -923,11 +803,7 @@
 
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('p', 'mm', 'a4');
-        const originalBlocks = document.querySelectorAll('.schedule-block');
-        const A4_WIDTH_MM = 210;
-        const A4_HEIGHT_MM = 297;
-        const MARGIN_MM = 10;
-        const PAGE_SPACING_MM = 5; 
+        const A4_WIDTH_MM = 210, A4_HEIGHT_MM = 297, MARGIN_MM = 10, PAGE_SPACING_MM = 5; 
         const USABLE_WIDTH = A4_WIDTH_MM - (MARGIN_MM * 2);
         const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_MM * 2);
 
@@ -936,18 +812,11 @@
         document.body.appendChild(printContainer);
 
         const itemsToPrint = [];
-        for (const block of originalBlocks) {
+        for (const block of document.querySelectorAll('.schedule-block')) {
             const clone = block.cloneNode(true);
             clone.querySelector('.event-btn').style.display = 'none';
             clone.querySelector('.mobile-view-container').style.display = 'none';
             clone.querySelector('table').style.display = 'table';
-
-            // Before capturing, ensure any date inputs are shown as text
-            const dateInput = clone.querySelector('.date-input');
-            if (dateInput && dateInput.value) {
-                dateInput.parentElement.textContent = dateInput.value.split('-').reverse().join('-');
-            }
-
             printContainer.appendChild(clone);
             
             const canvas = await html2canvas(clone, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
@@ -958,7 +827,6 @@
         }
         
         document.body.removeChild(printContainer);
-
         let currentY = MARGIN_MM;
         itemsToPrint.forEach((item, index) => {
             if (index > 0 && currentY + item.height > USABLE_HEIGHT + MARGIN_MM) {
@@ -971,44 +839,10 @@
 
         const fileName = `${projectTitleEl.textContent.trim() || 'schedule'}.pdf`;
         pdf.save(fileName);
-
         printButton.disabled = false;
         printButton.querySelector('span:last-child').textContent = 'Download PDF';
-        
-        // We must re-render the project to restore the inputs that PDF generation removed
-        if(activeProject) {
-            activeProject.render();
-        }
     }
 
-    // --- NEW MENU TOGGLE JAVASCRIPT ---
-    const menuToggleButton = document.getElementById('menu-toggle-button');
-    const slideMenu = document.getElementById('slide-menu');
-    const menuOverlay = document.getElementById('menu-overlay');
-    const body = document.body;
-    
-    function closeMenu() {
-        if (!slideMenu || !menuOverlay) return;
-        slideMenu.classList.remove('is-open');
-        menuOverlay.classList.remove('is-open');
-        body.classList.remove('menu-open');
-    }
-
-    if (menuToggleButton) {
-        menuToggleButton.addEventListener('click', () => {
-            if (body.classList.contains('menu-open')) {
-                closeMenu();
-            } else {
-                slideMenu.classList.add('is-open');
-                menuOverlay.classList.add('is-open');
-                body.classList.add('menu-open');
-            }
-        });
-    }
-    if (menuOverlay) {
-        menuOverlay.addEventListener('click', closeMenu);
-    }
-  
 })();
 </script>
 </body>
