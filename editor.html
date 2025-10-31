@@ -4,11 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>User - Schedule Editor</title>
+<!-- FIREBASE SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<!-- PDF Generation Libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- FONTS AND ICONS -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -16,7 +19,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 <style>
     :root {
-        /* Editor Variables */
+        /* Core Editor Theme Variables */
         --primary-color: #012726;
         --primary-hover: #024443;
         --primary-light: #e6f6f6;
@@ -33,107 +36,75 @@
         --warning-color: #f59e0b;
         --success-color: #2e7d32;
 
-        /* New Navbar Variables */
+        /* Navbar Theme Variables */
         --header-bg: #292929;
         --text-light: #fff;
-        --body-bg: var(--background-color); /* Aliased to editor's var */
         --menu-new-text: #4a6da7;
         --menu-new-bg: #ffffff;
         --menu-new-border: #eeeeee;
         --menu-new-hover: #f5f5f5;
     }
 
-    @font-face {
-        font-family: "jw-icons-external";
-        /* You may need to adjust this path if the font file is not in the same directory */
-        src: url("./jw-icons-external-d876da3.woff") format("woff");
-        font-weight: normal; font-style: normal;
-    }
-
+    /* GENERAL STYLES */
     *, *::before, *::after { box-sizing: border-box; }
     html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-    
-    body { 
-        font-family: 'Inter', sans-serif; 
-        background-color: var(--body-bg); 
-        margin: 0; 
-        /* Adjusted padding-top for new 56px navbar + 20px spacing */
-        padding: 76px 20px 20px; 
-        color: var(--text-primary); 
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--background-color);
+        margin: 0;
+        padding: calc(56px + 20px) 20px 20px;
+        color: var(--text-primary);
         visibility: hidden; opacity: 0;
         transition: opacity 0.3s ease-in;
     }
     body.auth-ready { visibility: visible; opacity: 1; }
     body.menu-open { overflow: hidden; }
-    
     .hidden { display: none !important; }
 
-    /* New Navbar Styles */
+    /* NAVBAR AND MENU STYLES */
     .site-header { background-color: var(--header-bg); padding: 0; color: var(--text-light); position: fixed; top: 0; left: 0; width: 100%; z-index: 900; }
-    .top-bar { display: flex; justify-content: space-between; align-items: center; height: 56px; padding: 0 15px 0 0; max-width: 1100px; margin: 0 auto; }
-    #mobileNavTopBar .mobileLogo { display: block; width: 75px; height: 56px; background-image: url(https://www.jw.org/assets/ct/46605f23da/images/siteLogo-jworg-mobile.svg), none; background-repeat: no-repeat; background-size: contain; background-position: center left; flex-shrink: 0; }
+    .top-bar { display: flex; justify-content: space-between; align-items: center; height: 56px; padding: 0 15px 0 0; max-width: 1200px; margin: 0 auto; }
+    .mobileLogo { display: block; width: 75px; height: 56px; background-image: url(https://www.jw.org/assets/ct/46605f23da/images/siteLogo-jworg-mobile.svg), none; background-repeat: no-repeat; background-size: contain; background-position: center left; flex-shrink: 0; }
     .header-right-controls { display: flex; align-items: center; gap: 15px; }
     .header-icons { display: flex; align-items: center; height: 56px; cursor: pointer; }
     .header-icons svg { height: 24px; width: 24px; color: var(--text-light); }
     .header-icons .close-icon { display: none; }
     body.menu-open .header-icons .hamburger-icon { display: none; }
     body.menu-open .header-icons .close-icon { display: block; }
-    
     .menu-overlay { position: fixed; top: 56px; left: 0; width: 100%; height: calc(100% - 56px); background-color: rgba(0, 0, 0, 0.6); z-index: 998; opacity: 0; visibility: hidden; transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; }
     .menu-overlay.is-open { opacity: 1; visibility: visible; }
-    
     .slide-menu { position: fixed; top: 56px; right: 0; height: calc(100dvh - 56px); width: 320px; max-width: 90%; background-color: var(--menu-new-bg); z-index: 999; transform: translateX(100%); transition: transform 0.3s ease-in-out; display: flex; flex-direction: column; border-left: 1px solid var(--menu-new-border); }
     .slide-menu.is-open { transform: translateX(0); }
-    
     .menu-links { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex-grow: 1; }
-    .menu-links li a { display: flex; align-items: center; color: var(--menu-new-text); background-color: var(--menu-new-bg); height: 50px; padding: 12px 5px 12px 12px; box-sizing: border-box; text-decoration: none; font-size: 1rem; transition: background-color 0.2s; border-top: 1px dotted #a7a7a7; }
+    .menu-links li a, .menu-links li button { display: flex; align-items: center; color: var(--menu-new-text); background-color: var(--menu-new-bg); width: 100%; height: 50px; padding: 12px 5px 12px 12px; box-sizing: border-box; text-decoration: none; font-size: 1rem; transition: background-color 0.2s; border-top: 1px dotted #a7a7a7; font-family: inherit; cursor: pointer; }
     .menu-links li:first-child a { border-top: none; }
-    .menu-links li a:hover { background-color: var(--menu-new-hover); }
-    
+    .menu-links li a:hover, .menu-links li button:hover { background-color: var(--menu-new-hover); }
     .profile-section { padding: 16px; border-top: 1px solid var(--menu-new-border); flex-shrink: 0; background-color: #fafafa; margin-top: auto; }
     .profile-info { display: flex; align-items: center; }
     .profile-name { font-weight: bold; font-size: 1.1rem; color: #333; }
-    .iconLink-icon { font-family: "jw-icons-external"; font-size: 24px; display: inline-block; color: #757575; width: 30px; margin-right: 10px; text-align: center; }
-    .home-icon::before { content: "\e661"; }
-    .midweek-icon::before { content: "\e625"; }
-    .sunday-icon::before { content: "\e610"; }
-    .members-icon::before { content: "\e695"; }
+    .menu-icon { font-size: 24px; color: #757575; width: 30px; margin-right: 10px; text-align: center; }
 
-    /* Button Style from Original Code */
-    .toolbar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); transition: all 0.2s; text-decoration: none; color: var(--text-secondary); }
-    .toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; border-color: #d1d5db; color: var(--text-primary); }
-    .toolbar-btn:disabled { cursor: not-allowed; opacity: 0.5; }
-
-    /* Editor Body Styles */
+    /* EDITOR CONTENT STYLES */
     .master-container { max-width: 1100px; margin: 0 auto; background: var(--surface-color); padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
     .project-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color); }
     .project-title { font-size: 1.75rem; font-weight: 700; margin: 0; flex-grow: 1; border: none; padding: 4px 8px; margin: -4px -8px; border-radius: var(--radius-md); font-family: 'Noto Sans Telugu', sans-serif; }
     .project-title:focus { outline: 2px solid var(--primary-color); background-color: var(--primary-light); }
+    .toolbar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); transition: all 0.2s; text-decoration: none; color: var(--text-secondary); }
+    .toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; border-color: #d1d5db; color: var(--text-primary); }
+    .toolbar-btn:disabled { cursor: not-allowed; opacity: 0.5; }
+
+    /* STATUS INDICATOR (ADJUSTED FOR NAVBAR) */
+    .status-indicator { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; display: flex; align-items: center; gap: 6px; }
+    .status-indicator::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background-color: currentColor; }
+    .status-indicator[data-status="synced"] { color: #4caf50; background-color: rgba(76, 175, 80, 0.2); }
+    .status-indicator[data-status="syncing"] { color: #ffeb3b; background-color: rgba(255, 235, 59, 0.2); }
+    .status-indicator[data-status="error"] { color: #f44336; background-color: rgba(244, 67, 54, 0.2); }
+    
     .schedule-block { margin-bottom: 32px; }
     .schedule-block:last-child { margin-bottom: 0; }
     .schedule-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
     .schedule-title { font-size: 1.25rem; font-weight: 600; margin: 0; color: var(--text-secondary); font-family: 'Noto Sans Telugu', sans-serif; }
     
-    /* Status Indicator (Original) */
-    .status-indicator { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; display: flex; align-items: center; gap: 6px; }
-    .status-indicator::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background-color: currentColor; }
-    .status-indicator[data-status="synced"] { color: var(--success-color); background-color: #eaf5ea; }
-    .status-indicator[data-status="syncing"] { color: var(--warning-color); background-color: #fffbeb; }
-    .status-indicator[data-status="error"] { color: var(--danger-color); background-color: #fde8e8; }
-
-    /* NEW Styles for Status Indicator in Navbar */
-    .site-header .status-indicator {
-        background-color: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-    .site-header .status-indicator[data-status="synced"] { color: #4ade80; background-color: rgba(74, 222, 128, 0.1); border-color: rgba(74, 222, 128, 0.3); }
-    .site-header .status-indicator[data-status="syncing"] { color: #facc15; background-color: rgba(250, 204, 21, 0.1); border-color: rgba(250, 204, 21, 0.3); }
-    .site-header .status-indicator[data-status="error"] { color: #f87171; background-color: rgba(248, 113, 113, 0.1); border-color: rgba(248, 113, 113, 0.3); }
-    .site-header .status-indicator[data-status="synced"]::before { background-color: #4ade80; }
-    .site-header .status-indicator[data-status="syncing"]::before { background-color: #facc15; }
-    .site-header .status-indicator[data-status="error"]::before { background-color: #f87171; }
-    
-    /* Table & Editor Styles (Unchanged) */
     .schedule-block table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.25px; }
     .schedule-block th, .schedule-block td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; }
     .schedule-block .editable-cell:not([contenteditable="true"]) { cursor: pointer; }
@@ -145,17 +116,15 @@
     .schedule-block .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; }
     .schedule-block .header-row td { font-size: 16px; color: #ffffff; height: 42px; }
     .schedule-block .row-handle { display: none !important; }
-    .special-event-text { color: red; text-align: center !important; font-weight: 700; }
     
-    /* Context Menu & Dropdown (Unchanged) */
+    .special-event-text { color: red; text-align: center !important; font-weight: 700; }
     #event-context-menu, #member-dropdown { position: fixed; display: none; background: var(--surface-color); border-radius: var(--radius-md); box-shadow: var(--shadow-md); z-index: 1001; padding: 6px; min-width: 180px; border: 1px solid var(--border-color); }
     .context-menu-item, .member-dropdown-item { font-family: 'Inter', sans-serif; display: block; width: 100%; padding: 8px 12px; cursor: pointer; font-size: 14px; border-radius: 6px; background: none; border: none; text-align: left; }
     .context-menu-item:hover, .member-dropdown-item:hover { background: #f9fafb; }
     .member-dropdown-item { display: flex; justify-content: space-between; align-items: center; }
     #member-dropdown { max-height: 300px; overflow-y: auto; }
     .servant-tag { font-size: 0.75rem; font-weight: 600; color: var(--primary-color); background-color: var(--primary-light); padding: 2px 6px; border-radius: 4px; }
-    
-    /* Modal (Unchanged) */
+
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 16px; }
     .modal-content { background: white; padding: 24px; border-radius: var(--radius-lg); width: 100%; max-width: 500px; max-height: 90vh; display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow-lg); }
     #new-project-name { width: 100%; padding: 12px; font-size: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); }
@@ -166,34 +135,19 @@
     .modal-actions button { padding: 10px 20px; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); }
     #cancel-template-selection { background-color: var(--surface-color); }
     #confirm-template-selection { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
+
     #print-container { position: absolute; left: -9999px; top: auto; width: 1100px; background: white; }
     .mobile-view-container { display: none; }
-    
-    .date-input {
-        cursor: pointer;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-        background-color: transparent;
-        border: none;
-        width: 100%;
-        height: 100%;
-        font-family: inherit;
-        font-size: inherit;
-        font-weight: inherit;
-        text-align: left;
-        padding-left: 8px;
-    }
+
+    .date-input { cursor: pointer; -webkit-appearance: none; -moz-appearance: none; appearance: none; background-color: transparent; border: none; width: 100%; height: 100%; font-family: inherit; font-size: inherit; font-weight: inherit; text-align: left; padding-left: 8px; }
     
     @media (max-width: 768px) {
-        /* Mobile padding-top matches new 56px navbar */
         body { padding: 56px 0 0 0; background-color: var(--surface-color); }
         .master-container { padding: 16px; border-radius: 0; box-shadow: none; }
         .project-header { flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px 0; margin-bottom: 16px; }
         .project-title { font-size: 1.5rem; }
         .schedule-block { margin-bottom: 24px; padding: 0 0 24px 0; border-bottom: 8px solid var(--background-color); }
         .schedule-block:last-child { border-bottom: none; }
-
         .schedule-block table { display: none; }
         .mobile-view-container { display: flex; flex-direction: column; gap: 1.5rem; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 16px; }
         .mobile-item .item-label { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; font-family: 'Noto Sans Telugu', sans-serif; }
@@ -201,18 +155,16 @@
         .mobile-item .input-group { margin-bottom: 12px; }
         .mobile-item .input-group:last-child { margin-bottom: 0; }
     }
-  
 </style>
 </head>
 <body>
 
+<!-- NEW NAVBAR AND MENU -->
 <header class="site-header">
-    <div class="top-bar" id="mobileNavTopBar">
-        <a href="./dashboard.html" class="mobileLogo" title="Home"></a>
+    <div class="top-bar">
+        <a href="./dashboard.html" class="mobileLogo" title="Dashboard"></a>
         <div class="header-right-controls">
-            
             <div class="status-indicator" data-status="synced">Synced</div>
-
             <div class="header-icons" id="menu-toggle-button">
                 <svg class="hamburger-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M22.5 7h-21a.5.5 0 010-1h21a.5.5 0 010 1zM22.5 13h-21a.5.5 0 010-1h21a.5.5 0 010 1zM22.5 19h-21a.5.5 0 010-1h21a.5.5 0 010 1z"></path></svg>
                 <svg class="close-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12.707 12l6.146-6.146a.5.5 0 00-.707-.707L12 11.293 5.854 5.146a.5.5 0 00-.707.707L11.293 12l-6.147 6.146a.5.5 0 10.707.707L12 12.707l6.146 6.146a.5.5 0 00.707-.707z"></path></svg>
@@ -220,32 +172,27 @@
         </div>
     </div>
 </header>
-
 <div class="menu-overlay" id="menu-overlay"></div>
 <div class="slide-menu" id="slide-menu">
     <ul class="menu-links">
-        <li><a href="./dashboard.html"><span class="iconLink-icon home-icon"></span><span>Dashboard</span></a></li>
-        <li><a href="./members.html"><span class="iconLink-icon members-icon"></span><span>Members</span></a></li>
+        <li><a href="./dashboard.html"><span class="material-symbols-outlined menu-icon">dashboard</span><span>Dashboard</span></a></li>
+        <li><a href="./members.html"><span class="material-symbols-outlined menu-icon">group</span><span>Members</span></a></li>
+        <li><button id="logout-button"><span class="material-symbols-outlined menu-icon">logout</span><span>Logout</span></button></li>
     </ul>
     <div class="profile-section">
         <div class="profile-info">
              <div class="profile-name">Loading...</div>
         </div>
-        <button id="logout-button" style="width: 100%; padding: 10px; margin-top: 10px; border: 1px solid var(--danger-color); background: #fde8e8; color: var(--danger-color); border-radius: var(--radius-md); cursor: pointer; font-weight: 600; font-size: 15px;">Logout</button>
     </div>
 </div>
 
-<div id="app-container">
+<!-- MAIN EDITOR CONTENT -->
+<div id="app-container" class="hidden">
     <div class="master-container">
         <div id="project-header" class="project-header">
             <h1 id="project-title" contenteditable="true">Loading Project...</h1>
-            
-            <button id="print-button" class="toolbar-btn">
-                <span class="material-symbols-outlined">picture_as_pdf</span>
-                <span>Download PDF</span>
-            </button>
-            
-            </div>
+            <button id="print-button" class="toolbar-btn"><span class="material-symbols-outlined">picture_as_pdf</span><span>Download PDF</span></button>
+        </div>
         <div id="schedules-wrapper"></div>
     </div>
 </div>
@@ -315,7 +262,6 @@
     let activeEventScheduleTable = null;
     let activeCellForDropdown = null;
 
-    // References to elements
     const appContainer = document.getElementById('app-container');
     const projectTitleEl = document.getElementById('project-title');
     const schedulesWrapper = document.getElementById('schedules-wrapper');
@@ -323,16 +269,11 @@
     const templateList = document.getElementById('template-list');
     const eventContextMenu = document.getElementById('event-context-menu');
     const memberDropdown = document.getElementById('member-dropdown');
+    const statusIndicator = document.querySelector('.status-indicator');
     
-    // Status indicator is now in the header, but we still need to select it
-    const statusIndicator = document.querySelector('.status-indicator'); 
-
     function updateStatus(text, status) {
-        // This function works as before, but targets the indicator in its new location
-        if (statusIndicator) {
-            statusIndicator.textContent = text;
-            statusIndicator.dataset.status = status;
-        }
+        statusIndicator.textContent = text;
+        statusIndicator.dataset.status = status;
     }
 
     async function fetchMembers() {
@@ -350,9 +291,6 @@
         });
     }
 
-    //
-    // --- ScheduleTable Class (Unchanged) ---
-    //
     class ScheduleTable {
         constructor(parentProject, tableData, index) {
             this.parentProject = parentProject;
@@ -400,39 +338,26 @@
 
         _createMobileView() {
             this.mobileViewContainer.innerHTML = '';
-
             if (this.data.eventType && this.data.eventType !== 'normal') {
                 const eventTexts = { 'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం', 'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో', 'convention': 'ప్రాదేశిక సమావేశం' };
                 const firstRow = this.tableBody.rows[0];
                 const dateCell = firstRow.cells[2];
                 const dateInput = dateCell ? dateCell.querySelector('.date-input') : null;
                 const dateValue = dateInput ? dateInput.value : '';
-
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'mobile-item';
-                itemDiv.innerHTML = `
-                    <div class="item-label special-event-text">${eventTexts[this.data.eventType]}</div>
-                    <div class="input-group">
-                        <div class="item-label">తేదీ:</div>
-                        <input type="date" class="item-input date-input" data-row-index="0" data-cell-index="2" value="${dateValue}">
-                    </div>
-                `;
+                itemDiv.innerHTML = `<div class="item-label special-event-text">${eventTexts[this.data.eventType]}</div><div class="input-group"><div class="item-label">తేదీ:</div><input type="date" class="item-input date-input" data-row-index="0" data-cell-index="2" value="${dateValue}"></div>`;
                 this.mobileViewContainer.appendChild(itemDiv);
                 return;
             }
-
             Array.from(this.tableBody.rows).forEach((row, rowIndex) => {
                 if (row.classList.contains('header-row')) return;
-
                 const editableCellsInRow = Array.from(row.cells).filter(c => c.hasAttribute('data-user-editable'));
                 if (editableCellsInRow.length === 0) return;
-
                 const groupedInputs = {};
-
                 editableCellsInRow.forEach(cell => {
                     const cellIndex = cell.cellIndex;
                     let labelText = '';
-                    
                     for (let i = cellIndex - 1; i >= 0; i--) {
                         const potentialLabelCell = row.cells[i];
                         if (potentialLabelCell && !potentialLabelCell.hasAttribute('data-user-editable') && potentialLabelCell.textContent.trim() !== '') {
@@ -442,37 +367,29 @@
                             break;
                         }
                     }
-
                     if (!labelText && row.cells[0] && !row.cells[0].hasAttribute('data-user-editable')) {
                         const tempDiv = document.createElement('div');
                         tempDiv.innerHTML = row.cells[0].innerHTML;
                         labelText = tempDiv.textContent.trim().replace('⠿', '').replace(':', '');
                     }
-                    
-                    if (!groupedInputs[labelText]) {
-                        groupedInputs[labelText] = [];
-                    }
+                    if (!groupedInputs[labelText]) groupedInputs[labelText] = [];
                     groupedInputs[labelText].push(cell);
                 });
-
                 for (const label in groupedInputs) {
                     const itemDiv = document.createElement('div');
                     itemDiv.className = 'mobile-item';
-
                     if (label) {
                         const labelDiv = document.createElement('div');
                         labelDiv.className = 'item-label';
                         labelDiv.textContent = label;
                         itemDiv.appendChild(labelDiv);
                     }
-                    
                     const inputsContainer = document.createElement('div');
                     groupedInputs[label].forEach(cell => {
                         const cellIndex = cell.cellIndex;
                         const inputWrapper = document.createElement('div');
                         inputWrapper.className = 'input-group';
-
-                        if (rowIndex === 0) { 
+                        if (rowIndex === 0) {
                             const dateInput = cell.querySelector('.date-input');
                             const dateValue = dateInput ? dateInput.value : '';
                             const inputEl = document.createElement('input');
@@ -482,7 +399,7 @@
                             inputEl.dataset.rowIndex = rowIndex;
                             inputEl.dataset.cellIndex = cellIndex;
                             inputWrapper.appendChild(inputEl);
-                        } else { 
+                        } else {
                             const inputDiv = document.createElement('div');
                             inputDiv.className = 'item-input editable-cell';
                             inputDiv.textContent = cell.textContent.trim() || 'Select Name';
@@ -514,7 +431,6 @@
             this.data.eventType = eventType;
             const allRows = this.tableBody.querySelectorAll('tr');
             const firstRow = this.tableBody.rows[0];
-
             if (eventType === 'normal') {
                 allRows.forEach(row => row.style.display = '');
                 if (firstRow && firstRow.dataset.originalContent) {
@@ -522,39 +438,20 @@
                     delete firstRow.dataset.originalContent;
                 }
             } else {
-                const eventTexts = {
-                    'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం',
-                    'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో',
-                    'convention': 'ప్రాదేశిక సమావేశం'
-                };
-                allRows.forEach((row, index) => {
-                    row.style.display = (index === 0) ? '' : 'none';
-                });
-
+                const eventTexts = { 'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం', 'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో', 'convention': 'ప్రాదేశిక సమావేశం' };
+                allRows.forEach((row, index) => { row.style.display = (index === 0) ? '' : 'none'; });
                 let existingDateValue = '';
                 if (firstRow) {
-                    if (!firstRow.dataset.originalContent) {
-                        firstRow.dataset.originalContent = firstRow.innerHTML;
-                    }
+                    if (!firstRow.dataset.originalContent) firstRow.dataset.originalContent = firstRow.innerHTML;
                     const tempDiv = document.createElement('div');
                     tempDiv.innerHTML = firstRow.dataset.originalContent;
                     const originalDateCell = tempDiv.querySelector('[data-user-editable]');
-                    if (originalDateCell) {
-                         existingDateValue = originalDateCell.textContent.trim().split('-').reverse().join('-');
-                    }
+                    if (originalDateCell) existingDateValue = originalDateCell.textContent.trim().split('-').reverse().join('-');
                 }
-                
-                firstRow.innerHTML = `
-                    <th colspan="1" class="special-event-text">${eventTexts[eventType]}</th>
-                    <td style="text-align: right; font-weight: 700;">తేదీ:</td>
-                    <td data-user-editable="true"><input type="date" class="date-input" value="${existingDateValue}"></td>
-                `;
+                firstRow.innerHTML = `<th colspan="1" class="special-event-text">${eventTexts[eventType]}</th><td style="text-align: right; font-weight: 700;">తేదీ:</td><td data-user-editable="true"><input type="date" class="date-input" value="${existingDateValue}"></td>`;
             }
-
-            this.render(); 
-            if (shouldSave) {
-                this.parentProject.triggerSave();
-            }
+            this.render();
+            if (shouldSave) this.parentProject.triggerSave();
         }
 
         setupEventListeners() {
@@ -564,7 +461,6 @@
                     const rowIndex = input.dataset.rowIndex;
                     const cellIndex = input.dataset.cellIndex;
                     const targetCell = this.tableBody.rows[rowIndex].cells[cellIndex];
-                    
                     if(input.type === 'date') {
                         const tableInput = targetCell.querySelector('.date-input');
                         if(tableInput) tableInput.value = input.value;
@@ -574,7 +470,6 @@
                 }
                 this.parentProject.triggerSave();
             });
-
             this.eventBtn.addEventListener('click', (e) => {
                 activeEventScheduleTable = this;
                 const rect = e.currentTarget.getBoundingClientRect();
@@ -584,10 +479,7 @@
             });
         }
     }
-
-    //
-    // --- Project Class (Unchanged) ---
-    //
+    
     class Project {
         constructor(id, initialData, collectionRef) {
             this.id = id;
@@ -605,7 +497,6 @@
             if (document.activeElement !== projectTitleEl) projectTitleEl.textContent = this.data.name;
             schedulesWrapper.innerHTML = '';
             this.scheduleTables = [];
-            
             this.data.tables.forEach((tableData, index) => {
                 this.scheduleTables.push(new ScheduleTable(this, tableData, index));
             });
@@ -628,23 +519,11 @@
                     cell.textContent = dateInput.value.split('-').reverse().join('-');
                 }
             });
-            const updatedTablesData = this.scheduleTables.map(table => ({
-                title: table.data.title,
-                content: table.getContent(),
-                eventType: table.data.eventType || 'normal'
-            }));
+            const updatedTablesData = this.scheduleTables.map(table => ({ title: table.data.title, content: table.getContent(), eventType: table.data.eventType || 'normal' }));
             const payload = { name: projectTitleEl.textContent, tables: updatedTablesData };
-
             this.collectionRef.doc(this.id).update(payload)
-                .then(() => {
-                    updateStatus('Synced', 'synced');
-                    this.isSaving = false;
-                })
-                .catch(err => {
-                    console.error("Save failed:", err);
-                    updateStatus('Error', 'error');
-                    this.isSaving = false;
-                });
+                .then(() => { updateStatus('Synced', 'synced'); this.isSaving = false; })
+                .catch(err => { console.error("Save failed:", err); updateStatus('Error', 'error'); this.isSaving = false; });
         }
 
         setupEventListeners() {
@@ -652,30 +531,16 @@
         }
     }
 
-    //
-    // --- Auth & Init Functions (MODIFIED) ---
-    //
     auth.onAuthStateChanged(async user => {
         if (user) {
             if (user.email === ADMIN_EMAIL) { window.location.replace('./admin.html'); return; }
             currentUser = user;
             await fetchMembers(); 
             userSchedulesCollection = db.collection(`userSchedules/${currentUser.uid}/schedules`);
-            
-            // MODIFICATION: Show body instead of appContainer
+            appContainer.classList.remove('hidden');
             document.body.classList.add('auth-ready');
-            
-            // MODIFICATION: Populate new profile menu
-            const profileNameEl = document.querySelector('.profile-name');
-            if (profileNameEl) {
-                profileNameEl.textContent = user.email; // Using email as before
-            }
-            
-            // OLD Lines (Removed)
-            // appContainer.classList.remove('hidden');
-            // userEmailEl.textContent = user.email;
-            // userAvatarEl.textContent = user.email.charAt(0).toUpperCase();
-            
+            document.querySelector('.profile-name').textContent = user.displayName || user.email;
+
             setupGlobalUI();
 
             const params = new URLSearchParams(window.location.search);
@@ -725,92 +590,8 @@
         templateSelectionModal.style.display = 'flex';
     }
 
-    //
-    // --- Global UI (MODIFIED) ---
-    //
     function setupGlobalUI() {
-        // This listener for #logout-button now finds the button in the slide-out menu
-        document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
-        
-        document.getElementById('print-button').addEventListener('click', generatePdf);
-        document.getElementById('cancel-template-selection').addEventListener('click', () => window.location.href = './dashboard.html');
-        document.getElementById('confirm-template-selection').addEventListener('click', async () => {
-            const newProjectName = document.getElementById('new-project-name').value.trim();
-            if (!newProjectName) return alert("Please enter a name for your new project.");
-            const selectedCheckboxes = Array.from(templateList.querySelectorAll('input:checked'));
-            if (selectedCheckboxes.length === 0) return alert("Please select at least one template.");
-
-            const tablesArray = selectedCheckboxes.map(input => {
-                const rawContent = decodeURIComponent(input.dataset.content);
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = `<table><tbody>${rawContent}</tbody></table>`;
-                tempDiv.querySelectorAll('td, th').forEach(cell => {
-                    const isEssentiallyEmpty = cell.textContent.trim() === '' && !cell.querySelector('img');
-                    if (isEssentiallyEmpty) cell.setAttribute('data-user-editable', 'true');
-                });
-                return { title: input.dataset.name, content: tempDiv.querySelector('tbody').innerHTML, eventType: 'normal' };
-            });
-            const newDocRef = await userSchedulesCollection.add({
-                name: newProjectName,
-                tables: tablesArray,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            window.location.href = `./editor.html?id=${newDocRef.id}`;
-        });
-        
-        eventContextMenu.addEventListener('click', (e) => {
-            const target = e.target.closest('.context-menu-item');
-            if (target && activeEventScheduleTable) {
-                activeEventScheduleTable.applyEventType(target.dataset.eventType);
-            }
-            eventContextMenu.style.display = 'none';
-            activeEventScheduleTable = null;
-        });
-
-        schedulesWrapper.addEventListener('click', e => {
-            const targetElement = e.target.closest('.editable-cell, [contenteditable="true"]');
-            if (!targetElement) return;
-
-            if (targetElement.getAttribute('contenteditable') === 'true') {
-                return;
-            }
-
-            let realCell;
-            let mobileDiv = null;
-
-            if (targetElement.tagName === 'DIV') { 
-                mobileDiv = targetElement;
-                const rowIndex = mobileDiv.dataset.rowIndex;
-                const cellIndex = mobileDiv.dataset.cellIndex;
-                const tableBody = mobileDiv.closest('.schedule-block').querySelector('.schedule-table-body');
-                realCell = tableBody.rows[rowIndex].cells[cellIndex];
-            } else { 
-                realCell = targetElement;
-            }
-            
-            openMemberDropdown(realCell, mobileDiv);
-        });
-
-        memberDropdown.addEventListener('click', e => {
-            const item = e.target.closest('.member-dropdown-item');
-            if (item && activeCellForDropdown.realCell) {
-                const newName = item.dataset.name;
-                activeCellForDropdown.realCell.textContent = newName;
-                if (activeCellForDropdown.mobileDiv) {
-                    activeCellForDropdown.mobileDiv.textContent = newName;
-                }
-                activeProject.triggerSave();
-            }
-            memberDropdown.style.display = 'none';
-            activeCellForDropdown = null;
-        });
-
-        document.addEventListener('click', (e) => {
-            if (!eventContextMenu.contains(e.target) && !e.target.closest('.event-btn')) { eventContextMenu.style.display = 'none'; }
-            if (!memberDropdown.contains(e.target) && !e.target.closest('.editable-cell')) { memberDropdown.style.display = 'none'; }
-        });
-
-        // --- NEW MENU JAVASCRIPT ---
+        // Menu Toggle Logic
         const menuToggleButton = document.getElementById('menu-toggle-button');
         const slideMenu = document.getElementById('slide-menu');
         const menuOverlay = document.getElementById('menu-overlay');
@@ -822,48 +603,84 @@
             body.classList.remove('menu-open');
         }
 
-        if (menuToggleButton) {
-            menuToggleButton.addEventListener('click', () => {
-                if (body.classList.contains('menu-open')) {
-                    closeMenu();
-                } else {
-                    slideMenu.classList.add('is-open');
-                    menuOverlay.classList.add('is-open');
-                    body.classList.add('menu-open');
-                }
+        menuToggleButton.addEventListener('click', () => {
+            body.classList.contains('menu-open') ? closeMenu() : (slideMenu.classList.add('is-open'), menuOverlay.classList.add('is-open'), body.classList.add('menu-open'));
+        });
+        menuOverlay.addEventListener('click', closeMenu);
+
+        // Editor specific UI
+        document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
+        document.getElementById('print-button').addEventListener('click', generatePdf);
+        document.getElementById('cancel-template-selection').addEventListener('click', () => window.location.href = './dashboard.html');
+        document.getElementById('confirm-template-selection').addEventListener('click', async () => {
+            const newProjectName = document.getElementById('new-project-name').value.trim();
+            if (!newProjectName) return alert("Please enter a name for your new project.");
+            const selectedCheckboxes = Array.from(templateList.querySelectorAll('input:checked'));
+            if (selectedCheckboxes.length === 0) return alert("Please select at least one template.");
+            const tablesArray = selectedCheckboxes.map(input => {
+                const rawContent = decodeURIComponent(input.dataset.content);
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = `<table><tbody>${rawContent}</tbody></table>`;
+                tempDiv.querySelectorAll('td, th').forEach(cell => { if (cell.textContent.trim() === '' && !cell.querySelector('img')) cell.setAttribute('data-user-editable', 'true'); });
+                return { title: input.dataset.name, content: tempDiv.querySelector('tbody').innerHTML, eventType: 'normal' };
             });
-        }
-        if (menuOverlay) {
-            menuOverlay.addEventListener('click', closeMenu);
-        }
-        // --- END NEW MENU JAVASCRIPT ---
+            const newDocRef = await userSchedulesCollection.add({ name: newProjectName, tables: tablesArray, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+            window.location.href = `./editor.html?id=${newDocRef.id}`;
+        });
+        
+        eventContextMenu.addEventListener('click', (e) => {
+            const target = e.target.closest('.context-menu-item');
+            if (target && activeEventScheduleTable) activeEventScheduleTable.applyEventType(target.dataset.eventType);
+            eventContextMenu.style.display = 'none';
+            activeEventScheduleTable = null;
+        });
+
+        schedulesWrapper.addEventListener('click', e => {
+            const targetElement = e.target.closest('.editable-cell, [contenteditable="true"]');
+            if (!targetElement || targetElement.getAttribute('contenteditable') === 'true') return;
+            let realCell, mobileDiv = null;
+            if (targetElement.tagName === 'DIV') {
+                mobileDiv = targetElement;
+                const tableBody = mobileDiv.closest('.schedule-block').querySelector('.schedule-table-body');
+                realCell = tableBody.rows[mobileDiv.dataset.rowIndex].cells[mobileDiv.dataset.cellIndex];
+            } else {
+                realCell = targetElement;
+            }
+            openMemberDropdown(realCell, mobileDiv);
+        });
+
+        memberDropdown.addEventListener('click', e => {
+            const item = e.target.closest('.member-dropdown-item');
+            if (item && activeCellForDropdown.realCell) {
+                const newName = item.dataset.name;
+                activeCellForDropdown.realCell.textContent = newName;
+                if (activeCellForDropdown.mobileDiv) activeCellForDropdown.mobileDiv.textContent = newName;
+                activeProject.triggerSave();
+            }
+            memberDropdown.style.display = 'none';
+            activeCellForDropdown = null;
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!eventContextMenu.contains(e.target) && !e.target.closest('.event-btn')) { eventContextMenu.style.display = 'none'; }
+            if (!memberDropdown.contains(e.target) && !e.target.closest('.editable-cell')) { memberDropdown.style.display = 'none'; }
+        });
     }
     
-    //
-    // --- Helper & PDF Functions (Unchanged) ---
-    //
     function isCellInMinistrySection(cell) {
         const table = cell.closest('table');
         if (!table) return false;
         const allRows = Array.from(table.querySelectorAll('tbody > tr'));
         const cellRow = cell.closest('tr');
         const cellIndex = allRows.indexOf(cellRow);
-        
         let ministryHeaderIndex = -1;
         let nextHeaderIndex = allRows.length;
-
         allRows.forEach((row, index) => {
             if(row.classList.contains('header-row')) {
-                if (row.dataset.section === 'ministry') {
-                    ministryHeaderIndex = index;
-                } else if (ministryHeaderIndex !== -1 && index > ministryHeaderIndex) {
-                    if (index < nextHeaderIndex) {
-                        nextHeaderIndex = index;
-                    }
-                }
+                if (row.dataset.section === 'ministry') ministryHeaderIndex = index;
+                else if (ministryHeaderIndex !== -1 && index > ministryHeaderIndex && index < nextHeaderIndex) nextHeaderIndex = index;
             }
         });
-        
         if (ministryHeaderIndex === -1) return false;
         return cellIndex > ministryHeaderIndex && cellIndex < nextHeaderIndex;
     }
@@ -873,13 +690,10 @@
         memberDropdown.innerHTML = '';
         let listToShow;
         if (isInMinistry) {
-            const sortedSisters = [...members.sisters].sort((a, b) => a.name.localeCompare(b.name));
-            const sortedBrothers = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
-            listToShow = [...sortedSisters, ...sortedBrothers];
+            listToShow = [...members.sisters.sort((a,b) => a.name.localeCompare(b.name)), ...members.brothers.sort((a,b) => a.name.localeCompare(b.name))];
         } else {
             listToShow = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
         }
-
         listToShow.forEach(member => { 
             const item = document.createElement('button');
             item.className = 'member-dropdown-item';
@@ -887,7 +701,6 @@
             item.innerHTML = `<span>${member.name}</span>` + (member.isServant ? '<span class="servant-tag">Servant</span>' : '');
             memberDropdown.appendChild(item);
         });
-
         const rect = (mobileDiv || cell).getBoundingClientRect();
         memberDropdown.style.display = 'block';
         memberDropdown.style.top = `${rect.bottom}px`;
@@ -900,21 +713,15 @@
         const printButton = document.getElementById('print-button');
         printButton.disabled = true;
         printButton.querySelector('span:last-child').textContent = 'Generating...';
-
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('p', 'mm', 'a4');
         const originalBlocks = document.querySelectorAll('.schedule-block');
-        const A4_WIDTH_MM = 210;
-        const A4_HEIGHT_MM = 297;
-        const MARGIN_MM = 10;
-        const PAGE_SPACING_MM = 5; 
+        const A4_WIDTH_MM = 210, A4_HEIGHT_MM = 297, MARGIN_MM = 10, PAGE_SPACING_MM = 5;
         const USABLE_WIDTH = A4_WIDTH_MM - (MARGIN_MM * 2);
         const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_MM * 2);
-
         const printContainer = document.createElement('div');
         printContainer.id = 'print-container';
         document.body.appendChild(printContainer);
-
         const itemsToPrint = [];
         for (const block of originalBlocks) {
             const clone = block.cloneNode(true);
@@ -922,16 +729,13 @@
             clone.querySelector('.mobile-view-container').style.display = 'none';
             clone.querySelector('table').style.display = 'table';
             printContainer.appendChild(clone);
-            
             const canvas = await html2canvas(clone, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
             const imgData = canvas.toDataURL('image/jpeg', 0.8);
             const imgProps = pdf.getImageProperties(imgData);
             const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
             itemsToPrint.push({ imgData, width: USABLE_WIDTH, height: imgHeight });
         }
-        
         document.body.removeChild(printContainer);
-
         let currentY = MARGIN_MM;
         itemsToPrint.forEach((item, index) => {
             if (index > 0 && currentY + item.height > USABLE_HEIGHT + MARGIN_MM) {
@@ -941,18 +745,12 @@
             pdf.addImage(item.imgData, 'JPEG', MARGIN_MM, currentY, item.width, item.height);
             currentY += item.height + PAGE_SPACING_MM;
         });
-
         const fileName = `${projectTitleEl.textContent.trim() || 'schedule'}.pdf`;
         pdf.save(fileName);
-
         printButton.disabled = false;
         printButton.querySelector('span:last-child').textContent = 'Download PDF';
     }
 
-    // Call setupGlobalUI to attach all listeners, including the new menu listeners
-    // setupGlobalUI(); 
-    // This is already called from onAuthStateChanged, so no need to call it here.
-  
 })();
 </script>
 </body>
