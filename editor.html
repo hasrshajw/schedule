@@ -335,10 +335,12 @@
 
                     // Check for a sub-label in the preceding cell
                     if (cellIndex > 0 && row.cells[cellIndex - 1] && !row.cells[cellIndex - 1].hasAttribute('data-user-editable')) {
+                      if (cellIndex - 1 !== 0 || isPrimaryCellEditable) {
                         const subLabelText = row.cells[cellIndex - 1].textContent.trim().replace('⠿', '').replace(':', '');
                         if(subLabelText) {
                             inputWrapper.innerHTML += `<div class="item-label">${subLabelText}</div>`;
                         }
+                      }
                     }
 
                     const inputDiv = document.createElement('div');
