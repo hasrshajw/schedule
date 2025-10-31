@@ -5,13 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>User - Schedule Editor</title>
 
+<!-- FIREBASE SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
+<!-- PDF Generation Libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
+<!-- FONTS -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -20,11 +23,9 @@
 
 <style>
     :root {
-        --primary-color: #012726;
-        --primary-hover: #024443;
-        --primary-light: #e6f6f6;
+        --primary-color: #4a6da7;
+        --primary-light: #eef2f9;
         --danger-color: #d32f2f;
-        --danger-hover: #b71c1c;
         --border-color: #e5e7eb;
         --background-color: #f8fafc;
         --text-primary: #1f2937;
@@ -33,126 +34,93 @@
         --radius-md: 8px;
         --radius-lg: 16px;
         --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-        --warning-color: #f59e0b;
-        --success-color: #2e7d32;
     }
     *, *::before, *::after { box-sizing: border-box; }
-    html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    html { -webkit-font-smoothing: antialiased; }
     body { font-family: 'Inter', sans-serif; background-color: var(--background-color); margin: 0; padding: 72px 0 0; color: var(--text-primary); }
     .hidden { display: none !important; }
 
-    #app-header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border-color); padding: 12px 16px; }
-    .header-content { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-    #user-info { display: flex; align-items: center; gap: 12px; font-size: 14px; }
-    #user-avatar { width: 32px; height: 32px; border-radius: 50%; background-color: var(--border-color); display: flex; align-items: center; justify-content: center; font-weight: 600; color: var(--text-secondary); }
-    #user-email { font-weight: 600; color: var(--text-primary); display: none; }
-    .header-actions { display: flex; align-items: center; gap: 8px; width: 100%; justify-content: space-between; }
-    .toolbar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 10px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); transition: all 0.2s; text-decoration: none; color: var(--text-secondary); }
-    .toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; color: var(--text-primary); }
+    #app-header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border-color); padding: 12px 20px; }
+    .header-content { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
+    .header-actions { display: flex; align-items: center; gap: 12px; }
+    .toolbar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); text-decoration: none; color: var(--text-secondary); }
+    .toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; }
     .toolbar-btn:disabled { cursor: not-allowed; opacity: 0.5; }
-    #logout-button { background-color: transparent; border: 1px solid var(--border-color); padding: 8px 16px; border-radius: var(--radius-md); cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s; }
-    #logout-button:hover { background-color: var(--danger-light); color: var(--danger-hover); border-color: var(--danger-hover); }
 
-    .master-container { background: var(--surface-color); }
-    .project-header { padding: 16px; border-bottom: 1px solid var(--border-color); }
-    .project-title { font-size: 1.5rem; font-weight: 700; margin: 0; flex-grow: 1; border: none; padding: 4px; margin: -4px; border-radius: var(--radius-md); font-family: 'Noto Sans Telugu', sans-serif; }
-    .project-title:focus { outline: 2px solid var(--primary-color); background-color: var(--primary-light); }
+    .master-container { max-width: 1100px; margin: 0 auto; background: var(--surface-color); padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); margin-top: 20px; }
+    .project-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color); }
+    .project-title { font-size: 1.75rem; font-weight: 700; margin: 0; flex-grow: 1; border: none; padding: 4px 8px; margin: -4px -8px; border-radius: var(--radius-md); font-family: 'Noto Sans Telugu', sans-serif; }
     
-    .status-indicator { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; }
-    .status-indicator::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background-color: currentColor; }
-    .status-indicator[data-status="synced"] { color: var(--success-color); background-color: #eaf5ea; }
-    .status-indicator[data-status="syncing"] { color: var(--warning-color); background-color: #fffbeb; }
-    .status-indicator[data-status="error"] { color: var(--danger-color); background-color: #fde8e8; }
-    
-    .schedule-block { border-bottom: 8px solid var(--background-color); padding: 16px; }
+    .schedule-block { margin-bottom: 32px; }
     .schedule-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
     .schedule-title { font-size: 1.25rem; font-weight: 600; margin: 0; color: var(--text-secondary); font-family: 'Noto Sans Telugu', sans-serif; }
-
-    #event-context-menu, #member-dropdown { position: fixed; display: none; background: var(--surface-color); border-radius: var(--radius-md); box-shadow: var(--shadow-md); z-index: 1001; padding: 6px; min-width: 220px; border: 1px solid var(--border-color); }
-    .context-menu-item, .member-dropdown-item { font-family: 'Inter', sans-serif; display: block; width: 100%; padding: 10px 12px; cursor: pointer; font-size: 16px; border-radius: 6px; background: none; border: none; text-align: left; }
+    
+    .status-indicator { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; display: flex; align-items: center; gap: 6px; }
+    .status-indicator::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background-color: currentColor; }
+    .status-indicator[data-status="synced"] { color: #2e7d32; background-color: #eaf5ea; }
+    .status-indicator[data-status="syncing"] { color: #f59e0b; background-color: #fffbeb; }
+    .status-indicator[data-status="error"] { color: var(--danger-color); background-color: #fde8e8; }
+    
+    .special-event-text { color: red; text-align: center !important; font-weight: 700; }
+    
+    #event-context-menu, #member-dropdown { position: fixed; display: none; background: var(--surface-color); border-radius: var(--radius-md); box-shadow: var(--shadow-md); z-index: 1001; padding: 6px; min-width: 180px; border: 1px solid var(--border-color); }
+    .context-menu-item, .member-dropdown-item { font-family: 'Inter', sans-serif; display: block; width: 100%; padding: 8px 12px; cursor: pointer; font-size: 14px; border-radius: 6px; background: none; border: none; text-align: left; }
     .context-menu-item:hover, .member-dropdown-item:hover { background: #f9fafb; }
     .member-dropdown-item { display: flex; justify-content: space-between; align-items: center; }
-    #member-dropdown { max-height: 50vh; overflow-y: auto; }
-    .servant-tag { font-size: 0.8rem; font-weight: 600; color: var(--primary-color); background-color: var(--primary-light); padding: 2px 6px; border-radius: 4px; }
+    #member-dropdown { max-height: 300px; overflow-y: auto; }
+    .servant-tag { font-size: 0.75rem; font-weight: 600; color: var(--primary-color); background-color: var(--primary-light); padding: 2px 6px; border-radius: 4px; }
 
-    .desktop-view { display: none; }
-    .mobile-form-view { display: block; }
-    .mobile-form-item { margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 16px; }
-    .mobile-form-item label { display: block; font-weight: 500; color: var(--text-secondary); margin-bottom: 8px; font-family: 'Noto Sans Telugu', sans-serif; }
-    .mobile-form-item .assignment-slot { display: block; width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: 1rem; font-family: 'Noto Sans Telugu', sans-serif; font-weight: 700; background-color: #f9fafb; cursor: pointer; }
-    .mobile-form-item input.assignment-slot { background-color: white; cursor: text; }
+    /* Desktop Table View */
+    .desktop-view { display: block; }
+    .desktop-view table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; }
+    .desktop-view th, .desktop-view td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; height: 36px; font-family: 'Noto Sans Telugu', sans-serif; font-size: 14px; font-weight: 700; }
+    .desktop-view .editable-cell:not([contenteditable="true"]) { cursor: pointer; }
+    .desktop-view .editable-cell:not([contenteditable="true"]):hover { background-color: #f9fafb; }
+    .desktop-view [contenteditable="true"]:focus { background-color: #fffbe5; }
+    .desktop-view .header-row td { color: #ffffff; }
 
-    @media (min-width: 769px) {
-        body { padding: 88px 20px 20px; }
-        #user-email { display: inline; }
-        #user-avatar { width: 36px; height: 36px; }
-        .master-container { max-width: 1100px; margin: 0 auto; padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
-        .project-header { padding: 0 0 24px; border-bottom: 1px solid var(--border-color); margin-bottom: 24px; }
-        .project-title { font-size: 1.75rem; }
-        .schedule-block { padding: 0; border-bottom: none; margin-bottom: 32px; }
-        .desktop-view { display: block; }
-        .mobile-form-view { display: none; }
+    /* Mobile Card View */
+    .mobile-view { display: none; }
+
+    #print-container { position: absolute; left: -9999px; top: auto; width: 1100px; background: white; }
+
+    /* Responsive Styles */
+    @media (max-width: 768px) {
+        body { padding-top: 56px; }
+        .master-container { margin-top: 0; padding: 16px; border-radius: 0; box-shadow: none; }
+        .project-title { font-size: 1.5rem; }
+        .desktop-view { display: none; }
+        .mobile-view { display: block; }
+        .mobile-card { background: var(--surface-color); border: 1px solid var(--border-color); padding: 12px; border-radius: var(--radius-md); margin-bottom: 12px; }
+        .mobile-card-title { font-weight: 600; margin: 0 0 12px 0; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); font-family: 'Noto Sans Telugu', sans-serif; }
+        .assignee-slot { display: block; background: #f9fafb; border: 1px dashed var(--border-color); border-radius: var(--radius-md); padding: 10px; margin-top: 8px; cursor: pointer; color: var(--text-secondary); }
+        .assignee-slot.filled { background: var(--primary-light); color: var(--primary-color); font-weight: 600; border-style: solid; }
     }
 </style>
-
 </head>
 <body>
-
 <div id="app-container" class="hidden">
-    <header id="app-header">
-        <div class="header-content">
-            <div id="user-info">
-                <div id="user-avatar"></div>
-                <span id="user-email"></span>
-            </div>
-            <div class="header-actions">
-                <a href="./dashboard.html" class="toolbar-btn"><span class="material-symbols-outlined">dashboard</span></a>
-                <a href="./members.html" class="toolbar-btn"><span class="material-symbols-outlined">group</span></a>
-                <button id="print-button" class="toolbar-btn"><span class="material-symbols-outlined">picture_as_pdf</span></button>
-                <button id="logout-button">Logout</button>
-            </div>
-        </div>
-    </header>
-
+    <header id="app-header"></header>
     <div class="master-container">
-        <div class="project-header">
-            <h1 id="project-title" contenteditable="true">Loading Project...</h1>
-            <div class="status-indicator" data-status="synced">Synced</div>
-        </div>
+        <div id="project-header"></div>
         <div id="schedules-wrapper"></div>
     </div>
 </div>
-
 <template id="schedule-template">
     <div class="schedule-block">
-        <div class="schedule-header">
-            <h2 class="schedule-title"></h2>
-            <button class="toolbar-btn event-btn">
-                <span class="material-symbols-outlined">celebration</span>
-                <span>Event</span>
-            </button>
-        </div>
+        <div class="schedule-header"></div>
         <div class="desktop-view">
             <table>
                 <colgroup><col style="width: 60%;"><col style="width: 20%;"><col style="width: 20%;"></colgroup>
                 <tbody class="schedule-table-body"></tbody>
             </table>
         </div>
-        <div class="mobile-form-view"></div>
+        <div class="mobile-view"></div>
     </div>
 </template>
-
-<div id="event-context-menu">
-    <button class="context-menu-item" data-event-type="normal">Normal</button>
-    <button class="context-menu-item" data-event-type="co-visit">CO Visit</button>
-    <button class="context-menu-item" data-event-type="assembly">Assembly</button>
-    <button class="context-menu-item" data-event-type="convention">Convention</button>
-</div>
-
+<div id="event-context-menu"></div>
 <div id="member-dropdown"></div>
-
 <div id="template-selection-modal" class="modal-overlay"></div>
-
 <script>
 (function() {
     'use strict';
@@ -168,11 +136,12 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
-    
+
     const ADMIN_EMAIL = 'harshavardhanjw@gmail.com';
     let currentUser = null;
     let currentProjectId = null;
     let userSchedulesCollection = null;
+    let membersCollection = null;
     let members = { brothers: [], sisters: [] };
     let currentListener = null;
     let activeProject = null;
@@ -184,6 +153,7 @@
     const userAvatarEl = document.getElementById('user-avatar');
     const projectTitleEl = document.getElementById('project-title');
     const schedulesWrapper = document.getElementById('schedules-wrapper');
+    const templateSelectionModal = document.getElementById('template-selection-modal');
     const eventContextMenu = document.getElementById('event-context-menu');
     const memberDropdown = document.getElementById('member-dropdown');
     const statusIndicator = document.querySelector('.project-header .status-indicator');
@@ -195,12 +165,16 @@
 
     async function fetchMembers() {
         if (!currentUser) return;
-        const membersCollection = db.collection(`users/${currentUser.uid}/members`);
+        membersCollection = db.collection(`users/${currentUser.uid}/members`);
         const snapshot = await membersCollection.orderBy("name").get();
         members = { brothers: [], sisters: [] };
         snapshot.forEach(doc => {
             const member = { id: doc.id, ...doc.data() };
-            member.type === 'brother' ? members.brothers.push(member) : members.sisters.push(member);
+            if (member.type === 'brother') {
+                members.brothers.push(member);
+            } else {
+                members.sisters.push(member);
+            }
         });
     }
 
@@ -210,8 +184,7 @@
             this.data = tableData;
             this.index = index;
             this.initDOM();
-            this.renderDesktop();
-            this.renderMobile();
+            this.render();
             this.setupEventListeners();
             this.applyEventType(this.data.eventType || 'normal', false);
         }
@@ -221,89 +194,54 @@
             this.element = templateClone.querySelector('.schedule-block');
             this.titleEl = this.element.querySelector('.schedule-title');
             this.tableBody = this.element.querySelector('.schedule-table-body');
-            this.mobileForm = this.element.querySelector('.mobile-form-view');
             this.eventBtn = this.element.querySelector('.event-btn');
             schedulesWrapper.appendChild(this.element);
         }
 
-        renderDesktop() {
+        render() {
             this.titleEl.textContent = this.data.title;
             this.tableBody.innerHTML = this.data.content;
-        }
-
-        renderMobile() {
-            this.mobileForm.innerHTML = '';
-            const tempDiv = document.createElement('div');
-            
-            Array.from(this.tableBody.rows).forEach((row, rowIndex) => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'mobile-form-item';
-                
-                const labelCell = row.cells[0];
-                tempDiv.innerHTML = labelCell.innerHTML;
-                const labelText = tempDiv.textContent.trim();
-                
-                const label = document.createElement('label');
-                label.textContent = labelText;
-                itemDiv.appendChild(label);
-                
-                for (let i = 0; i < row.cells.length; i++) {
-                    const cell = row.cells[i];
-                    if (cell.hasAttribute('data-user-editable')) {
-                        if (rowIndex === 0) {
-                            const input = document.createElement('input');
-                            input.type = 'text';
-                            input.className = 'assignment-slot';
-                            input.value = cell.textContent;
-                            input.dataset.rowIndex = rowIndex;
-                            input.dataset.cellIndex = i;
-                            itemDiv.appendChild(input);
-                        } else {
-                            const slot = document.createElement('div');
-                            slot.className = 'assignment-slot';
-                            slot.textContent = cell.textContent || 'Select Name';
-                            slot.dataset.rowIndex = rowIndex;
-                            slot.dataset.cellIndex = i;
-                            itemDiv.appendChild(slot);
-                        }
-                    }
-                }
-                if (itemDiv.querySelector('.assignment-slot')) {
-                    this.mobileForm.appendChild(itemDiv);
+            this.tableBody.querySelectorAll('td[data-user-editable], th[data-user-editable]').forEach(cell => {
+                if (cell.closest('tr') === this.tableBody.rows[0]) {
+                    cell.setAttribute('contenteditable', 'true');
+                } else {
+                    cell.classList.add('editable-cell');
+                    cell.removeAttribute('contenteditable');
                 }
             });
         }
         
         getContent() {
-            return this.tableBody.innerHTML;
-        }
-
-        updateTableCell(rowIndex, cellIndex, value) {
-            const row = this.tableBody.rows[rowIndex];
-            if (row && row.cells[cellIndex]) {
-                row.cells[cellIndex].textContent = value;
-            }
+            const tempTable = this.element.querySelector('table').cloneNode(true);
+            const body = tempTable.querySelector('tbody');
+            if (body) return body.innerHTML;
+            return tempTable.innerHTML;
         }
 
         applyEventType(eventType, shouldSave = true) {
             this.data.eventType = eventType;
-            const desktopView = this.element.querySelector('.desktop-view');
-            const mobileView = this.element.querySelector('.mobile-form-view');
+            const allRows = this.tableBody.querySelectorAll('tr');
+            const firstRow = this.tableBody.rows[0];
 
             if (eventType === 'normal') {
-                desktopView.style.display = 'block';
-                mobileView.style.display = 'block'; 
-                if (this.tableBody.rows[0] && this.tableBody.rows[0].dataset.originalContent) {
-                    this.tableBody.rows[0].innerHTML = this.tableBody.rows[0].dataset.originalContent;
-                    delete this.tableBody.rows[0].dataset.originalContent;
+                allRows.forEach(row => row.style.display = '');
+                if (firstRow && firstRow.dataset.originalContent) {
+                    firstRow.innerHTML = firstRow.dataset.originalContent;
+                    firstRow.querySelectorAll('td[data-user-editable], th[data-user-editable]').forEach(cell => {
+                       cell.setAttribute('contenteditable', 'true');
+                    });
+                    delete firstRow.dataset.originalContent;
                 }
-                this.tableBody.querySelectorAll('tr').forEach(r => r.style.display = '');
             } else {
-                const eventTexts = {'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం', 'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో', 'convention': 'ప్రాదేశిక సమావేశం'};
-                desktopView.style.display = 'block';
-                mobileView.style.display = 'none';
+                const eventTexts = {
+                    'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం',
+                    'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో',
+                    'convention': 'ప్రాదేశిక సమావేశం'
+                };
+                allRows.forEach((row, index) => {
+                    row.style.display = (index === 0) ? '' : 'none';
+                });
 
-                const firstRow = this.tableBody.rows[0];
                 if (firstRow && !firstRow.dataset.originalContent) {
                     firstRow.dataset.originalContent = firstRow.innerHTML;
                 }
@@ -313,7 +251,6 @@
                     <td style="text-align: right; font-weight: 700;">తేదీ:</td>
                     <td data-user-editable="true" contenteditable="true"></td>
                 `;
-                this.tableBody.querySelectorAll('tr:not(:first-child)').forEach(r => r.style.display = 'none');
             }
 
             if (shouldSave) {
@@ -322,27 +259,13 @@
         }
 
         setupEventListeners() {
-            this.element.addEventListener('input', (e) => {
-                if(e.target.matches('.mobile-form-view input')) {
-                    const { rowIndex, cellIndex } = e.target.dataset;
-                    this.updateTableCell(rowIndex, cellIndex, e.target.value);
-                }
-                this.parentProject.triggerSave();
-            });
+            this.element.addEventListener('input', () => this.parentProject.triggerSave());
             this.eventBtn.addEventListener('click', (e) => {
                 activeEventScheduleTable = this;
                 const rect = e.currentTarget.getBoundingClientRect();
                 eventContextMenu.style.display = 'block';
                 eventContextMenu.style.top = `${rect.bottom}px`;
                 eventContextMenu.style.left = `${rect.left}px`;
-            });
-            this.mobileForm.addEventListener('click', (e) => {
-                const slot = e.target.closest('.assignment-slot:not(input)');
-                if(slot) {
-                    const { rowIndex, cellIndex } = slot.dataset;
-                    const tableCell = this.tableBody.rows[rowIndex].cells[cellIndex];
-                    openMemberDropdown(tableCell, slot);
-                }
             });
         }
     }
@@ -389,8 +312,15 @@
             const payload = { name: projectTitleEl.textContent, tables: updatedTablesData };
 
             this.collectionRef.doc(this.id).update(payload)
-                .then(() => { updateStatus('Synced', 'synced'); this.isSaving = false; })
-                .catch(err => { console.error("Save failed:", err); updateStatus('Error', 'error'); this.isSaving = false; });
+                .then(() => {
+                    updateStatus('Synced', 'synced');
+                    this.isSaving = false;
+                })
+                .catch(err => {
+                    console.error("Save failed:", err);
+                    updateStatus('Error', 'error');
+                    this.isSaving = false;
+                });
         }
 
         setupEventListeners() {
@@ -400,7 +330,10 @@
 
     auth.onAuthStateChanged(async user => {
         if (user) {
-            if (user.email === ADMIN_EMAIL) { window.location.replace('./admin.html'); return; }
+            if (user.email === ADMIN_EMAIL) {
+                window.location.replace('./admin.html');
+                return;
+            }
             currentUser = user;
             await fetchMembers(); 
             userSchedulesCollection = db.collection(`userSchedules/${currentUser.uid}/schedules`);
@@ -409,7 +342,11 @@
             userAvatarEl.textContent = user.email.charAt(0).toUpperCase();
             const params = new URLSearchParams(window.location.search);
             currentProjectId = params.get('id');
-            currentProjectId ? initEditor() : initCreationFlow();
+            if (currentProjectId) {
+                initEditor();
+            } else {
+                initCreationFlow();
+            }
         } else {
             window.location.replace('./login.html');
         }
@@ -426,7 +363,7 @@
                 } else if (!activeProject.isSaving) {
                     activeProject.render(remoteData);
                 }
-                updateStatus('Synced', 'synced');
+                 updateStatus('Synced', 'synced');
             } else {
                 alert("This schedule may have been deleted.");
                 window.location.href = './dashboard.html';
@@ -457,6 +394,30 @@
     function setupGlobalUI() {
         document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
         document.getElementById('print-button').addEventListener('click', generatePdf);
+        document.getElementById('cancel-template-selection').addEventListener('click', () => window.location.href = './dashboard.html');
+        document.getElementById('confirm-template-selection').addEventListener('click', async () => {
+            const newProjectName = document.getElementById('new-project-name').value.trim();
+            if (!newProjectName) return alert("Please enter a name for your new project.");
+            const selectedCheckboxes = Array.from(templateList.querySelectorAll('input:checked'));
+            if (selectedCheckboxes.length === 0) return alert("Please select at least one template.");
+
+            const tablesArray = selectedCheckboxes.map(input => {
+                const rawContent = decodeURIComponent(input.dataset.content);
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = `<table><tbody>${rawContent}</tbody></table>`;
+                tempDiv.querySelectorAll('td, th').forEach(cell => {
+                    const isEssentiallyEmpty = cell.textContent.trim() === '' && !cell.querySelector('img');
+                    if (isEssentiallyEmpty) cell.setAttribute('data-user-editable', 'true');
+                });
+                return { title: input.dataset.name, content: tempDiv.querySelector('tbody').innerHTML, eventType: 'normal' };
+            });
+            const newDocRef = await userSchedulesCollection.add({
+                name: newProjectName,
+                tables: tablesArray,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            window.location.href = `./editor.html?id=${newDocRef.id}`;
+        });
         
         eventContextMenu.addEventListener('click', (e) => {
             const target = e.target.closest('.context-menu-item');
@@ -467,11 +428,22 @@
             activeEventScheduleTable = null;
         });
 
+        schedulesWrapper.addEventListener('click', e => {
+            const cell = e.target.closest('.editable-cell');
+            if (cell) {
+                // If the cell is in the first row, it should be contenteditable, so do nothing.
+                const parentRow = cell.closest('tr');
+                if (parentRow && parentRow.parentElement.rows[0] === parentRow) {
+                    return;
+                }
+                openMemberDropdown(cell);
+            }
+        });
+
         memberDropdown.addEventListener('click', e => {
             const item = e.target.closest('.member-dropdown-item');
-            if (item && activeCellForDropdown.tableCell) {
-                activeCellForDropdown.tableCell.textContent = item.dataset.name;
-                activeCellForDropdown.mobileSlot.textContent = item.dataset.name;
+            if (item && activeCellForDropdown) {
+                activeCellForDropdown.textContent = item.dataset.name;
                 activeProject.triggerSave();
             }
             memberDropdown.style.display = 'none';
@@ -482,7 +454,7 @@
             if (!eventContextMenu.contains(e.target) && !e.target.closest('.event-btn')) {
                 eventContextMenu.style.display = 'none';
             }
-            if (!memberDropdown.contains(e.target) && !e.target.closest('.assignment-slot')) {
+            if (!memberDropdown.contains(e.target) && !e.target.closest('.editable-cell')) {
                 memberDropdown.style.display = 'none';
             }
         });
@@ -494,7 +466,7 @@
 
         const ministryHeader = table.querySelector('.header-row[data-section="ministry"]');
         const livingHeader = table.querySelector('.header-row[data-section="living"]');
-        if (!ministryHeader) return false;
+        if (!ministryHeader) return false; // Section doesn't exist
 
         const cellRow = cell.closest('tr');
         const allRows = Array.from(table.querySelectorAll('tbody > tr'));
@@ -506,33 +478,41 @@
         return cellIndex > ministryIndex && cellIndex < livingIndex;
     }
 
-    function openMemberDropdown(tableCell, mobileSlot) {
-        const isInMinistry = isCellInMinistrySection(tableCell);
+    function openMemberDropdown(cell) {
+        const isInMinistry = isCellInMinistrySection(cell);
+        
         memberDropdown.innerHTML = '';
         let listToShow;
 
         if (isInMinistry) {
+            // Sort sisters and brothers separately, then combine
             const sortedSisters = [...members.sisters].sort((a, b) => a.name.localeCompare(b.name));
             const sortedBrothers = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
             listToShow = [...sortedSisters, ...sortedBrothers];
         } else {
+            // Only show sorted brothers for other sections
             listToShow = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
         }
 
         listToShow.forEach(member => { 
+          
             const item = document.createElement('button');
             item.className = 'member-dropdown-item';
             item.dataset.name = member.name;
-            item.innerHTML = `<span>${member.name}</span>` + (member.isServant ? '<span class="servant-tag">Servant</span>' : '');
+            let nameHtml = `<span>${member.name}</span>`;
+            if (member.isServant) {
+                nameHtml += '<span class="servant-tag">Servant</span>';
+            }
+            item.innerHTML = nameHtml;
             memberDropdown.appendChild(item);
         });
 
-        const rect = mobileSlot.getBoundingClientRect();
+        const rect = cell.getBoundingClientRect();
         memberDropdown.style.display = 'block';
         memberDropdown.style.top = `${rect.bottom}px`;
         memberDropdown.style.left = `${rect.left}px`;
         memberDropdown.style.width = `${rect.width}px`;
-        activeCellForDropdown = { tableCell, mobileSlot };
+        activeCellForDropdown = cell;
     }
 
     async function generatePdf() {
