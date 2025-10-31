@@ -832,7 +832,7 @@
             // Increase the height of all table cells for better spacing in the PDF
             const allCells = clone.querySelectorAll('th, td');
             allCells.forEach(cell => {
-                cell.style.height = '40px'; // Adjust this value as needed
+                cell.style.height = '42px'; // Adjust this value as needed
             });
 
             // --- END: ADD THIS NEW CODE BLOCK ---
@@ -848,19 +848,63 @@
             itemsToPrint.push({ imgData, width: USABLE_WIDTH, height: imgHeight });
         }
         
+        // ... code that generates itemsToPrint ...
+
         document.body.removeChild(printContainer);
-        let currentY = MARGIN_MM;
-        itemsToPrint.forEach((item, index) => {
-            if (index > 0 && currentY + item.height > USABLE_HEIGHT + MARGIN_MM) {
-                pdf.addPage();
-                currentY = MARGIN_MM;
+
+        // --- START: NEW VERTICAL CENTERING LOGIC ---
+
+        // 1. Group items into pages
+        const pageGroups = [];
+        let currentPageItems = [];
+        let currentPageHeight = 0;
+
+        itemsToPrint.forEach(item => {
+            const itemHeightWithSpacing = (currentPageItems.length > 0 ? PAGE_SPACING_MM : 0) + item.height;
+
+            if (currentPageHeight + itemHeightWithSpacing <= USABLE_HEIGHT) {
+                currentPageItems.push(item);
+                currentPageHeight += itemHeightWithSpacing;
+            } else {
+                pageGroups.push(currentPageItems); // Finalize the previous page
+                currentPageItems = [item];      // Start a new page with the current item
+                currentPageHeight = item.height;
             }
-            pdf.addImage(item.imgData, 'JPEG', MARGIN_MM, currentY, item.width, item.height);
-            currentY += item.height + PAGE_SPACING_MM;
         });
+        if (currentPageItems.length > 0) {
+            pageGroups.push(currentPageItems); // Add the last page
+        }
+
+        // 2. Render each page group, centered vertically
+        pageGroups.forEach((itemsOnPage, pageIndex) => {
+            if (pageIndex > 0) {
+                pdf.addPage();
+            }
+
+            // Calculate the total height of content for THIS page
+            const totalContentHeight = itemsOnPage.reduce((sum, item, index) => {
+                const spacing = (index > 0) ? PAGE_SPACING_MM : 0;
+                return sum + item.height + spacing;
+            }, 0);
+
+            // Calculate the leftover space and the offset to center the content block
+            const leftoverSpace = USABLE_HEIGHT - totalContentHeight;
+            const initialOffset = (leftoverSpace > 0) ? leftoverSpace / 2 : 0;
+
+            // Start drawing from the calculated offset
+            let currentY = MARGIN_MM + initialOffset;
+
+            itemsOnPage.forEach(item => {
+                pdf.addImage(item.imgData, 'JPEG', MARGIN_MM, currentY, item.width, item.height);
+                currentY += item.height + PAGE_SPACING_MM;
+            });
+        });
+
+        // --- END: NEW VERTICAL CENTERING LOGIC ---
 
         const fileName = `${projectTitleEl.textContent.trim() || 'schedule'}.pdf`;
         pdf.save(fileName);
+
         printButton.disabled = false;
         printButton.querySelector('span:last-child').textContent = 'Download PDF';
     }
