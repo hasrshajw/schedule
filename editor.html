@@ -113,7 +113,24 @@
     #print-container { position: absolute; left: -9999px; top: auto; width: 1100px; background: white; }
     
     .mobile-view-container { display: none; }
-
+    
+/* Add this new rule for the date input */
+    .date-input {
+        cursor: pointer;
+        -webkit-appearance: none; /* Hides default UI on some browsers */
+        -moz-appearance: none;
+        appearance: none;
+        background-color: transparent;
+        border: none;
+        width: 100%;
+        height: 100%;
+        font-family: inherit;
+        font-size: inherit;
+        font-weight: inherit;
+        text-align: left;
+        padding-left: 8px;
+    }
+    
     @media (max-width: 768px) {
         body { padding: 56px 0 0 0; background-color: var(--surface-color); }
         #app-header { padding: 0 16px; }
@@ -150,14 +167,6 @@
             </div>
         </div>
     </header>
-
-
-code
-Code
-download
-content_copy
-expand_less
-
 <div class="master-container">
     <div id="project-header" class="project-header">
         <h1 id="project-title" contenteditable="true">Loading Project...</h1>
@@ -296,8 +305,15 @@ expand_less
                 if (cell.hasAttribute('data-user-editable')) {
                     // Check if it's the date cell in the first row
                     if (cell.closest('tr') === tempDiv.querySelector('tbody').rows[0]) {
-                        cell.setAttribute('contenteditable', 'true');
-                    } else {
+    // This is the first row. Check if it's the specific date cell (usually the last one).
+    if (cell.hasAttribute('data-user-editable')) {
+        const originalText = cell.textContent;
+        cell.innerHTML = `<input type="date" class="date-input" value="${originalText.split('-').reverse().join('-') || ''}">`;
+        cell.removeAttribute('contenteditable'); // The input handles editing now
+    } else {
+        cell.setAttribute('contenteditable', 'false'); // Lock other cells in first row
+    }
+} else {
                         // It's a dropdown cell for names
                         cell.classList.add('editable-cell');
                         cell.removeAttribute('contenteditable');
@@ -363,13 +379,24 @@ expand_less
                     inputWrapper.className = 'input-group';
 
                     // Check for a sub-label in the preceding cell
-                    if (cellIndex > 0 && row.cells[cellIndex - 1] && !row.cells[cellIndex - 1].hasAttribute('data-user-editable')) {
-                      if (cellIndex - 1 !== 0 || isPrimaryCellEditable) {
-                        const subLabelText = row.cells[cellIndex - 1].textContent.trim().replace('⠿', '').replace(':', '');
-                        if(subLabelText) {
-                            inputWrapper.innerHTML += `<div class="item-label">${subLabelText}</div>`;
+                    // NEW LOGIC: Always use the immediately preceding cell as the label.
+                    if (cellIndex > 0 && row.cells[cellIndex - 1]) {
+                        const labelCell = row.cells[cellIndex - 1];
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = labelCell.innerHTML;
+                        const labelText = tempDiv.textContent.trim().replace('⠿', '').replace(':', '');
+                        
+                        if (labelText) {
+                            inputWrapper.innerHTML += `<div class="item-label">${labelText}</div>`;
                         }
-                      }
+                    } else if (isPrimaryCellEditable) {
+                        // Fallback for cases where the very first cell is the input
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = cell.innerHTML;
+                        const labelText = tempDiv.textContent.trim().replace('⠿', '');
+                         if (labelText) {
+                            inputWrapper.innerHTML += `<div class="item-label">${labelText}</div>`;
+                        }
                     }
 
                     const inputDiv = document.createElement('div');
@@ -489,7 +516,15 @@ expand_less
         save() {
             this.isSaving = true;
             updateStatus('Syncing...', 'syncing');
-            
+            // Before saving, update the table cells with the values from any date inputs
+            this.scheduleTables.forEach(table => {
+                const dateInput = table.tableBody.querySelector('.date-input');
+                if (dateInput && dateInput.value) {
+                    const cell = dateInput.parentElement;
+                    // Convert YYYY-MM-DD back to DD-MM-YYYY for display
+                    cell.textContent = dateInput.value.split('-').reverse().join('-');
+                }
+            });
             const updatedTablesData = this.scheduleTables.map(table => ({
                 title: table.data.title,
                 content: table.getContent(),
