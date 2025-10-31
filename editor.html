@@ -43,138 +43,143 @@
         --warning-color: #f59e0b;
         --success-color: #2e7d32;
     }
-    
-    @font-face {
-        font-family: "jw-icons-external";
-        src: url("./jw-icons-external-d876da3.woff") format("woff");
-        font-weight: normal; font-style: normal;
-    }
 
-    body {
-        margin: 0; padding: 0;
-        font-family: 'Inter', sans-serif;
-        background-color: var(--body-bg);
-        color: var(--text-primary);
-        visibility: hidden; opacity: 0;
-        transition: opacity 0.3s ease-in;
-    }
-    body.auth-ready { visibility: visible; opacity: 1; }
-    body.menu-open { overflow: hidden; }
+code
+Code
+download
+content_copy
+expand_less
+@font-face {
+    font-family: "jw-icons-external";
+    src: url("./jw-icons-external-d876da3.woff") format("woff");
+    font-weight: normal; font-style: normal;
+}
 
-    .site-header { background-color: var(--header-bg); padding: 0; color: var(--text-light); position: fixed; top: 0; left: 0; width: 100%; z-index: 900; }
-    .top-bar { display: flex; justify-content: space-between; align-items: center; height: 56px; padding: 0 15px 0 0; max-width: 1200px; margin: 0 auto; }
-    .top-bar .mobileLogo { display: block; width: 75px; height: 56px; background-image: url(https://www.jw.org/assets/ct/46605f23da/images/siteLogo-jworg-mobile.svg), none; background-repeat: no-repeat; background-size: contain; background-position: center left; flex-shrink: 0; margin-left: 0px; }
-    .header-right-controls { display: flex; align-items: center; gap: 15px; }
-    .header-icons { display: flex; align-items: center; height: 56px; cursor: pointer; }
-    .header-icons svg { height: 24px; width: 24px; color: var(--text-light); }
-    .header-icons .close-icon { display: none; }
-    body.menu-open .header-icons .hamburger-icon { display: none; }
-    body.menu-open .header-icons .close-icon { display: block; }
-    
-    .menu-overlay { position: fixed; top: 56px; left: 0; width: 100%; height: calc(100% - 56px); background-color: rgba(0, 0, 0, 0.6); z-index: 998; opacity: 0; visibility: hidden; transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; }
-    .menu-overlay.is-open { opacity: 1; visibility: visible; }
-    .slide-menu { position: fixed; top: 56px; right: 0; height: calc(100dvh - 56px); width: 320px; max-width: 90%; background-color: var(--menu-new-bg); z-index: 999; transform: translateX(100%); transition: transform 0.3s ease-in-out; display: flex; flex-direction: column; border-left: 1px solid var(--menu-new-border); }
-    .slide-menu.is-open { transform: translateX(0); }
-    
-    .menu-links { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex-grow: 1; }
-    .menu-links li a { display: flex; align-items: center; color: var(--menu-new-text); background-color: var(--menu-new-bg); height: 50px; padding: 12px 5px 12px 12px; box-sizing: border-box; text-decoration: none; font-size: 1rem; transition: background-color 0.2s; border-top: 1px dotted #a7a7a7; }
-    .menu-links li:first-child a { border-top: none; }
-    .menu-links li a:hover { background-color: var(--menu-new-hover); }
-    
-    .profile-section { padding: 16px; border-top: 1px solid var(--menu-new-border); flex-shrink: 0; background-color: #fafafa; margin-top: auto; }
-    .profile-info { display: flex; align-items: center; }
-    .profile-name { font-weight: bold; font-size: 1rem; color: #333; word-break: break-all; }
-    
-    .iconLink-icon { font-family: "jw-icons-external"; font-size: 24px; display: inline-block; color: #757575; width: 30px; margin-right: 10px; text-align: center; }
-    .home-icon::before { content: "\e661"; }
-    .midweek-icon::before { content: "\e625"; }
-    .sunday-icon::before { content: "\e610"; }
-    .members-icon::before { content: "\e695"; }
+body {
+    margin: 0; padding: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: var(--body-bg);
+    color: var(--text-primary);
+    visibility: hidden; opacity: 0;
+    transition: opacity 0.3s ease-in;
+}
+body.auth-ready { visibility: visible; opacity: 1; }
+body.menu-open { overflow: hidden; }
+
+.site-header { background-color: var(--header-bg); padding: 0; color: var(--text-light); position: fixed; top: 0; left: 0; width: 100%; z-index: 900; }
+.top-bar { display: flex; justify-content: space-between; align-items: center; height: 56px; padding: 0 15px 0 0; max-width: 1200px; margin: 0 auto; }
+.top-bar .mobileLogo { display: block; width: 75px; height: 56px; background-image: url(https://www.jw.org/assets/ct/46605f23da/images/siteLogo-jworg-mobile.svg), none; background-repeat: no-repeat; background-size: contain; background-position: center left; flex-shrink: 0; margin-left: 0px; }
+.header-right-controls { display: flex; align-items: center; gap: 15px; }
+.header-icons { display: flex; align-items: center; height: 56px; cursor: pointer; }
+.header-icons svg { height: 24px; width: 24px; color: var(--text-light); }
+.header-icons .close-icon { display: none; }
+body.menu-open .header-icons .hamburger-icon { display: none; }
+body.menu-open .header-icons .close-icon { display: block; }
+
+.menu-overlay { position: fixed; top: 56px; left: 0; width: 100%; height: calc(100% - 56px); background-color: rgba(0, 0, 0, 0.6); z-index: 998; opacity: 0; visibility: hidden; transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; }
+.menu-overlay.is-open { opacity: 1; visibility: visible; }
+.slide-menu { position: fixed; top: 56px; right: 0; height: calc(100dvh - 56px); width: 320px; max-width: 90%; background-color: var(--menu-new-bg); z-index: 999; transform: translateX(100%); transition: transform 0.3s ease-in-out; display: flex; flex-direction: column; border-left: 1px solid var(--menu-new-border); }
+.slide-menu.is-open { transform: translateX(0); }
+
+.menu-links { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex-grow: 1; }
+.menu-links li a { display: flex; align-items: center; color: var(--menu-new-text); background-color: var(--menu-new-bg); height: 50px; padding: 12px 5px 12px 12px; box-sizing: border-box; text-decoration: none; font-size: 1rem; transition: background-color 0.2s; border-top: 1px dotted #a7a7a7; }
+.menu-links li:first-child a { border-top: none; }
+.menu-links li a:hover { background-color: var(--menu-new-hover); }
+
+.profile-section { padding: 16px; border-top: 1px solid var(--menu-new-border); flex-shrink: 0; background-color: #fafafa; margin-top: auto; }
+.profile-info { display: flex; align-items: center; }
+.profile-name { font-weight: bold; font-size: 1rem; color: #333; word-break: break-all; }
+
+.iconLink-icon { font-family: "jw-icons-external"; font-size: 24px; display: inline-block; color: #757575; width: 30px; margin-right: 10px; text-align: center; }
+.home-icon::before { content: "\e661"; }
+.midweek-icon::before { content: "\e625"; }
+.sunday-icon::before { content: "\e610"; }
+.members-icon::before { content: "\e695"; }
 
 
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; border-radius: var(--radius-md); font-size: 1rem; font-weight: 600; cursor: pointer; border: none; text-decoration: none; background-color: var(--primary-color); color: white; transition: background-color 0.2s; }
-    .btn:hover:not(:disabled) { background-color: var(--primary-hover); }
-    .btn:disabled { cursor: not-allowed; opacity: 0.6; }
-    /* END: NEW NAVBAR STYLES */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; border-radius: var(--radius-md); font-size: 1rem; font-weight: 600; cursor: pointer; border: none; text-decoration: none; background-color: var(--primary-color); color: white; transition: background-color 0.2s; }
+.btn:hover:not(:disabled) { background-color: var(--primary-hover); }
+.btn:disabled { cursor: not-allowed; opacity: 0.6; }
+/* END: NEW NAVBAR STYLES */
 
-    /* START: ORIGINAL EDITOR STYLES */
-    *, *::before, *::after { box-sizing: border-box; }
-    html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-    
-    .hidden { display: none !important; }
+/* START: ORIGINAL EDITOR STYLES */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 
-    main { padding: calc(56px + 20px) 20px 20px; }
-    .editor-main { max-width: 1100px; margin: 0 auto; }
-    .page-controls { margin-bottom: 24px; }
-    
-    .master-container { background: var(--surface-color); padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
-    .project-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color); }
-    .project-title { font-size: 1.75rem; font-weight: 700; margin: 0; flex-grow: 1; border: none; padding: 4px 8px; margin: -4px -8px; border-radius: var(--radius-md); font-family: 'Noto Sans Telugu', sans-serif; }
-    .project-title:focus { outline: 2px solid var(--primary-color); background-color: var(--primary-light); }
-    
-    .schedule-block { margin-bottom: 32px; }
-    .schedule-block:last-child { margin-bottom: 0; }
-    .schedule-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    .schedule-title { font-size: 1.25rem; font-weight: 600; margin: 0; color: var(--text-secondary); font-family: 'Noto Sans Telugu', sans-serif; }
-    
-    .status-indicator { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; display: flex; align-items: center; gap: 6px; }
-    .status-indicator::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background-color: currentColor; }
-    .status-indicator[data-status="synced"] { color: var(--success-color); background-color: #eaf5ea; }
-    .status-indicator[data-status="syncing"] { color: var(--warning-color); background-color: #fffbeb; }
-    .status-indicator[data-status="error"] { color: var(--danger-color); background-color: #fde8e8; }
-    
-    .toolbar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); transition: all 0.2s; text-decoration: none; color: var(--text-secondary); }
-    .toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; border-color: #d1d5db; color: var(--text-primary); }
-    .toolbar-btn:disabled { cursor: not-allowed; opacity: 0.5; }
-    
-    .schedule-block table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.25px; }
-    .schedule-block th, .schedule-block td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; }
-    .schedule-block .editable-cell:not([contenteditable="true"]) { cursor: pointer; }
-    .schedule-block .editable-cell:not([contenteditable="true"]):hover { background-color: #f9fafb; }
-    .schedule-block [contenteditable="true"]:focus { background-color: #fffbe5; }
-    .schedule-block .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; }
-    .schedule-block .cell-icon { height: 70%; max-height: 24px; object-fit: contain; flex-shrink: 0; }
-    .schedule-block .header-row .cell-icon { filter: brightness(0) invert(1); }
-    .schedule-block .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; }
-    .schedule-block .header-row td { font-size: 16px; color: #ffffff; height: 42px; }
-    .schedule-block .row-handle { display: none !important; }
-    .special-event-text { color: red; text-align: center !important; font-weight: 700; }
-    #event-context-menu, #member-dropdown { position: fixed; display: none; background: var(--surface-color); border-radius: var(--radius-md); box-shadow: var(--shadow-md); z-index: 1001; padding: 6px; min-width: 180px; border: 1px solid var(--border-color); }
-    .context-menu-item, .member-dropdown-item { font-family: 'Inter', sans-serif; display: block; width: 100%; padding: 8px 12px; cursor: pointer; font-size: 14px; border-radius: 6px; background: none; border: none; text-align: left; }
-    .context-menu-item:hover, .member-dropdown-item:hover { background: #f9fafb; }
-    .member-dropdown-item { display: flex; justify-content: space-between; align-items: center; }
-    #member-dropdown { max-height: 300px; overflow-y: auto; }
-    .servant-tag { font-size: 0.75rem; font-weight: 600; color: var(--primary-color); background-color: var(--primary-light); padding: 2px 6px; border-radius: 4px; }
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 16px; }
-    .modal-content { background: white; padding: 24px; border-radius: var(--radius-lg); width: 100%; max-width: 500px; max-height: 90vh; display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow-lg); }
-    #new-project-name { width: 100%; padding: 12px; font-size: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); }
-    #template-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md); }
-    #template-list li { padding: 12px; border-bottom: 1px solid var(--border-color); }
-    #template-list label { display: flex; align-items: center; gap: 10px; font-size: 16px; cursor: pointer; font-weight: 500; }
-    .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px; }
-    .modal-actions button { padding: 10px 20px; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); }
-    #cancel-template-selection { background-color: var(--surface-color); }
-    #confirm-template-selection { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
-    #print-container { position: absolute; left: -9999px; top: auto; width: 1100px; background: white; }
-    .mobile-view-container { display: none; }
-    .date-input { cursor: pointer; -webkit-appearance: none; -moz-appearance: none; appearance: none; background-color: transparent; border: none; width: 100%; height: 100%; font-family: inherit; font-size: inherit; font-weight: inherit; text-align: left; padding-left: 8px; }
-    
-    @media (max-width: 768px) {
-        main { padding: 56px 0 0 0; }
-        .master-container { padding: 16px; border-radius: 0; box-shadow: none; }
-        .page-controls { padding: 0 16px; margin-bottom: 16px; }
-        .project-header { flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px 0; margin-bottom: 16px; }
-        .project-title { font-size: 1.5rem; }
-        .schedule-block { margin-bottom: 24px; padding: 0 0 24px 0; border-bottom: 8px solid var(--background-color); }
-        .schedule-block:last-child { border-bottom: none; }
-        .schedule-block table { display: none; }
-        .mobile-view-container { display: flex; flex-direction: column; gap: 1.5rem; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 16px; }
-        .mobile-item .item-label { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; font-family: 'Noto Sans Telugu', sans-serif; }
-        .mobile-item .item-input { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-md); background-color: #f9fafb; font-size: 1rem; font-weight: 500; color: var(--text-secondary); margin-top: 4px; }
-        .mobile-item .input-group { margin-bottom: 12px; }
-        .mobile-item .input-group:last-child { margin-bottom: 0; }
-    }
-    /* END: ORIGINAL EDITOR STYLES */
+.hidden { display: none !important; }
+
+main { padding: calc(56px + 20px) 20px 20px; }
+.editor-main { max-width: 1100px; margin: 0 auto; }
+.page-controls { margin-bottom: 24px; }
+
+.master-container { background: var(--surface-color); padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
+.project-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color); }
+.project-title { font-size: 1.75rem; font-weight: 700; margin: 0; flex-grow: 1; border: none; padding: 4px 8px; margin: -4px -8px; border-radius: var(--radius-md); font-family: 'Noto Sans Telugu', sans-serif; }
+.project-title:focus { outline: 2px solid var(--primary-color); background-color: var(--primary-light); }
+
+.schedule-block { margin-bottom: 32px; }
+.schedule-block:last-child { margin-bottom: 0; }
+.schedule-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.schedule-title { font-size: 1.25rem; font-weight: 600; margin: 0; color: var(--text-secondary); font-family: 'Noto Sans Telugu', sans-serif; }
+
+.status-indicator { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; display: flex; align-items: center; gap: 6px; }
+.status-indicator::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background-color: currentColor; }
+.status-indicator[data-status="synced"] { color: var(--success-color); background-color: #eaf5ea; }
+.status-indicator[data-status="syncing"] { color: var(--warning-color); background-color: #fffbeb; }
+.status-indicator[data-status="error"] { color: var(--danger-color); background-color: #fde8e8; }
+
+.toolbar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); transition: all 0.2s; text-decoration: none; color: var(--text-secondary); }
+.toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; border-color: #d1d5db; color: var(--text-primary); }
+.toolbar-btn:disabled { cursor: not-allowed; opacity: 0.5; }
+
+.schedule-block table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.25px; }
+.schedule-block th, .schedule-block td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; }
+.schedule-block .editable-cell:not([contenteditable="true"]) { cursor: pointer; }
+.schedule-block .editable-cell:not([contenteditable="true"]):hover { background-color: #f9fafb; }
+.schedule-block [contenteditable="true"]:focus { background-color: #fffbe5; }
+.schedule-block .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; }
+.schedule-block .cell-icon { height: 70%; max-height: 24px; object-fit: contain; flex-shrink: 0; }
+.schedule-block .header-row .cell-icon { filter: brightness(0) invert(1); }
+.schedule-block .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; }
+.schedule-block .header-row td { font-size: 16px; color: #ffffff; height: 42px; }
+.schedule-block .row-handle { display: none !important; }
+.special-event-text { color: red; text-align: center !important; font-weight: 700; }
+#event-context-menu, #member-dropdown { position: fixed; display: none; background: var(--surface-color); border-radius: var(--radius-md); box-shadow: var(--shadow-md); z-index: 1001; padding: 6px; min-width: 180px; border: 1px solid var(--border-color); }
+.context-menu-item, .member-dropdown-item { font-family: 'Inter', sans-serif; display: block; width: 100%; padding: 8px 12px; cursor: pointer; font-size: 14px; border-radius: 6px; background: none; border: none; text-align: left; }
+.context-menu-item:hover, .member-dropdown-item:hover { background: #f9fafb; }
+.member-dropdown-item { display: flex; justify-content: space-between; align-items: center; }
+#member-dropdown { max-height: 300px; overflow-y: auto; }
+.servant-tag { font-size: 0.75rem; font-weight: 600; color: var(--primary-color); background-color: var(--primary-light); padding: 2px 6px; border-radius: 4px; }
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 16px; }
+.modal-content { background: white; padding: 24px; border-radius: var(--radius-lg); width: 100%; max-width: 500px; max-height: 90vh; display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow-lg); }
+#new-project-name { width: 100%; padding: 12px; font-size: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); }
+#template-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md); }
+#template-list li { padding: 12px; border-bottom: 1px solid var(--border-color); }
+#template-list label { display: flex; align-items: center; gap: 10px; font-size: 16px; cursor: pointer; font-weight: 500; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px; }
+.modal-actions button { padding: 10px 20px; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); }
+#cancel-template-selection { background-color: var(--surface-color); }
+#confirm-template-selection { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
+#print-container { position: absolute; left: -9999px; top: auto; width: 1100px; background: white; }
+.mobile-view-container { display: none; }
+.date-input { cursor: pointer; -webkit-appearance: none; -moz-appearance: none; appearance: none; background-color: transparent; border: none; width: 100%; height: 100%; font-family: inherit; font-size: inherit; font-weight: inherit; text-align: left; padding-left: 8px; }
+
+@media (max-width: 768px) {
+    main { padding: 56px 0 0 0; }
+    .master-container { padding: 16px; border-radius: 0; box-shadow: none; }
+    .page-controls { padding: 0 16px; margin-bottom: 16px; }
+    .project-header { flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px 0; margin-bottom: 16px; }
+    .project-title { font-size: 1.5rem; }
+    .schedule-block { margin-bottom: 24px; padding: 0 0 24px 0; border-bottom: 8px solid var(--background-color); }
+    .schedule-block:last-child { border-bottom: none; }
+    .schedule-block table { display: none; }
+    .mobile-view-container { display: flex; flex-direction: column; gap: 1.5rem; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 16px; }
+    .mobile-item .item-label { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; font-family: 'Noto Sans Telugu', sans-serif; }
+    .mobile-item .item-input { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-md); background-color: #f9fafb; font-size: 1rem; font-weight: 500; color: var(--text-secondary); margin-top: 4px; }
+    .mobile-item .input-group { margin-bottom: 12px; }
+    .mobile-item .input-group:last-child { margin-bottom: 0; }
+}
+/* END: ORIGINAL EDITOR STYLES */
 </style>
 </head>
 <body>
@@ -796,13 +801,6 @@
         activeCellForDropdown = { realCell: cell, mobileDiv: mobileDiv };
     }
 
-
-
-
-
-
-
-
     async function generatePdf() {
         const printButton = document.getElementById('print-button');
         printButton.disabled = true;
@@ -814,112 +812,113 @@
         const USABLE_WIDTH = A4_WIDTH_MM - (MARGIN_MM * 2);
         const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_MM * 2);
 
-        // --- START: NEW CODE ---
-        // Create a temporary stylesheet to force consistent rendering
-        const printStyles = document.createElement('style');
-        printStyles.innerHTML = `
-            #print-container {
-                /* These rules ensure the print container ignores mobile styles */
-                padding: 0 !important;
-                font-size: 16px; /* A consistent base font size */
-            }
-            #print-container .project-title {
-                font-size: 1.75rem !important; /* Force desktop title size */
-            }
-            #print-container .schedule-block table {
-                font-size: 14px !important; /* Force desktop table font size */
-                letter-spacing: 0.25px !important;
-            }
-        `;
-        // --- END: NEW CODE ---
-
         const printContainer = document.createElement('div');
         printContainer.id = 'print-container';
         document.body.appendChild(printContainer);
-        
-        try {
-            // --- START: NEW CODE ---
-            // Temporarily add the styles to the document
-            document.head.appendChild(printStyles);
-            // --- END: NEW CODE ---
 
-            const itemsToPrint = [];
-            for (const block of document.querySelectorAll('.schedule-block')) {
-                const clone = block.cloneNode(true);
-                
-                clone.querySelector('.event-btn').style.display = 'none';
-                clone.querySelector('.mobile-view-container').style.display = 'none';
-                clone.querySelector('table').style.display = 'table';
-                
-                const titleEl = clone.querySelector('.schedule-title');
-                if (titleEl) titleEl.style.display = 'none';
-                clone.style.marginBottom = '0';
+        const itemsToPrint = [];
+        // INSIDE THE generatePdf function...
 
-                const allCells = clone.querySelectorAll('th, td');
-                allCells.forEach(cell => {
-                    cell.style.height = '40px';
-                });
-
-                printContainer.appendChild(clone);
-                
-                const canvas = await html2canvas(clone, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
-                
-                const imgData = canvas.toDataURL('image/jpeg', 0.8);
-                const imgProps = pdf.getImageProperties(imgData);
-                const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
-                itemsToPrint.push({ imgData, width: USABLE_WIDTH, height: imgHeight });
-            }
+        for (const block of document.querySelectorAll('.schedule-block')) {
+            const clone = block.cloneNode(true);
             
-            // --- This part remains the same ---
-            const pages = [];
-            let currentPageItems = [];
-            let currentPageHeight = 0;
+            clone.querySelector('.event-btn').style.display = 'none';
+            clone.querySelector('.mobile-view-container').style.display = 'none';
+            clone.querySelector('table').style.display = 'table';
+            
+            const titleEl = clone.querySelector('.schedule-title');
+            if (titleEl) {
+                titleEl.style.display = 'none';
+            }
+            clone.style.marginBottom = '0';
+            
+            
+            clone.style.padding = '0';
+            clone.style.border = 'none';
 
-            itemsToPrint.forEach(item => {
-                const itemHeightWithSpacing = currentPageItems.length > 0 ? item.height + PAGE_SPACING_MM : item.height;
-                if (currentPageHeight + itemHeightWithSpacing > USABLE_HEIGHT && currentPageItems.length > 0) {
-                    pages.push(currentPageItems);
-                    currentPageItems = [item];
-                    currentPageHeight = item.height;
-                } else {
-                    currentPageItems.push(item);
-                    currentPageHeight += itemHeightWithSpacing;
-                }
+            // --- START: ADD THIS NEW CODE BLOCK ---
+
+            // Increase the height of all table cells for better spacing in the PDF
+            const allCells = clone.querySelectorAll('th, td');
+            allCells.forEach(cell => {
+                cell.style.height = '40px'; // Adjust this value as needed
             });
-            if (currentPageItems.length > 0) {
-                pages.push(currentPageItems);
+
+            // --- END: ADD THIS NEW CODE BLOCK ---
+
+            printContainer.appendChild(clone);
+            
+            const canvas = await html2canvas(clone, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+            
+            // --- And continue with the rest of the logic ---
+            const imgData = canvas.toDataURL('image/jpeg', 0.8);
+            const imgProps = pdf.getImageProperties(imgData);
+            const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
+            itemsToPrint.push({ imgData, width: USABLE_WIDTH, height: imgHeight });
+        }
+        
+        document.body.removeChild(printContainer);
+        let currentY = MARGIN_MM;
+        // --- START: NEW, ADVANCED PDF LAYOUT LOGIC ---
+
+        // Stage 1: Group all printable items into pages first.
+        const pages = [];
+        let currentPageItems = [];
+        let currentPageHeight = 0;
+
+        itemsToPrint.forEach(item => {
+            const itemHeightWithSpacing = currentPageItems.length > 0 ? item.height + PAGE_SPACING_MM : item.height;
+            if (currentPageHeight + itemHeightWithSpacing > USABLE_HEIGHT && currentPageItems.length > 0) {
+                pages.push(currentPageItems); // Finalize the current page
+                currentPageItems = [item]; // Start a new page with the current item
+                currentPageHeight = item.height;
+            } else {
+                currentPageItems.push(item);
+                currentPageHeight += itemHeightWithSpacing;
+            }
+        });
+        if (currentPageItems.length > 0) {
+            pages.push(currentPageItems); // Add the last page
+        }
+
+        // Stage 2: Render each page with calculated vertical alignment.
+        pages.forEach((pageItems, pageIndex) => {
+            if (pageIndex > 0) {
+                pdf.addPage();
             }
 
-            pages.forEach((pageItems, pageIndex) => {
-                if (pageIndex > 0) pdf.addPage();
-                const totalContentHeight = pageItems.reduce((sum, item) => sum + item.height, 0) + (PAGE_SPACING_MM * (pageItems.length - 1));
-                let startY = MARGIN_MM;
-                if (pageItems.length > 1) {
-                    const remainingSpace = USABLE_HEIGHT - totalContentHeight;
-                    if (remainingSpace > 0) startY = MARGIN_MM + (remainingSpace / 2);
+            // Calculate the total height of all content on this specific page
+            const totalContentHeight = pageItems.reduce((sum, item) => sum + item.height, 0) + (PAGE_SPACING_MM * (pageItems.length - 1));
+
+            let startY = MARGIN_MM; // Default: top-aligned
+
+            // *** This is the key logic for your request ***
+            // If there's more than one item on the page, center the entire content block vertically.
+            if (pageItems.length > 1) {
+                const remainingSpace = USABLE_HEIGHT - totalContentHeight;
+                if (remainingSpace > 0) {
+                    startY = MARGIN_MM + (remainingSpace / 2);
                 }
-                let currentY = startY;
-                pageItems.forEach(item => {
-                    pdf.addImage(item.imgData, 'JPEG', MARGIN_MM, currentY, item.width, item.height);
-                    currentY += item.height + PAGE_SPACING_MM;
-                });
+            }
+
+            // Now, draw the items for this page starting at the calculated Y position
+            let currentY = startY;
+            pageItems.forEach(item => {
+                pdf.addImage(item.imgData, 'JPEG', MARGIN_MM, currentY, item.width, item.height);
+                currentY += item.height + PAGE_SPACING_MM;
             });
+        });
 
-            const fileName = `${projectTitleEl.textContent.trim() || 'schedule'}.pdf`;
-            pdf.save(fileName);
+        // --- END: NEW LOGIC ---
 
-        } finally {
-            // --- START: NEW CODE ---
-            // IMPORTANT: Always remove the temporary container and styles
-            document.body.removeChild(printContainer);
-            document.head.removeChild(printStyles);
-            printButton.disabled = false;
-            printButton.querySelector('span:last-child').textContent = 'Download PDF';
-            // --- END: NEW CODE ---
-        }
+        const fileName = `${projectTitleEl.textContent.trim() || 'schedule'}.pdf`;
+        pdf.save(fileName);
+        printButton.disabled = false;
+        printButton.querySelector('span:last-child').textContent = 'Download PDF';
     }
 
 })();
 </script>
+
 </body>
 </html>
