@@ -298,20 +298,25 @@
             Array.from(this.tableBody.rows).forEach((row, rowIndex) => {
                 if (row.classList.contains('header-row')) return;
                 
-                const editableCellsInRow = Array.from(row.cells).filter(cell => cell.hasAttribute('data-user-editable'));
+                const allCells = Array.from(row.cells);
+                const editableCellsInRow = allCells.filter(cell => cell.hasAttribute('data-user-editable'));
                 if (editableCellsInRow.length === 0) return;
 
-                const labelCell = row.cells[0];
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = labelCell.innerHTML;
-                const labelText = tempDiv.textContent.trim();
+                // CORRECTED LOGIC: Find the first non-editable cell to use as the label.
+                const labelCell = allCells.find(cell => !cell.hasAttribute('data-user-editable'));
+                let labelText = '';
+                if (labelCell) {
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = labelCell.innerHTML;
+                    labelText = tempDiv.textContent.trim();
+                }
 
                 const mainItemDiv = document.createElement('div');
                 mainItemDiv.className = 'mobile-item';
                 mainItemDiv.innerHTML = `<div class="item-label">${labelText}</div>`;
                 
                 editableCellsInRow.forEach(cell => {
-                    const cellIndex = Array.from(row.cells).indexOf(cell);
+                    const cellIndex = allCells.indexOf(cell);
                     const inputDiv = document.createElement('div');
                     inputDiv.className = 'item-input editable-cell';
                     inputDiv.textContent = cell.textContent || 'Select Name';
@@ -325,6 +330,7 @@
 
             this.element.appendChild(mobileContainer);
         }
+        
         
         getContent() {
             const tempTable = this.element.querySelector('table').cloneNode(true);
