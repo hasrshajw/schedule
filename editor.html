@@ -23,9 +23,11 @@
 
 <style>
     :root {
-        --primary-color: #4a6da7;
-        --primary-light: #eef2f9;
+        --primary-color: #012726;
+        --primary-hover: #024443;
+        --primary-light: #e6f6f6;
         --danger-color: #d32f2f;
+        --danger-hover: #b71c1c;
         --border-color: #e5e7eb;
         --background-color: #f8fafc;
         --text-primary: #1f2937;
@@ -34,35 +36,56 @@
         --radius-md: 8px;
         --radius-lg: 16px;
         --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --warning-color: #f59e0b;
+        --success-color: #2e7d32;
     }
     *, *::before, *::after { box-sizing: border-box; }
-    html { -webkit-font-smoothing: antialiased; }
-    body { font-family: 'Inter', sans-serif; background-color: var(--background-color); margin: 0; padding: 72px 0 0; color: var(--text-primary); }
+    html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    body { font-family: 'Inter', sans-serif; background-color: var(--background-color); margin: 0; padding: 88px 20px 20px; color: var(--text-primary); }
     .hidden { display: none !important; }
 
     #app-header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border-color); padding: 12px 20px; }
-    .header-content { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
+    .header-content { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    #user-info { display: flex; align-items: center; gap: 12px; font-size: 14px; }
+    #user-avatar { width: 36px; height: 36px; border-radius: 50%; background-color: var(--border-color); display: flex; align-items: center; justify-content: center; font-weight: 600; color: var(--text-secondary); }
+    #user-email { font-weight: 600; color: var(--text-primary); }
     .header-actions { display: flex; align-items: center; gap: 12px; }
-    .toolbar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); text-decoration: none; color: var(--text-secondary); }
-    .toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; }
+    .toolbar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); transition: all 0.2s; text-decoration: none; color: var(--text-secondary); }
+    .toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; border-color: #d1d5db; color: var(--text-primary); }
     .toolbar-btn:disabled { cursor: not-allowed; opacity: 0.5; }
+    #logout-button { background-color: transparent; border: 1px solid var(--border-color); padding: 8px 16px; border-radius: var(--radius-md); cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s; }
+    #logout-button:hover { background-color: var(--danger-light); color: var(--danger-hover); border-color: var(--danger-hover); }
 
-    .master-container { max-width: 1100px; margin: 0 auto; background: var(--surface-color); padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); margin-top: 20px; }
+    .master-container { max-width: 1100px; margin: 0 auto; background: var(--surface-color); padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
     .project-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color); }
     .project-title { font-size: 1.75rem; font-weight: 700; margin: 0; flex-grow: 1; border: none; padding: 4px 8px; margin: -4px -8px; border-radius: var(--radius-md); font-family: 'Noto Sans Telugu', sans-serif; }
+    .project-title:focus { outline: 2px solid var(--primary-color); background-color: var(--primary-light); }
     
     .schedule-block { margin-bottom: 32px; }
+    .schedule-block:last-child { margin-bottom: 0; }
     .schedule-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
     .schedule-title { font-size: 1.25rem; font-weight: 600; margin: 0; color: var(--text-secondary); font-family: 'Noto Sans Telugu', sans-serif; }
     
     .status-indicator { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; display: flex; align-items: center; gap: 6px; }
     .status-indicator::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background-color: currentColor; }
-    .status-indicator[data-status="synced"] { color: #2e7d32; background-color: #eaf5ea; }
-    .status-indicator[data-status="syncing"] { color: #f59e0b; background-color: #fffbeb; }
+    .status-indicator[data-status="synced"] { color: var(--success-color); background-color: #eaf5ea; }
+    .status-indicator[data-status="syncing"] { color: var(--warning-color); background-color: #fffbeb; }
     .status-indicator[data-status="error"] { color: var(--danger-color); background-color: #fde8e8; }
+
+    .schedule-block table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.25px; }
+    .schedule-block th, .schedule-block td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; }
+    .schedule-block .editable-cell:not([contenteditable="true"]) { cursor: pointer; }
+    .schedule-block .editable-cell:not([contenteditable="true"]):hover { background-color: #f9fafb; }
+    .schedule-block [contenteditable="true"]:focus { background-color: #fffbe5; }
+    .schedule-block .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; }
+    .schedule-block .cell-icon { height: 70%; max-height: 24px; object-fit: contain; flex-shrink: 0; }
+    .schedule-block .header-row .cell-icon { filter: brightness(0) invert(1); }
+    .schedule-block .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; }
+    .schedule-block .header-row td { font-size: 16px; color: #ffffff; height: 42px; }
+    .schedule-block .row-handle { display: none !important; }
     
     .special-event-text { color: red; text-align: center !important; font-weight: 700; }
-    
+
     #event-context-menu, #member-dropdown { position: fixed; display: none; background: var(--surface-color); border-radius: var(--radius-md); box-shadow: var(--shadow-md); z-index: 1001; padding: 6px; min-width: 180px; border: 1px solid var(--border-color); }
     .context-menu-item, .member-dropdown-item { font-family: 'Inter', sans-serif; display: block; width: 100%; padding: 8px 12px; cursor: pointer; font-size: 14px; border-radius: 6px; background: none; border: none; text-align: left; }
     .context-menu-item:hover, .member-dropdown-item:hover { background: #f9fafb; }
@@ -70,57 +93,139 @@
     #member-dropdown { max-height: 300px; overflow-y: auto; }
     .servant-tag { font-size: 0.75rem; font-weight: 600; color: var(--primary-color); background-color: var(--primary-light); padding: 2px 6px; border-radius: 4px; }
 
-    /* Desktop Table View */
-    .desktop-view { display: block; }
-    .desktop-view table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; }
-    .desktop-view th, .desktop-view td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; height: 36px; font-family: 'Noto Sans Telugu', sans-serif; font-size: 14px; font-weight: 700; }
-    .desktop-view .editable-cell:not([contenteditable="true"]) { cursor: pointer; }
-    .desktop-view .editable-cell:not([contenteditable="true"]):hover { background-color: #f9fafb; }
-    .desktop-view [contenteditable="true"]:focus { background-color: #fffbe5; }
-    .desktop-view .header-row td { color: #ffffff; }
 
-    /* Mobile Card View */
-    .mobile-view { display: none; }
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 16px; }
+    .modal-content { background: white; padding: 24px; border-radius: var(--radius-lg); width: 100%; max-width: 500px; max-height: 90vh; display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow-lg); }
+    #new-project-name { width: 100%; padding: 12px; font-size: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); }
+    #template-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md); }
+    #template-list li { padding: 12px; border-bottom: 1px solid var(--border-color); }
+    #template-list label { display: flex; align-items: center; gap: 10px; font-size: 16px; cursor: pointer; font-weight: 500; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px; }
+    .modal-actions button { padding: 10px 20px; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); }
+    #cancel-template-selection { background-color: var(--surface-color); }
+    #confirm-template-selection { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 
     #print-container { position: absolute; left: -9999px; top: auto; width: 1100px; background: white; }
-
-    /* Responsive Styles */
+    /* MOBILE RESPONSIVE STYLES */
     @media (max-width: 768px) {
-        body { padding-top: 56px; }
-        .master-container { margin-top: 0; padding: 16px; border-radius: 0; box-shadow: none; }
+        body { padding: 72px 0 0 0; background-color: var(--surface-color); }
+        #app-header { padding: 12px 16px; }
+        #user-info { display: none; }
+        .header-content { justify-content: center; }
+        .header-actions { width: 100%; display: flex; justify-content: space-between; gap: 8px; }
+        .header-actions .toolbar-btn, .header-actions #logout-button { flex: 1; font-size: 12px; padding: 8px 4px; }
+        
+        .master-container { padding: 16px; border-radius: 0; box-shadow: none; }
+        .project-header { flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px 0; margin-bottom: 16px; }
         .project-title { font-size: 1.5rem; }
-        .desktop-view { display: none; }
-        .mobile-view { display: block; }
-        .mobile-card { background: var(--surface-color); border: 1px solid var(--border-color); padding: 12px; border-radius: var(--radius-md); margin-bottom: 12px; }
-        .mobile-card-title { font-weight: 600; margin: 0 0 12px 0; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); font-family: 'Noto Sans Telugu', sans-serif; }
-        .assignee-slot { display: block; background: #f9fafb; border: 1px dashed var(--border-color); border-radius: var(--radius-md); padding: 10px; margin-top: 8px; cursor: pointer; color: var(--text-secondary); }
-        .assignee-slot.filled { background: var(--primary-light); color: var(--primary-color); font-weight: 600; border-style: solid; }
+        .schedule-block { margin-bottom: 24px; padding: 0 0 24px 0; border-bottom: 8px solid var(--background-color); }
+        .schedule-block:last-child { border-bottom: none; }
+        .schedule-header { padding: 0; }
+        
+        /* --- NEW MOBILE VIEW LOGIC --- */
+        .schedule-block table {
+            display: none; /* Hide the original table on mobile */
+        }
+
+        .mobile-view-container {
+            display: flex; /* Use flex for the new mobile view */
+            flex-direction: column;
+            gap: 1.25rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+        }
+        
+        .mobile-item {
+            font-family: 'Noto Sans Telugu', sans-serif;
+        }
+
+        .item-label {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        
+        .item-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background-color: #f9fafb;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
     }
 </style>
+
 </head>
 <body>
+
 <div id="app-container" class="hidden">
-    <header id="app-header"></header>
+    <header id="app-header">
+        <div class="header-content">
+            <div id="user-info">
+                <div id="user-avatar"></div>
+                <span>Welcome, <span id="user-email"></span></span>
+            </div>
+            <div class="header-actions">
+                <a href="./dashboard.html" class="toolbar-btn"><span class="material-symbols-outlined">dashboard</span><span>Dashboard</span></a>
+                <a href="./members.html" class="toolbar-btn"><span class="material-symbols-outlined">group</span><span>Members</span></a>
+                <button id="print-button" class="toolbar-btn"><span class="material-symbols-outlined">picture_as_pdf</span><span>Download PDF</span></button>
+                <button id="logout-button">Logout</button>
+            </div>
+        </div>
+    </header>
+
     <div class="master-container">
-        <div id="project-header"></div>
+        <div id="project-header" class="project-header">
+            <h1 id="project-title" contenteditable="true">Loading Project...</h1>
+            <div class="status-indicator" data-status="synced">Synced</div>
+        </div>
         <div id="schedules-wrapper"></div>
     </div>
 </div>
+
 <template id="schedule-template">
     <div class="schedule-block">
-        <div class="schedule-header"></div>
-        <div class="desktop-view">
-            <table>
-                <colgroup><col style="width: 60%;"><col style="width: 20%;"><col style="width: 20%;"></colgroup>
-                <tbody class="schedule-table-body"></tbody>
-            </table>
+        <div class="schedule-header">
+            <h2 class="schedule-title"></h2>
+            <button class="toolbar-btn event-btn">
+                <span class="material-symbols-outlined">celebration</span>
+                <span>Event</span>
+            </button>
         </div>
-        <div class="mobile-view"></div>
+        <table>
+            <colgroup><col style="width: 60%;"><col style="width: 20%;"><col style="width: 20%;"></colgroup>
+            <tbody class="schedule-table-body"></tbody>
+        </table>
     </div>
 </template>
-<div id="event-context-menu"></div>
+
+<div id="event-context-menu">
+    <button class="context-menu-item" data-event-type="normal">Normal</button>
+    <button class="context-menu-item" data-event-type="co-visit">CO Visit</button>
+    <button class="context-menu-item" data-event-type="assembly">Assembly</button>
+    <button class="context-menu-item" data-event-type="convention">Convention</button>
+</div>
+
 <div id="member-dropdown"></div>
-<div id="template-selection-modal" class="modal-overlay"></div>
+
+<div id="template-selection-modal" class="modal-overlay">
+    <div class="modal-content">
+        <h2>Create a New Schedule</h2>
+        <p>Give your new project a name and select the templates to include.</p>
+        <input type="text" id="new-project-name" placeholder="Enter Project Name">
+        <ul id="template-list"></ul>
+        <div class="modal-actions">
+            <button id="cancel-template-selection">Cancel</button>
+            <button id="confirm-template-selection">Create Schedule</button>
+        </div>
+    </div>
+</div>
+
 <script>
 (function() {
     'use strict';
@@ -200,6 +305,8 @@
 
         render() {
             this.titleEl.textContent = this.data.title;
+
+            // Desktop rendering (no change)
             this.tableBody.innerHTML = this.data.content;
             this.tableBody.querySelectorAll('td[data-user-editable], th[data-user-editable]').forEach(cell => {
                 if (cell.closest('tr') === this.tableBody.rows[0]) {
@@ -209,6 +316,54 @@
                     cell.removeAttribute('contenteditable');
                 }
             });
+
+            // NEW: Mobile rendering logic
+            this._createMobileView();
+        }
+        _createMobileView() {
+            // Remove any existing mobile view first
+            const existingMobileView = this.element.querySelector('.mobile-view-container');
+            if (existingMobileView) {
+                existingMobileView.remove();
+            }
+
+            const mobileContainer = document.createElement('div');
+            mobileContainer.className = 'mobile-view-container';
+
+            Array.from(this.tableBody.rows).forEach((row, rowIndex) => {
+                // Skip header rows
+                if (row.classList.contains('header-row')) return;
+
+                const labelCell = row.cells[0];
+                if (!labelCell) return;
+
+                // Extract clean label text, removing any icons or wrappers
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = labelCell.innerHTML;
+                const labelText = tempDiv.textContent.trim();
+                
+                // Create an item for the main label
+                const mainItemDiv = document.createElement('div');
+                mainItemDiv.className = 'mobile-item';
+                mainItemDiv.innerHTML = `<div class="item-label">${labelText}</div>`;
+                
+                // Find and create inputs for all editable cells in that row
+                Array.from(row.cells).forEach((cell, cellIndex) => {
+                    if (cell.hasAttribute('data-user-editable')) {
+                        const inputDiv = document.createElement('div');
+                        inputDiv.className = 'item-input editable-cell';
+                        inputDiv.textContent = cell.textContent || 'Select Name';
+                        // Link this mobile input back to the original table cell
+                        inputDiv.dataset.rowIndex = rowIndex;
+                        inputDiv.dataset.cellIndex = cellIndex;
+                        mainItemDiv.appendChild(inputDiv);
+                    }
+                });
+
+                mobileContainer.appendChild(mainItemDiv);
+            });
+
+            this.element.appendChild(mobileContainer);
         }
         
         getContent() {
@@ -429,21 +584,40 @@
         });
 
         schedulesWrapper.addEventListener('click', e => {
-            const cell = e.target.closest('.editable-cell');
-            if (cell) {
-                // If the cell is in the first row, it should be contenteditable, so do nothing.
-                const parentRow = cell.closest('tr');
-                if (parentRow && parentRow.parentElement.rows[0] === parentRow) {
+            const targetElement = e.target.closest('.editable-cell');
+            if (!targetElement) return;
+
+            // If the element is a DIV, it's our mobile view. Find the real cell.
+            if (targetElement.tagName === 'DIV') {
+                const rowIndex = targetElement.dataset.rowIndex;
+                const cellIndex = targetElement.dataset.cellIndex;
+                const tableBody = targetElement.closest('.schedule-block').querySelector('.schedule-table-body');
+                const realCell = tableBody.rows[rowIndex].cells[cellIndex];
+                
+                // Prevent dropdown for the manually editable date cell
+                if (realCell.closest('tr') === tableBody.rows[0]) {
+                    realCell.focus(); // Allow typing on mobile too
                     return;
                 }
-                openMemberDropdown(cell);
+                openMemberDropdown(realCell, targetElement); // Pass both real cell and mobile div
+            } else { // It's a TD from the desktop view
+                const parentRow = targetElement.closest('tr');
+                if (parentRow && parentRow.parentElement.rows[0] === parentRow) {
+                    return; // Is a manually editable date cell
+                }
+                openMemberDropdown(targetElement); // Pass only the real cell
             }
         });
 
         memberDropdown.addEventListener('click', e => {
             const item = e.target.closest('.member-dropdown-item');
-            if (item && activeCellForDropdown) {
-                activeCellForDropdown.textContent = item.dataset.name;
+            if (item && activeCellForDropdown.realCell) {
+                const newName = item.dataset.name;
+                // Update both the hidden table cell and the visible mobile input
+                activeCellForDropdown.realCell.textContent = newName;
+                if (activeCellForDropdown.mobileDiv) {
+                    activeCellForDropdown.mobileDiv.textContent = newName;
+                }
                 activeProject.triggerSave();
             }
             memberDropdown.style.display = 'none';
@@ -512,7 +686,7 @@
         memberDropdown.style.top = `${rect.bottom}px`;
         memberDropdown.style.left = `${rect.left}px`;
         memberDropdown.style.width = `${rect.width}px`;
-        activeCellForDropdown = cell;
+        activeCellForDropdown = { realCell: cell, mobileDiv: mobileDiv };
     }
 
     async function generatePdf() {
