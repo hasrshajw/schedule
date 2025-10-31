@@ -443,8 +443,14 @@
                 allRows.forEach(row => row.style.display = '');
                 if (firstRow && firstRow.dataset.originalContent) {
                     firstRow.innerHTML = firstRow.dataset.originalContent;
+                    // Restore editable attributes after reverting
                     firstRow.querySelectorAll('[data-user-editable]').forEach(cell => {
-                       cell.setAttribute('contenteditable', 'true');
+                       if(cell.querySelector('.date-input')) {
+                           // This is a date cell, no contenteditable needed
+                           cell.removeAttribute('contenteditable');
+                       } else {
+                           cell.setAttribute('contenteditable', 'true');
+                       }
                     });
                     delete firstRow.dataset.originalContent;
                 }
@@ -458,14 +464,27 @@
                     row.style.display = (index === 0) ? '' : 'none';
                 });
 
-                if (firstRow && !firstRow.dataset.originalContent) {
-                    firstRow.dataset.originalContent = firstRow.innerHTML;
+                let existingDateValue = '';
+                if (firstRow) {
+                    if (!firstRow.dataset.originalContent) {
+                        firstRow.dataset.originalContent = firstRow.innerHTML;
+                    }
+                    // --- THIS IS THE FIX ---
+                    // Try to find the date value from the original content before overwriting
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = firstRow.dataset.originalContent;
+                    const originalDateInput = tempDiv.querySelector('.date-input');
+                    if(originalDateInput) {
+                        existingDateValue = originalDateInput.value;
+                    }
                 }
                 
                 firstRow.innerHTML = `
                     <th colspan="1" class="special-event-text">${eventTexts[eventType]}</th>
                     <td style="text-align: right; font-weight: 700;">తేదీ:</td>
-                    <td data-user-editable="true" contenteditable="true"></td>
+                    <td data-user-editable="true">
+                        <input type="date" class="date-input" value="${existingDateValue}">
+                    </td>
                 `;
             }
 
@@ -477,29 +496,20 @@
 
         setupEventListeners() {
             this.element.addEventListener('input', (e) => {
+                // This handles syncing from mobile inputs back to the hidden table
                 const input = e.target;
-                const rowIndex = input.dataset.rowIndex;
-                const cellIndex = input.dataset.cellIndex;
-
-                if (!rowIndex || !cellIndex) return; // Not a tracked input
-
-                const targetCell = this.tableBody.rows[rowIndex].cells[cellIndex];
-                if (!targetCell) return;
-                
-                // This handles syncing from mobile OR desktop inputs back to the hidden table
-                if (input.type === 'date') {
-                    // Find the date input inside the hidden table cell and update its value
-                    const tableInput = targetCell.querySelector('.date-input');
-                    if (tableInput) {
-                        tableInput.value = input.value;
+                if(input.classList.contains('item-input')) {
+                    const rowIndex = input.dataset.rowIndex;
+                    const cellIndex = input.dataset.cellIndex;
+                    const targetCell = this.tableBody.rows[rowIndex].cells[cellIndex];
+                    
+                    if(input.type === 'date') {
+                        // Find the date input inside the hidden table cell and update its value
+                        const tableInput = targetCell.querySelector('.date-input');
+                        if(tableInput) tableInput.value = input.value;
+                    } else {
+                         targetCell.textContent = input.textContent;
                     }
-                    // For special events, the date cell is just a TD, so update its textContent
-                    if (this.data.eventType !== 'normal') {
-                        targetCell.textContent = input.value.split('-').reverse().join('-');
-                    }
-                } else {
-                    // Sync from desktop contenteditable cells
-                     targetCell.textContent = input.textContent;
                 }
                 this.parentProject.triggerSave();
             });
