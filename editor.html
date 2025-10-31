@@ -325,15 +325,17 @@
                 const eventTexts = { 'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం', 'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో', 'convention': 'ప్రాదేశిక సమావేశం' };
                 const firstRow = this.tableBody.rows[0];
                 const dateCell = firstRow.cells[2];
-                const dateValue = dateCell ? dateCell.textContent.trim().split('-').reverse().join('-') : '';
-                
+                // --- FIX IS HERE ---
+                const dateInput = dateCell ? dateCell.querySelector('.date-input') : null;
+                const dateValue = dateInput ? dateInput.value : '';
+
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'mobile-item';
                 itemDiv.innerHTML = `
                     <div class="item-label special-event-text">${eventTexts[this.data.eventType]}</div>
                     <div class="input-group">
                         <div class="item-label">తేదీ:</div>
-                        <input type="date" class="item-input" data-row-index="0" data-cell-index="2" value="${dateValue}">
+                        <input type="date" class="item-input date-input" data-row-index="0" data-cell-index="2" value="${dateValue}">
                     </div>
                 `;
                 this.mobileViewContainer.appendChild(itemDiv);
@@ -342,17 +344,12 @@
 
             // Handle Normal view
             Array.from(this.tableBody.rows).forEach((row, rowIndex) => {
-                if (row.classList.contains('header-row')) return;
-
                 const editableCellsInRow = Array.from(row.cells).filter(c => c.hasAttribute('data-user-editable'));
-                if (editableCellsInRow.length === 0) return;
+                if (row.classList.contains('header-row') || editableCellsInRow.length === 0) return;
 
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'mobile-item';
-
-                // --- NEW ROBUST LOGIC ---
-
-                // Step 1: Find the main label for the entire group.
+                
                 const firstCell = row.cells[0];
                 const isFirstCellEditable = firstCell.hasAttribute('data-user-editable');
                 
@@ -368,13 +365,11 @@
                     }
                 }
                 
-                // Step 2: Create an input group for each editable cell.
                 editableCellsInRow.forEach(cell => {
                     const cellIndex = cell.cellIndex;
                     const inputWrapper = document.createElement('div');
                     inputWrapper.className = 'input-group';
 
-                    // If the first cell is not the main label, each input needs its own label.
                     if (isFirstCellEditable) {
                         const tempDiv = document.createElement('div');
                         const labelCell = (cellIndex > 0 && row.cells[cellIndex - 1]) ? row.cells[cellIndex - 1] : cell;
@@ -388,16 +383,17 @@
                         }
                     }
                     
-                    // Create the actual input element (date or div)
                     if (rowIndex === 0) { // Date cell
-                        const dateValue = cell.textContent.trim().split('-').reverse().join('-') || '';
-                        const inputEl = document.createElement('input');
-                        inputEl.type = 'date';
-                        inputEl.className = 'item-input';
-                        inputEl.value = dateValue;
-                        inputEl.dataset.rowIndex = rowIndex;
-                        inputEl.dataset.cellIndex = cellIndex;
-                        inputWrapper.appendChild(inputEl);
+                         // --- AND FIX IS HERE ---
+                         const dateInput = cell.querySelector('.date-input');
+                         const dateValue = dateInput ? dateInput.value : '';
+                         const inputEl = document.createElement('input');
+                         inputEl.type = 'date';
+                         inputEl.className = 'item-input';
+                         inputEl.value = dateValue;
+                         inputEl.dataset.rowIndex = rowIndex;
+                         inputEl.dataset.cellIndex = cellIndex;
+                         inputWrapper.appendChild(inputEl);
                     } else { // Name selection cell
                         const inputDiv = document.createElement('div');
                         inputDiv.className = 'item-input editable-cell';
@@ -409,7 +405,9 @@
                     itemDiv.appendChild(inputWrapper);
                 });
 
-                this.mobileViewContainer.appendChild(itemDiv);
+                if (itemDiv.hasChildNodes()) {
+                    this.mobileViewContainer.appendChild(itemDiv);
+                }
             });
         }
         
