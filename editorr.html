@@ -205,11 +205,6 @@
     const eventContextMenu = document.getElementById('event-context-menu');
     const statusIndicator = document.querySelector('.project-header .status-indicator');
     
-    const debounce = (func, delay) => {
-        let timeout;
-        return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), delay); };
-    };
-
     function updateStatus(text, status) {
         statusIndicator.textContent = text;
         statusIndicator.dataset.status = status;
@@ -288,12 +283,12 @@
             }
 
             if (shouldSave) {
-                this.parentProject.debouncedSave();
+                this.parentProject.triggerSave();
             }
         }
 
         setupEventListeners() {
-            this.tableBody.addEventListener('input', () => this.parentProject.debouncedSave());
+            this.tableBody.addEventListener('input', () => this.parentProject.triggerSave());
             this.eventBtn.addEventListener('click', (e) => {
                 activeEventScheduleTable = this;
                 const rect = e.currentTarget.getBoundingClientRect();
@@ -310,6 +305,8 @@
             this.data = initialData;
             this.collectionRef = collectionRef;
             this.scheduleTables = [];
+            this.isSaving = false;
+            this.saveTimeout = null;
             this.render();
             this.setupEventListeners();
         }
@@ -324,9 +321,17 @@
                 this.scheduleTables.push(new ScheduleTable(this, tableData, index));
             });
         }
+
+        triggerSave() {
+            if (this.isSaving) return;
+            clearTimeout(this.saveTimeout);
+            this.saveTimeout = setTimeout(() => this.save(), 500); // Throttle saves to every 500ms
+        }
         
         save() {
+            this.isSaving = true;
             updateStatus('Syncing...', 'syncing');
+            
             const updatedTablesData = this.scheduleTables.map(table => ({
                 title: table.data.title,
                 content: table.getContent(),
@@ -335,14 +340,16 @@
             const payload = { name: projectTitleEl.textContent, tables: updatedTablesData };
 
             this.collectionRef.doc(this.id).update(payload)
-                .then(() => updateStatus('Synced', 'synced'))
+                .then(() => {
+                    updateStatus('Synced', 'synced');
+                    this.isSaving = false;
+                })
                 .catch(err => {
                     console.error("Save failed:", err);
                     updateStatus('Error', 'error');
+                    this.isSaving = false;
                 });
         }
-        
-        debouncedSave = debounce(() => this.save(), 1500);
 
         getContentForComparison() {
             const tablesData = this.scheduleTables.map(table => ({ 
@@ -354,7 +361,7 @@
         }
 
         setupEventListeners() {
-            projectTitleEl.addEventListener('input', () => this.debouncedSave());
+            projectTitleEl.addEventListener('input', () => this.triggerSave());
         }
     }
 
@@ -392,7 +399,7 @@
                 } else {
                     const localContent = activeProject.getContentForComparison();
                     const remoteContent = JSON.stringify(remoteData.tables);
-                    if (localContent !== remoteContent) {
+                    if (localContent !== remoteContent && !activeProject.isSaving) {
                         activeProject.render(remoteData);
                     }
                 }
