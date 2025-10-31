@@ -6,15 +6,21 @@
 <title>User - Schedule Editor</title>
 
 <!-- FIREBASE SDKs -->
+
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
 <!-- PDF Generation Libraries -->
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <!-- FONTS -->
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -73,21 +79,18 @@
     .status-indicator[data-status="error"] { color: var(--danger-color); background-color: #fde8e8; }
 
     .schedule-block table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.25px; }
-    .schedule-block th, .schedule-block td { border: 1px solid #333; padding: 0; text-align: left; vertical-align: middle; position: relative; height: 36px; }
-    .schedule-block .editable-cell:not([contenteditable="true"]) { cursor: pointer; padding: 0 8px; }
+    .schedule-block th, .schedule-block td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; }
+    .schedule-block .editable-cell:not([contenteditable="true"]) { cursor: pointer; }
     .schedule-block .editable-cell:not([contenteditable="true"]):hover { background-color: #f9fafb; }
-    .date-input { cursor: pointer; -webkit-appearance: none; -moz-appearance: none; appearance: none; background-color: transparent; border: none; width: 100%; height: 100%; font-family: inherit; font-size: inherit; font-weight: inherit; text-align: left; padding: 0 8px; }
-    .date-input:focus { background-color: #fffbe5; }
-
     .schedule-block [contenteditable="true"]:focus { background-color: #fffbe5; }
-    .schedule-block .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; padding: 0 8px;}
+    .schedule-block .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; }
     .schedule-block .cell-icon { height: 70%; max-height: 24px; object-fit: contain; flex-shrink: 0; }
     .schedule-block .header-row .cell-icon { filter: brightness(0) invert(1); }
     .schedule-block .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; }
     .schedule-block .header-row td { font-size: 16px; color: #ffffff; height: 42px; }
     .schedule-block .row-handle { display: none !important; }
     
-    .special-event-text { color: red; text-align: center !important; font-weight: 700; padding: 0 8px; }
+    .special-event-text { color: red; text-align: center !important; font-weight: 700; }
 
     #event-context-menu, #member-dropdown { position: fixed; display: none; background: var(--surface-color); border-radius: var(--radius-md); box-shadow: var(--shadow-md); z-index: 1001; padding: 6px; min-width: 180px; border: 1px solid var(--border-color); }
     .context-menu-item, .member-dropdown-item { font-family: 'Inter', sans-serif; display: block; width: 100%; padding: 8px 12px; cursor: pointer; font-size: 14px; border-radius: 6px; background: none; border: none; text-align: left; }
@@ -110,7 +113,24 @@
     #print-container { position: absolute; left: -9999px; top: auto; width: 1100px; background: white; }
     
     .mobile-view-container { display: none; }
-
+    
+/* Add this new rule for the date input */
+    .date-input {
+        cursor: pointer;
+        -webkit-appearance: none; /* Hides default UI on some browsers */
+        -moz-appearance: none;
+        appearance: none;
+        background-color: transparent;
+        border: none;
+        width: 100%;
+        height: 100%;
+        font-family: inherit;
+        font-size: inherit;
+        font-weight: inherit;
+        text-align: left;
+        padding-left: 8px;
+    }
+    
     @media (max-width: 768px) {
         body { padding: 56px 0 0 0; background-color: var(--surface-color); }
         #app-header { padding: 0 16px; }
@@ -123,11 +143,12 @@
         .schedule-block table { display: none; }
         .mobile-view-container { display: flex; flex-direction: column; gap: 1.5rem; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 16px; }
         .mobile-item .item-label { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; font-family: 'Noto Sans Telugu', sans-serif; }
-        .mobile-item .item-input { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-md); background-color: #f9fafb; font-size: 1rem; font-weight: 500; color: var(--text-secondary); margin-top: 4px;}
+        .mobile-item .item-input { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-md); background-color: #f9fafb; font-size: 1rem; font-weight: 500; color: var(--text-secondary); margin-top: 4px; }
         .mobile-item .input-group { margin-bottom: 12px; }
         .mobile-item .input-group:last-child { margin-bottom: 0; }
     }
 </style>
+
 </head>
 <body>
 
@@ -146,14 +167,13 @@
             </div>
         </div>
     </header>
-
-    <div class="master-container">
-        <div id="project-header" class="project-header">
-            <h1 id="project-title" contenteditable="true">Loading Project...</h1>
-            <div class="status-indicator" data-status="synced">Synced</div>
-        </div>
-        <div id="schedules-wrapper"></div>
+<div class="master-container">
+    <div id="project-header" class="project-header">
+        <h1 id="project-title" contenteditable="true">Loading Project...</h1>
+        <div class="status-indicator" data-status="synced">Synced</div>
     </div>
+    <div id="schedules-wrapper"></div>
+</div>
 </div>
 
 <template id="schedule-template">
@@ -275,33 +295,53 @@
 
         render() {
             this.titleEl.textContent = this.data.title;
+            
+            // Create a temporary document fragment to parse the content
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = `<table><tbody>${this.data.content}</tbody></table>`;
+
+            // Process editable status BEFORE adding to the page
             tempDiv.querySelectorAll('td, th').forEach(cell => {
                 if (cell.hasAttribute('data-user-editable')) {
+                    // Check if it's the date cell in the first row
                     if (cell.closest('tr') === tempDiv.querySelector('tbody').rows[0]) {
-                        const originalText = cell.textContent;
-                        cell.innerHTML = `<input type="date" class="date-input" value="${originalText.split('-').reverse().join('-') || ''}">`;
-                    } else {
+    // This is the first row. Check if it's the specific date cell (usually the last one).
+    if (cell.hasAttribute('data-user-editable')) {
+        const originalText = cell.textContent;
+        cell.innerHTML = `<input type="date" class="date-input" value="${originalText.split('-').reverse().join('-') || ''}">`;
+        cell.removeAttribute('contenteditable'); // The input handles editing now
+    } else {
+        cell.setAttribute('contenteditable', 'false'); // Lock other cells in first row
+    }
+} else {
+                        // It's a dropdown cell for names
                         cell.classList.add('editable-cell');
+                        cell.removeAttribute('contenteditable');
                     }
                 } else {
+                    // Not a user-editable cell, so lock it down.
                     cell.setAttribute('contenteditable', 'false');
                 }
             });
+
+            // Now, set the innerHTML of the actual table body with the processed content
             this.tableBody.innerHTML = tempDiv.querySelector('tbody').innerHTML;
+
+            // Finally, create the mobile view based on the corrected table structure
             this._createMobileView();
         }
 
         _createMobileView() {
             this.mobileViewContainer.innerHTML = '';
-            
+
+            // Handle Special Event view
             if (this.data.eventType && this.data.eventType !== 'normal') {
                 const eventTexts = { 'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం', 'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో', 'convention': 'ప్రాదేశిక సమావేశం' };
                 const firstRow = this.tableBody.rows[0];
                 const dateCell = firstRow.cells[2];
-                const dateValue = dateCell ? (dateCell.querySelector('.date-input') ? dateCell.querySelector('.date-input').value : dateCell.textContent.split('-').reverse().join('-')) : '';
-                
+                const dateInput = dateCell ? dateCell.querySelector('.date-input') : null;
+                const dateValue = dateInput ? dateInput.value : '';
+
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'mobile-item';
                 itemDiv.innerHTML = `
@@ -315,38 +355,56 @@
                 return;
             }
 
+            // Handle Normal view
             Array.from(this.tableBody.rows).forEach((row, rowIndex) => {
-                const editableCellsInRow = Array.from(row.cells).filter(c => c.hasAttribute('data-user-editable') || c.querySelector('.date-input'));
-                if (row.classList.contains('header-row') || editableCellsInRow.length === 0) return;
+                if (row.classList.contains('header-row')) return;
                 
+                // Find all editable cells in the current row
+                const editableCellsInRow = Array.from(row.cells).filter(c => c.hasAttribute('data-user-editable'));
+                if (editableCellsInRow.length === 0) return;
+
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'mobile-item';
+
+                // Get the main label for the row (if it exists and isn't itself editable)
+                const primaryCell = row.cells[0];
+                if (primaryCell && !primaryCell.hasAttribute('data-user-editable')) {
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = primaryCell.innerHTML;
+                    const primaryLabelText = tempDiv.textContent.trim().replace('⠿', '');
+                    if (primaryLabelText) {
+                        itemDiv.innerHTML = `<div class="item-label">${primaryLabelText}</div>`;
+                    }
+                }
+
+                const inputsContainer = document.createElement('div');
                 
                 editableCellsInRow.forEach(cell => {
                     const cellIndex = cell.cellIndex;
                     const inputWrapper = document.createElement('div');
                     inputWrapper.className = 'input-group';
-                    
+
+                    // Get the specific label for this input (usually the cell to the left)
                     let labelText = '';
-                    if (cellIndex > 0 && row.cells[cellIndex - 1]) {
+                    if (cellIndex > 0 && row.cells[cellIndex - 1] && !row.cells[cellIndex - 1].hasAttribute('data-user-editable')) {
                         const labelCell = row.cells[cellIndex - 1];
-                        labelText = labelCell.textContent.trim().replace('⠿', '').replace(':', '');
-                    } else if (cellIndex === 0) {
-                        const primaryCell = row.cells[0];
                         const tempDiv = document.createElement('div');
-                        tempDiv.innerHTML = primaryCell.innerHTML;
-                        labelText = tempDiv.textContent.trim().replace('⠿', '');
+                        tempDiv.innerHTML = labelCell.innerHTML;
+                        labelText = tempDiv.textContent.trim().replace('⠿', '').replace(':', '');
                     }
+                    
                     if (labelText) {
                         inputWrapper.innerHTML = `<div class="item-label">${labelText}</div>`;
                     }
-                    
-                    if(cell.querySelector('.date-input')) {
+
+                    // Create date input for the first row, otherwise a div for member selection
+                    if (rowIndex === 0) {
                         const dateInput = cell.querySelector('.date-input');
+                        const dateValue = dateInput ? dateInput.value : '';
                         const inputEl = document.createElement('input');
                         inputEl.type = 'date';
                         inputEl.className = 'item-input date-input';
-                        inputEl.value = dateInput.value;
+                        inputEl.value = dateValue;
                         inputEl.dataset.rowIndex = rowIndex;
                         inputEl.dataset.cellIndex = cellIndex;
                         inputWrapper.appendChild(inputEl);
@@ -358,20 +416,16 @@
                         inputDiv.dataset.cellIndex = cellIndex;
                         inputWrapper.appendChild(inputDiv);
                     }
-                    itemDiv.appendChild(inputWrapper);
+                    inputsContainer.appendChild(inputWrapper);
                 });
-                if(itemDiv.hasChildNodes()) {
-                    this.mobileViewContainer.appendChild(itemDiv);
-                }
+                
+                itemDiv.appendChild(inputsContainer);
+                this.mobileViewContainer.appendChild(itemDiv);
             });
         }
         
         getContent() {
             const tempTable = this.element.querySelector('table').cloneNode(true);
-            tempTable.querySelectorAll('.date-input').forEach(input => {
-                const cell = input.parentElement;
-                cell.textContent = input.value ? input.value.split('-').reverse().join('-') : '';
-            });
             const body = tempTable.querySelector('tbody');
             if (body) return body.innerHTML;
             return tempTable.innerHTML;
@@ -387,37 +441,57 @@
                 if (firstRow && firstRow.dataset.originalContent) {
                     firstRow.innerHTML = firstRow.dataset.originalContent;
                     firstRow.querySelectorAll('[data-user-editable]').forEach(cell => {
-                        const originalText = cell.textContent;
-                        cell.innerHTML = `<input type="date" class="date-input" value="${originalText.split('-').reverse().join('-') || ''}">`;
+                       cell.setAttribute('contenteditable', 'true');
                     });
                     delete firstRow.dataset.originalContent;
                 }
             } else {
-                const eventTexts = { 'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం', 'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో', 'convention': 'ప్రాదేశిక సమావేశం' };
-                allRows.forEach((row, index) => { row.style.display = (index === 0) ? '' : 'none'; });
-                if (firstRow && !firstRow.dataset.originalContent) { firstRow.dataset.originalContent = firstRow.innerHTML; }
-                const dateInput = firstRow.querySelector('.date-input');
-                const dateValue = dateInput ? dateInput.value.split('-').reverse().join('-') : '';
+                const eventTexts = {
+                    'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం',
+                    'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో',
+                    'convention': 'ప్రాదేశిక సమావేశం'
+                };
+                allRows.forEach((row, index) => {
+                    row.style.display = (index === 0) ? '' : 'none';
+                });
+
+                if (firstRow && !firstRow.dataset.originalContent) {
+                    firstRow.dataset.originalContent = firstRow.innerHTML;
+                }
+                
                 firstRow.innerHTML = `
                     <th colspan="1" class="special-event-text">${eventTexts[eventType]}</th>
                     <td style="text-align: right; font-weight: 700;">తేదీ:</td>
-                    <td data-user-editable="true"><input type="date" class="date-input" value="${dateValue.split('-').reverse().join('-') || ''}"></td>`;
+                    <td data-user-editable="true" contenteditable="true"></td>
+                `;
             }
 
             this._createMobileView();
-            if (shouldSave) { this.parentProject.triggerSave(); }
+            if (shouldSave) {
+                this.parentProject.triggerSave();
+            }
         }
 
         setupEventListeners() {
             this.element.addEventListener('input', (e) => {
-                if(e.target.classList.contains('date-input')) {
-                    const rowIndex = e.target.dataset.rowIndex;
-                    const cellIndex = e.target.dataset.cellIndex;
-                    const tableCellInput = this.tableBody.rows[rowIndex].cells[cellIndex].querySelector('.date-input');
-                    if(tableCellInput) tableCellInput.value = e.target.value;
+                // This handles syncing from mobile inputs back to the hidden table
+                const input = e.target;
+                if(input.classList.contains('item-input')) {
+                    const rowIndex = input.dataset.rowIndex;
+                    const cellIndex = input.dataset.cellIndex;
+                    const targetCell = this.tableBody.rows[rowIndex].cells[cellIndex];
+                    
+                    if(input.type === 'date') {
+                        // Find the date input inside the hidden table cell and update its value
+                        const tableInput = targetCell.querySelector('.date-input');
+                        if(tableInput) tableInput.value = input.value;
+                    } else {
+                         targetCell.textContent = input.textContent;
+                    }
                 }
                 this.parentProject.triggerSave();
             });
+
             this.eventBtn.addEventListener('click', (e) => {
                 activeEventScheduleTable = this;
                 const rect = e.currentTarget.getBoundingClientRect();
@@ -426,7 +500,6 @@
                 eventContextMenu.style.left = `${rect.left}px`;
             });
         }
-    }
     
     class Project {
         constructor(id, initialData, collectionRef) {
@@ -445,6 +518,7 @@
             if (document.activeElement !== projectTitleEl) projectTitleEl.textContent = this.data.name;
             schedulesWrapper.innerHTML = '';
             this.scheduleTables = [];
+            
             this.data.tables.forEach((tableData, index) => {
                 this.scheduleTables.push(new ScheduleTable(this, tableData, index));
             });
@@ -452,17 +526,40 @@
 
         triggerSave() {
             clearTimeout(this.saveTimeout);
-            if (!this.isSaving) { this.saveTimeout = setTimeout(() => this.save(), 500); }
+            if (!this.isSaving) {
+                this.saveTimeout = setTimeout(() => this.save(), 500);
+            }
         }
         
         save() {
             this.isSaving = true;
             updateStatus('Syncing...', 'syncing');
-            const updatedTablesData = this.scheduleTables.map(table => ({ title: table.data.title, content: table.getContent(), eventType: table.data.eventType || 'normal' }));
+            // Before saving, update the table cells with the values from any date inputs
+            this.scheduleTables.forEach(table => {
+                const dateInput = table.tableBody.querySelector('.date-input');
+                if (dateInput && dateInput.value) {
+                    const cell = dateInput.parentElement;
+                    // Convert YYYY-MM-DD back to DD-MM-YYYY for display
+                    cell.textContent = dateInput.value.split('-').reverse().join('-');
+                }
+            });
+            const updatedTablesData = this.scheduleTables.map(table => ({
+                title: table.data.title,
+                content: table.getContent(),
+                eventType: table.data.eventType || 'normal'
+            }));
             const payload = { name: projectTitleEl.textContent, tables: updatedTablesData };
+
             this.collectionRef.doc(this.id).update(payload)
-                .then(() => { updateStatus('Synced', 'synced'); this.isSaving = false; })
-                .catch(err => { console.error("Save failed:", err); updateStatus('Error', 'error'); this.isSaving = false; });
+                .then(() => {
+                    updateStatus('Synced', 'synced');
+                    this.isSaving = false;
+                })
+                .catch(err => {
+                    console.error("Save failed:", err);
+                    updateStatus('Error', 'error');
+                    this.isSaving = false;
+                });
         }
 
         setupEventListeners() {
@@ -479,7 +576,9 @@
             appContainer.classList.remove('hidden');
             userEmailEl.textContent = user.email;
             userAvatarEl.textContent = user.email.charAt(0).toUpperCase();
+            
             setupGlobalUI();
+
             const params = new URLSearchParams(window.location.search);
             currentProjectId = params.get('id');
             if (currentProjectId) { initEditor(); } else { initCreationFlow(); }
@@ -536,35 +635,58 @@
             if (!newProjectName) return alert("Please enter a name for your new project.");
             const selectedCheckboxes = Array.from(templateList.querySelectorAll('input:checked'));
             if (selectedCheckboxes.length === 0) return alert("Please select at least one template.");
+
             const tablesArray = selectedCheckboxes.map(input => {
                 const rawContent = decodeURIComponent(input.dataset.content);
                 const tempDiv = document.createElement('div');
                 tempDiv.innerHTML = `<table><tbody>${rawContent}</tbody></table>`;
                 tempDiv.querySelectorAll('td, th').forEach(cell => {
-                    if (cell.textContent.trim() === '' && !cell.querySelector('img')) cell.setAttribute('data-user-editable', 'true');
+                    const isEssentiallyEmpty = cell.textContent.trim() === '' && !cell.querySelector('img');
+                    if (isEssentiallyEmpty) cell.setAttribute('data-user-editable', 'true');
                 });
                 return { title: input.dataset.name, content: tempDiv.querySelector('tbody').innerHTML, eventType: 'normal' };
             });
-            const newDocRef = await userSchedulesCollection.add({ name: newProjectName, tables: tablesArray, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+            const newDocRef = await userSchedulesCollection.add({
+                name: newProjectName,
+                tables: tablesArray,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
             window.location.href = `./editor.html?id=${newDocRef.id}`;
         });
         
         eventContextMenu.addEventListener('click', (e) => {
             const target = e.target.closest('.context-menu-item');
-            if (target && activeEventScheduleTable) { activeEventScheduleTable.applyEventType(target.dataset.eventType); }
+            if (target && activeEventScheduleTable) {
+                activeEventScheduleTable.applyEventType(target.dataset.eventType);
+            }
             eventContextMenu.style.display = 'none';
             activeEventScheduleTable = null;
         });
 
         schedulesWrapper.addEventListener('click', e => {
-            const targetElement = e.target.closest('.editable-cell');
+            const targetElement = e.target.closest('.editable-cell, [contenteditable="true"]');
             if (!targetElement) return;
-            if (targetElement.hasAttribute('contenteditable')) return; 
-            const rowIndex = targetElement.dataset.rowIndex;
-            const cellIndex = targetElement.dataset.cellIndex;
-            const tableBody = targetElement.closest('.schedule-block, .mobile-view-container').querySelector('.schedule-table-body');
-            const realCell = tableBody.rows[rowIndex].cells[cellIndex];
-            openMemberDropdown(realCell, targetElement);
+
+            // If the element is specifically marked as contenteditable, it's for typing. Do nothing.
+            if (targetElement.getAttribute('contenteditable') === 'true') {
+                return;
+            }
+
+            // If we are here, it must be a dropdown cell (desktop or mobile).
+            let realCell;
+            let mobileDiv = null;
+
+            if (targetElement.tagName === 'DIV') { // It's a mobile input
+                mobileDiv = targetElement;
+                const rowIndex = mobileDiv.dataset.rowIndex;
+                const cellIndex = mobileDiv.dataset.cellIndex;
+                const tableBody = mobileDiv.closest('.schedule-block').querySelector('.schedule-table-body');
+                realCell = tableBody.rows[rowIndex].cells[cellIndex];
+            } else { // It's a desktop table cell (TD)
+                realCell = targetElement;
+            }
+            
+            openMemberDropdown(realCell, mobileDiv);
         });
 
         memberDropdown.addEventListener('click', e => {
@@ -572,7 +694,9 @@
             if (item && activeCellForDropdown.realCell) {
                 const newName = item.dataset.name;
                 activeCellForDropdown.realCell.textContent = newName;
-                if (activeCellForDropdown.mobileDiv) { activeCellForDropdown.mobileDiv.textContent = newName; }
+                if (activeCellForDropdown.mobileDiv) {
+                    activeCellForDropdown.mobileDiv.textContent = newName;
+                }
                 activeProject.triggerSave();
             }
             memberDropdown.style.display = 'none';
@@ -591,16 +715,22 @@
         const allRows = Array.from(table.querySelectorAll('tbody > tr'));
         const cellRow = cell.closest('tr');
         const cellIndex = allRows.indexOf(cellRow);
+        
         let ministryHeaderIndex = -1;
         let nextHeaderIndex = allRows.length;
+
         allRows.forEach((row, index) => {
             if(row.classList.contains('header-row')) {
-                if (row.dataset.section === 'ministry') { ministryHeaderIndex = index; } 
-                else if (ministryHeaderIndex !== -1 && index > ministryHeaderIndex) {
-                    if (index < nextHeaderIndex) { nextHeaderIndex = index; }
+                if (row.dataset.section === 'ministry') {
+                    ministryHeaderIndex = index;
+                } else if (ministryHeaderIndex !== -1 && index > ministryHeaderIndex) {
+                    if (index < nextHeaderIndex) {
+                        nextHeaderIndex = index;
+                    }
                 }
             }
         });
+        
         if (ministryHeaderIndex === -1) return false;
         return cellIndex > ministryHeaderIndex && cellIndex < nextHeaderIndex;
     }
@@ -616,6 +746,7 @@
         } else {
             listToShow = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
         }
+
         listToShow.forEach(member => { 
             const item = document.createElement('button');
             item.className = 'member-dropdown-item';
@@ -623,6 +754,7 @@
             item.innerHTML = `<span>${member.name}</span>` + (member.isServant ? '<span class="servant-tag">Servant</span>' : '');
             memberDropdown.appendChild(item);
         });
+
         const rect = (mobileDiv || cell).getBoundingClientRect();
         memberDropdown.style.display = 'block';
         memberDropdown.style.top = `${rect.bottom}px`;
@@ -635,6 +767,7 @@
         const printButton = document.getElementById('print-button');
         printButton.disabled = true;
         printButton.querySelector('span:last-child').textContent = 'Generating...';
+
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('p', 'mm', 'a4');
         const originalBlocks = document.querySelectorAll('.schedule-block');
@@ -656,12 +789,14 @@
             clone.querySelector('.mobile-view-container').style.display = 'none';
             clone.querySelector('table').style.display = 'table';
             printContainer.appendChild(clone);
+            
             const canvas = await html2canvas(clone, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
             const imgData = canvas.toDataURL('image/jpeg', 0.8);
             const imgProps = pdf.getImageProperties(imgData);
             const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
             itemsToPrint.push({ imgData, width: USABLE_WIDTH, height: imgHeight });
         }
+        
         document.body.removeChild(printContainer);
 
         let currentY = MARGIN_MM;
@@ -676,6 +811,7 @@
 
         const fileName = `${projectTitleEl.textContent.trim() || 'schedule'}.pdf`;
         pdf.save(fileName);
+
         printButton.disabled = false;
         printButton.querySelector('span:last-child').textContent = 'Download PDF';
     }
@@ -683,5 +819,6 @@
     setupGlobalUI();
 })();
 </script>
+
 </body>
 </html>
