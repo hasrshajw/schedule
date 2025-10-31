@@ -449,39 +449,70 @@
             this.data.eventType = eventType;
             const allRows = this.tableBody.querySelectorAll('tr');
             const firstRow = this.tableBody.rows[0];
+
             if (eventType === 'normal') {
                 allRows.forEach(row => row.style.display = '');
                 if (firstRow && firstRow.dataset.originalContent) {
                     firstRow.innerHTML = firstRow.dataset.originalContent;
                     delete firstRow.dataset.originalContent;
+                    
+                    const dateCell = firstRow.querySelector('[data-user-editable]');
+                    if(dateCell) {
+                        const originalText = dateCell.textContent.trim();
+                        const dateValue = originalText.split('-').reverse().join('-');
+                        dateCell.innerHTML = `<input type="date" class="date-input" value="${dateValue || ''}">`;
+                    }
                 }
             } else {
-                const eventTexts = { 'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం', 'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో', 'convention': 'ప్రాదేశిక సమావేశం' };
-                allRows.forEach((row, index) => { row.style.display = (index === 0) ? '' : 'none'; });
+                const eventTexts = {
+                    'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం',
+                    'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో',
+                    'convention': 'ప్రాదేశిక సమావేశం'
+                };
+                allRows.forEach((row, index) => {
+                    row.style.display = (index === 0) ? '' : 'none';
+                });
+
                 let existingDateValue = '';
                 if (firstRow) {
-                    if (!firstRow.dataset.originalContent) { firstRow.dataset.originalContent = firstRow.innerHTML; }
+                    if (!firstRow.dataset.originalContent) {
+                        firstRow.dataset.originalContent = firstRow.innerHTML;
+                    }
                     const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = firstRow.dataset.originalContent;
-                    const originalDateCell = tempDiv.querySelector('[data-user-editable]');
-                    if (originalDateCell) { existingDateValue = originalDateCell.textContent.trim().split('-').reverse().join('-'); }
+                    tempDiv.innerHTML = `<table><tbody><tr>${firstRow.dataset.originalContent}</tr></tbody></table>`;
+                    const originalDateInput = tempDiv.querySelector('.date-input');
+                    if (originalDateInput) {
+                         existingDateValue = originalDateInput.value;
+                    }
                 }
-                firstRow.innerHTML = `<th colspan="1" class="special-event-text">${eventTexts[eventType]}</th><td style="text-align: right; font-weight: 700;">తేదీ:</td><td data-user-editable="true"><input type="date" class="date-input" value="${existingDateValue}"></td>`;
+                
+                firstRow.innerHTML = `
+                    <th colspan="1" class="special-event-text">${eventTexts[eventType]}</th>
+                    <td style="text-align: right; font-weight: 700;">తేదీ:</td>
+                    <td data-user-editable="true"><input type="date" class="date-input" value="${existingDateValue}"></td>
+                `;
             }
-            this.render();
-            if (shouldSave) { this.parentProject.triggerSave(); }
+
+            this._createMobileView(); 
+            
+            if (shouldSave) {
+                this.parentProject.triggerSave();
+            }
         }
         setupEventListeners() {
             this.element.addEventListener('input', (e) => {
                 const input = e.target;
-                if(input.classList.contains('item-input')) {
+                if(input.classList.contains('item-input') || input.classList.contains('date-input')) {
                     const rowIndex = input.dataset.rowIndex;
                     const cellIndex = input.dataset.cellIndex;
-                    const targetCell = this.tableBody.rows[rowIndex].cells[cellIndex];
-                    if(input.type === 'date') {
-                        const tableInput = targetCell.querySelector('.date-input');
-                        if(tableInput) tableInput.value = input.value;
-                    } else { targetCell.textContent = input.textContent; }
+                    // Sync from mobile to hidden table
+                    if (rowIndex && cellIndex) {
+                        const targetCell = this.tableBody.rows[rowIndex].cells[cellIndex];
+                        if(input.type === 'date') {
+                            const tableInput = targetCell.querySelector('.date-input');
+                            if(tableInput) tableInput.value = input.value;
+                        } else { targetCell.textContent = input.textContent; }
+                    }
                 }
                 this.parentProject.triggerSave();
             });
@@ -545,7 +576,6 @@
             if (user.email === ADMIN_EMAIL) { window.location.replace('./admin.html'); return; }
             currentUser = user;
             
-            // Populate user info in the new slide-out menu
             if(profileNameEl) profileNameEl.textContent = user.displayName || user.email;
             document.body.classList.add('auth-ready');
 
@@ -584,7 +614,6 @@
 
     async function initCreationFlow() {
         document.getElementById('project-header').style.display = 'none';
-        document.getElementById('print-button').style.display = 'none';
         const templatesCollection = db.collection("templates");
         const snapshot = await templatesCollection.orderBy("createdAt").get();
         templateList.innerHTML = '';
@@ -601,7 +630,6 @@
     }
 
     function setupGlobalUI() {
-        // --- NEW SLIDE MENU LOGIC ---
         const menuToggleButton = document.getElementById('menu-toggle-button');
         const slideMenu = document.getElementById('slide-menu');
         const menuOverlay = document.getElementById('menu-overlay');
@@ -614,17 +642,12 @@
         }
 
         menuToggleButton.addEventListener('click', () => {
-            if (body.classList.contains('menu-open')) {
-                closeMenu();
-            } else {
-                slideMenu.classList.add('is-open');
-                menuOverlay.classList.add('is-open');
-                body.classList.add('menu-open');
-            }
+            body.classList.toggle('menu-open');
+            slideMenu.classList.toggle('is-open');
+            menuOverlay.classList.toggle('is-open');
         });
         menuOverlay.addEventListener('click', closeMenu);
 
-        // --- ORIGINAL GLOBAL UI LISTENERS (ADAPTED) ---
         document.getElementById('logout-link').addEventListener('click', () => auth.signOut());
         document.getElementById('print-button').addEventListener('click', generatePdf);
         document.getElementById('cancel-template-selection').addEventListener('click', () => window.location.href = './dashboard.html');
@@ -663,8 +686,7 @@
 
         schedulesWrapper.addEventListener('click', e => {
             const targetElement = e.target.closest('.editable-cell, [contenteditable="true"]');
-            if (!targetElement) return;
-            if (targetElement.getAttribute('contenteditable') === 'true') { return; }
+            if (!targetElement || targetElement.getAttribute('contenteditable') === 'true') return;
             let realCell, mobileDiv = null;
             if (targetElement.tagName === 'DIV') {
                 mobileDiv = targetElement;
@@ -781,7 +803,6 @@
         printButton.querySelector('span:last-child').textContent = 'Download PDF';
     }
 
-    // Call setupGlobalUI once the DOM is ready and before authentication check
     setupGlobalUI();
 })();
 </script>
