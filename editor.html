@@ -848,59 +848,51 @@
             itemsToPrint.push({ imgData, width: USABLE_WIDTH, height: imgHeight });
         }
         
-        // ... code that generates itemsToPrint ...
-
         document.body.removeChild(printContainer);
 
-        // --- START: NEW VERTICAL CENTERING LOGIC ---
+        // --- START: NEW VERTICAL JUSTIFICATION LOGIC ---
 
-        // 1. Group items into pages
-        const pageGroups = [];
-        let currentPageItems = [];
-        let currentPageHeight = 0;
-
-        itemsToPrint.forEach(item => {
-            const itemHeightWithSpacing = (currentPageItems.length > 0 ? PAGE_SPACING_MM : 0) + item.height;
-
-            if (currentPageHeight + itemHeightWithSpacing <= USABLE_HEIGHT) {
-                currentPageItems.push(item);
-                currentPageHeight += itemHeightWithSpacing;
-            } else {
-                pageGroups.push(currentPageItems); // Finalize the previous page
-                currentPageItems = [item];      // Start a new page with the current item
-                currentPageHeight = item.height;
-            }
-        });
-        if (currentPageItems.length > 0) {
-            pageGroups.push(currentPageItems); // Add the last page
-        }
-
-        // 2. Render each page group, centered vertically
-        pageGroups.forEach((itemsOnPage, pageIndex) => {
-            if (pageIndex > 0) {
+        let pageNumber = 1;
+        // Process items page by page until none are left
+        while (itemsToPrint.length > 0) {
+            // Add a new page for all pages after the first one
+            if (pageNumber > 1) {
                 pdf.addPage();
             }
 
-            // Calculate the total height of content for THIS page
-            const totalContentHeight = itemsOnPage.reduce((sum, item, index) => {
-                const spacing = (index > 0) ? PAGE_SPACING_MM : 0;
-                return sum + item.height + spacing;
-            }, 0);
+            // Step 1: Determine which items fit on the current page
+            const itemsForThisPage = [];
+            let currentContentHeight = 0;
+            for (const item of itemsToPrint) {
+                // Calculate the height needed if we add this item
+                const potentialHeight = currentContentHeight + item.height + (itemsForThisPage.length > 0 ? PAGE_SPACING_MM : 0);
+                if (potentialHeight <= USABLE_HEIGHT) {
+                    itemsForThisPage.push(item);
+                    currentContentHeight = potentialHeight;
+                } else {
+                    break; // This item doesn't fit, so we stop collecting for this page
+                }
+            }
 
-            // Calculate the leftover space and the offset to center the content block
-            const leftoverSpace = USABLE_HEIGHT - totalContentHeight;
-            const initialOffset = (leftoverSpace > 0) ? leftoverSpace / 2 : 0;
+            // Step 2: Calculate the spacing needed to justify the content
+            const remainingSpace = USABLE_HEIGHT - currentContentHeight;
+            // We have gaps at the top, bottom, and between each item. So, N items have N+1 gaps.
+            const extraSpacePerGap = remainingSpace / (itemsForThisPage.length + 1);
 
-            // Start drawing from the calculated offset
-            let currentY = MARGIN_MM + initialOffset;
-
-            itemsOnPage.forEach(item => {
+            // Step 3: Place the items on the page with the calculated spacing
+            let currentY = MARGIN_MM + extraSpacePerGap; // Start with the top margin plus the extra space
+            
+            for (const item of itemsForThisPage) {
                 pdf.addImage(item.imgData, 'JPEG', MARGIN_MM, currentY, item.width, item.height);
-                currentY += item.height + PAGE_SPACING_MM;
-            });
-        });
+                // Move Y down by the item's height, the standard gap, and the extra justification space
+                currentY += item.height + PAGE_SPACING_MM + extraSpacePerGap;
+            }
 
-        // --- END: NEW VERTICAL CENTERING LOGIC ---
+            // Step 4: Remove the processed items from the main list
+            itemsToPrint.splice(0, itemsForThisPage.length);
+            pageNumber++;
+        }
+        // --- END: NEW VERTICAL JUSTIFICATION LOGIC ---
 
         const fileName = `${projectTitleEl.textContent.trim() || 'schedule'}.pdf`;
         pdf.save(fileName);
