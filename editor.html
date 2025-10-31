@@ -812,32 +812,29 @@
         document.body.appendChild(printContainer);
 
         const itemsToPrint = [];
+        // INSIDE THE generatePdf function...
+
         for (const block of document.querySelectorAll('.schedule-block')) {
             const clone = block.cloneNode(true);
             
-            // --- Keep these existing modifications ---
+            // --- All your modifications happen first ---
             clone.querySelector('.event-btn').style.display = 'none';
             clone.querySelector('.mobile-view-container').style.display = 'none';
             clone.querySelector('table').style.display = 'table';
-
-            // --- START: ADD THESE NEW LINES ---
-
-            // 1. Hide the schedule title to create more vertical space
+            
             const titleEl = clone.querySelector('.schedule-title');
             if (titleEl) {
                 titleEl.style.display = 'none';
             }
-
-            // 2. Remove the bottom margin to fix the extra spacing issue
             clone.style.marginBottom = '0';
-
-            // --- END: ADD THESE NEW LINES ---
             
+            // --- Then you append the clone to the DOM ---
             printContainer.appendChild(clone);
             
+            // --- FINALLY, you render it to the canvas ONE TIME ---
             const canvas = await html2canvas(clone, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
             
-            const canvas = await html2canvas(clone, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+            // --- And continue with the rest of the logic ---
             const imgData = canvas.toDataURL('image/jpeg', 0.8);
             const imgProps = pdf.getImageProperties(imgData);
             const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
