@@ -477,20 +477,29 @@
 
         setupEventListeners() {
             this.element.addEventListener('input', (e) => {
-                // This handles syncing from mobile inputs back to the hidden table
                 const input = e.target;
-                if(input.classList.contains('item-input')) {
-                    const rowIndex = input.dataset.rowIndex;
-                    const cellIndex = input.dataset.cellIndex;
-                    const targetCell = this.tableBody.rows[rowIndex].cells[cellIndex];
-                    
-                    if(input.type === 'date') {
-                        // Find the date input inside the hidden table cell and update its value
-                        const tableInput = targetCell.querySelector('.date-input');
-                        if(tableInput) tableInput.value = input.value;
-                    } else {
-                         targetCell.textContent = input.textContent;
+                const rowIndex = input.dataset.rowIndex;
+                const cellIndex = input.dataset.cellIndex;
+
+                if (!rowIndex || !cellIndex) return; // Not a tracked input
+
+                const targetCell = this.tableBody.rows[rowIndex].cells[cellIndex];
+                if (!targetCell) return;
+                
+                // This handles syncing from mobile OR desktop inputs back to the hidden table
+                if (input.type === 'date') {
+                    // Find the date input inside the hidden table cell and update its value
+                    const tableInput = targetCell.querySelector('.date-input');
+                    if (tableInput) {
+                        tableInput.value = input.value;
                     }
+                    // For special events, the date cell is just a TD, so update its textContent
+                    if (this.data.eventType !== 'normal') {
+                        targetCell.textContent = input.value.split('-').reverse().join('-');
+                    }
+                } else {
+                    // Sync from desktop contenteditable cells
+                     targetCell.textContent = input.textContent;
                 }
                 this.parentProject.triggerSave();
             });
