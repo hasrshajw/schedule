@@ -242,9 +242,7 @@
             const tempTable = this.element.querySelector('table').cloneNode(true);
             tempTable.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
             const body = tempTable.querySelector('tbody');
-            if (body) {
-                return body.innerHTML;
-            }
+            if (body) return body.innerHTML;
             return tempTable.innerHTML;
         }
 
@@ -488,35 +486,37 @@
         const A4_WIDTH_MM = 210;
         const A4_HEIGHT_MM = 297;
         const MARGIN_MM = 10;
+        const PAGE_SPACING_MM = 5; 
         const USABLE_WIDTH = A4_WIDTH_MM - (MARGIN_MM * 2);
+        const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_MM * 2);
 
         const printContainer = document.createElement('div');
         printContainer.id = 'print-container';
         document.body.appendChild(printContainer);
 
-        const clonedBlocks = [];
-        originalBlocks.forEach(block => {
+        const itemsToPrint = [];
+        for (const block of originalBlocks) {
             const clone = block.cloneNode(true);
             clone.querySelector('.event-btn').style.display = 'none';
             printContainer.appendChild(clone);
-            clonedBlocks.push(clone);
-        });
-
-        for (let i = 0; i < clonedBlocks.length; i++) {
-            const blockToCapture = clonedBlocks[i];
-            const isTopPosition = i % 2 === 0;
-
-            if (i > 0 && isTopPosition) pdf.addPage();
-
-            const canvas = await html2canvas(blockToCapture, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+            const canvas = await html2canvas(clone, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
             const imgData = canvas.toDataURL('image/jpeg', 0.8);
             const imgProps = pdf.getImageProperties(imgData);
             const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
-            let yPosition = isTopPosition ? MARGIN_MM : (A4_HEIGHT_MM / 2);
-            pdf.addImage(imgData, 'JPEG', MARGIN_MM, yPosition, USABLE_WIDTH, imgHeight);
+            itemsToPrint.push({ imgData, width: USABLE_WIDTH, height: imgHeight });
         }
         
         document.body.removeChild(printContainer);
+
+        let currentY = MARGIN_MM;
+        itemsToPrint.forEach((item, index) => {
+            if (index > 0 && currentY + item.height > USABLE_HEIGHT + MARGIN_MM) {
+                pdf.addPage();
+                currentY = MARGIN_MM;
+            }
+            pdf.addImage(item.imgData, 'JPEG', MARGIN_MM, currentY, item.width, item.height);
+            currentY += item.height + PAGE_SPACING_MM;
+        });
 
         const fileName = `${projectTitleEl.textContent.trim() || 'schedule'}.pdf`;
         pdf.save(fileName);
