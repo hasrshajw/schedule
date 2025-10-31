@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Members - Schedule Editor</title>
+
+<!-- FIREBASE SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+<!-- FONTS and ICONS -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+
+<style>
+    :root {
+        --primary-color: #012726;
+        --primary-hover: #024443;
+        --primary-light: #e6f6f6;
+        --danger-color: #d32f2f;
+        --danger-hover: #b71c1c;
+        --danger-light: #fde8e8;
+        --border-color: #e5e7eb;
+        --background-color: #f8fafc;
+        --text-primary: #1f2937;
+        --text-secondary: #6b7280;
+        --surface-color: #ffffff;
+        --radius-md: 8px;
+        --radius-lg: 16px;
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--background-color);
+        margin: 0;
+        padding: 88px 20px 20px;
+        color: var(--text-primary);
+    }
+    .hidden { display: none !important; }
+
+    #app-header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border-color); padding: 12px 20px; }
+    .header-content { max-width: 1000px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
+    #user-info { display: flex; align-items: center; gap: 12px; font-size: 14px; }
+    #logout-button { background-color: transparent; border: 1px solid var(--border-color); padding: 8px 16px; border-radius: var(--radius-md); cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s; }
+    #logout-button:hover { background-color: var(--danger-light); color: var(--danger-hover); border-color: var(--danger-hover); }
+    .header-actions { display: flex; align-items: center; gap: 12px; }
+    .toolbar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); text-decoration: none; color: var(--text-secondary); }
+    .toolbar-btn:hover { background-color: #f9fafb; color: var(--text-primary); }
+
+    .master-container { max-width: 1000px; margin: 0 auto; }
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .page-title { font-size: 2rem; font-weight: 700; margin: 0; }
+    
+    .members-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+    .members-column { background-color: var(--surface-color); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-md); }
+    .column-title { font-size: 1.25rem; font-weight: 600; margin-top: 0; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 16px; }
+    .member-list { list-style: none; padding: 0; margin: 0; }
+    .member-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-color); }
+    .member-item:last-child { border-bottom: none; }
+    .member-name { font-weight: 500; }
+    .servant-tag { font-size: 0.75rem; font-weight: 600; color: var(--primary-color); background-color: var(--primary-light); padding: 2px 6px; border-radius: 4px; margin-left: 8px; }
+    .member-actions button { background: none; border: none; cursor: pointer; padding: 6px; border-radius: 50%; display: flex; }
+    .member-actions button:hover { background-color: #f0f0f0; }
+
+    /* Modal */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; }
+    .modal-content { background: white; padding: 24px; border-radius: var(--radius-lg); width: 100%; max-width: 400px; }
+    .modal-content h2 { margin-top: 0; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-weight: 500; margin-bottom: 6px; }
+    .form-group input[type="text"] { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: 16px; }
+    .radio-group label { margin-right: 16px; }
+    .checkbox-group label { display: flex; align-items: center; gap: 8px; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; }
+    .modal-actions button { padding: 10px 20px; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); }
+    #modal-cancel { background-color: var(--surface-color); }
+    #modal-save { background-color: var(--primary-color); color: white; }
+</style>
+</head>
+<body>
+
+<div id="app-container" class="hidden">
+    <header id="app-header">
+        <div class="header-content">
+            <div id="user-info"></div>
+            <div class="header-actions">
+                 <a href="./dashboard.html" class="toolbar-btn">
+                    <span class="material-symbols-outlined">dashboard</span>
+                    <span>Dashboard</span>
+                </a>
+                <button id="logout-button">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="master-container">
+        <div class="page-header">
+            <h1 class="page-title">Manage Members</h1>
+            <button id="add-member-btn" class="toolbar-btn" style="background-color: var(--primary-color); color: white;">
+                <span class="material-symbols-outlined">add</span>
+                Add New Member
+            </button>
+        </div>
+        
+        <div class="members-grid">
+            <div class="members-column">
+                <h2 class="column-title">Brothers</h2>
+                <ul id="brothers-list" class="member-list"></ul>
+            </div>
+            <div class="members-column">
+                <h2 class="column-title">Sisters</h2>
+                <ul id="sisters-list" class="member-list"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="member-modal" class="modal-overlay">
+    <div class="modal-content">
+        <h2 id="modal-title">Add New Member</h2>
+        <div class="form-group">
+            <label>Type</label>
+            <div class="radio-group">
+                <input type="radio" id="type-brother" name="member-type" value="brother" checked>
+                <label for="type-brother">Brother</label>
+                <input type="radio" id="type-sister" name="member-type" value="sister">
+                <label for="type-sister">Sister</label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="member-name">Name</label>
+            <input type="text" id="member-name" placeholder="Enter full name">
+        </div>
+        <div class="form-group" id="servant-group">
+            <div class="checkbox-group">
+                <input type="checkbox" id="is-servant">
+                <label for="is-servant">Appointed Servant (MS/Elder)</label>
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button id="modal-cancel">Cancel</button>
+            <button id="modal-save">Save Member</button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    'use strict';
+    const firebaseConfig = {
+      apiKey: "AIzaSyDLK5f4C-nfG6fz0ajqqay1q9TTN6rxgmQ",
+      authDomain: "schedule-harsha.firebaseapp.com",
+      projectId: "schedule-harsha",
+      storageBucket: "schedule-harsha.firebasestorage.app",
+      messagingSenderId: "965478014820",
+      appId: "1:965478014820:web:1c36c5d890a27e599aa471"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    
+    let currentUser = null;
+    let membersCollection = null;
+    let currentListener = null;
+    let editingMemberId = null;
+
+    const appContainer = document.getElementById('app-container');
+    const memberModal = document.getElementById('member-modal');
+    
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            currentUser = user;
+            membersCollection = db.collection(`users/${currentUser.uid}/members`);
+            appContainer.classList.remove('hidden');
+            document.getElementById('user-info').textContent = `Welcome, ${user.email}`;
+            initMembersPage();
+        } else {
+            window.location.replace('./login.html');
+        }
+    });
+
+    function initMembersPage() {
+        if (currentListener) currentListener();
+        
+        currentListener = membersCollection.orderBy("name").onSnapshot(snapshot => {
+            const brothersList = document.getElementById('brothers-list');
+            const sistersList = document.getElementById('sisters-list');
+            brothersList.innerHTML = '';
+            sistersList.innerHTML = '';
+            
+            snapshot.docs.forEach(doc => {
+                const member = doc.data();
+                const memberId = doc.id;
+                const li = document.createElement('li');
+                li.className = 'member-item';
+                li.dataset.id = memberId;
+
+                let nameHtml = `<span class="member-name">${member.name}</span>`;
+                if (member.isServant) {
+                    nameHtml += '<span class="servant-tag">Servant</span>';
+                }
+
+                li.innerHTML = `
+                    <div>${nameHtml}</div>
+                    <div class="member-actions">
+                        <button class="edit-btn"><span class="material-symbols-outlined">edit</span></button>
+                        <button class="delete-btn"><span class="material-symbols-outlined">delete</span></button>
+                    </div>`;
+
+                if (member.type === 'brother') {
+                    brothersList.appendChild(li);
+                } else {
+                    sistersList.appendChild(li);
+                }
+            });
+        });
+    }
+
+    function openModal(title, member = {}) {
+        editingMemberId = member.id || null;
+        document.getElementById('modal-title').textContent = title;
+        document.getElementById('member-name').value = member.name || '';
+        document.getElementById('is-servant').checked = member.isServant || false;
+        
+        const typeBrother = document.getElementById('type-brother');
+        const typeSister = document.getElementById('type-sister');
+        if (member.type === 'sister') {
+            typeSister.checked = true;
+        } else {
+            typeBrother.checked = true;
+        }
+        
+        toggleServantCheckbox();
+        memberModal.style.display = 'flex';
+    }
+
+    function closeModal() {
+        memberModal.style.display = 'none';
+        editingMemberId = null;
+    }
+    
+    function toggleServantCheckbox() {
+        const servantGroup = document.getElementById('servant-group');
+        if (document.getElementById('type-brother').checked) {
+            servantGroup.style.display = 'block';
+        } else {
+            servantGroup.style.display = 'none';
+            document.getElementById('is-servant').checked = false; // Uncheck if switching to sister
+        }
+    }
+
+    document.getElementById('add-member-btn').addEventListener('click', () => {
+        openModal('Add New Member');
+    });
+    
+    document.getElementById('modal-cancel').addEventListener('click', closeModal);
+    document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
+    
+    document.querySelectorAll('input[name="member-type"]').forEach(radio => {
+        radio.addEventListener('change', toggleServantCheckbox);
+    });
+    
+    document.getElementById('modal-save').addEventListener('click', async () => {
+        const name = document.getElementById('member-name').value.trim();
+        if (!name) return alert('Name is required.');
+        
+        const memberData = {
+            name: name,
+            type: document.getElementById('type-brother').checked ? 'brother' : 'sister',
+            isServant: document.getElementById('is-servant').checked,
+        };
+        
+        if (editingMemberId) {
+            await membersCollection.doc(editingMemberId).update(memberData);
+        } else {
+            await membersCollection.add(memberData);
+        }
+        closeModal();
+    });
+
+    document.querySelector('.members-grid').addEventListener('click', async e => {
+        const editBtn = e.target.closest('.edit-btn');
+        if (editBtn) {
+            const memberId = editBtn.closest('.member-item').dataset.id;
+            const doc = await membersCollection.doc(memberId).get();
+            if (doc.exists) {
+                openModal('Edit Member', { id: doc.id, ...doc.data() });
+            }
+        }
+        
+        const deleteBtn = e.target.closest('.delete-btn');
+        if (deleteBtn) {
+            const memberId = deleteBtn.closest('.member-item').dataset.id;
+            if (confirm('Are you sure you want to delete this member?')) {
+                await membersCollection.doc(memberId).delete();
+            }
+        }
+    });
+
+})();
+</script>
+</body>
+</html>
