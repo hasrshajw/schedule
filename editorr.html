@@ -43,58 +43,52 @@
     .hidden { display: none !important; }
 
     #app-header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border-color); padding: 12px 20px; }
-    .header-content { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .header-content { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
     .header-actions { display: flex; align-items: center; gap: 12px; }
     .toolbar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); text-decoration: none; color: var(--text-secondary); }
     .toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; color: var(--text-primary); }
     .toolbar-btn:disabled { cursor: not-allowed; opacity: 0.5; }
     #logout-button { background: transparent; border: 1px solid var(--border-color); padding: 8px 16px; border-radius: var(--radius-md); cursor: pointer; font-weight: 600; font-size: 14px; }
-    
+    #logout-button:hover { background-color: var(--danger-light); color: var(--danger-hover); border-color: var(--danger-hover); }
+
     .master-container { max-width: 1100px; margin: 0 auto; background: var(--surface-color); padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
-    .project-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color); }
+    .project-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color); }
     .project-title { font-size: 1.75rem; font-weight: 700; margin: 0; flex-grow: 1; border: none; padding: 4px 8px; border-radius: var(--radius-md); font-family: 'Noto Sans Telugu', sans-serif; }
     .project-title:focus { outline: 2px solid var(--primary-color); background-color: var(--primary-light); }
     
-    .schedule-block { margin-bottom: 32px; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 16px; }
-    .schedule-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    .schedule-title { font-size: 1.25rem; font-weight: 600; margin: 0; color: var(--text-secondary); font-family: 'Noto Sans Telugu', sans-serif; }
+    .schedule-block { margin-bottom: 32px; position: relative; } /* Added relative positioning */
+    .schedule-block:last-child { margin-bottom: 0; }
     
-    .schedule-block table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 14px; font-weight: 700; }
+    /* Event button and menu */
+    .event-options-btn { position: absolute; top: 8px; right: 8px; z-index: 10; }
+    #event-context-menu { position: fixed; display: none; background: var(--surface-color); border-radius: var(--radius-md); box-shadow: var(--shadow-md); z-index: 1001; padding: 6px; min-width: 180px; border: 1px solid var(--border-color); }
+    .context-menu-item { display: block; width: 100%; padding: 8px 12px; cursor: pointer; font-size: 14px; border-radius: 6px; background: none; border: none; text-align: left; }
+    .context-menu-item:hover { background: #f9fafb; }
+    
+    .schedule-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 16px; color: var(--text-secondary); font-family: 'Noto Sans Telugu', sans-serif; }
+    
+    .schedule-block table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.25px; }
     .schedule-block th, .schedule-block td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; height: 36px; }
     .schedule-block [contenteditable="true"]:focus { background-color: #fffbe5; }
-    
+    .schedule-block .cell-icon { height: 70%; max-height: 24px; object-fit: contain; flex-shrink: 0; margin-right: 8px; }
+    .schedule-block .header-row .cell-icon { filter: brightness(0) invert(1); }
+    .schedule-block .header-row td { font-size: 16px; color: #ffffff; height: 42px; text-align: center;}
+    .schedule-block .special-event-row th { background-color: #f0f8ff; font-size: 1.1em; }
+
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 16px; }
     .modal-content { background: white; padding: 24px; border-radius: var(--radius-lg); width: 100%; max-width: 500px; max-height: 90vh; display: flex; flex-direction: column; gap: 16px; }
+    #new-project-name { width: 100%; padding: 12px; font-size: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); }
+    #template-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md); }
+    #template-list li { padding: 12px; border-bottom: 1px solid var(--border-color); }
+    #template-list label { display: flex; align-items: center; gap: 10px; font-size: 16px; cursor: pointer; font-weight: 500; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px; }
+    .modal-actions button { padding: 10px 20px; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); }
+    #cancel-template-selection, #confirm-template-selection { font-family: 'Inter', sans-serif; }
+    #confirm-template-selection { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
     
     #print-container { position: absolute; left: -9999px; top: auto; width: 1100px; background: white; }
-
-    /* NEW: Special Event Block styling */
-    .special-event-block {
-        border: 2px solid #4B0082;
-        background-color: #fff;
-        padding: 8px;
-        font-family: 'Noto Sans Telugu', sans-serif;
-        font-weight: 700;
-        font-size: 14px;
-    }
-    .special-event-block-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background-color: #f0f8ff;
-        padding: 0 8px;
-        height: 36px;
-        border: 1px solid #333;
-    }
-    .special-event-text {
-        flex-grow: 1;
-    }
-
-    /* NEW: Event menu */
-    #event-context-menu { position: fixed; display: none; background: var(--surface-color); border-radius: var(--radius-md); box-shadow: var(--shadow-md); z-index: 1001; padding: 6px; min-width: 180px; border: 1px solid var(--border-color); }
-    .context-menu-item { font-family: 'Inter', sans-serif; display: block; width: 100%; padding: 8px 12px; cursor: pointer; font-size: 14px; border-radius: 6px; background: none; border: none; text-align: left; }
-    .context-menu-item:hover { background: #f9fafb; }
 </style>
+
 </head>
 <body>
 
@@ -126,16 +120,9 @@
 
 <template id="schedule-template">
     <div class="schedule-block">
-        <div class="schedule-header">
-            <h2 class="schedule-title"></h2>
-            <button class="toolbar-btn event-type-btn">
-                <span class="material-symbols-outlined">event</span>
-                <span>Set Event Type</span>
-            </button>
-        </div>
-        <div class="schedule-content">
-            <!-- Table or special event block will go here -->
-        </div>
+        <h2 class="schedule-title"></h2>
+        <button class="event-options-btn toolbar-btn"><span class="material-symbols-outlined">edit_calendar</span></button>
+        <div class="schedule-content"></div>
     </div>
 </template>
 
@@ -180,7 +167,7 @@
     let userSchedulesCollection = null;
     let currentListener = null;
     let activeProject = null;
-    let activeScheduleForEvent = null;
+    let activeScheduleBlockForEvent = null;
 
     const appContainer = document.getElementById('app-container');
     const projectTitleEl = document.getElementById('project-title');
@@ -206,6 +193,7 @@
         initDOM() {
             const templateClone = document.getElementById('schedule-template').content.cloneNode(true);
             this.element = templateClone.querySelector('.schedule-block');
+            this.element.dataset.index = this.index;
             this.titleEl = this.element.querySelector('.schedule-title');
             this.contentEl = this.element.querySelector('.schedule-content');
             schedulesWrapper.appendChild(this.element);
@@ -213,80 +201,65 @@
 
         render() {
             this.titleEl.textContent = this.data.title;
-            this.data.eventType = this.data.eventType || 'normal';
-
-            if (this.data.eventType === 'normal') {
-                this.contentEl.innerHTML = `
-                    <table>
-                        <colgroup><col style="width: 60%;"><col style="width: 20%;"><col style="width: 20%;"></colgroup>
-                        <tbody class="schedule-table-body">${this.data.content}</tbody>
-                    </table>
-                `;
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = this.contentEl.innerHTML;
-                tempDiv.querySelectorAll('td, th').forEach(cell => {
-                    if (cell.hasAttribute('data-user-editable')) {
-                        cell.setAttribute('contenteditable', 'true');
-                    }
-                });
-                this.contentEl.innerHTML = tempDiv.innerHTML;
-            } else {
-                const eventText = this.data.eventText || this.getEventTextForType(this.data.eventType);
-                const dateText = this.getDateFromContent();
-                this.contentEl.innerHTML = `
-                    <div class="special-event-block">
-                        <div class="special-event-block-header">
-                            <span class="special-event-text" contenteditable="true">${eventText}</span>
-                            <span>${dateText}</span>
-                        </div>
-                    </div>
-                `;
-            }
+            const eventType = this.data.eventType || 'normal';
+            this.applyEventType(eventType, false); // Render without saving
         }
 
-        getDateFromContent() {
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = `<table><tbody>${this.data.content}</tbody></table>`;
-            const dateCell = tempDiv.querySelector('th:nth-child(2)');
-            return dateCell ? dateCell.textContent : 'తేదీ:';
-        }
-
-        getEventTextForType(type) {
+        applyEventType(eventType, shouldSave = true) {
+            this.data.eventType = eventType;
             const eventTexts = {
                 'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం',
                 'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో',
                 'convention': 'ప్రాదేశిక సమావేశం'
             };
-            return eventTexts[type] || '';
-        }
 
-        getContent() {
-            if (this.data.eventType !== 'normal') {
-                return this.data.content; 
+            if (eventType !== 'normal') {
+                this.contentEl.innerHTML = `
+                    <table>
+                        <colgroup><col style="width: 80%;"><col style="width: 20%;"></colgroup>
+                        <tbody>
+                            <tr class="special-event-row">
+                                <th colspan="1">${eventTexts[eventType]}</th>
+                                <th style="text-align: right;">తేదీ:</th>
+                            </tr>
+                        </tbody>
+                    </table>`;
+            } else {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = `<table><tbody>${this.data.content}</tbody></table>`;
+                tempDiv.querySelectorAll('td, th').forEach(cell => {
+                    if (cell.hasAttribute('data-user-editable')) {
+                        cell.setAttribute('contenteditable', 'true');
+                    } else {
+                        cell.setAttribute('contenteditable', 'false');
+                    }
+                });
+                this.contentEl.innerHTML = tempDiv.innerHTML;
             }
-            const table = this.contentEl.querySelector('table');
-            if (!table) return this.data.content;
-            
-            const tempTable = table.cloneNode(true);
-            tempTable.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
-            return tempTable.querySelector('tbody').innerHTML;
-        }
 
-        getEventText() {
-            const eventTextEl = this.contentEl.querySelector('.special-event-text');
-            return eventTextEl ? eventTextEl.textContent : null;
+            if (shouldSave) {
+                this.parentProject.debouncedSave();
+            }
+        }
+        
+        getContent() {
+            if (this.data.eventType && this.data.eventType !== 'normal') {
+                return this.data.content; // Return original template content
+            }
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = this.contentEl.innerHTML;
+            tempDiv.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+            return tempDiv.querySelector('table').outerHTML;
         }
 
         setupEventListeners() {
-            this.contentEl.addEventListener('input', () => {
-                this.parentProject.debouncedSave();
-            });
-            this.element.querySelector('.event-type-btn').addEventListener('click', (e) => {
-                activeScheduleForEvent = this;
+            this.contentEl.addEventListener('input', () => this.parentProject.debouncedSave());
+            this.element.querySelector('.event-options-btn').addEventListener('click', (e) => {
+                activeScheduleBlockForEvent = this.element;
                 const rect = e.currentTarget.getBoundingClientRect();
                 eventContextMenu.style.display = 'block';
                 eventContextMenu.style.top = `${rect.bottom}px`;
-                eventContextMenu.style.left = `${rect.left}px`;
+                eventContextMenu.style.left = `${rect.left - eventContextMenu.offsetWidth + rect.width}px`;
             });
         }
     }
@@ -307,26 +280,25 @@
             schedulesWrapper.innerHTML = '';
             this.scheduleTables = [];
             this.data.tables.forEach((tableData, index) => {
-                this.scheduleTables.push(new ScheduleTable(this, tableData, index));
+                const scheduleTable = new ScheduleTable(this, tableData, index);
+                this.scheduleTables.push(scheduleTable);
             });
         }
         
         save() {
-            const updatedTablesData = this.scheduleTables.map(table => {
-                const eventText = table.getEventText();
-                return { 
-                    title: table.data.title, 
-                    content: table.getContent(),
-                    eventType: table.data.eventType,
-                    eventText: eventText ? eventText : (table.data.eventType !== 'normal' ? table.getEventTextForType(table.data.eventType) : null)
-                };
-            });
+            const updatedTablesData = this.scheduleTables.map(table => ({
+                title: table.data.title,
+                content: table.data.content, // Always save the original template content
+                eventType: table.data.eventType,
+                currentHTML: table.getContent() // Save the current state including user edits
+            }));
             const payload = { name: projectTitleEl.textContent, tables: updatedTablesData };
-            this.collectionRef.doc(this.id).update(payload)
+            this.collectionRef.doc(this.id).set(payload, { merge: true })
                 .catch(err => console.error("Save failed:", err));
         }
         
         debouncedSave = debounce(() => this.save(), 1500);
+
         setupEventListeners() {
             projectTitleEl.addEventListener('input', () => this.debouncedSave());
         }
@@ -334,11 +306,15 @@
 
     auth.onAuthStateChanged(user => {
         if (user) {
-            if (user.email === ADMIN_EMAIL) { window.location.replace('./admin.html'); return; }
+            if (user.email === ADMIN_EMAIL) {
+                window.location.replace('./admin.html');
+                return;
+            }
             currentUser = user;
             userSchedulesCollection = db.collection(`userSchedules/${currentUser.uid}/schedules`);
             appContainer.classList.remove('hidden');
-            document.getElementById('user-info').innerHTML = `<img id="user-pic" style="width:36px; height:36px; border-radius:50%;" src="${user.photoURL}" alt="User photo"><span>${user.displayName}</span>`;
+            document.getElementById('user-info').innerHTML = `<div id="user-avatar">${user.email.charAt(0).toUpperCase()}</div><span>Welcome, <span id="user-email">${user.email}</span></span>`;
+
             const params = new URLSearchParams(window.location.search);
             currentProjectId = params.get('id');
             if (currentProjectId) initEditor(); else initCreationFlow();
@@ -348,7 +324,6 @@
     });
 
     function initEditor() {
-        if (!currentUser || !currentProjectId) return;
         if (currentListener) currentListener();
         currentListener = userSchedulesCollection.doc(currentProjectId).onSnapshot(doc => {
             if (doc.exists) {
@@ -356,10 +331,12 @@
                 if (!activeProject) {
                     activeProject = new Project(doc.id, remoteData, userSchedulesCollection);
                 } else {
-                    activeProject.render(remoteData);
+                    // Simple check to prevent re-render on own saves
+                    if(JSON.stringify(remoteData.tables) !== JSON.stringify(activeProject.data.tables)) {
+                         activeProject.render(remoteData);
+                    }
                 }
             } else {
-                alert("This schedule may have been deleted.");
                 window.location.href = './dashboard.html';
             }
         });
@@ -378,43 +355,41 @@
     function setupGlobalUI() {
         document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
         document.getElementById('print-button').addEventListener('click', generatePdf);
-        document.getElementById('cancel-template-selection').addEventListener('click', () => {
-            templateSelectionModal.style.display = 'none';
-            window.location.href = './dashboard.html';
-        });
+        document.getElementById('cancel-template-selection').addEventListener('click', () => window.location.href = './dashboard.html');
         document.getElementById('confirm-template-selection').addEventListener('click', async () => {
             const newProjectName = document.getElementById('new-project-name').value.trim();
-            if (!newProjectName) return alert("Please enter a name for your project.");
+            if (!newProjectName) return alert("Please enter a name for your new project.");
             const selectedCheckboxes = Array.from(document.querySelectorAll('#template-list input:checked'));
             if (selectedCheckboxes.length === 0) return alert("Please select at least one template.");
-
+            
             const tablesArray = selectedCheckboxes.map(input => {
                 const rawContent = decodeURIComponent(input.dataset.content);
                 const tempDiv = document.createElement('div');
                 tempDiv.innerHTML = `<table><tbody>${rawContent}</tbody></table>`;
                 tempDiv.querySelectorAll('td, th').forEach(cell => {
-                    if (cell.textContent.trim() === '' && !cell.querySelector('img')) {
+                    if ((cell.textContent.trim() === '' && !cell.querySelector('img')) || cell.textContent.trim() === '...') {
                         cell.setAttribute('data-user-editable', 'true');
                     }
                 });
                 return { title: input.dataset.name, content: tempDiv.querySelector('tbody').innerHTML, eventType: 'normal' };
             });
+
             const newDocRef = await userSchedulesCollection.add({ name: newProjectName, tables: tablesArray, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
             window.location.href = `./editor.html?id=${newDocRef.id}`;
         });
-        
-        eventContextMenu.addEventListener('click', (e) => {
+
+        eventContextMenu.addEventListener('click', e => {
             const target = e.target.closest('.context-menu-item');
-            if (target && activeScheduleForEvent) {
-                activeScheduleForEvent.data.eventType = target.dataset.eventType;
-                activeScheduleForEvent.render();
-                activeScheduleForEvent.parentProject.debouncedSave();
+            if (target && activeScheduleBlockForEvent) {
+                const scheduleIndex = activeScheduleBlockForEvent.dataset.index;
+                const scheduleTable = activeProject.scheduleTables[scheduleIndex];
+                scheduleTable.applyEventType(target.dataset.eventType);
+                eventContextMenu.style.display = 'none';
             }
-            eventContextMenu.style.display = 'none';
         });
 
-        document.addEventListener('click', (e) => {
-            if (!eventContextMenu.contains(e.target) && !e.target.closest('.event-type-btn')) {
+        document.addEventListener('click', e => {
+            if (!eventContextMenu.contains(e.target) && !e.target.closest('.event-options-btn')) {
                 eventContextMenu.style.display = 'none';
             }
         });
@@ -427,6 +402,7 @@
 
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('p', 'mm', 'a4');
+        const originalBlocks = document.querySelectorAll('.schedule-block');
         const A4_WIDTH_MM = 210;
         const A4_HEIGHT_MM = 297;
         const MARGIN_MM = 10;
@@ -436,9 +412,9 @@
         printContainer.id = 'print-container';
         document.body.appendChild(printContainer);
 
-        const clonedBlocks = activeProject.scheduleTables.map(schedule => {
-            const clone = schedule.element.cloneNode(true);
-            clone.querySelector('.event-type-btn').remove(); // Remove button from print
+        const clonedBlocks = Array.from(originalBlocks).map(block => {
+            const clone = block.cloneNode(true);
+            clone.querySelector('.event-options-btn').remove(); // Remove button from clone
             printContainer.appendChild(clone);
             return clone;
         });
@@ -446,13 +422,15 @@
         for (let i = 0; i < clonedBlocks.length; i++) {
             const blockToCapture = clonedBlocks[i];
             const isTopPosition = i % 2 === 0;
+
             if (i > 0 && isTopPosition) pdf.addPage();
-            
+
             const canvas = await html2canvas(blockToCapture, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
             const imgData = canvas.toDataURL('image/jpeg', 0.8);
             const imgProps = pdf.getImageProperties(imgData);
             const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
             let yPosition = isTopPosition ? MARGIN_MM : (A4_HEIGHT_MM / 2);
+
             pdf.addImage(imgData, 'JPEG', MARGIN_MM, yPosition, USABLE_WIDTH, imgHeight);
         }
 
