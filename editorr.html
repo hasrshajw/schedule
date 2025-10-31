@@ -28,7 +28,6 @@
         --primary-light: #e6f6f6;
         --danger-color: #d32f2f;
         --danger-hover: #b71c1c;
-        --danger-light: #fde8e8;
         --border-color: #e5e7eb;
         --background-color: #f8fafc;
         --text-primary: #1f2937;
@@ -75,10 +74,10 @@
     .schedule-block .header-row td { font-size: 16px; color: #ffffff; height: 42px; }
     .schedule-block .row-handle { display: none !important; }
     
-    /* NEW: Specific style for the special event text */
+    /* NEW: Style for special event text */
     .special-event-text {
         color: red;
-        text-align: center;
+        text-align: center !important;
         font-weight: 700;
     }
 
@@ -255,11 +254,7 @@
                 allRows.forEach(row => row.style.display = '');
                 if (firstRow && firstRow.dataset.originalContent) {
                     firstRow.innerHTML = firstRow.dataset.originalContent;
-                    // Re-add contenteditable attributes for normal cells
-                    firstRow.querySelectorAll('[data-editable-cache]').forEach(cell => {
-                        cell.setAttribute('contenteditable', 'true');
-                        cell.removeAttribute('data-editable-cache');
-                    });
+                    delete firstRow.dataset.originalContent; // Clean up attribute
                 }
             } else {
                 const eventTexts = {
@@ -268,19 +263,15 @@
                     'convention': 'ప్రాదేశిక సమావేశం'
                 };
                 allRows.forEach((row, index) => {
-                    if (index > 0) row.style.display = 'none';
+                    row.style.display = (index === 0) ? '' : 'none';
                 });
 
                 if (firstRow && !firstRow.dataset.originalContent) {
                     firstRow.dataset.originalContent = firstRow.innerHTML;
-                    // Cache which cells were originally editable
-                    firstRow.querySelectorAll('[contenteditable="true"]').forEach(cell => {
-                        cell.dataset.editableCache = 'true';
-                    });
                 }
                 
                 firstRow.innerHTML = `
-                    <th class="special-event-text" colspan="1">${eventTexts[eventType]}</th>
+                    <th colspan="1" class="special-event-text">${eventTexts[eventType]}</th>
                     <td style="text-align: right; font-weight: 700;">తేదీ:</td>
                     <td contenteditable="true"></td>
                 `;
@@ -328,7 +319,7 @@
             const updatedTablesData = this.scheduleTables.map(table => ({ 
                 title: table.data.title, 
                 content: table.getContent(),
-                eventType: table.data.eventType || 'normal'
+                eventType: table.data.eventType || 'normal' // FIX: Ensure eventType is read from the object
             }));
             const payload = { name: projectTitleEl.textContent, tables: updatedTablesData };
             this.collectionRef.doc(this.id).update(payload)
@@ -403,7 +394,7 @@
         const snapshot = await templatesCollection.orderBy("createdAt").get();
         templateList.innerHTML = '';
         if (snapshot.empty) {
-            templateList.innerHTML = '<li>No templates available. Please ask an admin to create one.</li>';
+            templateList.innerHTML = '<li>No templates available.</li>';
         } else {
             snapshot.docs.forEach(doc => {
                 const li = document.createElement('li');
@@ -417,30 +408,20 @@
     function setupGlobalUI() {
         document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
         document.getElementById('print-button').addEventListener('click', generatePdf);
-        document.getElementById('cancel-template-selection').addEventListener('click', () => {
-            templateSelectionModal.style.display = 'none';
-            window.location.href = './dashboard.html';
-        });
+        document.getElementById('cancel-template-selection').addEventListener('click', () => window.location.href = './dashboard.html');
         document.getElementById('confirm-template-selection').addEventListener('click', async () => {
             const newProjectName = document.getElementById('new-project-name').value.trim();
-            if (!newProjectName) {
-                alert("Please enter a name for your new project.");
-                return;
-            }
+            if (!newProjectName) return alert("Please enter a name for your new project.");
             const selectedCheckboxes = Array.from(templateList.querySelectorAll('input:checked'));
-            if (selectedCheckboxes.length === 0) {
-                alert("Please select at least one template.");
-                return;
-            }
+            if (selectedCheckboxes.length === 0) return alert("Please select at least one template.");
+
             const tablesArray = selectedCheckboxes.map(input => {
                 const rawContent = decodeURIComponent(input.dataset.content);
                 const tempDiv = document.createElement('div');
                 tempDiv.innerHTML = `<table><tbody>${rawContent}</tbody></table>`;
                 tempDiv.querySelectorAll('td, th').forEach(cell => {
                     const isEssentiallyEmpty = cell.textContent.trim() === '' && !cell.querySelector('img');
-                    if (isEssentiallyEmpty) {
-                        cell.setAttribute('data-user-editable', 'true');
-                    }
+                    if (isEssentiallyEmpty) cell.setAttribute('data-user-editable', 'true');
                 });
                 return { title: input.dataset.name, content: tempDiv.querySelector('tbody').innerHTML, eventType: 'normal' };
             });
@@ -497,22 +478,13 @@
             const blockToCapture = clonedBlocks[i];
             const isTopPosition = i % 2 === 0;
 
-            if (i > 0 && isTopPosition) {
-                pdf.addPage();
-            }
+            if (i > 0 && isTopPosition) pdf.addPage();
 
-            const canvas = await html2canvas(blockToCapture, {
-                scale: 2,
-                useCORS: true,
-                backgroundColor: '#ffffff'
-            });
-
+            const canvas = await html2canvas(blockToCapture, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
             const imgData = canvas.toDataURL('image/jpeg', 0.8);
             const imgProps = pdf.getImageProperties(imgData);
             const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
-
             let yPosition = isTopPosition ? MARGIN_MM : (A4_HEIGHT_MM / 2);
-
             pdf.addImage(imgData, 'JPEG', MARGIN_MM, yPosition, USABLE_WIDTH, imgHeight);
         }
         
