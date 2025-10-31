@@ -36,6 +36,8 @@
         --radius-md: 8px;
         --radius-lg: 16px;
         --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --warning-color: #f59e0b;
+        --success-color: #2e7d32;
     }
     *, *::before, *::after { box-sizing: border-box; }
     html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
@@ -64,6 +66,12 @@
     .schedule-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
     .schedule-title { font-size: 1.25rem; font-weight: 600; margin: 0; color: var(--text-secondary); font-family: 'Noto Sans Telugu', sans-serif; }
     
+    .status-indicator { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; display: flex; align-items: center; gap: 6px; }
+    .status-indicator::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background-color: currentColor; }
+    .status-indicator[data-status="synced"] { color: var(--success-color); background-color: #eaf5ea; }
+    .status-indicator[data-status="syncing"] { color: var(--warning-color); background-color: #fffbeb; }
+    .status-indicator[data-status="error"] { color: var(--danger-color); background-color: #fde8e8; }
+
     .schedule-block table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.25px; }
     .schedule-block th, .schedule-block td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; }
     .schedule-block [contenteditable="true"]:focus { background-color: #fffbe5; }
@@ -74,12 +82,7 @@
     .schedule-block .header-row td { font-size: 16px; color: #ffffff; height: 42px; }
     .schedule-block .row-handle { display: none !important; }
     
-    /* NEW: Style for special event text */
-    .special-event-text {
-        color: red;
-        text-align: center !important;
-        font-weight: 700;
-    }
+    .special-event-text { color: red; text-align: center !important; font-weight: 700; }
 
     #event-context-menu { position: fixed; display: none; background: var(--surface-color); border-radius: var(--radius-md); box-shadow: var(--shadow-md); z-index: 1001; padding: 6px; min-width: 180px; border: 1px solid var(--border-color); }
     .context-menu-item { font-family: 'Inter', sans-serif; display: block; width: 100%; padding: 8px 12px; cursor: pointer; font-size: 14px; border-radius: 6px; background: none; border: none; text-align: left; }
@@ -126,6 +129,7 @@
     <div class="master-container">
         <div id="project-header" class="project-header">
             <h1 id="project-title" contenteditable="true">Loading Project...</h1>
+            <div class="status-indicator" data-status="synced">Synced</div>
         </div>
         <div id="schedules-wrapper"></div>
     </div>
@@ -199,11 +203,17 @@
     const templateSelectionModal = document.getElementById('template-selection-modal');
     const templateList = document.getElementById('template-list');
     const eventContextMenu = document.getElementById('event-context-menu');
+    const statusIndicator = document.querySelector('.project-header .status-indicator');
     
     const debounce = (func, delay) => {
         let timeout;
         return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), delay); };
     };
+
+    function updateStatus(text, status) {
+        statusIndicator.textContent = text;
+        statusIndicator.dataset.status = status;
+    }
 
     class ScheduleTable {
         constructor(parentProject, tableData, index) {
@@ -254,7 +264,7 @@
                 allRows.forEach(row => row.style.display = '');
                 if (firstRow && firstRow.dataset.originalContent) {
                     firstRow.innerHTML = firstRow.dataset.originalContent;
-                    delete firstRow.dataset.originalContent; // Clean up attribute
+                    delete firstRow.dataset.originalContent;
                 }
             } else {
                 const eventTexts = {
@@ -316,14 +326,20 @@
         }
         
         save() {
-            const updatedTablesData = this.scheduleTables.map(table => ({ 
-                title: table.data.title, 
+            updateStatus('Syncing...', 'syncing');
+            const updatedTablesData = this.scheduleTables.map(table => ({
+                title: table.data.title,
                 content: table.getContent(),
-                eventType: table.data.eventType || 'normal' // FIX: Ensure eventType is read from the object
+                eventType: table.data.eventType || 'normal'
             }));
             const payload = { name: projectTitleEl.textContent, tables: updatedTablesData };
+
             this.collectionRef.doc(this.id).update(payload)
-                .catch(err => console.error("Save failed:", err));
+                .then(() => updateStatus('Synced', 'synced'))
+                .catch(err => {
+                    console.error("Save failed:", err);
+                    updateStatus('Error', 'error');
+                });
         }
         
         debouncedSave = debounce(() => this.save(), 1500);
@@ -380,10 +396,13 @@
                         activeProject.render(remoteData);
                     }
                 }
+                 updateStatus('Synced', 'synced');
             } else {
                 alert("This schedule may have been deleted.");
                 window.location.href = './dashboard.html';
             }
+        }, error => {
+             updateStatus('Error', 'error');
         });
     }
 
