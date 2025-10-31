@@ -535,9 +535,20 @@
         const isInMinistry = isCellInMinistrySection(cell);
         
         memberDropdown.innerHTML = '';
-        const listToShow = isInMinistry ? [...members.brothers, ...members.sisters] : members.brothers;
+        let listToShow;
 
-        listToShow.sort((a, b) => a.name.localeCompare(b.name)).forEach(member => {
+        if (isInMinistry) {
+            // Sort sisters and brothers separately, then combine
+            const sortedSisters = [...members.sisters].sort((a, b) => a.name.localeCompare(b.name));
+            const sortedBrothers = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
+            listToShow = [...sortedSisters, ...sortedBrothers];
+        } else {
+            // Only show sorted brothers for other sections
+            listToShow = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
+        }
+
+        listToShow.forEach(member => { 
+          
             const item = document.createElement('button');
             item.className = 'member-dropdown-item';
             item.dataset.name = member.name;
