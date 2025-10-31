@@ -796,6 +796,13 @@
         activeCellForDropdown = { realCell: cell, mobileDiv: mobileDiv };
     }
 
+
+
+
+
+
+
+
     async function generatePdf() {
         const printButton = document.getElementById('print-button');
         printButton.disabled = true;
@@ -807,105 +814,109 @@
         const USABLE_WIDTH = A4_WIDTH_MM - (MARGIN_MM * 2);
         const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_MM * 2);
 
+        // --- START: NEW CODE ---
+        // Create a temporary stylesheet to force consistent rendering
+        const printStyles = document.createElement('style');
+        printStyles.innerHTML = `
+            #print-container {
+                /* These rules ensure the print container ignores mobile styles */
+                padding: 0 !important;
+                font-size: 16px; /* A consistent base font size */
+            }
+            #print-container .project-title {
+                font-size: 1.75rem !important; /* Force desktop title size */
+            }
+            #print-container .schedule-block table {
+                font-size: 14px !important; /* Force desktop table font size */
+                letter-spacing: 0.25px !important;
+            }
+        `;
+        // --- END: NEW CODE ---
+
         const printContainer = document.createElement('div');
         printContainer.id = 'print-container';
         document.body.appendChild(printContainer);
-
-        const itemsToPrint = [];
-        // INSIDE THE generatePdf function...
-
-        for (const block of document.querySelectorAll('.schedule-block')) {
-            const clone = block.cloneNode(true);
-            
-            clone.querySelector('.event-btn').style.display = 'none';
-            clone.querySelector('.mobile-view-container').style.display = 'none';
-            clone.querySelector('table').style.display = 'table';
-            
-            const titleEl = clone.querySelector('.schedule-title');
-            if (titleEl) {
-                titleEl.style.display = 'none';
-            }
-            clone.style.marginBottom = '0';
-
-            // --- START: ADD THIS NEW CODE BLOCK ---
-
-            // Increase the height of all table cells for better spacing in the PDF
-            const allCells = clone.querySelectorAll('th, td');
-            allCells.forEach(cell => {
-                cell.style.height = '40px'; // Adjust this value as needed
-            });
-
-            // --- END: ADD THIS NEW CODE BLOCK ---
-
-            printContainer.appendChild(clone);
-            
-            const canvas = await html2canvas(clone, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
-            
-            // --- And continue with the rest of the logic ---
-            const imgData = canvas.toDataURL('image/jpeg', 0.8);
-            const imgProps = pdf.getImageProperties(imgData);
-            const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
-            itemsToPrint.push({ imgData, width: USABLE_WIDTH, height: imgHeight });
-        }
         
-        document.body.removeChild(printContainer);
-        let currentY = MARGIN_MM;
-        // --- START: NEW, ADVANCED PDF LAYOUT LOGIC ---
+        try {
+            // --- START: NEW CODE ---
+            // Temporarily add the styles to the document
+            document.head.appendChild(printStyles);
+            // --- END: NEW CODE ---
 
-        // Stage 1: Group all printable items into pages first.
-        const pages = [];
-        let currentPageItems = [];
-        let currentPageHeight = 0;
+            const itemsToPrint = [];
+            for (const block of document.querySelectorAll('.schedule-block')) {
+                const clone = block.cloneNode(true);
+                
+                clone.querySelector('.event-btn').style.display = 'none';
+                clone.querySelector('.mobile-view-container').style.display = 'none';
+                clone.querySelector('table').style.display = 'table';
+                
+                const titleEl = clone.querySelector('.schedule-title');
+                if (titleEl) titleEl.style.display = 'none';
+                clone.style.marginBottom = '0';
 
-        itemsToPrint.forEach(item => {
-            const itemHeightWithSpacing = currentPageItems.length > 0 ? item.height + PAGE_SPACING_MM : item.height;
-            if (currentPageHeight + itemHeightWithSpacing > USABLE_HEIGHT && currentPageItems.length > 0) {
-                pages.push(currentPageItems); // Finalize the current page
-                currentPageItems = [item]; // Start a new page with the current item
-                currentPageHeight = item.height;
-            } else {
-                currentPageItems.push(item);
-                currentPageHeight += itemHeightWithSpacing;
+                const allCells = clone.querySelectorAll('th, td');
+                allCells.forEach(cell => {
+                    cell.style.height = '40px';
+                });
+
+                printContainer.appendChild(clone);
+                
+                const canvas = await html2canvas(clone, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+                
+                const imgData = canvas.toDataURL('image/jpeg', 0.8);
+                const imgProps = pdf.getImageProperties(imgData);
+                const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
+                itemsToPrint.push({ imgData, width: USABLE_WIDTH, height: imgHeight });
             }
-        });
-        if (currentPageItems.length > 0) {
-            pages.push(currentPageItems); // Add the last page
-        }
+            
+            // --- This part remains the same ---
+            const pages = [];
+            let currentPageItems = [];
+            let currentPageHeight = 0;
 
-        // Stage 2: Render each page with calculated vertical alignment.
-        pages.forEach((pageItems, pageIndex) => {
-            if (pageIndex > 0) {
-                pdf.addPage();
-            }
-
-            // Calculate the total height of all content on this specific page
-            const totalContentHeight = pageItems.reduce((sum, item) => sum + item.height, 0) + (PAGE_SPACING_MM * (pageItems.length - 1));
-
-            let startY = MARGIN_MM; // Default: top-aligned
-
-            // *** This is the key logic for your request ***
-            // If there's more than one item on the page, center the entire content block vertically.
-            if (pageItems.length > 1) {
-                const remainingSpace = USABLE_HEIGHT - totalContentHeight;
-                if (remainingSpace > 0) {
-                    startY = MARGIN_MM + (remainingSpace / 2);
+            itemsToPrint.forEach(item => {
+                const itemHeightWithSpacing = currentPageItems.length > 0 ? item.height + PAGE_SPACING_MM : item.height;
+                if (currentPageHeight + itemHeightWithSpacing > USABLE_HEIGHT && currentPageItems.length > 0) {
+                    pages.push(currentPageItems);
+                    currentPageItems = [item];
+                    currentPageHeight = item.height;
+                } else {
+                    currentPageItems.push(item);
+                    currentPageHeight += itemHeightWithSpacing;
                 }
+            });
+            if (currentPageItems.length > 0) {
+                pages.push(currentPageItems);
             }
 
-            // Now, draw the items for this page starting at the calculated Y position
-            let currentY = startY;
-            pageItems.forEach(item => {
-                pdf.addImage(item.imgData, 'JPEG', MARGIN_MM, currentY, item.width, item.height);
-                currentY += item.height + PAGE_SPACING_MM;
+            pages.forEach((pageItems, pageIndex) => {
+                if (pageIndex > 0) pdf.addPage();
+                const totalContentHeight = pageItems.reduce((sum, item) => sum + item.height, 0) + (PAGE_SPACING_MM * (pageItems.length - 1));
+                let startY = MARGIN_MM;
+                if (pageItems.length > 1) {
+                    const remainingSpace = USABLE_HEIGHT - totalContentHeight;
+                    if (remainingSpace > 0) startY = MARGIN_MM + (remainingSpace / 2);
+                }
+                let currentY = startY;
+                pageItems.forEach(item => {
+                    pdf.addImage(item.imgData, 'JPEG', MARGIN_MM, currentY, item.width, item.height);
+                    currentY += item.height + PAGE_SPACING_MM;
+                });
             });
-        });
 
-        // --- END: NEW LOGIC ---
+            const fileName = `${projectTitleEl.textContent.trim() || 'schedule'}.pdf`;
+            pdf.save(fileName);
 
-        const fileName = `${projectTitleEl.textContent.trim() || 'schedule'}.pdf`;
-        pdf.save(fileName);
-        printButton.disabled = false;
-        printButton.querySelector('span:last-child').textContent = 'Download PDF';
+        } finally {
+            // --- START: NEW CODE ---
+            // IMPORTANT: Always remove the temporary container and styles
+            document.body.removeChild(printContainer);
+            document.head.removeChild(printStyles);
+            printButton.disabled = false;
+            printButton.querySelector('span:last-child').textContent = 'Download PDF';
+            // --- END: NEW CODE ---
+        }
     }
 
 })();
