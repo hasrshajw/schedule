@@ -120,8 +120,8 @@
         .schedule-block table { display: none; }
         .mobile-view-container { display: flex; flex-direction: column; gap: 1.5rem; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 16px; }
         .mobile-item .item-label { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; font-family: 'Noto Sans Telugu', sans-serif; }
-        .mobile-item .item-sub-label { font-size: 0.9rem; font-weight: 500; color: var(--text-secondary); margin-bottom: 6px; }
         .mobile-item .item-input { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-md); background-color: #f9fafb; font-size: 1rem; font-weight: 500; color: var(--text-secondary); margin-top: 4px;}
+        .mobile-item-group { display: flex; flex-direction: column; gap: 1rem; }
     }
 </style>
 </head>
@@ -223,7 +223,6 @@
     const projectTitleEl = document.getElementById('project-title');
     const schedulesWrapper = document.getElementById('schedules-wrapper');
     const templateSelectionModal = document.getElementById('template-selection-modal');
-    const templateList = document.getElementById('template-list');
     const eventContextMenu = document.getElementById('event-context-menu');
     const memberDropdown = document.getElementById('member-dropdown');
     const statusIndicator = document.querySelector('.project-header .status-indicator');
@@ -287,36 +286,51 @@
 
         _createMobileView() {
             this.mobileViewContainer.innerHTML = '';
+
+            if (this.data.eventType && this.data.eventType !== 'normal') {
+                const eventTexts = {
+                    'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం',
+                    'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో',
+                    'convention': 'ప్రాదేశిక సమావేశం'
+                };
+                const eventDiv = document.createElement('div');
+                eventDiv.className = 'mobile-item';
+                eventDiv.innerHTML = `<div class="item-label special-event-text">${eventTexts[this.data.eventType]}</div>`;
+                this.mobileViewContainer.appendChild(eventDiv);
+                return;
+            }
+
             Array.from(this.tableBody.rows).forEach((row, rowIndex) => {
-                if (row.classList.contains('header-row')) return;
+                if (row.classList.contains('header-row') || !Array.from(row.cells).some(c => c.hasAttribute('data-user-editable'))) {
+                    return;
+                }
+                
+                const itemGroup = document.createElement('div');
+                itemGroup.className = 'mobile-item-group';
 
+                let primaryLabel = '';
                 const primaryCell = row.cells[0];
-                if (!primaryCell) return;
-
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = primaryCell.innerHTML;
-                let primaryText = tempDiv.textContent.trim();
+                if (primaryCell && !primaryCell.hasAttribute('data-user-editable')) {
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = primaryCell.innerHTML;
+                    primaryLabel = tempDiv.textContent.trim().replace('⠿', '').trim();
+                }
                 
-                let hasEditableCells = Array.from(row.cells).some(c => c.hasAttribute('data-user-editable'));
-                if (!hasEditableCells) return;
-
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'mobile-item';
-                
-                const inputsContainer = document.createElement('div');
+                if (primaryLabel) {
+                    itemGroup.innerHTML = `<div class="item-label">${primaryLabel}</div>`;
+                }
                 
                 Array.from(row.cells).forEach((cell, cellIndex) => {
                     if (cell.hasAttribute('data-user-editable')) {
+                        const inputWrapper = document.createElement('div');
+                        
                         let subLabelText = '';
                         if (cellIndex > 0 && row.cells[cellIndex - 1] && !row.cells[cellIndex - 1].hasAttribute('data-user-editable')) {
                             subLabelText = row.cells[cellIndex - 1].textContent.trim();
-                        } else if (cellIndex === 0) {
-                            primaryText = '';
                         }
-                        
-                        const inputWrapper = document.createElement('div');
+
                         if (subLabelText) {
-                            inputWrapper.innerHTML += `<div class="item-sub-label">${subLabelText}</div>`;
+                            inputWrapper.innerHTML = `<div class="item-label">${subLabelText}</div>`;
                         }
 
                         const inputDiv = document.createElement('div');
@@ -325,16 +339,10 @@
                         inputDiv.dataset.rowIndex = rowIndex;
                         inputDiv.dataset.cellIndex = cellIndex;
                         inputWrapper.appendChild(inputDiv);
-                        inputsContainer.appendChild(inputWrapper);
+                        itemGroup.appendChild(inputWrapper);
                     }
                 });
-                
-                if (primaryText) {
-                    itemDiv.innerHTML = `<div class="item-label">${primaryText}</div>`;
-                }
-                
-                itemDiv.appendChild(inputsContainer);
-                this.mobileViewContainer.appendChild(itemDiv);
+                this.mobileViewContainer.appendChild(itemGroup);
             });
         }
         
@@ -671,7 +679,7 @@
             clone.querySelector('.mobile-view-container').style.display = 'none';
             clone.querySelector('table').style.display = 'table';
             printContainer.appendChild(clone);
-
+            
             const canvas = await html2canvas(clone, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
             const imgData = canvas.toDataURL('image/jpeg', 0.8);
             const imgProps = pdf.getImageProperties(imgData);
