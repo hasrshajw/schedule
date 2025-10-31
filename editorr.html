@@ -232,22 +232,20 @@
 
         render() {
             this.titleEl.textContent = this.data.title;
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = `<table><tbody>${this.data.content}</tbody></table>`;
-            tempDiv.querySelectorAll('td, th').forEach(cell => {
-                if (cell.hasAttribute('data-user-editable')) {
-                    cell.setAttribute('contenteditable', 'true');
-                } else {
-                    cell.setAttribute('contenteditable', 'false');
-                }
+            this.tableBody.innerHTML = this.data.content;
+            this.tableBody.querySelectorAll('td[data-user-editable], th[data-user-editable]').forEach(cell => {
+                cell.setAttribute('contenteditable', 'true');
             });
-            this.tableBody.innerHTML = tempDiv.querySelector('tbody').innerHTML;
         }
         
         getContent() {
-            const tempBody = this.tableBody.cloneNode(true);
-            tempBody.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
-            return tempBody.querySelector('tbody').innerHTML;
+            const tempTable = this.element.querySelector('table').cloneNode(true);
+            tempTable.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+            const body = tempTable.querySelector('tbody');
+            if (body) {
+                return body.innerHTML;
+            }
+            return tempTable.innerHTML;
         }
 
         applyEventType(eventType, shouldSave = true) {
@@ -259,6 +257,9 @@
                 allRows.forEach(row => row.style.display = '');
                 if (firstRow && firstRow.dataset.originalContent) {
                     firstRow.innerHTML = firstRow.dataset.originalContent;
+                    firstRow.querySelectorAll('td[data-user-editable], th[data-user-editable]').forEach(cell => {
+                       cell.setAttribute('contenteditable', 'true');
+                    });
                     delete firstRow.dataset.originalContent;
                 }
             } else {
@@ -288,7 +289,7 @@
         }
 
         setupEventListeners() {
-            this.tableBody.addEventListener('input', () => this.parentProject.triggerSave());
+            this.element.addEventListener('input', () => this.parentProject.triggerSave());
             this.eventBtn.addEventListener('click', (e) => {
                 activeEventScheduleTable = this;
                 const rect = e.currentTarget.getBoundingClientRect();
@@ -323,9 +324,10 @@
         }
 
         triggerSave() {
-            if (this.isSaving) return;
             clearTimeout(this.saveTimeout);
-            this.saveTimeout = setTimeout(() => this.save(), 500); // Throttle saves to every 500ms
+            if (!this.isSaving) {
+                this.saveTimeout = setTimeout(() => this.save(), 500);
+            }
         }
         
         save() {
