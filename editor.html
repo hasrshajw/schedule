@@ -18,7 +18,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 <style>
-    /* --- NEW NAVBAR & MENU STYLES --- */
     :root {
         --header-bg: #292929;
         --text-light: #fff;
@@ -37,7 +36,6 @@
         --background-color: #f8fafc;
         --text-primary: #1f2937;
         --text-secondary: #6b7280;
-        --surface-color: #ffffff;
         --radius-md: 8px;
         --radius-lg: 16px;
         --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
@@ -56,7 +54,7 @@
 
     body {
         margin: 0;
-        padding: calc(56px + 24px) 20px 20px; /* Adjusted padding for new header */
+        padding: calc(56px + 24px) 20px 20px;
         font-family: 'Inter', sans-serif;
         background-color: var(--background-color);
         color: var(--text-primary);
@@ -90,11 +88,12 @@
     .profile-name { font-weight: bold; font-size: 1.1rem; color: #333; }
     
     .iconLink-icon { font-family: "jw-icons-external"; font-size: 24px; display: inline-block; color: #757575; width: 30px; margin-right: 10px; text-align: center; }
+    /* --- NEW ICONS FROM REFERENCE CODE --- */
     .home-icon::before { content: "\e661"; }
+    .midweek-icon::before { content: "\e625"; }
+    .sunday-icon::before { content: "\e610"; }
     .members-icon::before { content: "\e695"; }
-    .logout-icon::before { content: "\e656"; }
 
-    /* --- ORIGINAL EDITOR STYLES (ADAPTED) --- */
     .hidden { display: none !important; }
 
     .toolbar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); transition: all 0.2s; text-decoration: none; color: var(--text-secondary); }
@@ -103,7 +102,6 @@
 
     .master-container { max-width: 1100px; margin: 0 auto; background: var(--surface-color); padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
     .project-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color); }
-    .project-title-wrapper { flex-grow: 1; display: flex; align-items: center; gap: 16px; }
     .project-title { font-size: 1.75rem; font-weight: 700; margin: 0; border: none; padding: 4px 8px; margin: -4px -8px; border-radius: var(--radius-md); font-family: 'Noto Sans Telugu', sans-serif; flex-grow: 1; }
     .project-title:focus { outline: 2px solid var(--primary-color); background-color: var(--primary-light); }
     
@@ -114,21 +112,25 @@
     
     .status-indicator { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; display: flex; align-items: center; gap: 6px; }
     .status-indicator::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background-color: currentColor; }
+    
+    /* --- Styles for Status Indicator when NOT in header --- */
     .status-indicator[data-status="synced"] { color: var(--success-color); background-color: #eaf5ea; }
     .status-indicator[data-status="syncing"] { color: var(--warning-color); background-color: #fffbeb; }
     .status-indicator[data-status="error"] { color: var(--danger-color); background-color: #fde8e8; }
+
+    /* --- NEW: Styles for Status Indicator when in header --- */
+    .site-header .status-indicator {
+        font-size: 11px; padding: 2px 8px; border: 1px solid transparent; background-color: transparent;
+    }
+    .site-header .status-indicator[data-status="synced"] { color: #4caf50; border-color: #4caf50; }
+    .site-header .status-indicator[data-status="syncing"] { color: #ffc107; border-color: #ffc107; }
+    .site-header .status-indicator[data-status="error"] { color: #f44336; border-color: #f44336; }
 
     .schedule-block table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.25px; }
     .schedule-block th, .schedule-block td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; }
     .schedule-block .editable-cell:not([contenteditable="true"]) { cursor: pointer; }
     .schedule-block .editable-cell:not([contenteditable="true"]):hover { background-color: #f9fafb; }
     .schedule-block [contenteditable="true"]:focus { background-color: #fffbe5; }
-    .schedule-block .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; }
-    .schedule-block .cell-icon { height: 70%; max-height: 24px; object-fit: contain; flex-shrink: 0; }
-    .schedule-block .header-row .cell-icon { filter: brightness(0) invert(1); }
-    .schedule-block .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; }
-    .schedule-block .header-row td { font-size: 16px; color: #ffffff; height: 42px; }
-    .schedule-block .row-handle { display: none !important; }
     
     .special-event-text { color: red; text-align: center !important; font-weight: 700; }
 
@@ -160,7 +162,6 @@
         body { padding: 56px 0 0 0; background-color: var(--surface-color); }
         .master-container { padding: 16px; border-radius: 0; box-shadow: none; }
         .project-header { flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px 0; margin-bottom: 16px; }
-        .project-title-wrapper { width: 100%; }
         .project-title { font-size: 1.5rem; }
         .schedule-block { margin-bottom: 24px; padding: 0 0 24px 0; border-bottom: 8px solid var(--background-color); }
         .schedule-block:last-child { border-bottom: none; }
@@ -179,6 +180,8 @@
     <div class="top-bar">
         <a href="./dashboard.html" class="mobileLogo" title="Home"></a>
         <div class="header-right-controls">
+            <!-- STATUS INDICATOR MOVED HERE -->
+            <div class="status-indicator" data-status="synced">Synced</div>
             <div class="header-icons" id="menu-toggle-button">
                 <svg class="hamburger-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M22.5 7h-21a.5.5 0 010-1h21a.5.5 0 010 1zM22.5 13h-21a.5.5 0 010-1h21a.5.5 0 010 1zM22.5 19h-21a.5.5 0 010-1h21a.5.5 0 010 1z"></path></svg>
                 <svg class="close-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12.707 12l6.146-6.146a.5.5 0 00-.707-.707L12 11.293 5.854 5.146a.5.5 0 00-.707.707L11.293 12l-6.147 6.146a.5.5 0 10.707.707L12 12.707l6.146 6.146a.5.5 0 00.707-.707z"></path></svg>
@@ -188,10 +191,12 @@
 </header>
 <div class="menu-overlay" id="menu-overlay"></div>
 <div class="slide-menu" id="slide-menu">
+    <!-- MENU LINKS REPLACED HERE -->
     <ul class="menu-links">
-        <li><a href="./dashboard.html"><span class="iconLink-icon home-icon"></span><span>Dashboard</span></a></li>
+        <li><a href="./home.html"><span class="iconLink-icon home-icon"></span><span>Home</span></a></li>
+        <li><a href="./mid-week.html"><span class="iconLink-icon midweek-icon"></span><span>Mid-Week Schedules</span></a></li>
+        <li><a href="./sunday-dashboard.html"><span class="iconLink-icon sunday-icon"></span><span>Sunday Schedules</span></a></li>
         <li><a href="./members.html"><span class="iconLink-icon members-icon"></span><span>Members</span></a></li>
-        <li><a id="logout-link"><span class="iconLink-icon logout-icon"></span><span>Logout</span></a></li>
     </ul>
     <div class="profile-section">
         <div class="profile-info">
@@ -203,10 +208,7 @@
 <div id="app-container" class="hidden">
     <div class="master-container">
         <div id="project-header" class="project-header">
-            <div class="project-title-wrapper">
-                <h1 id="project-title" contenteditable="true">Loading Project...</h1>
-                <div class="status-indicator" data-status="synced">Synced</div>
-            </div>
+            <h1 id="project-title" contenteditable="true">Loading Project...</h1>
             <div class="project-actions">
                 <button id="print-button" class="toolbar-btn"><span class="material-symbols-outlined">picture_as_pdf</span><span>Download PDF</span></button>
             </div>
@@ -288,7 +290,7 @@
     const templateList = document.getElementById('template-list');
     const eventContextMenu = document.getElementById('event-context-menu');
     const memberDropdown = document.getElementById('member-dropdown');
-    const statusIndicator = document.querySelector('.project-header .status-indicator');
+    const statusIndicator = document.querySelector('.site-header .status-indicator'); // Updated selector
     
     function updateStatus(text, status) {
         statusIndicator.textContent = text;
@@ -492,12 +494,8 @@
                     <td data-user-editable="true"><input type="date" class="date-input" value="${existingDateValue}"></td>
                 `;
             }
-
             this._createMobileView(); 
-            
-            if (shouldSave) {
-                this.parentProject.triggerSave();
-            }
+            if (shouldSave) { this.parentProject.triggerSave(); }
         }
         setupEventListeners() {
             this.element.addEventListener('input', (e) => {
@@ -505,7 +503,6 @@
                 if(input.classList.contains('item-input') || input.classList.contains('date-input')) {
                     const rowIndex = input.dataset.rowIndex;
                     const cellIndex = input.dataset.cellIndex;
-                    // Sync from mobile to hidden table
                     if (rowIndex && cellIndex) {
                         const targetCell = this.tableBody.rows[rowIndex].cells[cellIndex];
                         if(input.type === 'date') {
@@ -648,7 +645,7 @@
         });
         menuOverlay.addEventListener('click', closeMenu);
 
-        document.getElementById('logout-link').addEventListener('click', () => auth.signOut());
+        // LOGOUT BUTTON REMOVED
         document.getElementById('print-button').addEventListener('click', generatePdf);
         document.getElementById('cancel-template-selection').addEventListener('click', () => window.location.href = './dashboard.html');
         document.getElementById('confirm-template-selection').addEventListener('click', async () => {
