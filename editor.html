@@ -11,14 +11,23 @@
 <!-- PDF Generation Libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<!-- FONTS AND ICONS -->
+<!-- FONTS & ICONS -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 <style>
+    /* --- NEW NAVBAR & MENU STYLES --- */
     :root {
+        --header-bg: #292929;
+        --text-light: #fff;
+        --body-bg: #f8fafc;
+        --surface-color: #ffffff;
+        --menu-new-text: #4a6da7;
+        --menu-new-bg: #ffffff;
+        --menu-new-border: #eeeeee;
+        --menu-new-hover: #f5f5f5;
         --primary-color: #012726;
         --primary-hover: #024443;
         --primary-light: #e6f6f6;
@@ -34,41 +43,31 @@
         --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
         --warning-color: #f59e0b;
         --success-color: #2e7d32;
-        
-        /* New Nav variables */
-        --header-bg: #292929;
-        --text-light: #fff;
-        --menu-new-text: #4a6da7;
-        --menu-new-bg: #ffffff;
-        --menu-new-border: #eeeeee;
-        --menu-new-hover: #f5f5f5;
+    }
+    
+    @font-face {
+        font-family: "jw-icons-external";
+        src: url("https://www.jw.org/assets/css/fonts/jw-icons-external/jw-icons-external-d876da3.woff") format("woff");
+        font-weight: normal; font-style: normal;
     }
 
     *, *::before, *::after { box-sizing: border-box; }
     html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 
-    /* NEW NAV STYLES */
-    @font-face {
-        font-family: "jw-icons-external";
-        src: url("https://www.jw.org/assets/css/jw-icons-external-d876da3.woff") format("woff");
-        font-weight: normal; font-style: normal;
-    }
-
     body {
+        margin: 0;
+        padding: calc(56px + 24px) 20px 20px; /* Adjusted padding for new header */
         font-family: 'Inter', sans-serif;
         background-color: var(--background-color);
-        margin: 0;
-        padding: calc(56px + 20px) 20px 20px;
         color: var(--text-primary);
         visibility: hidden; opacity: 0;
         transition: opacity 0.3s ease-in;
     }
     body.auth-ready { visibility: visible; opacity: 1; }
     body.menu-open { overflow: hidden; }
-    .hidden { display: none !important; }
 
     .site-header { background-color: var(--header-bg); padding: 0; color: var(--text-light); position: fixed; top: 0; left: 0; width: 100%; z-index: 900; }
-    .top-bar { display: flex; justify-content: space-between; align-items: center; height: 56px; padding: 0 15px 0 0; max-width: 1100px; margin: 0 auto; }
+    .top-bar { display: flex; justify-content: space-between; align-items: center; height: 56px; padding: 0 15px 0 0; max-width: 1200px; margin: 0 auto; }
     .mobileLogo { display: block; width: 75px; height: 56px; background-image: url(https://www.jw.org/assets/ct/46605f23da/images/siteLogo-jworg-mobile.svg), none; background-repeat: no-repeat; background-size: contain; background-position: center left; flex-shrink: 0; }
     .header-right-controls { display: flex; align-items: center; gap: 15px; }
     .header-icons { display: flex; align-items: center; height: 56px; cursor: pointer; }
@@ -76,35 +75,38 @@
     .header-icons .close-icon { display: none; }
     body.menu-open .header-icons .hamburger-icon { display: none; }
     body.menu-open .header-icons .close-icon { display: block; }
+    
     .menu-overlay { position: fixed; top: 56px; left: 0; width: 100%; height: calc(100% - 56px); background-color: rgba(0, 0, 0, 0.6); z-index: 998; opacity: 0; visibility: hidden; transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; }
     .menu-overlay.is-open { opacity: 1; visibility: visible; }
     .slide-menu { position: fixed; top: 56px; right: 0; height: calc(100dvh - 56px); width: 320px; max-width: 90%; background-color: var(--menu-new-bg); z-index: 999; transform: translateX(100%); transition: transform 0.3s ease-in-out; display: flex; flex-direction: column; border-left: 1px solid var(--menu-new-border); }
     .slide-menu.is-open { transform: translateX(0); }
     .menu-links { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex-grow: 1; }
-    .menu-links li a, .menu-links li button { display: flex; align-items: center; color: var(--menu-new-text); background-color: var(--menu-new-bg); height: 50px; padding: 12px 5px 12px 12px; box-sizing: border-box; text-decoration: none; font-size: 1rem; transition: background-color 0.2s; border-top: 1px dotted #a7a7a7; width: 100%; cursor: pointer; font-family: inherit; }
+    .menu-links li a { display: flex; align-items: center; color: var(--menu-new-text); background-color: var(--menu-new-bg); height: 50px; padding: 12px 5px 12px 12px; box-sizing: border-box; text-decoration: none; font-size: 1rem; transition: background-color 0.2s; border-top: 1px dotted #a7a7a7; cursor: pointer; }
     .menu-links li:first-child a { border-top: none; }
-    .menu-links li a:hover, .menu-links li button:hover { background-color: var(--menu-new-hover); }
+    .menu-links li a:hover { background-color: var(--menu-new-hover); }
+    
     .profile-section { padding: 16px; border-top: 1px solid var(--menu-new-border); flex-shrink: 0; background-color: #fafafa; margin-top: auto; }
-    .profile-info { display: flex; align-items: center; margin-bottom: 12px; }
+    .profile-info { display: flex; align-items: center; }
     .profile-name { font-weight: bold; font-size: 1.1rem; color: #333; }
-    #logout-button { width: 100%; padding: 8px 12px; background-color: var(--danger-color); color: white; border: none; border-radius: var(--radius-md); font-weight: 600; cursor: pointer; transition: background-color 0.2s; }
-    #logout-button:hover { background-color: var(--danger-hover); }
+    
     .iconLink-icon { font-family: "jw-icons-external"; font-size: 24px; display: inline-block; color: #757575; width: 30px; margin-right: 10px; text-align: center; }
     .home-icon::before { content: "\e661"; }
-    .midweek-icon::before { content: "\e625"; }
-    .sunday-icon::before { content: "\e610"; }
     .members-icon::before { content: "\e695"; }
+    .logout-icon::before { content: "\e656"; }
 
-    /* MAIN CONTENT STYLES */
-    .master-container { max-width: 1100px; margin: 0 auto; background: var(--surface-color); padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
-    .project-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color); }
-    .project-title { font-size: 1.75rem; font-weight: 700; margin: 0; flex-grow: 1; border: none; padding: 4px 8px; margin: -4px -8px; border-radius: var(--radius-md); font-family: 'Noto Sans Telugu', sans-serif; }
-    .project-title:focus { outline: 2px solid var(--primary-color); background-color: var(--primary-light); }
-    .project-actions { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+    /* --- ORIGINAL EDITOR STYLES (ADAPTED) --- */
+    .hidden { display: none !important; }
+
     .toolbar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); transition: all 0.2s; text-decoration: none; color: var(--text-secondary); }
     .toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; border-color: #d1d5db; color: var(--text-primary); }
     .toolbar-btn:disabled { cursor: not-allowed; opacity: 0.5; }
 
+    .master-container { max-width: 1100px; margin: 0 auto; background: var(--surface-color); padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
+    .project-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color); }
+    .project-title-wrapper { flex-grow: 1; display: flex; align-items: center; gap: 16px; }
+    .project-title { font-size: 1.75rem; font-weight: 700; margin: 0; border: none; padding: 4px 8px; margin: -4px -8px; border-radius: var(--radius-md); font-family: 'Noto Sans Telugu', sans-serif; flex-grow: 1; }
+    .project-title:focus { outline: 2px solid var(--primary-color); background-color: var(--primary-light); }
+    
     .schedule-block { margin-bottom: 32px; }
     .schedule-block:last-child { margin-bottom: 0; }
     .schedule-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
@@ -127,6 +129,7 @@
     .schedule-block .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; }
     .schedule-block .header-row td { font-size: 16px; color: #ffffff; height: 42px; }
     .schedule-block .row-handle { display: none !important; }
+    
     .special-event-text { color: red; text-align: center !important; font-weight: 700; }
 
     #event-context-menu, #member-dropdown { position: fixed; display: none; background: var(--surface-color); border-radius: var(--radius-md); box-shadow: var(--shadow-md); z-index: 1001; padding: 6px; min-width: 180px; border: 1px solid var(--border-color); }
@@ -148,6 +151,7 @@
     #confirm-template-selection { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 
     #print-container { position: absolute; left: -9999px; top: auto; width: 1100px; background: white; }
+    
     .mobile-view-container { display: none; }
     
     .date-input { cursor: pointer; -webkit-appearance: none; -moz-appearance: none; appearance: none; background-color: transparent; border: none; width: 100%; height: 100%; font-family: inherit; font-size: inherit; font-weight: inherit; text-align: left; padding-left: 8px; }
@@ -155,9 +159,9 @@
     @media (max-width: 768px) {
         body { padding: 56px 0 0 0; background-color: var(--surface-color); }
         .master-container { padding: 16px; border-radius: 0; box-shadow: none; }
-        .project-header { flex-wrap: wrap; align-items: flex-start; gap: 12px; padding: 16px 0; margin-bottom: 16px; }
-        .project-title { font-size: 1.5rem; order: 1; width: 100%; }
-        .project-actions { order: 2; width: 100%; justify-content: space-between; }
+        .project-header { flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px 0; margin-bottom: 16px; }
+        .project-title-wrapper { width: 100%; }
+        .project-title { font-size: 1.5rem; }
         .schedule-block { margin-bottom: 24px; padding: 0 0 24px 0; border-bottom: 8px solid var(--background-color); }
         .schedule-block:last-child { border-bottom: none; }
         .schedule-block table { display: none; }
@@ -170,6 +174,7 @@
 </style>
 </head>
 <body>
+
 <header class="site-header">
     <div class="top-bar">
         <a href="./dashboard.html" class="mobileLogo" title="Home"></a>
@@ -186,21 +191,23 @@
     <ul class="menu-links">
         <li><a href="./dashboard.html"><span class="iconLink-icon home-icon"></span><span>Dashboard</span></a></li>
         <li><a href="./members.html"><span class="iconLink-icon members-icon"></span><span>Members</span></a></li>
+        <li><a id="logout-link"><span class="iconLink-icon logout-icon"></span><span>Logout</span></a></li>
     </ul>
     <div class="profile-section">
         <div class="profile-info">
              <div class="profile-name">Loading...</div>
         </div>
-        <button id="logout-button">Logout</button>
     </div>
 </div>
 
 <div id="app-container" class="hidden">
     <div class="master-container">
         <div id="project-header" class="project-header">
-            <h1 id="project-title" contenteditable="true">Loading Project...</h1>
-            <div class="project-actions">
+            <div class="project-title-wrapper">
+                <h1 id="project-title" contenteditable="true">Loading Project...</h1>
                 <div class="status-indicator" data-status="synced">Synced</div>
+            </div>
+            <div class="project-actions">
                 <button id="print-button" class="toolbar-btn"><span class="material-symbols-outlined">picture_as_pdf</span><span>Download PDF</span></button>
             </div>
         </div>
@@ -231,6 +238,7 @@
     <button class="context-menu-item" data-event-type="assembly">Assembly</button>
     <button class="context-menu-item" data-event-type="convention">Convention</button>
 </div>
+
 <div id="member-dropdown"></div>
 
 <div id="template-selection-modal" class="modal-overlay">
@@ -272,7 +280,6 @@
     let activeEventScheduleTable = null;
     let activeCellForDropdown = null;
 
-    // --- DOM Elements ---
     const appContainer = document.getElementById('app-container');
     const profileNameEl = document.querySelector('.profile-name');
     const projectTitleEl = document.getElementById('project-title');
@@ -282,9 +289,6 @@
     const eventContextMenu = document.getElementById('event-context-menu');
     const memberDropdown = document.getElementById('member-dropdown');
     const statusIndicator = document.querySelector('.project-header .status-indicator');
-    const menuToggleButton = document.getElementById('menu-toggle-button');
-    const slideMenu = document.getElementById('slide-menu');
-    const menuOverlay = document.getElementById('menu-overlay');
     
     function updateStatus(text, status) {
         statusIndicator.textContent = text;
@@ -316,7 +320,6 @@
             this.setupEventListeners();
             this.applyEventType(this.data.eventType || 'normal', false);
         }
-
         initDOM() {
             const templateClone = document.getElementById('schedule-template').content.cloneNode(true);
             this.element = templateClone.querySelector('.schedule-block');
@@ -326,11 +329,9 @@
             this.eventBtn = this.element.querySelector('.event-btn');
             schedulesWrapper.appendChild(this.element);
         }
-
         render() {
             this.titleEl.textContent = this.data.title;
             this.tableBody.innerHTML = this.data.content;
-            
             this.tableBody.querySelectorAll('td, th').forEach(cell => {
                 if (cell.hasAttribute('data-user-editable')) {
                     const isFirstRow = cell.closest('tr') === this.tableBody.rows[0];
@@ -347,10 +348,8 @@
                     cell.setAttribute('contenteditable', 'false');
                 }
             });
-
             this._createMobileView();
         }
-
         _createMobileView() {
             this.mobileViewContainer.innerHTML = '';
             if (this.data.eventType && this.data.eventType !== 'normal') {
@@ -393,7 +392,7 @@
                         tempDiv.innerHTML = row.cells[0].innerHTML;
                         labelText = tempDiv.textContent.trim().replace('⠿', '').replace(':', '');
                     }
-                    if (!groupedInputs[labelText]) groupedInputs[labelText] = [];
+                    if (!groupedInputs[labelText]) { groupedInputs[labelText] = []; }
                     groupedInputs[labelText].push(cell);
                 });
                 for (const label in groupedInputs) {
@@ -435,7 +434,6 @@
                 }
             });
         }
-        
         getContent() {
             const tempBody = this.tableBody.cloneNode(true);
             const dateInput = tempBody.querySelector('.date-input');
@@ -447,7 +445,6 @@
             tempBody.querySelectorAll('.editable-cell').forEach(el => el.classList.remove('editable-cell'));
             return tempBody.innerHTML;
         }
-
         applyEventType(eventType, shouldSave = true) {
             this.data.eventType = eventType;
             const allRows = this.tableBody.querySelectorAll('tr');
@@ -463,18 +460,17 @@
                 allRows.forEach((row, index) => { row.style.display = (index === 0) ? '' : 'none'; });
                 let existingDateValue = '';
                 if (firstRow) {
-                    if (!firstRow.dataset.originalContent) firstRow.dataset.originalContent = firstRow.innerHTML;
+                    if (!firstRow.dataset.originalContent) { firstRow.dataset.originalContent = firstRow.innerHTML; }
                     const tempDiv = document.createElement('div');
                     tempDiv.innerHTML = firstRow.dataset.originalContent;
                     const originalDateCell = tempDiv.querySelector('[data-user-editable]');
-                    if (originalDateCell) existingDateValue = originalDateCell.textContent.trim().split('-').reverse().join('-');
+                    if (originalDateCell) { existingDateValue = originalDateCell.textContent.trim().split('-').reverse().join('-'); }
                 }
                 firstRow.innerHTML = `<th colspan="1" class="special-event-text">${eventTexts[eventType]}</th><td style="text-align: right; font-weight: 700;">తేదీ:</td><td data-user-editable="true"><input type="date" class="date-input" value="${existingDateValue}"></td>`;
             }
             this.render();
-            if (shouldSave) this.parentProject.triggerSave();
+            if (shouldSave) { this.parentProject.triggerSave(); }
         }
-
         setupEventListeners() {
             this.element.addEventListener('input', (e) => {
                 const input = e.target;
@@ -485,9 +481,7 @@
                     if(input.type === 'date') {
                         const tableInput = targetCell.querySelector('.date-input');
                         if(tableInput) tableInput.value = input.value;
-                    } else {
-                         targetCell.textContent = input.textContent;
-                    }
+                    } else { targetCell.textContent = input.textContent; }
                 }
                 this.parentProject.triggerSave();
             });
@@ -512,7 +506,6 @@
             this.render();
             this.setupEventListeners();
         }
-
         render(newData) {
             if (newData) this.data = newData;
             if (document.activeElement !== projectTitleEl) projectTitleEl.textContent = this.data.name;
@@ -522,21 +515,18 @@
                 this.scheduleTables.push(new ScheduleTable(this, tableData, index));
             });
         }
-
         triggerSave() {
             clearTimeout(this.saveTimeout);
-            if (!this.isSaving) {
-                this.saveTimeout = setTimeout(() => this.save(), 500);
-            }
+            if (!this.isSaving) { this.saveTimeout = setTimeout(() => this.save(), 500); }
         }
-        
         save() {
             this.isSaving = true;
             updateStatus('Syncing...', 'syncing');
             this.scheduleTables.forEach(table => {
                 const dateInput = table.tableBody.querySelector('.date-input');
                 if (dateInput && dateInput.value) {
-                    dateInput.parentElement.textContent = dateInput.value.split('-').reverse().join('-');
+                    const cell = dateInput.parentElement;
+                    cell.textContent = dateInput.value.split('-').reverse().join('-');
                 }
             });
             const updatedTablesData = this.scheduleTables.map(table => ({ title: table.data.title, content: table.getContent(), eventType: table.data.eventType || 'normal' }));
@@ -545,7 +535,6 @@
                 .then(() => { updateStatus('Synced', 'synced'); this.isSaving = false; })
                 .catch(err => { console.error("Save failed:", err); updateStatus('Error', 'error'); this.isSaving = false; });
         }
-
         setupEventListeners() {
             projectTitleEl.addEventListener('input', () => this.triggerSave());
         }
@@ -555,14 +544,15 @@
         if (user) {
             if (user.email === ADMIN_EMAIL) { window.location.replace('./admin.html'); return; }
             currentUser = user;
+            
+            // Populate user info in the new slide-out menu
+            if(profileNameEl) profileNameEl.textContent = user.displayName || user.email;
+            document.body.classList.add('auth-ready');
+
             await fetchMembers(); 
             userSchedulesCollection = db.collection(`userSchedules/${currentUser.uid}/schedules`);
             appContainer.classList.remove('hidden');
-            document.body.classList.add('auth-ready');
-            if (profileNameEl) profileNameEl.textContent = user.email;
             
-            setupGlobalUI();
-
             const params = new URLSearchParams(window.location.search);
             currentProjectId = params.get('id');
             if (currentProjectId) { initEditor(); } else { initCreationFlow(); }
@@ -594,6 +584,7 @@
 
     async function initCreationFlow() {
         document.getElementById('project-header').style.display = 'none';
+        document.getElementById('print-button').style.display = 'none';
         const templatesCollection = db.collection("templates");
         const snapshot = await templatesCollection.orderBy("createdAt").get();
         templateList.innerHTML = '';
@@ -610,7 +601,31 @@
     }
 
     function setupGlobalUI() {
-        document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
+        // --- NEW SLIDE MENU LOGIC ---
+        const menuToggleButton = document.getElementById('menu-toggle-button');
+        const slideMenu = document.getElementById('slide-menu');
+        const menuOverlay = document.getElementById('menu-overlay');
+        const body = document.body;
+        
+        function closeMenu() {
+            slideMenu.classList.remove('is-open');
+            menuOverlay.classList.remove('is-open');
+            body.classList.remove('menu-open');
+        }
+
+        menuToggleButton.addEventListener('click', () => {
+            if (body.classList.contains('menu-open')) {
+                closeMenu();
+            } else {
+                slideMenu.classList.add('is-open');
+                menuOverlay.classList.add('is-open');
+                body.classList.add('menu-open');
+            }
+        });
+        menuOverlay.addEventListener('click', closeMenu);
+
+        // --- ORIGINAL GLOBAL UI LISTENERS (ADAPTED) ---
+        document.getElementById('logout-link').addEventListener('click', () => auth.signOut());
         document.getElementById('print-button').addEventListener('click', generatePdf);
         document.getElementById('cancel-template-selection').addEventListener('click', () => window.location.href = './dashboard.html');
         document.getElementById('confirm-template-selection').addEventListener('click', async () => {
@@ -624,11 +639,16 @@
                 const tempDiv = document.createElement('div');
                 tempDiv.innerHTML = `<table><tbody>${rawContent}</tbody></table>`;
                 tempDiv.querySelectorAll('td, th').forEach(cell => {
-                    if (cell.textContent.trim() === '' && !cell.querySelector('img')) cell.setAttribute('data-user-editable', 'true');
+                    const isEssentiallyEmpty = cell.textContent.trim() === '' && !cell.querySelector('img');
+                    if (isEssentiallyEmpty) cell.setAttribute('data-user-editable', 'true');
                 });
                 return { title: input.dataset.name, content: tempDiv.querySelector('tbody').innerHTML, eventType: 'normal' };
             });
-            const newDocRef = await userSchedulesCollection.add({ name: newProjectName, tables: tablesArray, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+            const newDocRef = await userSchedulesCollection.add({
+                name: newProjectName,
+                tables: tablesArray,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
             window.location.href = `./editor.html?id=${newDocRef.id}`;
         });
         
@@ -642,17 +662,15 @@
         });
 
         schedulesWrapper.addEventListener('click', e => {
-            const targetElement = e.target.closest('.editable-cell');
+            const targetElement = e.target.closest('.editable-cell, [contenteditable="true"]');
             if (!targetElement) return;
+            if (targetElement.getAttribute('contenteditable') === 'true') { return; }
             let realCell, mobileDiv = null;
-            if (targetElement.tagName === 'DIV') { // Mobile input
+            if (targetElement.tagName === 'DIV') {
                 mobileDiv = targetElement;
-                const { rowIndex, cellIndex } = mobileDiv.dataset;
                 const tableBody = mobileDiv.closest('.schedule-block').querySelector('.schedule-table-body');
-                realCell = tableBody.rows[rowIndex].cells[cellIndex];
-            } else { // Desktop cell
-                realCell = targetElement;
-            }
+                realCell = tableBody.rows[mobileDiv.dataset.rowIndex].cells[mobileDiv.dataset.cellIndex];
+            } else { realCell = targetElement; }
             openMemberDropdown(realCell, mobileDiv);
         });
 
@@ -661,7 +679,9 @@
             if (item && activeCellForDropdown.realCell) {
                 const newName = item.dataset.name;
                 activeCellForDropdown.realCell.textContent = newName;
-                if (activeCellForDropdown.mobileDiv) activeCellForDropdown.mobileDiv.textContent = newName;
+                if (activeCellForDropdown.mobileDiv) {
+                    activeCellForDropdown.mobileDiv.textContent = newName;
+                }
                 activeProject.triggerSave();
             }
             memberDropdown.style.display = 'none';
@@ -672,23 +692,6 @@
             if (!eventContextMenu.contains(e.target) && !e.target.closest('.event-btn')) { eventContextMenu.style.display = 'none'; }
             if (!memberDropdown.contains(e.target) && !e.target.closest('.editable-cell')) { memberDropdown.style.display = 'none'; }
         });
-        
-        // --- Slide Menu Logic ---
-        function closeMenu() {
-            slideMenu.classList.remove('is-open');
-            menuOverlay.classList.remove('is-open');
-            document.body.classList.remove('menu-open');
-        }
-
-        menuToggleButton.addEventListener('click', () => {
-            if (document.body.classList.contains('menu-open')) closeMenu();
-            else {
-                slideMenu.classList.add('is-open');
-                menuOverlay.classList.add('is-open');
-                document.body.classList.add('menu-open');
-            }
-        });
-        menuOverlay.addEventListener('click', closeMenu);
     }
     
     function isCellInMinistrySection(cell) {
@@ -696,25 +699,31 @@
         if (!table) return false;
         const allRows = Array.from(table.querySelectorAll('tbody > tr'));
         const cellRow = cell.closest('tr');
-        const cellRowIndex = allRows.indexOf(cellRow);
+        const cellIndex = allRows.indexOf(cellRow);
         let ministryHeaderIndex = -1, nextHeaderIndex = allRows.length;
         allRows.forEach((row, index) => {
             if(row.classList.contains('header-row')) {
-                if (row.dataset.section === 'ministry') ministryHeaderIndex = index;
-                else if (ministryHeaderIndex !== -1 && index > ministryHeaderIndex && index < nextHeaderIndex) nextHeaderIndex = index;
+                if (row.dataset.section === 'ministry') { ministryHeaderIndex = index;
+                } else if (ministryHeaderIndex !== -1 && index > ministryHeaderIndex) {
+                    if (index < nextHeaderIndex) { nextHeaderIndex = index; }
+                }
             }
         });
         if (ministryHeaderIndex === -1) return false;
-        return cellRowIndex > ministryHeaderIndex && cellRowIndex < nextHeaderIndex;
+        return cellIndex > ministryHeaderIndex && cellIndex < nextHeaderIndex;
     }
 
     function openMemberDropdown(cell, mobileDiv = null) {
         const isInMinistry = isCellInMinistrySection(cell);
         memberDropdown.innerHTML = '';
         let listToShow;
-        if (isInMinistry) listToShow = [...members.sisters, ...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
-        else listToShow = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
-
+        if (isInMinistry) {
+            const sortedSisters = [...members.sisters].sort((a, b) => a.name.localeCompare(b.name));
+            const sortedBrothers = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
+            listToShow = [...sortedSisters, ...sortedBrothers];
+        } else {
+            listToShow = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
+        }
         listToShow.forEach(member => { 
             const item = document.createElement('button');
             item.className = 'member-dropdown-item';
@@ -722,7 +731,6 @@
             item.innerHTML = `<span>${member.name}</span>` + (member.isServant ? '<span class="servant-tag">Servant</span>' : '');
             memberDropdown.appendChild(item);
         });
-
         const rect = (mobileDiv || cell).getBoundingClientRect();
         memberDropdown.style.display = 'block';
         memberDropdown.style.top = `${rect.bottom}px`;
@@ -735,17 +743,17 @@
         const printButton = document.getElementById('print-button');
         printButton.disabled = true;
         printButton.querySelector('span:last-child').textContent = 'Generating...';
-
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('p', 'mm', 'a4');
-        const MARGIN_MM = 10, USABLE_WIDTH = 210 - (MARGIN_MM * 2), USABLE_HEIGHT = 297 - (MARGIN_MM * 2), PAGE_SPACING_MM = 5;
-        
+        const originalBlocks = document.querySelectorAll('.schedule-block');
+        const A4_WIDTH_MM = 210, A4_HEIGHT_MM = 297, MARGIN_MM = 10, PAGE_SPACING_MM = 5; 
+        const USABLE_WIDTH = A4_WIDTH_MM - (MARGIN_MM * 2);
+        const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_MM * 2);
         const printContainer = document.createElement('div');
         printContainer.id = 'print-container';
         document.body.appendChild(printContainer);
-
         const itemsToPrint = [];
-        for (const block of document.querySelectorAll('.schedule-block')) {
+        for (const block of originalBlocks) {
             const clone = block.cloneNode(true);
             clone.querySelector('.event-btn').style.display = 'none';
             clone.querySelector('.mobile-view-container').style.display = 'none';
@@ -757,9 +765,7 @@
             const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
             itemsToPrint.push({ imgData, width: USABLE_WIDTH, height: imgHeight });
         }
-        
         document.body.removeChild(printContainer);
-
         let currentY = MARGIN_MM;
         itemsToPrint.forEach((item, index) => {
             if (index > 0 && currentY + item.height > USABLE_HEIGHT + MARGIN_MM) {
@@ -769,12 +775,14 @@
             pdf.addImage(item.imgData, 'JPEG', MARGIN_MM, currentY, item.width, item.height);
             currentY += item.height + PAGE_SPACING_MM;
         });
-
         const fileName = `${projectTitleEl.textContent.trim() || 'schedule'}.pdf`;
         pdf.save(fileName);
         printButton.disabled = false;
         printButton.querySelector('span:last-child').textContent = 'Download PDF';
     }
+
+    // Call setupGlobalUI once the DOM is ready and before authentication check
+    setupGlobalUI();
 })();
 </script>
 </body>
