@@ -46,7 +46,7 @@
     
     @font-face {
         font-family: "jw-icons-external";
-        src: url("https://www.jw.org/assets/css/fonts/jw-icons-external/jw-icons-external-d876da3.woff") format("woff");
+        src: url("./jw-icons-external-d876da3.woff") format("woff");
         font-weight: normal; font-style: normal;
     }
 
@@ -817,7 +817,6 @@
         for (const block of document.querySelectorAll('.schedule-block')) {
             const clone = block.cloneNode(true);
             
-            // --- All your modifications happen first ---
             clone.querySelector('.event-btn').style.display = 'none';
             clone.querySelector('.mobile-view-container').style.display = 'none';
             clone.querySelector('table').style.display = 'table';
@@ -827,11 +826,19 @@
                 titleEl.style.display = 'none';
             }
             clone.style.marginBottom = '0';
-            
-            // --- Then you append the clone to the DOM ---
+
+            // --- START: ADD THIS NEW CODE BLOCK ---
+
+            // Increase the height of all table cells for better spacing in the PDF
+            const allCells = clone.querySelectorAll('th, td');
+            allCells.forEach(cell => {
+                cell.style.height = '42px'; // Adjust this value as needed
+            });
+
+            // --- END: ADD THIS NEW CODE BLOCK ---
+
             printContainer.appendChild(clone);
             
-            // --- FINALLY, you render it to the canvas ONE TIME ---
             const canvas = await html2canvas(clone, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
             
             // --- And continue with the rest of the logic ---
