@@ -288,7 +288,8 @@
 
         _createMobileView() {
             this.mobileViewContainer.innerHTML = '';
-            
+
+            // Handle Special Event view
             if (this.data.eventType && this.data.eventType !== 'normal') {
                 const eventTexts = { 'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం', 'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో', 'convention': 'ప్రాదేశిక సమావేశం' };
                 const firstRow = this.tableBody.rows[0];
@@ -298,55 +299,62 @@
                     <div class="item-label special-event-text">${eventTexts[this.data.eventType]}</div>
                     <div class="input-group">
                         <div class="item-label">తేదీ:</div>
-                        <div class="item-input editable-cell" contenteditable="true" data-row-index="0" data-cell-index="2">${firstRow.cells[2] ? firstRow.cells[2].textContent : ''}</div>
+                        <div class="item-input" contenteditable="true" data-row-index="0" data-cell-index="2">${firstRow.cells[2] ? firstRow.cells[2].textContent : ''}</div>
                     </div>
                 `;
                 this.mobileViewContainer.appendChild(itemDiv);
                 return;
             }
 
+            // Handle Normal view
             Array.from(this.tableBody.rows).forEach((row, rowIndex) => {
-                if (row.classList.contains('header-row') || !Array.from(row.cells).some(c => c.hasAttribute('data-user-editable'))) return;
+                const editableCellsInRow = Array.from(row.cells).filter(c => c.hasAttribute('data-user-editable'));
+                if (row.classList.contains('header-row') || editableCellsInRow.length === 0) return;
 
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'mobile-item';
-                
-                const inputsContainer = document.createElement('div');
-                
-                Array.from(row.cells).forEach((cell, cellIndex) => {
-                    if (cell.hasAttribute('data-user-editable')) {
-                        const tempDiv = document.createElement('div');
-                        let labelText = '';
 
-                        if (cellIndex > 0 && row.cells[cellIndex - 1] && !row.cells[cellIndex - 1].hasAttribute('data-user-editable')) {
-                            tempDiv.innerHTML = row.cells[cellIndex - 1].innerHTML;
-                            labelText = tempDiv.textContent.trim().replace('⠿', '').replace(':', '');
-                        } else {
-                            tempDiv.innerHTML = row.cells[0].innerHTML;
-                            labelText = tempDiv.textContent.trim().replace('⠿', '');
-                        }
-                        
-                        const inputWrapper = document.createElement('div');
-                        inputWrapper.className = 'input-group';
-                        inputWrapper.innerHTML = `<div class="item-label">${labelText}</div>`;
+                // --- NEW LOGIC STARTS HERE ---
+                // Find the primary label for the entire row (usually the first cell's text)
+                const primaryCell = row.cells[0];
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = primaryCell.innerHTML;
+                const primaryLabelText = tempDiv.textContent.trim().replace('⠿', '');
 
-                        const inputDiv = document.createElement('div');
-                        inputDiv.className = `item-input ${cell.hasAttribute('contenteditable') ? '' : 'editable-cell'}`;
-                        if (cell.hasAttribute('contenteditable')) {
-                            inputDiv.setAttribute('contenteditable', 'true');
+                // Only show a primary label if it's not an editable cell itself
+                const isPrimaryCellEditable = primaryCell.hasAttribute('data-user-editable');
+                if (primaryLabelText && !isPrimaryCellEditable) {
+                    itemDiv.innerHTML = `<div class="item-label">${primaryLabelText}</div>`;
+                }
+                
+                // Now, create an input for EACH editable cell
+                editableCellsInRow.forEach(cell => {
+                    const cellIndex = cell.cellIndex;
+                    const inputWrapper = document.createElement('div');
+                    inputWrapper.className = 'input-group';
+
+                    // Check for a sub-label in the preceding cell
+                    if (cellIndex > 0 && row.cells[cellIndex - 1] && !row.cells[cellIndex - 1].hasAttribute('data-user-editable')) {
+                        const subLabelText = row.cells[cellIndex - 1].textContent.trim().replace('⠿', '').replace(':', '');
+                        if(subLabelText) {
+                            inputWrapper.innerHTML += `<div class="item-label">${subLabelText}</div>`;
                         }
-                        inputDiv.textContent = cell.textContent.trim() || 'Select Name';
-                        inputDiv.dataset.rowIndex = rowIndex;
-                        inputDiv.dataset.cellIndex = cellIndex;
-                        inputWrapper.appendChild(inputDiv);
-                        inputsContainer.appendChild(inputWrapper);
                     }
+
+                    const inputDiv = document.createElement('div');
+                    inputDiv.className = `item-input ${cell.hasAttribute('contenteditable') ? '' : 'editable-cell'}`;
+                    if (cell.hasAttribute('contenteditable')) {
+                        inputDiv.setAttribute('contenteditable', 'true');
+                    }
+                    inputDiv.textContent = cell.textContent.trim() || 'Select Name';
+                    inputDiv.dataset.rowIndex = rowIndex;
+                    inputDiv.dataset.cellIndex = cellIndex;
+                    
+                    inputWrapper.appendChild(inputDiv);
+                    itemDiv.appendChild(inputWrapper);
                 });
                 
-                if (inputsContainer.hasChildNodes()) {
-                    itemDiv.appendChild(inputsContainer);
-                    this.mobileViewContainer.appendChild(itemDiv);
-                }
+                this.mobileViewContainer.appendChild(itemDiv);
             });
         }
         
