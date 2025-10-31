@@ -397,12 +397,12 @@
             }
 
             const canvas = await html2canvas(block, {
-                scale: 3,
+                scale: 2,
                 useCORS: true,
                 backgroundColor: '#ffffff'
             });
 
-            const imgData = canvas.toDataURL('image/png');
+            const imgData = canvas.toDataURL('image/jpeg', 0.8);
             const imgProps = pdf.getImageProperties(imgData);
             const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
 
@@ -413,7 +413,7 @@
                 yPosition = A4_HEIGHT_MM / 2;
             }
 
-            pdf.addImage(imgData, 'PNG', MARGIN_MM, yPosition, USABLE_WIDTH, imgHeight);
+            pdf.addImage(imgData, 'JPEG', MARGIN_MM, yPosition, USABLE_WIDTH, imgHeight);
         }
 
         const fileName = `${projectTitleEl.textContent.trim() || 'schedule'}.pdf`;
