@@ -5,12 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>User - Schedule Editor</title>
 
+<!-- FIREBASE SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+<!-- PDF Generation Libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
+<!-- FONTS -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -32,7 +36,6 @@
         --radius-md: 8px;
         --radius-lg: 16px;
         --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
         --warning-color: #f59e0b;
         --success-color: #2e7d32;
     }
@@ -43,13 +46,9 @@
 
     #app-header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border-color); padding: 12px 20px; }
     .header-content { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-    #user-info { display: flex; align-items: center; gap: 12px; font-size: 14px; }
-    #user-avatar { width: 36px; height: 36px; border-radius: 50%; background-color: var(--border-color); display: flex; align-items: center; justify-content: center; font-weight: 600; color: var(--text-secondary); }
-    #user-email { font-weight: 600; color: var(--text-primary); }
     .header-actions { display: flex; align-items: center; gap: 12px; }
     .toolbar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); transition: all 0.2s; text-decoration: none; color: var(--text-secondary); }
     .toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; border-color: #d1d5db; color: var(--text-primary); }
-    .toolbar-btn:disabled { cursor: not-allowed; opacity: 0.5; }
     #logout-button { background-color: transparent; border: 1px solid var(--border-color); padding: 8px 16px; border-radius: var(--radius-md); cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s; }
     #logout-button:hover { background-color: var(--danger-light); color: var(--danger-hover); border-color: var(--danger-hover); }
 
@@ -59,7 +58,6 @@
     .project-title:focus { outline: 2px solid var(--primary-color); background-color: var(--primary-light); }
     
     .schedule-block { margin-bottom: 32px; }
-    .schedule-block:last-child { margin-bottom: 0; }
     .schedule-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
     .schedule-title { font-size: 1.25rem; font-weight: 600; margin: 0; color: var(--text-secondary); font-family: 'Noto Sans Telugu', sans-serif; }
     
@@ -70,33 +68,33 @@
     .status-indicator[data-status="error"] { color: var(--danger-color); background-color: #fde8e8; }
 
     .schedule-block table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 14px; font-weight: 700; }
-    .schedule-block th, .schedule-block td { border: 1px solid #333; padding: 0; text-align: left; vertical-align: middle; position: relative; height: 36px; }
-    .schedule-block .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; padding: 0 8px; }
-    .schedule-block .cell-icon { height: 70%; max-height: 24px; object-fit: contain; flex-shrink: 0; }
-    .schedule-block .header-row .cell-icon { filter: brightness(0) invert(1); }
-    .schedule-block .header-content-wrapper { justify-content: center; }
-    .schedule-block .header-row td { font-size: 16px; color: #ffffff; height: 42px; }
-    
+    .schedule-block th, .schedule-block td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; }
+    .schedule-block .editable-cell { cursor: pointer; }
+    .schedule-block .editable-cell:hover { background-color: #f9fafb; }
     .special-event-text { color: red; text-align: center !important; font-weight: 700; }
 
-    #event-context-menu { position: fixed; display: none; background: var(--surface-color); border-radius: var(--radius-md); box-shadow: var(--shadow-md); z-index: 1002; padding: 6px; min-width: 180px; border: 1px solid var(--border-color); }
+    #event-context-menu { position: fixed; display: none; background: var(--surface-color); border-radius: var(--radius-md); box-shadow: var(--shadow-md); z-index: 1001; padding: 6px; min-width: 180px; border: 1px solid var(--border-color); }
     .context-menu-item { font-family: 'Inter', sans-serif; display: block; width: 100%; padding: 8px 12px; cursor: pointer; font-size: 14px; border-radius: 6px; background: none; border: none; text-align: left; }
     .context-menu-item:hover { background: #f9fafb; }
 
-    #member-dropdown { position: fixed; display: none; z-index: 1001; background: var(--surface-color); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); width: 220px; max-height: 300px; display: flex; flex-direction: column; }
-    #member-search { padding: 8px 12px; border: none; border-bottom: 1px solid var(--border-color); font-size: 14px; }
-    #member-search:focus { outline: none; }
-    #member-list { list-style: none; padding: 6px; margin: 0; overflow-y: auto; }
-    #member-list li { padding: 8px 12px; font-size: 14px; border-radius: 6px; cursor: pointer; }
-    #member-list li:hover { background-color: #f9fafb; }
-    #member-list li.clear-option { color: var(--danger-color); font-weight: 500; }
-    .assign-cell { cursor: pointer; display: flex; justify-content: space-between; align-items: center; height: 100%; padding: 0 8px; }
-    .assign-cell:hover { background-color: #f9fafb; }
-    .assign-cell .placeholder { color: var(--text-secondary); font-style: italic; font-weight: 400; }
-    .assign-cell .material-symbols-outlined { font-size: 16px; color: var(--text-secondary); }
-
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 16px; }
-    #print-container { position: absolute; left: -9999px; top: auto; width: 1100px; background: white; }
+    #member-dropdown {
+        position: fixed;
+        display: none;
+        z-index: 1002;
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        min-width: 200px;
+        max-height: 300px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+    }
+    #member-search { padding: 10px; font-size: 14px; border: none; border-bottom: 1px solid var(--border-color); outline: none; }
+    .member-option { padding: 10px 12px; cursor: pointer; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
+    .member-option:hover { background-color: #f9fafb; }
+    .servant-tag { font-size: 0.75rem; font-weight: 600; color: var(--primary-color); background-color: var(--primary-light); padding: 2px 6px; border-radius: 4px; }
 </style>
 
 </head>
@@ -107,9 +105,18 @@
         <div class="header-content">
             <div id="user-info"></div>
             <div class="header-actions">
-                <a href="./dashboard.html" class="toolbar-btn"><span class="material-symbols-outlined">dashboard</span><span>Dashboard</span></a>
-                <a href="./members.html" class="toolbar-btn"><span class="material-symbols-outlined">group</span><span>Members</span></a>
-                <button id="print-button" class="toolbar-btn"><span class="material-symbols-outlined">picture_as_pdf</span><span>Download PDF</span></button>
+                <a href="./members.html" class="toolbar-btn">
+                    <span class="material-symbols-outlined">group</span>
+                    <span>Members</span>
+                </a>
+                <a href="./dashboard.html" class="toolbar-btn">
+                    <span class="material-symbols-outlined">dashboard</span>
+                    <span>Dashboard</span>
+                </a>
+                <button id="print-button" class="toolbar-btn">
+                    <span class="material-symbols-outlined">picture_as_pdf</span>
+                    <span>Download PDF</span>
+                </button>
                 <button id="logout-button">Logout</button>
             </div>
         </div>
@@ -117,7 +124,7 @@
 
     <div class="master-container">
         <div id="project-header" class="project-header">
-            <h1 id="project-title" contenteditable="false">Loading Project...</h1>
+            <h1 id="project-title" contenteditable="true">Loading Project...</h1>
             <div class="status-indicator" data-status="synced">Synced</div>
         </div>
         <div id="schedules-wrapper"></div>
@@ -149,7 +156,7 @@
 
 <div id="member-dropdown">
     <input type="text" id="member-search" placeholder="Search names...">
-    <ul id="member-list"></ul>
+    <div id="member-options"></div>
 </div>
 
 <div id="template-selection-modal" class="modal-overlay">
@@ -184,25 +191,39 @@
     const ADMIN_EMAIL = 'harshavardhanjw@gmail.com';
     let currentUser = null;
     let currentProjectId = null;
-    let userSchedulesCollection = null;
-    let membersCollection = null;
     let members = { brothers: [], sisters: [] };
+    let userSchedulesCollection = null;
+    let currentListener = null;
     let activeProject = null;
     let activeEventScheduleTable = null;
-    let activeCellForAssignment = null;
+    let activeCellForDropdown = null;
 
     const appContainer = document.getElementById('app-container');
     const projectTitleEl = document.getElementById('project-title');
     const schedulesWrapper = document.getElementById('schedules-wrapper');
-    const statusIndicator = document.querySelector('.project-header .status-indicator');
+    const templateSelectionModal = document.getElementById('template-selection-modal');
     const eventContextMenu = document.getElementById('event-context-menu');
     const memberDropdown = document.getElementById('member-dropdown');
-    const memberSearchInput = document.getElementById('member-search');
-    const memberList = document.getElementById('member-list');
-
+    const statusIndicator = document.querySelector('.project-header .status-indicator');
+    
     function updateStatus(text, status) {
         statusIndicator.textContent = text;
         statusIndicator.dataset.status = status;
+    }
+
+    async function fetchMembers() {
+        if (!currentUser) return;
+        const membersCollection = db.collection(`users/${currentUser.uid}/members`);
+        const snapshot = await membersCollection.orderBy('name').get();
+        members = { brothers: [], sisters: [] };
+        snapshot.forEach(doc => {
+            const member = { id: doc.id, ...doc.data() };
+            if (member.type === 'brother') {
+                members.brothers.push(member);
+            } else {
+                members.sisters.push(member);
+            }
+        });
     }
 
     class ScheduleTable {
@@ -228,37 +249,17 @@
         render() {
             this.titleEl.textContent = this.data.title;
             this.tableBody.innerHTML = this.data.content;
-            
-            this.tableBody.querySelectorAll('tr').forEach((tr, rowIndex) => {
-                if (rowIndex === 0) { // Handle first row separately
-                    tr.querySelectorAll('th[data-user-editable="true"]').forEach(cell => {
-                        cell.setAttribute('contenteditable', 'true');
-                    });
-                    return;
-                }
-
-                tr.querySelectorAll('td[data-user-editable="true"]').forEach(cell => {
-                    const originalText = cell.innerHTML;
-                    cell.removeAttribute('contenteditable');
-                    cell.innerHTML = `
-                        <div class="assign-cell">
-                            <span class="value">${originalText || '<span class="placeholder">Select...</span>'}</span>
-                            <span class="material-symbols-outlined">arrow_drop_down</span>
-                        </div>
-                    `;
-                });
+            this.tableBody.querySelectorAll('td[data-user-editable], th[data-user-editable]').forEach(cell => {
+                cell.classList.add('editable-cell');
             });
         }
         
         getContent() {
-            const tempBody = this.tableBody.cloneNode(true);
-            tempBody.querySelectorAll('.assign-cell').forEach(div => {
-                const parentCell = div.parentElement;
-                const valueSpan = div.querySelector('.value');
-                const placeholder = div.querySelector('.placeholder');
-                parentCell.innerHTML = (placeholder) ? '' : valueSpan.innerHTML;
-            });
-            return tempBody.innerHTML;
+            const tempTable = this.element.querySelector('table').cloneNode(true);
+            tempTable.querySelectorAll('.editable-cell').forEach(cell => cell.classList.remove('editable-cell'));
+            const body = tempTable.querySelector('tbody');
+            if (body) return body.innerHTML;
+            return tempTable.innerHTML;
         }
 
         applyEventType(eventType, shouldSave = true) {
@@ -270,8 +271,8 @@
                 allRows.forEach(row => row.style.display = '');
                 if (firstRow && firstRow.dataset.originalContent) {
                     firstRow.innerHTML = firstRow.dataset.originalContent;
-                    firstRow.querySelectorAll('[data-user-editable="true"]').forEach(cell => {
-                       cell.setAttribute('contenteditable', 'true');
+                    firstRow.querySelectorAll('td[data-user-editable], th[data-user-editable]').forEach(cell => {
+                       cell.classList.add('editable-cell');
                     });
                     delete firstRow.dataset.originalContent;
                 }
@@ -284,21 +285,27 @@
                 allRows.forEach((row, index) => {
                     row.style.display = (index === 0) ? '' : 'none';
                 });
+
                 if (firstRow && !firstRow.dataset.originalContent) {
                     firstRow.dataset.originalContent = firstRow.innerHTML;
                 }
+                
                 firstRow.innerHTML = `
                     <th colspan="1" class="special-event-text">${eventTexts[eventType]}</th>
                     <td style="text-align: right; font-weight: 700;">తేదీ:</td>
-                    <td contenteditable="true"></td>
+                    <td class="editable-cell"></td>
                 `;
             }
 
-            if (shouldSave) this.parentProject.triggerSave();
+            if (shouldSave) {
+                this.parentProject.triggerSave();
+            }
         }
 
         setupEventListeners() {
-            this.element.addEventListener('input', () => this.parentProject.triggerSave());
+            this.element.addEventListener('input', (e) => {
+                if(e.target.isContentEditable) this.parentProject.triggerSave();
+            });
             this.eventBtn.addEventListener('click', (e) => {
                 activeEventScheduleTable = this;
                 const rect = e.currentTarget.getBoundingClientRect();
@@ -306,16 +313,16 @@
                 eventContextMenu.style.top = `${rect.bottom}px`;
                 eventContextMenu.style.left = `${rect.left}px`;
             });
-
+            
             this.tableBody.addEventListener('click', e => {
-                const assignCell = e.target.closest('.assign-cell');
-                if (assignCell) {
-                    const cell = assignCell.parentElement;
-                    const sectionHeader = cell.closest('tbody').querySelector('.header-row[data-section="ministry"]');
-                    const isInMinistrySection = sectionHeader && Array.from(sectionHeader.parentElement.children).indexOf(cell.parentElement) > Array.from(sectionHeader.parentElement.children).indexOf(sectionHeader);
-                    
-                    openMemberDropdown(cell, isInMinistrySection);
-                }
+                const cell = e.target.closest('.editable-cell');
+                if (!cell || (this.tableBody.rows[0] === cell.parentElement && cell.cellIndex === 2)) return; // Exclude date cell
+                
+                const ministrySectionHeader = this.tableBody.querySelector('[data-section="ministry"]');
+                const isMinistrySection = ministrySectionHeader && (cell.compareDocumentPosition(ministrySectionHeader) & Node.DOCUMENT_POSITION_FOLLOWING);
+
+                let namesToShow = isMinistrySection ? [...members.brothers, ...members.sisters] : members.brothers;
+                showMemberDropdown(cell, namesToShow);
             });
         }
     }
@@ -334,9 +341,10 @@
 
         render(newData) {
             if (newData) this.data = newData;
-            projectTitleEl.textContent = this.data.name;
+            if (document.activeElement !== projectTitleEl) projectTitleEl.textContent = this.data.name;
             schedulesWrapper.innerHTML = '';
             this.scheduleTables = [];
+            
             this.data.tables.forEach((tableData, index) => {
                 this.scheduleTables.push(new ScheduleTable(this, tableData, index));
             });
@@ -352,6 +360,7 @@
         save() {
             this.isSaving = true;
             updateStatus('Syncing...', 'syncing');
+            
             const updatedTablesData = this.scheduleTables.map(table => ({
                 title: table.data.title,
                 content: table.getContent(),
@@ -360,78 +369,51 @@
             const payload = { name: projectTitleEl.textContent, tables: updatedTablesData };
 
             this.collectionRef.doc(this.id).update(payload)
-                .then(() => { updateStatus('Synced', 'synced'); this.isSaving = false; })
-                .catch(err => { console.error("Save failed:", err); updateStatus('Error', 'error'); this.isSaving = false; });
+                .then(() => {
+                    updateStatus('Synced', 'synced');
+                    this.isSaving = false;
+                })
+                .catch(err => {
+                    console.error("Save failed:", err);
+                    updateStatus('Error', 'error');
+                    this.isSaving = false;
+                });
         }
-        
+
+        getContentForComparison() {
+            const tablesData = this.scheduleTables.map(table => ({ 
+                title: table.data.title, 
+                content: table.getContent(),
+                eventType: table.data.eventType || 'normal'
+            }));
+            return JSON.stringify(tablesData);
+        }
+
         setupEventListeners() {
-            // Title is not editable in this version
+            projectTitleEl.addEventListener('input', () => this.triggerSave());
         }
-    }
-
-    async function fetchMembers() {
-        if (!currentUser) return;
-        membersCollection = db.collection(`users/${currentUser.uid}/members`);
-        const snapshot = await membersCollection.orderBy("name").get();
-        members.brothers = [];
-        members.sisters = [];
-        snapshot.docs.forEach(doc => {
-            const member = doc.data();
-            if (member.type === 'brother') {
-                members.brothers.push(member.name);
-            } else {
-                members.sisters.push(member.name);
-            }
-        });
-    }
-
-    function openMemberDropdown(cell, includeSisters) {
-        activeCellForAssignment = cell;
-        const list = includeSisters ? [...members.brothers, ...members.sisters].sort() : [...members.brothers];
-        
-        populateMemberList(list);
-        memberSearchInput.value = '';
-
-        const rect = cell.getBoundingClientRect();
-        memberDropdown.style.display = 'flex';
-        memberDropdown.style.top = `${rect.bottom}px`;
-        memberDropdown.style.left = `${rect.left}px`;
-        memberSearchInput.focus();
-    }
-
-    function populateMemberList(nameList) {
-        memberList.innerHTML = '<li class="clear-option">Clear Assignment</li>';
-        nameList.forEach(name => {
-            const li = document.createElement('li');
-            li.textContent = name;
-            memberList.appendChild(li);
-        });
-    }
-
-    function filterMembers() {
-        const searchTerm = memberSearchInput.value.toLowerCase();
-        const allItems = memberList.querySelectorAll('li');
-        allItems.forEach(item => {
-            const name = item.textContent.toLowerCase();
-            if (name.includes(searchTerm) || item.classList.contains('clear-option')) {
-                item.style.display = '';
-            } else {
-                item.style.display = 'none';
-            }
-        });
     }
 
     auth.onAuthStateChanged(async user => {
         if (user) {
+            if (user.email === ADMIN_EMAIL) {
+                window.location.replace('./admin.html');
+                return;
+            }
             currentUser = user;
-            await fetchMembers();
             userSchedulesCollection = db.collection(`userSchedules/${currentUser.uid}/schedules`);
             appContainer.classList.remove('hidden');
-            document.getElementById('user-info').innerHTML = `<div id="user-avatar">${user.email.charAt(0).toUpperCase()}</div><span id="user-email">${user.email}</span>`;
+            document.getElementById('user-info').innerHTML = `<div id="user-avatar">${user.email.charAt(0).toUpperCase()}</div><span>${user.email}</span>`;
+
+            await fetchMembers();
 
             const params = new URLSearchParams(window.location.search);
             currentProjectId = params.get('id');
-            if (currentProjectId) initEditor(); else initCreationFlow();
+            if (currentProjectId) {
+                initEditor();
+            } else {
+                initCreationFlow();
+            }
         } else {
             window.location.replace('./login.html');
         }
@@ -439,7 +421,8 @@
 
     function initEditor() {
         if (!currentUser || !currentProjectId) return;
-        db.collection(`userSchedules/${currentUser.uid}/schedules`).doc(currentProjectId).onSnapshot(doc => {
+        if (currentListener) currentListener();
+        currentListener = userSchedulesCollection.doc(currentProjectId).onSnapshot(doc => {
             if (doc.exists) {
                 const remoteData = doc.data();
                 if (!activeProject) {
@@ -456,27 +439,23 @@
              updateStatus('Error', 'error');
         });
     }
-
+    
     async function initCreationFlow() {
-        const modal = document.getElementById('template-selection-modal');
-        modal.querySelector('h2').textContent = 'Create New Mid-Week Schedule';
-        modal.querySelector('p').textContent = 'Give your new schedule project a name and select the templates to include.';
+        document.getElementById('project-header').style.display = 'none';
         document.getElementById('print-button').style.display = 'none';
-        
         const templatesCollection = db.collection("templates");
         const snapshot = await templatesCollection.orderBy("createdAt").get();
-        const listEl = modal.querySelector('#template-list');
-        listEl.innerHTML = '';
+        templateList.innerHTML = '';
         if (snapshot.empty) {
-            listEl.innerHTML = '<li>No templates available.</li>';
+            templateList.innerHTML = '<li>No templates available.</li>';
         } else {
             snapshot.docs.forEach(doc => {
                 const li = document.createElement('li');
-                li.innerHTML = `<label><input type="checkbox" data-name="${doc.data().name}" data-content="${encodeURIComponent(doc.data().content)}"> ${doc.data().name}</label>`;
-                listEl.appendChild(li);
+                li.innerHTML = `<label><input type="checkbox" data-id="${doc.id}" data-name="${doc.data().name}" data-content="${encodeURIComponent(doc.data().content)}"> ${doc.data().name}</label>`;
+                templateList.appendChild(li);
             });
         }
-        modal.style.display = 'flex';
+        templateSelectionModal.style.display = 'flex';
     }
 
     function setupGlobalUI() {
@@ -486,18 +465,20 @@
         document.getElementById('confirm-template-selection').addEventListener('click', async () => {
             const newProjectName = document.getElementById('new-project-name').value.trim();
             if (!newProjectName) return alert("Please enter a name for your new project.");
-            const selectedCheckboxes = Array.from(document.querySelectorAll('#template-list input:checked'));
+            const selectedCheckboxes = Array.from(templateList.querySelectorAll('input:checked'));
             if (selectedCheckboxes.length === 0) return alert("Please select at least one template.");
 
             const tablesArray = selectedCheckboxes.map(input => {
                 const rawContent = decodeURIComponent(input.dataset.content);
-                return { title: input.dataset.name, content: rawContent, eventType: 'normal' };
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = `<table><tbody>${rawContent}</tbody></table>`;
+                tempDiv.querySelectorAll('td, th').forEach(cell => {
+                    const isEssentiallyEmpty = cell.textContent.trim() === '' && !cell.querySelector('img');
+                    if (isEssentiallyEmpty) cell.setAttribute('data-user-editable', 'true');
+                });
+                return { title: input.dataset.name, content: tempDiv.querySelector('tbody').innerHTML, eventType: 'normal' };
             });
-            const newDocRef = await userSchedulesCollection.add({
-                name: newProjectName,
-                tables: tablesArray,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
+            const newDocRef = await userSchedulesCollection.add({ name: newProjectName, tables: tablesArray, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
             window.location.href = `./editor.html?id=${newDocRef.id}`;
         });
         
@@ -510,31 +491,51 @@
             activeEventScheduleTable = null;
         });
 
-        memberSearchInput.addEventListener('input', filterMembers);
-        memberList.addEventListener('click', e => {
-            if (e.target.tagName === 'LI' && activeCellForAssignment) {
-                const valueSpan = activeCellForAssignment.querySelector('.value');
-                if (e.target.classList.contains('clear-option')) {
-                    valueSpan.innerHTML = '<span class="placeholder">Select...</span>';
-                } else {
-                    valueSpan.textContent = e.target.textContent;
-                    valueSpan.classList.remove('placeholder');
-                }
-                activeProject.triggerSave();
-                memberDropdown.style.display = 'none';
-            }
-        });
-
         document.addEventListener('click', (e) => {
-            if (!eventContextMenu.contains(e.target) && !e.target.closest('.event-btn')) {
-                eventContextMenu.style.display = 'none';
-            }
-            if (!memberDropdown.contains(e.target) && !e.target.closest('.assign-cell')) {
-                memberDropdown.style.display = 'none';
-            }
+            if (!eventContextMenu.contains(e.target) && !e.target.closest('.event-btn')) eventContextMenu.style.display = 'none';
+            if (!memberDropdown.contains(e.target) && !e.target.closest('.editable-cell')) memberDropdown.style.display = 'none';
         });
     }
 
+    function showMemberDropdown(cell, names) {
+        activeCellForDropdown = cell;
+        const rect = cell.getBoundingClientRect();
+        memberDropdown.style.top = `${rect.bottom}px`;
+        memberDropdown.style.left = `${rect.left}px`;
+        memberDropdown.style.display = 'flex';
+
+        const searchInput = document.getElementById('member-search');
+        const optionsContainer = document.getElementById('member-options');
+        
+        const renderOptions = (filter = '') => {
+            optionsContainer.innerHTML = '';
+            const filteredNames = names.filter(m => m.name.toLowerCase().includes(filter.toLowerCase()));
+            
+            filteredNames.forEach(member => {
+                const option = document.createElement('div');
+                option.className = 'member-option';
+                option.textContent = member.name;
+                if(member.isServant) {
+                    const tag = document.createElement('span');
+                    tag.className = 'servant-tag';
+                    tag.textContent = 'Servant';
+                    option.appendChild(tag);
+                }
+                option.onclick = () => {
+                    activeCellForDropdown.textContent = member.name;
+                    memberDropdown.style.display = 'none';
+                    activeProject.triggerSave();
+                };
+                optionsContainer.appendChild(option);
+            });
+        };
+
+        renderOptions();
+        searchInput.value = '';
+        searchInput.oninput = () => renderOptions(searchInput.value);
+        searchInput.focus();
+    }
+    
     async function generatePdf() {
         const printButton = document.getElementById('print-button');
         printButton.disabled = true;
