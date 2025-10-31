@@ -255,9 +255,6 @@
     let activeEventScheduleTable = null;
     let activeCellForDropdown = null;
 
-    const appContainer = document.getElementById('app-container');
-    const userEmailEl = document.getElementById('user-email');
-    const userAvatarEl = document.getElementById('user-avatar');
     const projectTitleEl = document.getElementById('project-title');
     const schedulesWrapper = document.getElementById('schedules-wrapper');
     const templateSelectionModal = document.getElementById('template-selection-modal');
@@ -606,13 +603,19 @@
 
     auth.onAuthStateChanged(async user => {
         if (user) {
-            if (user.email === ADMIN_EMAIL) { window.location.replace('./admin.html'); return; }
+            if (user.email === ADMIN_EMAIL) { window.location.replace('./home.html'); return; } // Admin should use admin page
             currentUser = user;
             await fetchMembers(); 
             userSchedulesCollection = db.collection(`userSchedules/${currentUser.uid}/schedules`);
-            appContainer.classList.remove('hidden');
-            userEmailEl.textContent = user.email;
-            userAvatarEl.textContent = user.email.charAt(0).toUpperCase();
+            
+            // Show the page and update the new profile name in the slide-out menu
+            document.body.classList.add('auth-ready');
+            const profileNameEl = document.querySelector('.profile-name');
+            if (profileNameEl && user.displayName) {
+                profileNameEl.textContent = user.displayName;
+            } else if (profileNameEl) {
+                profileNameEl.textContent = user.email;
+            }
             
             setupGlobalUI();
 
@@ -620,7 +623,7 @@
             currentProjectId = params.get('id');
             if (currentProjectId) { initEditor(); } else { initCreationFlow(); }
         } else {
-            window.location.replace('./login.html');
+            window.location.replace('./index.html');
         }
     });
 
