@@ -75,6 +75,13 @@
     .schedule-block .header-row td { font-size: 16px; color: #ffffff; height: 42px; }
     .schedule-block .row-handle { display: none !important; }
     
+    /* NEW: Specific style for the special event text */
+    .special-event-text {
+        color: red;
+        text-align: center;
+        font-weight: 700;
+    }
+
     #event-context-menu { position: fixed; display: none; background: var(--surface-color); border-radius: var(--radius-md); box-shadow: var(--shadow-md); z-index: 1001; padding: 6px; min-width: 180px; border: 1px solid var(--border-color); }
     .context-menu-item { font-family: 'Inter', sans-serif; display: block; width: 100%; padding: 8px 12px; cursor: pointer; font-size: 14px; border-radius: 6px; background: none; border: none; text-align: left; }
     .context-menu-item:hover { background: #f9fafb; }
@@ -248,6 +255,11 @@
                 allRows.forEach(row => row.style.display = '');
                 if (firstRow && firstRow.dataset.originalContent) {
                     firstRow.innerHTML = firstRow.dataset.originalContent;
+                    // Re-add contenteditable attributes for normal cells
+                    firstRow.querySelectorAll('[data-editable-cache]').forEach(cell => {
+                        cell.setAttribute('contenteditable', 'true');
+                        cell.removeAttribute('data-editable-cache');
+                    });
                 }
             } else {
                 const eventTexts = {
@@ -261,10 +273,14 @@
 
                 if (firstRow && !firstRow.dataset.originalContent) {
                     firstRow.dataset.originalContent = firstRow.innerHTML;
+                    // Cache which cells were originally editable
+                    firstRow.querySelectorAll('[contenteditable="true"]').forEach(cell => {
+                        cell.dataset.editableCache = 'true';
+                    });
                 }
                 
                 firstRow.innerHTML = `
-                    <th colspan="1" style="font-weight: 700;">${eventTexts[eventType]}</th>
+                    <th class="special-event-text" colspan="1">${eventTexts[eventType]}</th>
                     <td style="text-align: right; font-weight: 700;">తేదీ:</td>
                     <td contenteditable="true"></td>
                 `;
@@ -472,7 +488,7 @@
         const clonedBlocks = [];
         originalBlocks.forEach(block => {
             const clone = block.cloneNode(true);
-            clone.querySelector('.event-btn').style.display = 'none'; // Hide event button in clone
+            clone.querySelector('.event-btn').style.display = 'none';
             printContainer.appendChild(clone);
             clonedBlocks.push(clone);
         });
