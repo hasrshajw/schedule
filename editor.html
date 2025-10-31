@@ -295,39 +295,25 @@
 
         render() {
             this.titleEl.textContent = this.data.title;
+            this.tableBody.innerHTML = this.data.content;
             
-            // Create a temporary document fragment to parse the content
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = `<table><tbody>${this.data.content}</tbody></table>`;
-
-            // Process editable status BEFORE adding to the page
-            tempDiv.querySelectorAll('td, th').forEach(cell => {
+            this.tableBody.querySelectorAll('td, th').forEach(cell => {
                 if (cell.hasAttribute('data-user-editable')) {
-                    // Check if it's the date cell in the first row
-                    if (cell.closest('tr') === tempDiv.querySelector('tbody').rows[0]) {
-    // This is the first row. Check if it's the specific date cell (usually the last one).
-    if (cell.hasAttribute('data-user-editable')) {
-        const originalText = cell.textContent;
-        cell.innerHTML = `<input type="date" class="date-input" value="${originalText.split('-').reverse().join('-') || ''}">`;
-        cell.removeAttribute('contenteditable'); // The input handles editing now
-    } else {
-        cell.setAttribute('contenteditable', 'false'); // Lock other cells in first row
-    }
-} else {
-                        // It's a dropdown cell for names
+                    const isFirstRow = cell.closest('tr') === this.tableBody.rows[0];
+                    if (isFirstRow) {
+                        const originalText = cell.textContent.trim();
+                        const dateValue = originalText.split('-').reverse().join('-');
+                        cell.innerHTML = `<input type="date" class="date-input" value="${dateValue || ''}">`;
+                        cell.removeAttribute('contenteditable');
+                    } else {
                         cell.classList.add('editable-cell');
                         cell.removeAttribute('contenteditable');
                     }
                 } else {
-                    // Not a user-editable cell, so lock it down.
                     cell.setAttribute('contenteditable', 'false');
                 }
             });
 
-            // Now, set the innerHTML of the actual table body with the processed content
-            this.tableBody.innerHTML = tempDiv.querySelector('tbody').innerHTML;
-
-            // Finally, create the mobile view based on the corrected table structure
             this._createMobileView();
         }
 
@@ -428,11 +414,28 @@
         }
         
         getContent() {
-            const tempTable = this.element.querySelector('table').cloneNode(true);
-            const body = tempTable.querySelector('tbody');
-            if (body) return body.innerHTML;
-            return tempTable.innerHTML;
+            // This is the single source of truth for saving.
+            // First, we clone the master table body.
+            const tempBody = this.tableBody.cloneNode(true);
+
+            // Now, find any date inputs within it and sync their value to the cell's text content.
+            const dateInput = tempBody.querySelector('.date-input');
+            if (dateInput && dateInput.value) {
+                const cell = dateInput.parentElement;
+                // Convert YYYY-MM-DD back to DD-MM-YYYY for display and saving.
+                cell.textContent = dateInput.value.split('-').reverse().join('-');
+            }
+
+            // Clean up attributes for a clean save.
+            tempBody.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+            tempBody.querySelectorAll('.editable-cell').forEach(el => el.classList.remove('editable-cell'));
+            
+            return tempBody.innerHTML;
         }
+
+
+
+
 
         applyEventType(eventType, shouldSave = true) {
             this.data.eventType = eventType;
@@ -443,15 +446,6 @@
                 allRows.forEach(row => row.style.display = '');
                 if (firstRow && firstRow.dataset.originalContent) {
                     firstRow.innerHTML = firstRow.dataset.originalContent;
-                    // Restore editable attributes after reverting
-                    firstRow.querySelectorAll('[data-user-editable]').forEach(cell => {
-                       if(cell.querySelector('.date-input')) {
-                           // This is a date cell, no contenteditable needed
-                           cell.removeAttribute('contenteditable');
-                       } else {
-                           cell.setAttribute('contenteditable', 'true');
-                       }
-                    });
                     delete firstRow.dataset.originalContent;
                 }
             } else {
@@ -469,26 +463,22 @@
                     if (!firstRow.dataset.originalContent) {
                         firstRow.dataset.originalContent = firstRow.innerHTML;
                     }
-                    // --- THIS IS THE FIX ---
-                    // Try to find the date value from the original content before overwriting
                     const tempDiv = document.createElement('div');
                     tempDiv.innerHTML = firstRow.dataset.originalContent;
-                    const originalDateInput = tempDiv.querySelector('.date-input');
-                    if(originalDateInput) {
-                        existingDateValue = originalDateInput.value;
+                    const originalDateCell = tempDiv.querySelector('[data-user-editable]');
+                    if (originalDateCell) {
+                         existingDateValue = originalDateCell.textContent.trim().split('-').reverse().join('-');
                     }
                 }
                 
                 firstRow.innerHTML = `
                     <th colspan="1" class="special-event-text">${eventTexts[eventType]}</th>
                     <td style="text-align: right; font-weight: 700;">తేదీ:</td>
-                    <td data-user-editable="true">
-                        <input type="date" class="date-input" value="${existingDateValue}">
-                    </td>
+                    <td data-user-editable="true"><input type="date" class="date-input" value="${existingDateValue}"></td>
                 `;
             }
 
-            this._createMobileView();
+            this.render(); // Re-run render to apply all attributes and create mobile view correctly
             if (shouldSave) {
                 this.parentProject.triggerSave();
             }
