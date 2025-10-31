@@ -74,8 +74,9 @@
 
     .schedule-block table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.25px; }
     .schedule-block th, .schedule-block td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; }
-    .schedule-block .editable-cell { cursor: pointer; }
-    .schedule-block .editable-cell:hover { background-color: #f9fafb; }
+    .schedule-block .editable-cell:not([contenteditable="true"]) { cursor: pointer; }
+    .schedule-block .editable-cell:not([contenteditable="true"]):hover { background-color: #f9fafb; }
+    .schedule-block [contenteditable="true"]:focus { background-color: #fffbe5; }
     .schedule-block .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; }
     .schedule-block .cell-icon { height: 70%; max-height: 24px; object-fit: contain; flex-shrink: 0; }
     .schedule-block .header-row .cell-icon { filter: brightness(0) invert(1); }
@@ -254,8 +255,12 @@
             this.titleEl.textContent = this.data.title;
             this.tableBody.innerHTML = this.data.content;
             this.tableBody.querySelectorAll('td[data-user-editable], th[data-user-editable]').forEach(cell => {
-                cell.classList.add('editable-cell');
-                cell.removeAttribute('contenteditable');
+                if (cell.closest('tr') === this.tableBody.rows[0]) {
+                    cell.setAttribute('contenteditable', 'true');
+                } else {
+                    cell.classList.add('editable-cell');
+                    cell.removeAttribute('contenteditable');
+                }
             });
         }
         
@@ -276,8 +281,7 @@
                 if (firstRow && firstRow.dataset.originalContent) {
                     firstRow.innerHTML = firstRow.dataset.originalContent;
                     firstRow.querySelectorAll('td[data-user-editable], th[data-user-editable]').forEach(cell => {
-                       cell.classList.add('editable-cell');
-                       cell.removeAttribute('contenteditable');
+                       cell.setAttribute('contenteditable', 'true');
                     });
                     delete firstRow.dataset.originalContent;
                 }
@@ -298,7 +302,7 @@
                 firstRow.innerHTML = `
                     <th colspan="1" class="special-event-text">${eventTexts[eventType]}</th>
                     <td style="text-align: right; font-weight: 700;">తేదీ:</td>
-                    <td class="editable-cell" data-user-editable="true"></td>
+                    <td data-user-editable="true" contenteditable="true"></td>
                 `;
             }
 
@@ -308,6 +312,7 @@
         }
 
         setupEventListeners() {
+            this.element.addEventListener('input', () => this.parentProject.triggerSave());
             this.eventBtn.addEventListener('click', (e) => {
                 activeEventScheduleTable = this;
                 const rect = e.currentTarget.getBoundingClientRect();
@@ -479,6 +484,11 @@
         schedulesWrapper.addEventListener('click', e => {
             const cell = e.target.closest('.editable-cell');
             if (cell) {
+                // If the cell is in the first row, it should be contenteditable, so do nothing.
+                const parentRow = cell.closest('tr');
+                if (parentRow && parentRow.parentElement.rows[0] === parentRow) {
+                    return;
+                }
                 openMemberDropdown(cell);
             }
         });
@@ -503,12 +513,29 @@
         });
     }
     
+    function isCellInMinistrySection(cell) {
+        const table = cell.closest('table');
+        if (!table) return false;
+
+        const ministryHeader = table.querySelector('.header-row[data-section="ministry"]');
+        const livingHeader = table.querySelector('.header-row[data-section="living"]');
+        if (!ministryHeader) return false; // Section doesn't exist
+
+        const cellRow = cell.closest('tr');
+        const allRows = Array.from(table.querySelectorAll('tbody > tr'));
+        
+        const ministryIndex = allRows.indexOf(ministryHeader);
+        const livingIndex = livingHeader ? allRows.indexOf(livingHeader) : allRows.length;
+        const cellIndex = allRows.indexOf(cellRow);
+
+        return cellIndex > ministryIndex && cellIndex < livingIndex;
+    }
+
     function openMemberDropdown(cell) {
-        const headerRow = cell.closest('table').querySelector('.header-row[data-section="ministry"]');
-        const isInMinistrySection = headerRow && headerRow.contains(cell.closest('tr'));
+        const isInMinistry = isCellInMinistrySection(cell);
         
         memberDropdown.innerHTML = '';
-        const listToShow = isInMinistrySection ? [...members.brothers, ...members.sisters] : members.brothers;
+        const listToShow = isInMinistry ? [...members.brothers, ...members.sisters] : members.brothers;
 
         listToShow.sort((a, b) => a.name.localeCompare(b.name)).forEach(member => {
             const item = document.createElement('button');
