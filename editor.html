@@ -14,7 +14,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-<!-- FONTS and ICONS -->
+<!-- FONTS -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -50,6 +50,8 @@
         src: url("./jw-icons-external-d876da3.woff") format("woff");
         font-weight: normal; font-style: normal;
     }
+
+    *, *::before, *::after { box-sizing: border-box; }
 
     body {
         margin: 0; padding: 0;
@@ -89,6 +91,12 @@
     .sunday-icon::before { content: "\e610"; }
     .members-icon::before { content: "\e695"; }
 
+    .status-indicator { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 999px; display: flex; align-items: center; gap: 5px; color: white; border: 1px solid rgba(255,255,255,0.3); }
+    .status-indicator::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background-color: currentColor; }
+    .status-indicator[data-status="synced"] { color: #4ade80; }
+    .status-indicator[data-status="syncing"] { color: #facc15; }
+    .status-indicator[data-status="error"] { color: #f87171; }
+
     .master-container { max-width: 1100px; margin: 0 auto; background: var(--surface-color); padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); margin-top: calc(56px + 2rem); }
     .project-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color); }
     .project-title { font-size: 1.75rem; font-weight: 700; margin: 0; flex-grow: 1; border: none; padding: 4px 8px; margin: -4px -8px; border-radius: var(--radius-md); font-family: 'Noto Sans Telugu', sans-serif; }
@@ -98,12 +106,6 @@
     .schedule-block:last-child { margin-bottom: 0; }
     .schedule-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
     .schedule-title { font-size: 1.25rem; font-weight: 600; margin: 0; color: var(--text-secondary); font-family: 'Noto Sans Telugu', sans-serif; }
-    
-    .status-indicator { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; display: flex; align-items: center; gap: 6px; }
-    .status-indicator::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background-color: currentColor; }
-    .status-indicator[data-status="synced"] { color: var(--success-color); background-color: #eaf5ea; }
-    .status-indicator[data-status="syncing"] { color: var(--warning-color); background-color: #fffbeb; }
-    .status-indicator[data-status="error"] { color: var(--danger-color); background-color: #fde8e8; }
     
     .toolbar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); transition: all 0.2s; text-decoration: none; color: var(--text-secondary); }
     .toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; border-color: #d1d5db; color: var(--text-primary); }
@@ -142,20 +144,22 @@
     #confirm-template-selection { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 
     #print-container { position: absolute; left: -9999px; top: auto; width: 1100px; background: white; }
-    
     .date-input { cursor: pointer; -webkit-appearance: none; -moz-appearance: none; appearance: none; background-color: transparent; border: none; width: 100%; height: 100%; font-family: inherit; font-size: inherit; font-weight: inherit; text-align: left; padding-left: 8px; }
-    
     .mobile-view-container { display: none; }
-    
+    .mobile-pdf-btn { display: none; }
+
     @media (max-width: 768px) {
         body { padding: 56px 0 0 0; background-color: var(--surface-color); }
         .master-container { padding: 16px; border-radius: 0; box-shadow: none; margin-top: 0; }
-        .project-header { flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px 0; margin-bottom: 16px; }
-        .project-title { font-size: 1.5rem; }
-        .schedule-block { margin-bottom: 24px; padding: 0 0 24px 0; border-bottom: 8px solid var(--background-color); }
-        .schedule-block:last-child { border-bottom: none; }
+        .project-header { display: none; }
+        #app-header .desktop-only { display: none; }
+        
+        .mobile-pdf-btn { display: flex; width: calc(100% - 32px); margin: 0 16px 16px 16px; background-color: var(--primary-color); color: white; }
 
+        .schedule-block { margin-bottom: 24px; padding: 0; border-bottom: 8px solid var(--body-bg); }
+        .schedule-block:last-child { border-bottom: none; }
         .schedule-block table { display: none; }
+
         .mobile-view-container { display: flex; flex-direction: column; gap: 1.5rem; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 16px; }
         .mobile-item .item-label { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; font-family: 'Noto Sans Telugu', sans-serif; }
         .mobile-item .item-input { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-md); background-color: #f9fafb; font-size: 1rem; font-weight: 500; color: var(--text-secondary); margin-top: 4px; }
@@ -169,7 +173,8 @@
     <div class="top-bar" id="mobileNavTopBar">
         <a href="./home.html" class="mobileLogo" title="Home"></a>
         <div class="header-right-controls">
-            <button id="print-button" class="toolbar-btn" style="color: white; border-color: rgba(255,255,255,0.3);"><span class="material-symbols-outlined">picture_as_pdf</span></button>
+            <div id="status-indicator" class="status-indicator" data-status="synced">Synced</div>
+            <button id="print-button" class="toolbar-btn desktop-only" style="color: white; border-color: rgba(255,255,255,0.3);"><span class="material-symbols-outlined">picture_as_pdf</span></button>
             <div class="header-icons" id="menu-toggle-button">
                 <svg class="hamburger-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M22.5 7h-21a.5.5 0 010-1h21a.5.5 0 010 1zM22.5 13h-21a.5.5 0 010-1h21a.5.5 0 010 1zM22.5 19h-21a.5.5 0 010-1h21a.5.5 0 010 1z"></path></svg>
                 <svg class="close-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12.707 12l6.146-6.146a.5.5 0 00-.707-.707L12 11.293 5.854 5.146a.5.5 0 00-.707.707L11.293 12l-6.147 6.146a.5.5 0 10.707.707L12 12.707l6.146 6.146a.5.5 0 00.707-.707z"></path></svg>
@@ -194,10 +199,13 @@
 </div>
 
 <div id="app-container">
+    <button id="mobile-pdf-btn" class="toolbar-btn mobile-pdf-btn">
+        <span class="material-symbols-outlined">picture_as_pdf</span>
+        <span>Download PDF</span>
+    </button>
     <div class="master-container">
         <div id="project-header" class="project-header">
             <h1 id="project-title" contenteditable="true">Loading Project...</h1>
-            <div class="status-indicator" data-status="synced">Synced</div>
         </div>
         <div id="schedules-wrapper"></div>
     </div>
@@ -257,8 +265,7 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
-
-    const ADMIN_EMAIL = 'harshavardhanjw@gmail.com';
+    
     let currentUser = null;
     let currentProjectId = null;
     let userSchedulesCollection = null;
@@ -275,7 +282,7 @@
     const templateList = document.getElementById('template-list');
     const eventContextMenu = document.getElementById('event-context-menu');
     const memberDropdown = document.getElementById('member-dropdown');
-    const statusIndicator = document.querySelector('.project-header .status-indicator');
+    const statusIndicator = document.getElementById('status-indicator');
     
     function updateStatus(text, status) {
         statusIndicator.textContent = text;
@@ -428,11 +435,12 @@
         
         getContent() {
             const tempBody = this.tableBody.cloneNode(true);
-            const dateInput = tempBody.querySelector('.date-input');
-            if (dateInput && dateInput.value) {
-                const cell = dateInput.parentElement;
-                cell.textContent = dateInput.value.split('-').reverse().join('-');
-            }
+            tempBody.querySelectorAll('.date-input').forEach(dateInput => {
+                if (dateInput.value) {
+                    const cell = dateInput.parentElement;
+                    cell.textContent = dateInput.value.split('-').reverse().join('-');
+                }
+            });
             tempBody.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
             tempBody.querySelectorAll('.editable-cell').forEach(el => el.classList.remove('editable-cell'));
             return tempBody.innerHTML;
@@ -456,8 +464,8 @@
                     if (!firstRow.dataset.originalContent) { firstRow.dataset.originalContent = firstRow.innerHTML; }
                     const tempDiv = document.createElement('div');
                     tempDiv.innerHTML = firstRow.dataset.originalContent;
-                    const originalDateCell = tempDiv.querySelector('[data-user-editable]');
-                    if (originalDateCell) { existingDateValue = originalDateCell.textContent.trim().split('-').reverse().join('-'); }
+                    const originalDateInput = tempDiv.querySelector('.date-input');
+                    if(originalDateInput) { existingDateValue = originalDateInput.value; }
                 }
                 firstRow.innerHTML = `
                     <th colspan="1" class="special-event-text">${eventTexts[eventType]}</th>
@@ -509,7 +517,7 @@
 
         render(newData) {
             if (newData) this.data = newData;
-            if (document.activeElement !== projectTitleEl) projectTitleEl.textContent = this.data.name;
+            projectTitleEl.textContent = this.data.name;
             schedulesWrapper.innerHTML = '';
             this.scheduleTables = [];
             this.data.tables.forEach((tableData, index) => {
@@ -583,8 +591,7 @@
     }
 
     async function initCreationFlow() {
-        document.getElementById('project-header').style.display = 'none';
-        document.getElementById('print-button').style.display = 'none';
+        document.querySelector('.master-container').style.display = 'none';
         const templatesCollection = db.collection("templates");
         const snapshot = await templatesCollection.orderBy("createdAt").get();
         templateList.innerHTML = '';
@@ -601,8 +608,8 @@
     }
 
     function setupGlobalUI() {
-        document.getElementById('logout-button')?.addEventListener('click', () => auth.signOut());
         document.getElementById('print-button').addEventListener('click', generatePdf);
+        document.getElementById('mobile-pdf-btn').addEventListener('click', generatePdf);
         document.getElementById('cancel-template-selection').addEventListener('click', () => window.location.href = './dashboard.html');
         document.getElementById('confirm-template-selection').addEventListener('click', async () => {
             const newProjectName = document.getElementById('new-project-name').value.trim();
@@ -639,9 +646,7 @@
 
         schedulesWrapper.addEventListener('click', e => {
             const targetElement = e.target.closest('.editable-cell');
-            if (!targetElement) return;
-
-            if (targetElement.hasAttribute('contenteditable') && targetElement.getAttribute('contenteditable') === 'true') { return; }
+            if (!targetElement || (targetElement.hasAttribute('contenteditable') && targetElement.getAttribute('contenteditable') === 'true')) return;
             
             let realCell;
             let mobileDiv = null;
@@ -728,8 +733,10 @@
 
     async function generatePdf() {
         const printButton = document.getElementById('print-button');
+        const mobilePrintButton = document.getElementById('mobile-pdf-btn');
         printButton.disabled = true;
-        printButton.querySelector('span:last-child').textContent = 'Generating...';
+        mobilePrintButton.disabled = true;
+        mobilePrintButton.querySelector('span:last-child').textContent = 'Generating...';
 
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('p', 'mm', 'a4');
@@ -776,7 +783,8 @@
         pdf.save(fileName);
 
         printButton.disabled = false;
-        printButton.querySelector('span:last-child').textContent = 'Download PDF';
+        mobilePrintButton.disabled = false;
+        mobilePrintButton.querySelector('span:last-child').textContent = 'Download PDF';
     }
 
     // Menu Toggle Script
