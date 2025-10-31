@@ -9,7 +9,8 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoVBL5gI9kDXINERMhaDuLyPdCLTmw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -34,10 +35,7 @@
         --surface-color: #ffffff;
         --radius-md: 8px;
         --radius-lg: 16px;
-        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
         --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-        --ease: cubic-bezier(0.4, 0, 0.2, 1);
     }
     *, *::before, *::after { box-sizing: border-box; }
     html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
@@ -50,16 +48,17 @@
     #user-avatar { width: 36px; height: 36px; border-radius: 50%; background-color: var(--border-color); display: flex; align-items: center; justify-content: center; font-weight: 600; color: var(--text-secondary); }
     #user-email { font-weight: 600; color: var(--text-primary); }
     .header-actions { display: flex; align-items: center; gap: 12px; }
-    .toolbar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); transition: all 0.2s var(--ease); text-decoration: none; color: var(--text-secondary); }
+    .toolbar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); transition: all 0.2s; text-decoration: none; color: var(--text-secondary); }
     .toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; border-color: #d1d5db; color: var(--text-primary); }
-    #logout-button { background-color: transparent; border: 1px solid var(--border-color); padding: 8px 16px; border-radius: var(--radius-md); cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s var(--ease); }
+    .toolbar-btn:disabled { cursor: not-allowed; opacity: 0.5; background-color: #f9fafb;}
+    #logout-button { background-color: transparent; border: 1px solid var(--border-color); padding: 8px 16px; border-radius: var(--radius-md); cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s; }
     #logout-button:hover { background-color: var(--danger-light); color: var(--danger-hover); border-color: var(--danger-hover); }
 
     .master-container { max-width: 1100px; margin: 0 auto; background: var(--surface-color); padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
     .project-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color); }
     .project-title { font-size: 1.75rem; font-weight: 700; margin: 0; flex-grow: 1; border: none; padding: 4px 8px; margin: -4px -8px; border-radius: var(--radius-md); font-family: 'Noto Sans Telugu', sans-serif; }
     .project-title:focus { outline: 2px solid var(--primary-color); background-color: var(--primary-light); }
-
+    
     .schedule-block { margin-bottom: 32px; }
     .schedule-block:last-child { margin-bottom: 0; }
     .schedule-header { margin-bottom: 16px; }
@@ -73,7 +72,6 @@
     .schedule-block .header-row .cell-icon { filter: brightness(0) invert(1); }
     .schedule-block .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; }
     .schedule-block .header-row td { font-size: 16px; color: #ffffff; height: 42px; }
-    
     .schedule-block .row-handle { display: none !important; }
 
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 16px; }
@@ -90,23 +88,31 @@
     #cancel-template-selection { background-color: var(--surface-color); }
     #confirm-template-selection { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 
-    @media print {
-        @page { size: A4 portrait; margin: 0; }
-        html, body { height: 100%; width: 100%; margin: 0; padding: 0; background-color: #fff !important; }
-        #app-header, .header-actions { display: none !important; }
-        #app-container { box-shadow: none !important; border: none !important; background: none !important; }
-        .master-container { padding: 10mm !important; box-shadow: none !important; }
-        .project-header, .schedule-header { page-break-before: always; }
-        .project-header:first-child, .schedule-header:first-of-type { page-break-before: auto; }
-        .schedule-block { height: 135mm; page-break-inside: avoid; margin-bottom: 10mm; display: flex; flex-direction: column;}
-        .schedule-block:nth-child(even) { page-break-after: always; }
-        .schedule-block table { flex-grow: 1; }
-        table { width: 100%; border: 2px solid #000 !important; color: #000 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-        th, td { border: 1px solid #000 !important; }
-        td.cell-selected, th.cell-selected { outline: none !important; }
-        th { border-bottom: 1px solid #000 !important; }
-        tbody tr:nth-child(2) > td { border-top: 2px solid #000 !important; }
+    body.pdf-export-mode .master-container {
+        width: 794px;
+        margin: 0;
+        padding: 0;
+        box-shadow: none;
+        border-radius: 0;
     }
+    body.pdf-export-mode .schedule-block {
+        width: 100%;
+        padding: 20px;
+        box-sizing: border-box;
+        height: 550px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    body.pdf-export-mode #app-header,
+    body.pdf-export-mode .project-header,
+    body.pdf-export-mode .header-actions {
+        display: none !important;
+    }
+    body.pdf-export-mode table { font-size: 12px; }
+    body.pdf-export-mode .schedule-block th, 
+    body.pdf-export-mode .schedule-block td { height: 32px; }
+    body.pdf-export-mode .schedule-block .header-row td { height: 38px; }
 
     @media (max-width: 768px) {
         body { padding: 72px 0 0 0; background-color: var(--surface-color); }
@@ -142,9 +148,9 @@
                     <span class="material-symbols-outlined">arrow_back</span>
                     <span>Dashboard</span>
                 </a>
-                <button id="print-button" class="toolbar-btn">
-                    <span class="material-symbols-outlined">print</span>
-                    <span>Print</span>
+                <button id="download-pdf-button" class="toolbar-btn">
+                    <span class="material-symbols-outlined">picture_as_pdf</span>
+                    <span>Download PDF</span>
                 </button>
                 <button id="logout-button">Logout</button>
             </div>
@@ -289,7 +295,6 @@
             const updatedTablesData = this.scheduleTables.map(table => ({ title: table.data.title, content: table.getContent() }));
             const payload = { name: projectTitleEl.textContent, tables: updatedTablesData };
             this.collectionRef.doc(this.id).update(payload)
-                .then(() => console.log("Project saved"))
                 .catch(err => console.error("Save failed:", err));
         }
         
@@ -359,7 +364,7 @@
 
     async function initCreationFlow() {
         document.getElementById('project-header').style.display = 'none';
-        document.getElementById('print-button').style.display = 'none';
+        document.getElementById('download-pdf-button').style.display = 'none';
 
         const templatesCollection = db.collection("templates");
         const snapshot = await templatesCollection.orderBy("createdAt").get();
@@ -376,9 +381,52 @@
         templateSelectionModal.style.display = 'flex';
     }
 
+    async function handlePdfDownload() {
+        const downloadBtn = document.getElementById('download-pdf-button');
+        const originalBtnText = downloadBtn.innerHTML;
+        downloadBtn.disabled = true;
+        downloadBtn.innerHTML = `<span class="material-symbols-outlined">hourglass_top</span><span>Generating...</span>`;
+
+        document.body.classList.add('pdf-export-mode');
+
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({
+            orientation: 'p',
+            unit: 'px',
+            format: 'a4'
+        });
+
+        const scheduleBlocks = Array.from(document.querySelectorAll('.schedule-block'));
+        const a4Width = 794; 
+        const a4Height = 1123;
+        const margin = 20;
+
+        for (let i = 0; i < scheduleBlocks.length; i++) {
+            const element = scheduleBlocks[i];
+            const canvas = await html2canvas(element, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+            const imgData = canvas.toDataURL('image/png');
+            const imgProps = pdf.getImageProperties(imgData);
+            const pdfWidth = a4Width - (margin * 2);
+            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+            const yPos = (i % 2 === 0) ? margin : (a4Height / 2) + (margin / 2);
+
+            if (i > 0 && i % 2 === 0) {
+                pdf.addPage();
+            }
+
+            pdf.addImage(imgData, 'PNG', margin, yPos, pdfWidth, pdfHeight);
+        }
+
+        pdf.save(`${activeProject.data.name || 'schedule'}.pdf`);
+        document.body.classList.remove('pdf-export-mode');
+        downloadBtn.disabled = false;
+        downloadBtn.innerHTML = originalBtnText;
+    }
+
     function setupGlobalUI() {
         document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
-        document.getElementById('print-button').addEventListener('click', handlePrint);
+        document.getElementById('download-pdf-button').addEventListener('click', handlePdfDownload);
         
         document.getElementById('cancel-template-selection').addEventListener('click', () => {
             templateSelectionModal.style.display = 'none';
@@ -420,27 +468,6 @@
         });
     }
     
-    function handlePrint() {
-        const printButton = document.getElementById('print-button');
-        printButton.disabled = true;
-        printButton.querySelector('span:last-child').textContent = 'Generating...';
-
-        const element = document.getElementById('schedules-wrapper');
-        const projectTitle = document.getElementById('project-title').textContent.trim();
-        const opt = {
-            margin:       1,
-            filename:     projectTitle + '.pdf',
-            image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2, useCORS: true },
-            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-
-        html2pdf().from(element).set(opt).save().then(() => {
-             printButton.disabled = false;
-             printButton.querySelector('span:last-child').textContent = 'Print';
-        });
-    }
-
     setupGlobalUI();
 
 })();
