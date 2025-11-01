@@ -15,18 +15,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <!-- FONTS AND ICONS -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 
 <style>
-@font-face {
-        font-family: 'Noto Sans Telugu Local'; /* Give it a unique name */
-        src: url('NotoSansTelugu-Regular.woff2') format('woff2');
-        font-weight: 400; /* Regular weight */
-        font-style: normal;
-        font-display: swap; /* Improves loading performance */
-    }
-    
     :root {
         --primary-color: #012726;
         --primary-hover: #024443;
@@ -44,14 +39,14 @@
     }
     *, *::before, *::after { box-sizing: border-box; }
     html { -webkit-font-smoothing: antialiased; }
-    body { font-family: 'Noto Sans Telugu Local', 'Noto Sans Telugu', sans-serif;  background-color: var(--background-color); margin: 0; padding: 88px 20px 20px; color: var(--text-primary); }
+    body { font-family: 'Noto Sans Telugu', sans-serif; background-color: var(--background-color); margin: 0; padding: 88px 20px 20px; color: var(--text-primary); }
     
     main { margin-top: 0; }
     #app-header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border-color); padding: 12px 20px; }
     .header-content { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
     .header-actions { display: flex; align-items: center; gap: 12px; }
     .toolbar-btn { font-family: 'Inter', sans-serif; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); text-decoration: none; color: var(--text-secondary); }
-    .toolbar-btn:hover { background-color: #f9fafb; color: var(--text-primary); }
+    .toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; color: var(--text-primary); }
     .toolbar-btn:disabled { cursor: not-allowed; opacity: 0.5; }
     #logout-button { font-family: 'Inter', sans-serif; background: transparent; border: 1px solid var(--border-color); padding: 8px 16px; border-radius: var(--radius-md); cursor: pointer; font-weight: 600; font-size: 14px; }
     #logout-button:hover { background-color: var(--danger-light); color: var(--danger-hover); border-color: var(--danger-hover); }
@@ -73,7 +68,7 @@
     .schedule-table [contenteditable="true"]:focus { background-color: #fffbe5; outline: 1px solid #f59e0b; }
     .special-event { color: red; font-weight: 700; text-align: center; padding-left: 5px; }
     .schedule-table .top-empty-row { background-color: #ffffff; border-bottom: 2px solid #000; border-top: none; border-left: 2px solid white; border-right: 2px solid white; height: 25px; }
-
+    
     .event-btn { background: none; border: none; cursor: pointer; padding: 4px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
     .event-btn:hover { background-color: #f0f0f0; }
     #event-context-menu { position: fixed; display: none; background: var(--surface-color); border-radius: var(--radius-md); box-shadow: var(--shadow-md); z-index: 1001; padding: 6px; min-width: 180px; border: 1px solid var(--border-color); }
@@ -374,46 +369,45 @@
     async function generatePdf() {
         const printButton = document.getElementById('print-button');
         printButton.disabled = true;
-        printButton.querySelector('span:last-child').textContent = 'Generating... Please wait 5 seconds.'; // Update text to inform user
+        printButton.querySelector('span:last-child').textContent = 'Generating...';
 
-        // --- NEW: Force a 5-second delay ---
-        setTimeout(async () => {
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF('l', 'mm', 'a4'); // 'l' for landscape
-            const contentToPrint = document.getElementById('schedule-content-wrapper');
-            
-            const actionElements = contentToPrint.querySelectorAll('.actions-col, .event-btn');
-            actionElements.forEach(el => el.style.display = 'none');
-            
-            try {
-                const canvas = await html2canvas(contentToPrint, {
-                    scale: 2,
-                    useCORS: true,
-                    backgroundColor: '#ffffff'
-                });
+        await document.fonts.ready;
 
-                const imgData = canvas.toDataURL('image/jpeg', 0.9);
-                const A4_WIDTH_MM = 297;
-                const A4_HEIGHT_MM = 210;
-                
-                const imgProps = pdf.getImageProperties(imgData);
-                const pdfWidth = A4_WIDTH_MM;
-                const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-                
-                pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
-
-            } catch (error) {
-                console.error("PDF generation failed:", error);
-                alert("Sorry, there was an error creating the PDF.");
-            } finally {
-                actionElements.forEach(el => el.style.display = '');
-                const fileName = `${document.title}.pdf`;
-                pdf.save(fileName);
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('l', 'mm', 'a4'); // 'l' for landscape
+        const contentToPrint = document.getElementById('schedule-content-wrapper');
         
-                printButton.disabled = false;
-                printButton.querySelector('span:last-child').textContent = 'Download PDF';
-            }
-        }, 5000); // 5000 milliseconds = 5 seconds
+        const actionElements = contentToPrint.querySelectorAll('.actions-col, .event-btn');
+        actionElements.forEach(el => el.style.display = 'none');
+        
+        try {
+            const canvas = await html2canvas(contentToPrint, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: '#ffffff'
+            });
+
+            const imgData = canvas.toDataURL('image/jpeg', 0.9);
+            const A4_WIDTH_MM = 297;
+            const A4_HEIGHT_MM = 210;
+            
+            const imgProps = pdf.getImageProperties(imgData);
+            const pdfWidth = A4_WIDTH_MM;
+            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+            
+            pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+
+        } catch (error) {
+            console.error("PDF generation failed:", error);
+            alert("Sorry, there was an error creating the PDF.");
+        } finally {
+            actionElements.forEach(el => el.style.display = '');
+            const fileName = `${document.title}.pdf`;
+            pdf.save(fileName);
+    
+            printButton.disabled = false;
+            printButton.querySelector('span:last-child').textContent = 'Download PDF';
+        }
     }
 
     document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
