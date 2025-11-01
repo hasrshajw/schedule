@@ -47,8 +47,7 @@
     .header-content { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
     .header-actions { display: flex; align-items: center; gap: 12px; }
     .toolbar-btn { font-family: 'Inter', sans-serif; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); text-decoration: none; color: var(--text-secondary); }
-    .toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; color: var(--text-primary); }
-    .toolbar-btn:disabled { cursor: not-allowed; opacity: 0.5; }
+    .toolbar-btn:hover { background-color: #f9fafb; color: var(--text-primary); }
     #logout-button { font-family: 'Inter', sans-serif; background: transparent; border: 1px solid var(--border-color); padding: 8px 16px; border-radius: var(--radius-md); cursor: pointer; font-weight: 600; font-size: 14px; }
     #logout-button:hover { background-color: var(--danger-light); color: var(--danger-hover); border-color: var(--danger-hover); }
 
@@ -70,6 +69,7 @@
     .special-event { color: red; font-weight: 700; text-align: center; padding-left: 5px; }
     
     .schedule-table .top-empty-row { background-color: #ffffff; border-bottom: 2px solid #000; border-top: none; border-left: 2px solid white; border-right: 2px solid white; height: 25px; }
+    .schedule-table thead tr:nth-of-type(2) th { border-top: 2px solid #000; }
     .event-btn { background: none; border: none; cursor: pointer; padding: 4px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
     .event-btn:hover { background-color: #f0f0f0; }
     #event-context-menu { position: fixed; display: none; background: var(--surface-color); border-radius: var(--radius-md); box-shadow: var(--shadow-md); z-index: 1001; padding: 6px; min-width: 180px; border: 1px solid var(--border-color); }
@@ -98,7 +98,7 @@
                     <span class="material-symbols-outlined">arrow_back</span>
                     <span>Dashboard</span>
                 </a>
-                <button id="print-button" class="toolbar-btn">
+                <button id="print-button" class="toolbar-btn" disabled>
                     <span class="material-symbols-outlined">picture_as_pdf</span>
                     <span>Download PDF</span>
                 </button>
@@ -160,6 +160,7 @@
     const scheduleWrapper = document.getElementById('schedule-content-wrapper');
     const dateSelectionModal = document.getElementById('date-selection-modal');
     const eventContextMenu = document.getElementById('event-context-menu');
+    const printButton = document.getElementById('print-button');
 
     const debounce = (func, delay) => {
         let timeout;
@@ -180,6 +181,7 @@
     });
 
     function initEditor() {
+        printButton.disabled = false;
         if (currentListener) currentListener();
         currentListener = userSchedulesCollection.doc(currentScheduleId).onSnapshot(doc => {
             if (doc.exists) {
@@ -255,6 +257,7 @@
     }, 1500);
 
     function initCreationFlow() {
+        printButton.disabled = true;
         const dateList = document.getElementById('date-checklist');
         const upcomingSundays = generateNextSundays(30);
         dateList.innerHTML = '';
@@ -378,55 +381,85 @@
     }
     
     async function generatePdf() {
-        const printButton = document.getElementById('print-button');
         printButton.disabled = true;
         printButton.querySelector('span:last-child').textContent = 'Generating...';
 
         const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('l', 'mm', 'a4'); // 'l' for landscape
+        const pdf = new jsPDF('l', 'mm', 'a4'); 
         const A4_WIDTH_MM = 297;
         const A4_HEIGHT_MM = 210;
         const MARGIN_MM = 15;
         const USABLE_WIDTH = A4_WIDTH_MM - (MARGIN_MM * 2);
+        const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_MM * 2);
 
-        // Create an off-screen container for consistent rendering
         const printContainer = document.createElement('div');
         printContainer.style.position = 'absolute';
         printContainer.style.left = '-9999px';
-        printContainer.style.width = '1100px'; // A good desktop width for rendering
+        printContainer.style.width = '1200px'; 
         printContainer.style.background = 'white';
         document.body.appendChild(printContainer);
 
-        // Clone the content into the off-screen container
-        const contentToPrint = scheduleWrapper.cloneNode(true);
-        Array.from(contentToPrint.querySelectorAll('.actions-col, .event-btn')).forEach(el => el.remove());
-        printContainer.appendChild(contentToPrint);
-
-        const canvas = await html2canvas(contentToPrint, {
-            scale: 2,
-            useCORS: true,
-            backgroundColor: '#ffffff'
-        });
-
-        // Clean up the off-screen container
-        document.body.removeChild(printContainer);
-
-        const imgData = canvas.toDataURL('image/jpeg', 0.9);
-        const imgProps = pdf.getImageProperties(imgData);
-        const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
-
-        let heightLeft = imgHeight;
-        let position = MARGIN_MM;
+        const headerClone = scheduleWrapper.querySelector('.schedule-display-header').cloneNode(true);
+        const tableClone = scheduleWrapper.querySelector('.schedule-table').cloneNode(true);
+        Array.from(tableClone.querySelectorAll('.actions-col')).forEach(el => el.remove());
         
-        pdf.addImage(imgData, 'JPEG', MARGIN_MM, position, USABLE_WIDTH, imgHeight);
-        heightLeft -= (A4_HEIGHT_MM - (MARGIN_MM * 2));
+        const headerCanvas = await html2canvas(headerClone, { scale: 2, backgroundColor: '#ffffff' });
+        const headerImgData = headerCanvas.toDataURL('image/jpeg', 0.9);
+        const headerProps = pdf.getImageProperties(headerImgData);
+        const headerHeight = (headerProps.height * USABLE_WIDTH) / headerProps.width;
 
-        while (heightLeft > 0) {
-            position -= (A4_HEIGHT_MM - (MARGIN_MM * 2));
-            pdf.addPage();
-            pdf.addImage(imgData, 'JPEG', MARGIN_MM, position, USABLE_WIDTH, imgHeight);
-            heightLeft -= (A4_HEIGHT_MM - (MARGIN_MM * 2));
+        let yPos = MARGIN_MM;
+        pdf.addImage(headerImgData, 'JPEG', MARGIN_MM, yPos, USABLE_WIDTH, headerHeight);
+        yPos += headerHeight + 5; // Add some space after the header
+        
+        const sourceTableBody = tableClone.querySelector('tbody');
+        const sourceRows = Array.from(sourceTableBody.children);
+        const tableHeader = tableClone.querySelector('thead').cloneNode(true);
+        
+        const tempTable = document.createElement('table');
+        tempTable.className = 'schedule-table';
+        tempTable.style.width = '100%';
+        tempTable.appendChild(tableHeader);
+        const tempTbody = document.createElement('tbody');
+        tempTable.appendChild(tempTbody);
+        printContainer.appendChild(tempTable);
+
+        for (let i = 0; i < sourceRows.length; i++) {
+            const row = sourceRows[i].cloneNode(true);
+            tempTbody.appendChild(row);
+
+            const currentTableHeight = tempTable.offsetHeight;
+            const projectedHeightInMm = (currentTableHeight / 1200) * USABLE_WIDTH * (A4_WIDTH_MM / A4_HEIGHT_MM); // Approximate conversion
+
+            if (yPos + projectedHeightInMm > A4_HEIGHT_MM - MARGIN_MM) {
+                tempTbody.removeChild(row); // Remove the row that caused overflow
+
+                const tableCanvas = await html2canvas(tempTable, { scale: 2, backgroundColor: '#ffffff' });
+                const tableImgData = tableCanvas.toDataURL('image/jpeg', 0.9);
+                const tableProps = pdf.getImageProperties(tableImgData);
+                const tableHeight = (tableProps.height * USABLE_WIDTH) / tableProps.width;
+                
+                pdf.addImage(tableImgData, 'JPEG', MARGIN_MM, yPos, USABLE_WIDTH, tableHeight);
+                
+                pdf.addPage();
+                yPos = MARGIN_MM;
+                pdf.addImage(headerImgData, 'JPEG', MARGIN_MM, yPos, USABLE_WIDTH, headerHeight);
+                yPos += headerHeight + 5;
+                
+                tempTbody.innerHTML = '';
+                tempTbody.appendChild(row);
+            }
         }
+        
+        if (tempTbody.children.length > 0) {
+            const tableCanvas = await html2canvas(tempTable, { scale: 2, backgroundColor: '#ffffff' });
+            const tableImgData = tableCanvas.toDataURL('image/jpeg', 0.9);
+            const tableProps = pdf.getImageProperties(tableImgData);
+            const tableHeight = (tableProps.height * USABLE_WIDTH) / tableProps.width;
+            pdf.addImage(tableImgData, 'JPEG', MARGIN_MM, yPos, USABLE_WIDTH, tableHeight);
+        }
+
+        document.body.removeChild(printContainer);
 
         const fileName = `${document.title || 'sunday-schedule'}.pdf`;
         pdf.save(fileName);
