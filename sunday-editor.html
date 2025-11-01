@@ -278,7 +278,29 @@
         margin: 0;
         font-family: 'Noto Sans Telugu', sans-serif;
     }
+/* Add these rules to your existing CSS */
 
+/* Desktop table font */
+.schedule-table {
+    font-family: 'Noto Sans Telugu', sans-serif;
+}
+
+/* Desktop header font */
+.schedule-display-header h1,
+.schedule-display-header .subtitle {
+    font-family: 'Noto Sans Telugu', sans-serif;
+}
+
+/* Desktop table cells */
+.schedule-table th,
+.schedule-table td {
+    font-family: 'Noto Sans Telugu', sans-serif;
+}
+
+/* Ensure editable cells also use the font */
+.schedule-table [contenteditable="true"] {
+    font-family: 'Noto Sans Telugu', sans-serif;
+}
     @media (max-width: 768px) {
         main { padding: 56px 0 0 0; }
         .master-container { padding: 16px; border-radius: 0; box-shadow: none; }
@@ -426,15 +448,27 @@
 
 <div id="app-container" class="editor-main hidden">
     <div class="page-controls">
-        <a href="./sunday-dashboard.html" class="toolbar-btn">
-            <span class="material-symbols-outlined">arrow_back</span>
-            <span>Dashboard</span>
-        </a>
+    <a href="./sunday-dashboard.html" class="toolbar-btn">
+        <span class="material-symbols-outlined">arrow_back</span>
+        <span>Dashboard</span>
+    </a>
+    <div style="display: flex; gap: 10px;">
+        <!-- Add these two buttons -->
+        <button id="print-desktop" class="btn">
+            <span class="material-symbols-outlined">print</span>
+            <span>Print Desktop</span>
+        </button>
+        <button id="print-mobile" class="btn">
+            <span class="material-symbols-outlined">print</span>
+            <span>Print Mobile</span>
+        </button>
+        <!-- Existing PDF button -->
         <button id="print-button" class="btn">
             <span class="material-symbols-outlined">picture_as_pdf</span>
             <span>Download PDF</span>
         </button>
     </div>
+</div>
     <div class="master-container">
         <div id="schedule-content-wrapper">
             <!-- Schedule will be rendered here -->
@@ -1144,6 +1178,7 @@
         const menuOverlay = document.getElementById('menu-overlay');
         const body = document.body;
         
+        
         function closeMenu() {
             slideMenu.classList.remove('is-open');
             menuOverlay.classList.remove('is-open');
@@ -1165,6 +1200,9 @@
         document.getElementById('print-button').addEventListener('click', generatePdf);
         document.getElementById('cancel-creation').addEventListener('click', () => window.location.href = './sunday-dashboard.html');
         document.getElementById('confirm-creation').addEventListener('click', handleCreateSchedule);
+        // Add these lines in the setupGlobalUI() function
+document.getElementById('print-desktop').addEventListener('click', printDesktopView);
+document.getElementById('print-mobile').addEventListener('click', printMobileView);
 
         eventContextMenu.addEventListener('click', (e) => {
             const target = e.target.closest('.context-menu-item');
@@ -1188,6 +1226,46 @@
     }
 
 })();
+
+
+
+
+function printDesktopView() {
+    // Hide mobile view and show desktop table for printing
+    const mobileContainer = document.querySelector('.mobile-view-container');
+    const scheduleTable = document.querySelector('.schedule-table');
+    
+    if (mobileContainer) mobileContainer.style.display = 'none';
+    if (scheduleTable) scheduleTable.style.display = 'table';
+    
+    window.print();
+    
+    // Restore mobile view after printing (if on mobile)
+    if (window.innerWidth <= 768) {
+        if (mobileContainer) mobileContainer.style.display = 'flex';
+        if (scheduleTable) scheduleTable.style.display = 'none';
+    }
+}
+
+function printMobileView() {
+    // Show mobile view and hide desktop table for printing
+    const mobileContainer = document.querySelector('.mobile-view-container');
+    const scheduleTable = document.querySelector('.schedule-table');
+    
+    if (mobileContainer) mobileContainer.style.display = 'flex';
+    if (scheduleTable) scheduleTable.style.display = 'none';
+    
+    window.print();
+    
+    // Restore original view after printing
+    if (window.innerWidth <= 768) {
+        if (mobileContainer) mobileContainer.style.display = 'flex';
+        if (scheduleTable) scheduleTable.style.display = 'none';
+    } else {
+        if (mobileContainer) mobileContainer.style.display = 'none';
+        if (scheduleTable) scheduleTable.style.display = 'table';
+    }
+}
 </script>
 </body>
 </html>
