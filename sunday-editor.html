@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 
 <style>
@@ -40,16 +40,12 @@
         --text-primary: #1f2937;
         --text-secondary: #6b7280;
         --surface-color: #ffffff;
-        --radius-md: 12px;
+        --radius-md: 8px;
         --radius-lg: 16px;
-        --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
         --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
         --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
         --warning-color: #f59e0b;
         --success-color: #2e7d32;
-        --co-visit-color: #dc2626;
-        --assembly-color: #059669;
-        --convention-color: #7c3aed;
     }
     
     @font-face {
@@ -58,23 +54,16 @@
         font-weight: normal; font-style: normal;
     }
 
-    * {
-        box-sizing: border-box;
-    }
-
     body {
-        margin: 0; 
-        padding: 0;
-        font-family: 'Inter', sans-serif;
+        margin: 0; padding: 0;
+        font-family: 'Noto Sans Telugu', sans-serif;
         background-color: var(--body-bg);
         color: var(--text-primary);
-        visibility: hidden; 
-        opacity: 0;
+        visibility: hidden; opacity: 0;
         transition: opacity 0.3s ease-in;
     }
     body.auth-ready { visibility: visible; opacity: 1; }
     body.menu-open { overflow: hidden; }
-    body.dropdown-open { overflow: hidden; }
 
     /* START: NEW NAVBAR STYLES */
     .site-header { 
@@ -85,44 +74,39 @@
         top: 0; 
         left: 0; 
         width: 100%; 
-        z-index: 1000;
+        z-index: 900; 
         box-shadow: var(--shadow-md);
     }
     .top-bar { 
         display: flex; 
         justify-content: space-between; 
         align-items: center; 
-        height: 60px; 
-        padding: 0 16px; 
+        height: 56px; 
+        padding: 0 15px 0 0; 
         max-width: 1200px; 
         margin: 0 auto; 
     }
     .top-bar .mobileLogo { 
         display: block; 
-        width: 80px; 
-        height: 60px; 
+        width: 75px; 
+        height: 56px; 
         background-image: url(https://www.jw.org/assets/ct/46605f23da/images/siteLogo-jworg-mobile.svg), none; 
         background-repeat: no-repeat; 
         background-size: contain; 
         background-position: center left; 
         flex-shrink: 0; 
+        margin-left: 0px; 
     }
     .header-right-controls { 
         display: flex; 
         align-items: center; 
-        gap: 16px; 
+        gap: 15px; 
     }
     .header-icons { 
         display: flex; 
         align-items: center; 
-        height: 60px; 
+        height: 56px; 
         cursor: pointer; 
-        padding: 8px;
-        border-radius: 8px;
-        transition: background-color 0.2s;
-    }
-    .header-icons:hover {
-        background-color: rgba(255,255,255,0.1);
     }
     .header-icons svg { 
         height: 24px; 
@@ -133,14 +117,35 @@
     body.menu-open .header-icons .hamburger-icon { display: none; }
     body.menu-open .header-icons .close-icon { display: block; }
 
+    .status-indicator { 
+        font-size: 12px; 
+        font-weight: 600; 
+        padding: 4px 10px; 
+        border-radius: 999px; 
+        display: flex; 
+        align-items: center; 
+        gap: 6px; 
+        background: rgba(255,255,255,0.1);
+    }
+    .status-indicator::before { 
+        content: ''; 
+        width: 8px; 
+        height: 8px; 
+        border-radius: 50%; 
+        background-color: currentColor; 
+    }
+    .status-indicator[data-status="synced"] { color: #4ade80; }
+    .status-indicator[data-status="syncing"] { color: var(--warning-color); }
+    .status-indicator[data-status="error"] { color: var(--danger-color); }
+
     .menu-overlay { 
         position: fixed; 
-        top: 60px; 
+        top: 56px; 
         left: 0; 
         width: 100%; 
-        height: calc(100% - 60px); 
+        height: calc(100% - 56px); 
         background-color: rgba(0, 0, 0, 0.6); 
-        z-index: 999; 
+        z-index: 998; 
         opacity: 0; 
         visibility: hidden; 
         transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; 
@@ -148,49 +153,57 @@
     .menu-overlay.is-open { opacity: 1; visibility: visible; }
     .slide-menu { 
         position: fixed; 
-        top: 60px; 
+        top: 56px; 
         right: 0; 
-        height: calc(100dvh - 60px); 
+        height: calc(100dvh - 56px); 
         width: 320px; 
         max-width: 90%; 
         background-color: var(--menu-new-bg); 
-        z-index: 1000; 
+        z-index: 999; 
         transform: translateX(100%); 
         transition: transform 0.3s ease-in-out; 
         display: flex; 
         flex-direction: column; 
-        border-left: 1px solid var(--menu-new-border);
-        box-shadow: var(--shadow-lg);
+        border-left: 1px solid var(--menu-new-border); 
     }
     .slide-menu.is-open { transform: translateX(0); }
 
-    .menu-links { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex-grow: 1; }
+    .menu-links { 
+        list-style: none; 
+        margin: 0; 
+        padding: 0; 
+        overflow-y: auto; 
+        flex-grow: 1; 
+    }
     .menu-links li a { 
         display: flex; 
         align-items: center; 
         color: var(--menu-new-text); 
         background-color: var(--menu-new-bg); 
-        height: 56px; 
-        padding: 12px 16px; 
+        height: 50px; 
+        padding: 12px 5px 12px 12px; 
         box-sizing: border-box; 
         text-decoration: none; 
         font-size: 1rem; 
         transition: background-color 0.2s; 
-        border-bottom: 1px solid #f0f0f0; 
+        border-top: 1px dotted #a7a7a7; 
     }
     .menu-links li:first-child a { border-top: none; }
     .menu-links li a:hover { background-color: var(--menu-new-hover); }
 
     .profile-section { 
-        padding: 20px 16px; 
+        padding: 16px; 
         border-top: 1px solid var(--menu-new-border); 
         flex-shrink: 0; 
         background-color: #fafafa; 
         margin-top: auto; 
     }
-    .profile-info { display: flex; align-items: center; }
+    .profile-info { 
+        display: flex; 
+        align-items: center; 
+    }
     .profile-name { 
-        font-weight: 600; 
+        font-weight: bold; 
         font-size: 1rem; 
         color: #333; 
         word-break: break-all; 
@@ -201,21 +214,26 @@
         font-size: 24px; 
         display: inline-block; 
         color: #757575; 
-        width: 32px; 
-        margin-right: 12px; 
+        width: 30px; 
+        margin-right: 10px; 
         text-align: center; 
     }
     .home-icon::before { content: "\e661"; }
     .midweek-icon::before { content: "\e625"; }
     .sunday-icon::before { content: "\e610"; }
     .members-icon::before { content: "\e695"; }
+    /* END: NEW NAVBAR STYLES */
 
+    /* START: EDITOR STYLES */
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    
     .btn { 
         display: inline-flex; 
         align-items: center; 
         justify-content: center; 
         gap: 8px; 
-        padding: 12px 20px; 
+        padding: 10px 20px; 
         border-radius: var(--radius-md); 
         font-size: 1rem; 
         font-weight: 600; 
@@ -224,43 +242,25 @@
         text-decoration: none; 
         background-color: var(--primary-color); 
         color: white; 
-        transition: all 0.2s ease; 
-        box-shadow: var(--shadow-sm);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     .btn:hover:not(:disabled) { 
         background-color: var(--primary-hover); 
         transform: translateY(-1px);
-        box-shadow: var(--shadow-md);
-    }
-    .btn:active:not(:disabled) {
-        transform: translateY(0);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
     }
     .btn:disabled { cursor: not-allowed; opacity: 0.6; }
-
-    /* END: NEW NAVBAR STYLES */
-
-    /* START: ORIGINAL EDITOR STYLES */
+    
     .hidden { display: none !important; }
-    
-    main { 
-        padding: calc(60px + 20px) 20px 20px; 
-        min-height: 100vh;
-    }
-    
-    .editor-main { 
-        max-width: 1100px; 
-        margin: 0 auto; 
-    }
-    
+    main { padding: calc(56px + 20px) 20px 20px; }
+    .editor-main { max-width: 1100px; margin: 0 auto; }
     .page-controls { 
         margin-bottom: 24px; 
-        display: flex; 
-        justify-content: space-between; 
-        align-items: center;
-        flex-wrap: wrap;
+        display: flex;
         gap: 12px;
+        align-items: center;
     }
-    
     .master-container { 
         background: var(--surface-color); 
         padding: 24px; 
@@ -268,64 +268,13 @@
         box-shadow: var(--shadow-md); 
     }
     
-    .schedule-display-header { 
-        text-align: center; 
-        margin-bottom: 0; 
-    }
-    
-    .title-block { 
-        text-align: center; 
-        margin-bottom: 24px;
-    }
-    
-    .title-block h1 { 
-        margin: 0 0 12px 0; 
-        font-size: 1.8em; 
-        font-weight: 700; 
-        color: rgb(97, 40, 0); 
-        font-family: 'Noto Sans Telugu', sans-serif; 
-        line-height: 1.3;
-    }
-    
-    .subtitle-svg-container { 
-        position: relative; 
-        display: inline-block; 
-        margin-top: 0; 
-    }
-    
-    .subtitle { 
-        margin: 0; 
-        font-size: 1.1em; 
-        font-weight: 500; 
-        color: #333; 
-        background-color: #ffffff; 
-        padding: 8px 16px; 
-        display: inline-block; 
-        position: relative; 
-        z-index: 2; 
-        white-space: nowrap; 
-        border-radius: var(--radius-md); 
-        font-family: 'Noto Sans Telugu', sans-serif; 
-        border: 1px solid var(--border-color);
-        box-shadow: var(--shadow-sm);
-    }
-    
-    .subtitle:focus { 
-        outline: 2px solid var(--primary-color); 
-        background-color: #f0f0f0; 
-    }
-    
-    .svg-divider { 
-        width: 400px; 
-        height: 5px; 
-        display: block; 
-        position: absolute; 
-        left: 50%; 
-        transform: translateX(-50%); 
-        top: 50%; 
-        margin-top: -2.5px; 
-        z-index: 1; 
-    }
+    .schedule-display-header { text-align: center; margin-bottom: 0; }
+    .title-block { text-align: center; }
+    .title-block h1 { margin: 0; font-size: 1.8em; font-weight: 700; color: rgb(97, 40, 0); }
+    .subtitle-svg-container { position: relative; display: inline-block; margin-top: 0; }
+    .subtitle { margin: 0; font-size: 1.0em; font-weight: 500; color: #333; background-color: #ffffff; padding: 2px 8px; display: inline-block; position: relative; z-index: 2; white-space: nowrap; border-radius: var(--radius-md); }
+    .subtitle:focus { outline: 2px solid var(--primary-color); background-color: #f0f0f0; }
+    .svg-divider { width: 400px; height: 5px; display: block; position: absolute; left: 50%; transform: translateX(-50%); top: 50%; margin-top: -2.5px; z-index: 1; }
     
     .schedule-table { 
         width: 100%; 
@@ -334,42 +283,20 @@
         border-left: 2px solid #000; 
         border-right: 2px solid #000; 
         border-bottom: 2px solid #000; 
-        font-family: 'Noto Sans Telugu', sans-serif; 
+        font-family: 'Noto Sans Telugu', sans-serif;
     }
-    
     .schedule-table th, .schedule-table td { 
         border: 1px solid #000; 
         padding: 8px 5px; 
         text-align: center; 
         vertical-align: middle; 
         font-weight: 700; 
-        font-family: 'Noto Sans Telugu', sans-serif; 
+        font-family: 'Noto Sans Telugu', sans-serif;
     }
-    
-    .schedule-table tbody td:not(:first-child):not(.special-event) { 
-        text-align: left; 
-        padding-left: 10px; 
-    }
-    
-    .schedule-table thead th { 
-        background-color: #F3E5D7; 
-        font-size: 1.0em; 
-        padding: 10px 5px; 
-        font-family: 'Noto Sans Telugu', sans-serif; 
-    }
-    
-    .schedule-table [contenteditable="true"]:focus { 
-        background-color: #fffbe5; 
-        outline: 1px solid #f59e0b; 
-    }
-    
-    .special-event { 
-        color: red; 
-        font-weight: 700; 
-        text-align: center; 
-        padding-left: 5px; 
-        font-family: 'Noto Sans Telugu', sans-serif; 
-    }
+    .schedule-table tbody td:not(:first-child):not(.special-event) { text-align: left; padding-left: 10px; }
+    .schedule-table thead th { background-color: #F3E5D7; font-size: 1.0em; padding: 10px 5px; }
+    .schedule-table [contenteditable="true"]:focus { background-color: #fffbe5; outline: 1px solid #f59e0b; }
+    .special-event { color: red; font-weight: 700; text-align: center; padding-left: 5px; }
     
     .event-btn { 
         background: none; 
@@ -381,11 +308,9 @@
         align-items: center; 
         justify-content: center; 
         margin: 0 auto; 
+        transition: background-color 0.2s;
     }
-    
-    .event-btn:hover { 
-        background-color: #f0f0f0; 
-    }
+    .event-btn:hover { background-color: #f0f0f0; }
     
     .toolbar-btn { 
         font-family: 'Inter', sans-serif; 
@@ -393,7 +318,7 @@
         align-items: center; 
         justify-content: center; 
         gap: 6px; 
-        padding: 10px 16px; 
+        padding: 8px 12px; 
         font-size: 14px; 
         font-weight: 500; 
         cursor: pointer; 
@@ -402,398 +327,240 @@
         border-radius: var(--radius-md); 
         text-decoration: none; 
         color: var(--text-secondary); 
-        transition: all 0.2s ease;
+        transition: all 0.2s;
     }
-    
     .toolbar-btn:hover:not(:disabled) { 
         background-color: #f9fafb; 
         color: var(--text-primary); 
-        border-color: var(--primary-color);
+        border-color: #d1d5db; 
     }
-    
-    .toolbar-btn:disabled { 
-        cursor: not-allowed; 
-        opacity: 0.5; 
+    .toolbar-btn:disabled { cursor: not-allowed; opacity: 0.5; }
+
+    /* Advanced Dropdown Styles */
+    .advanced-dropdown {
+        position: fixed;
+        background: var(--surface-color);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-lg);
+        z-index: 1001;
+        border: 1px solid var(--border-color);
+        max-height: 400px;
+        overflow: hidden;
+        animation: dropdownSlideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        transform-origin: top left;
     }
 
-    /* Status Indicator */
-    .status-indicator { 
-        font-size: 12px; 
-        font-weight: 600; 
-        padding: 6px 12px; 
-        border-radius: 999px; 
-        display: flex; 
-        align-items: center; 
-        gap: 6px; 
-        color: var(--text-light);
-        background: rgba(255,255,255,0.1);
-        backdrop-filter: blur(10px);
+    @keyframes dropdownSlideIn {
+        from {
+            opacity: 0;
+            transform: scale(0.95) translateY(-8px);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
     }
-    
-    .status-indicator::before { 
-        content: ''; 
-        width: 8px; 
-        height: 8px; 
-        border-radius: 50%; 
-        background-color: currentColor; 
-    }
-    
-    .status-indicator[data-status="synced"] { color: var(--success-color); }
-    .status-indicator[data-status="syncing"] { color: var(--warning-color); }
-    .status-indicator[data-status="error"] { color: var(--danger-color); }
 
-    /* Enhanced Dropdown Styles */
-    .dropdown-backdrop {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.5);
-        z-index: 1100;
-        opacity: 0;
-        visibility: hidden;
-        transition: all 0.3s ease;
-        backdrop-filter: blur(4px);
-    }
-    
-    .dropdown-backdrop.active {
-        opacity: 1;
-        visibility: visible;
-    }
-    
-    .dropdown-container {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: white;
-        border-radius: 24px 24px 0 0;
-        z-index: 1101;
-        transform: translateY(100%);
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        max-height: 80vh;
-        display: flex;
-        flex-direction: column;
-        box-shadow: 0 -10px 30px rgba(0,0,0,0.2);
-    }
-    
-    .dropdown-container.active {
-        transform: translateY(0);
-    }
-    
     .dropdown-header {
-        padding: 20px 24px 12px;
+        padding: 12px 16px;
         border-bottom: 1px solid var(--border-color);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-shrink: 0;
-    }
-    
-    .dropdown-title {
-        font-size: 1.2rem;
+        background: var(--primary-light);
         font-weight: 600;
-        color: var(--text-primary);
+        color: var(--primary-color);
         font-family: 'Noto Sans Telugu', sans-serif;
     }
-    
-    .dropdown-close {
-        background: none;
-        border: none;
-        padding: 8px;
-        cursor: pointer;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--text-secondary);
-        transition: background-color 0.2s;
+
+    .dropdown-search {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border-color);
     }
-    
-    .dropdown-close:hover {
-        background-color: #f5f5f5;
+
+    .dropdown-search input {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        font-size: 14px;
+        font-family: 'Noto Sans Telugu', sans-serif;
     }
-    
-    .dropdown-content {
-        flex: 1;
+
+    .dropdown-list {
+        max-height: 300px;
         overflow-y: auto;
-        padding: 8px 0;
+        padding: 4px 0;
     }
-    
+
     .dropdown-item {
         display: flex;
         align-items: center;
-        width: 100%;
-        padding: 16px 24px;
+        justify-content: space-between;
+        padding: 12px 16px;
+        cursor: pointer;
         border: none;
         background: none;
-        cursor: pointer;
-        transition: background-color 0.2s;
-        font-family: 'Noto Sans Telugu', sans-serif;
-        font-size: 1rem;
+        width: 100%;
         text-align: left;
-        color: var(--text-primary);
+        font-family: 'Noto Sans Telugu', sans-serif;
+        font-size: 14px;
+        transition: background-color 0.15s;
+        border-bottom: 1px solid #f5f5f5;
     }
-    
+
+    .dropdown-item:last-child {
+        border-bottom: none;
+    }
+
     .dropdown-item:hover {
         background-color: #f8fafc;
     }
-    
+
     .dropdown-item.active {
         background-color: var(--primary-light);
         color: var(--primary-color);
-        font-weight: 600;
     }
-    
+
     .servant-tag {
         font-size: 0.75rem;
         font-weight: 600;
         color: var(--primary-color);
         background-color: var(--primary-light);
-        padding: 4px 8px;
-        border-radius: 12px;
-        margin-left: auto;
-        margin-right: 8px;
-    }
-
-    /* Event Type Selector */
-    .event-type-selector {
-        display: flex;
-        gap: 8px;
-        margin-bottom: 16px;
-        flex-wrap: wrap;
-    }
-    
-    .event-type-btn {
-        flex: 1;
-        min-width: 120px;
-        padding: 12px 16px;
-        border: 2px solid var(--border-color);
-        background: white;
-        border-radius: var(--radius-md);
-        cursor: pointer;
-        transition: all 0.2s ease;
-        font-family: 'Noto Sans Telugu', sans-serif;
-        font-weight: 500;
-        text-align: center;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 4px;
-    }
-    
-    .event-type-btn.active {
-        border-color: var(--primary-color);
-        background-color: var(--primary-light);
-        color: var(--primary-color);
-        font-weight: 600;
-    }
-    
-    .event-type-btn.co-visit.active {
-        border-color: var(--co-visit-color);
-        background-color: #fef2f2;
-        color: var(--co-visit-color);
-    }
-    
-    .event-type-btn.assembly.active {
-        border-color: var(--assembly-color);
-        background-color: #f0fdf4;
-        color: var(--assembly-color);
-    }
-    
-    .event-type-btn.convention.active {
-        border-color: var(--convention-color);
-        background-color: #faf5ff;
-        color: var(--convention-color);
-    }
-    
-    .event-type-icon {
-        font-size: 1.2rem;
+        padding: 2px 6px;
+        border-radius: 4px;
+        margin-left: 8px;
     }
 
     /* Mobile View Styles */
-    .mobile-view-container { 
-        display: none; 
-    }
-    
-    .mobile-week-card {
-        background: var(--surface-color);
-        border: 1px solid var(--border-color);
-        border-radius: var(--radius-lg);
-        padding: 20px;
-        margin-bottom: 20px;
-        box-shadow: var(--shadow-sm);
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .mobile-week-card:last-child {
-        margin-bottom: 0;
-    }
-    
-    .mobile-week-card:hover {
-        box-shadow: var(--shadow-md);
-        transform: translateY(-2px);
-    }
-    
-    .week-date {
-        font-size: 1.3rem;
-        font-weight: 700;
-        color: var(--text-primary);
-        margin: 0 0 20px 0;
-        padding-bottom: 12px;
-        border-bottom: 2px solid var(--border-color);
-        text-align: center;
-        font-family: 'Noto Sans Telugu', sans-serif;
-        position: relative;
-    }
-    
-    .week-date::after {
-        content: '';
-        position: absolute;
-        bottom: -2px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 60px;
-        height: 3px;
-        background: var(--primary-color);
-        border-radius: 2px;
-    }
-    
-    .week-fields {
-        display: flex;
+    .mobile-view-container {
+        display: none;
         flex-direction: column;
         gap: 16px;
+        margin-top: 20px;
     }
-    
-    .field-group {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
+
+    .mobile-week-card {
+        background: white;
+        border-radius: var(--radius-lg);
+        padding: 20px;
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--border-color);
+        transition: transform 0.2s, box-shadow 0.2s;
     }
-    
-    .field-group label {
-        font-size: 0.95rem;
-        font-weight: 600;
-        color: var(--text-secondary);
-        font-family: 'Noto Sans Telugu', sans-serif;
-        display: flex;
-        align-items: center;
-        gap: 6px;
+
+    .mobile-week-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
     }
-    
-    .field-group label::before {
-        content: '';
-        width: 4px;
-        height: 16px;
-        background: var(--primary-color);
-        border-radius: 2px;
-    }
-    
-    .mobile-field {
-        padding: 16px;
-        border: 2px solid var(--border-color);
-        border-radius: var(--radius-md);
-        background-color: #fafafa;
-        cursor: pointer;
-        font-family: 'Noto Sans Telugu', sans-serif;
-        font-weight: 500;
-        position: relative;
-        transition: all 0.2s ease;
+
+    .mobile-week-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        min-height: 56px;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid var(--primary-color);
     }
-    
-    .mobile-field:hover {
-        border-color: var(--primary-color);
-        background-color: white;
-    }
-    
-    .mobile-field::after {
-        content: '▼';
-        font-size: 0.8rem;
-        color: var(--text-secondary);
-        transition: transform 0.2s ease;
-    }
-    
-    .mobile-field.active::after {
-        transform: rotate(180deg);
-        color: var(--primary-color);
-    }
-    
-    .mobile-field-value {
-        flex: 1;
-        color: var(--text-primary);
-    }
-    
-    .mobile-field-placeholder {
-        color: var(--text-secondary);
-        font-style: italic;
-    }
-    
-    .special-event-mobile {
-        text-align: center;
-        padding: 20px;
-        background: linear-gradient(135deg, #fff5f5, #fed7d7);
-        border-radius: var(--radius-lg);
-        border: 2px dashed #fed7d7;
-        margin: 16px 0;
-    }
-    
-    .special-event-text-mobile {
-        color: var(--danger-color);
+
+    .mobile-date {
+        font-size: 1.2em;
         font-weight: 700;
-        font-size: 1.1rem;
-        margin: 0;
+        color: var(--primary-color);
         font-family: 'Noto Sans Telugu', sans-serif;
     }
-    
+
+    .mobile-event-type {
+        background: var(--primary-light);
+        color: var(--primary-color);
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8em;
+        font-weight: 600;
+        font-family: 'Noto Sans Telugu', sans-serif;
+    }
+
+    .mobile-special-event {
+        text-align: center;
+        color: red;
+        font-weight: 700;
+        font-size: 1.1em;
+        padding: 20px;
+        background: #fff5f5;
+        border-radius: var(--radius-md);
+        font-family: 'Noto Sans Telugu', sans-serif;
+    }
+
+    .mobile-field-group {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .mobile-field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .mobile-field label {
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 0.9em;
+        font-family: 'Noto Sans Telugu', sans-serif;
+    }
+
+    .mobile-select {
+        padding: 12px;
+        border: 2px solid var(--border-color);
+        border-radius: var(--radius-md);
+        background: white;
+        font-size: 1em;
+        font-family: 'Noto Sans Telugu', sans-serif;
+        cursor: pointer;
+        transition: border-color 0.2s;
+        position: relative;
+    }
+
+    .mobile-select:after {
+        content: '⌄';
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-secondary);
+    }
+
+    .mobile-select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px var(--primary-light);
+    }
+
     .mobile-actions {
         display: flex;
-        gap: 12px;
-        margin-top: 20px;
+        gap: 8px;
+        margin-top: 16px;
         padding-top: 16px;
         border-top: 1px solid var(--border-color);
     }
-    
+
     .mobile-action-btn {
         flex: 1;
-        padding: 12px 16px;
-        border: 2px solid var(--border-color);
-        background: white;
+        padding: 10px;
+        border: 1px solid var(--border-color);
         border-radius: var(--radius-md);
+        background: white;
         cursor: pointer;
         font-family: 'Noto Sans Telugu', sans-serif;
         font-weight: 500;
-        text-align: center;
-        transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
+        transition: all 0.2s;
     }
-    
-    .mobile-action-btn.primary {
+
+    .mobile-action-btn.active {
         background: var(--primary-color);
         color: white;
         border-color: var(--primary-color);
     }
-    
-    .mobile-action-btn.primary:hover {
-        background: var(--primary-hover);
-        border-color: var(--primary-hover);
-    }
-    
-    .mobile-action-btn.secondary:hover {
-        border-color: var(--primary-color);
-        color: var(--primary-color);
-    }
 
-    /* Enhanced Modal Styles */
+    /* Modal Styles */
     .modal-overlay { 
         position: fixed; 
         top: 0; 
@@ -806,9 +573,7 @@
         align-items: center; 
         z-index: 1000; 
         padding: 16px; 
-        backdrop-filter: blur(4px);
     }
-    
     .modal-content { 
         background: white; 
         padding: 24px; 
@@ -820,215 +585,58 @@
         flex-direction: column; 
         gap: 16px; 
         box-shadow: var(--shadow-lg); 
-        transform: scale(0.9);
-        opacity: 0;
-        transition: all 0.3s ease;
-    }
-    
-    .modal-overlay.active {
-        display: flex;
-    }
-    
-    .modal-overlay.active .modal-content {
-        transform: scale(1);
-        opacity: 1;
-    }
-    
-    #new-schedule-name { 
-        width: 100%; 
-        padding: 16px; 
-        font-size: 16px; 
-        border-radius: var(--radius-md); 
-        border: 2px solid var(--border-color); 
-        font-family: 'Inter', sans-serif;
-        transition: border-color 0.2s;
-    }
-    
-    #new-schedule-name:focus {
-        outline: none;
-        border-color: var(--primary-color);
-    }
-    
-    #date-checklist { 
-        list-style: none; 
-        padding: 0; 
-        margin: 0; 
-        overflow-y: auto; 
-        border: 1px solid var(--border-color); 
-        border-radius: var(--radius-md); 
-        max-height: 40vh; 
-    }
-    
-    #date-checklist label { 
-        display: flex; 
-        align-items: center; 
-        gap: 10px; 
-        font-size: 16px; 
-        cursor: pointer; 
-        font-weight: 500; 
-        padding: 12px 16px;
-        border-bottom: 1px solid var(--border-color);
-        transition: background-color 0.2s;
-    }
-    
-    #date-checklist label:last-child {
-        border-bottom: none;
-    }
-    
-    #date-checklist label:hover {
-        background-color: #f8fafc;
-    }
-    
-    .modal-actions { 
-        display: flex; 
-        justify-content: flex-end; 
-        gap: 12px; 
-        margin-top: 16px; 
-    }
-    
-    .modal-actions button { 
-        font-family: 'Inter', sans-serif; 
-        padding: 12px 24px; 
-        border-radius: var(--radius-md); 
-        font-size: 15px; 
-        font-weight: 600; 
-        cursor: pointer; 
-        border: 2px solid var(--border-color); 
-        transition: all 0.2s ease;
-    }
-    
-    #cancel-creation { 
-        background-color: var(--surface-color); 
-    }
-    
-    #cancel-creation:hover {
-        border-color: var(--text-secondary);
-    }
-    
-    #confirm-creation { 
-        background-color: var(--primary-color); 
-        color: white; 
-        border-color: var(--primary-color); 
-    }
-    
-    #confirm-creation:hover {
-        background-color: var(--primary-hover);
-        border-color: var(--primary-hover);
+        animation: modalSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
+    @keyframes modalSlideIn {
+        from {
+            opacity: 0;
+            transform: scale(0.9) translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+
+    #new-schedule-name { width: 100%; padding: 12px; font-size: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); }
+    #date-checklist { list-style: none; padding: 0; margin: 0; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md); max-height: 40vh; }
+    #date-checklist label { display: flex; align-items: center; gap: 10px; font-size: 16px; cursor: pointer; font-weight: 500; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px; }
+    .modal-actions button { font-family: 'Inter', sans-serif; padding: 10px 20px; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); }
+    #cancel-creation { background-color: var(--surface-color); }
+    #confirm-creation { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
+
+    /* Responsive Design */
     @media (max-width: 768px) {
-        main { 
-            padding: 60px 0 0 0; 
-        }
+        main { padding: 56px 0 0 0; }
+        .master-container { padding: 16px; border-radius: 0; box-shadow: none; }
+        .page-controls { padding: 0 16px; margin-bottom: 16px; }
         
-        .master-container { 
-            padding: 0; 
-            border-radius: 0; 
-            box-shadow: none; 
-            background: transparent;
-        }
+        .schedule-table { display: none; }
+        .mobile-view-container { display: flex; }
         
-        .page-controls { 
-            padding: 16px; 
-            margin-bottom: 0;
-            background: white;
-            border-bottom: 1px solid var(--border-color);
-            position: sticky;
-            top: 60px;
-            z-index: 100;
-        }
+        .title-block h1 { font-size: 1.5em; }
+        .subtitle { font-size: 0.9em; }
         
-        .page-controls .btn {
-            width: 100%;
-            justify-content: center;
-            margin-top: 8px;
-        }
-        
-        .schedule-table { 
-            display: none; 
-        }
-        
-        .mobile-view-container { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 1rem; 
+        .mobile-week-card {
+            margin-bottom: 16px;
             padding: 16px;
         }
         
-        .title-block {
-            padding: 0 16px;
-            margin-bottom: 16px;
+        .page-controls {
+            flex-direction: column;
+            align-items: stretch;
         }
         
-        .title-block h1 {
-            font-size: 1.5rem;
-        }
-        
-        .subtitle {
-            font-size: 1rem;
-            padding: 6px 12px;
-        }
-        
-        .svg-divider {
-            width: 300px;
-        }
-        
-        .event-type-selector {
-            gap: 6px;
-        }
-        
-        .event-type-btn {
-            min-width: calc(50% - 6px);
-            padding: 10px 12px;
-            font-size: 0.9rem;
+        .btn {
+            width: 100%;
+            justify-content: center;
         }
     }
 
-    /* Animation Classes */
-    .fade-in {
-        animation: fadeIn 0.3s ease-in-out;
-    }
-    
-    .slide-up {
-        animation: slideUp 0.3s ease-out;
-    }
-    
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
-    
-    @keyframes slideUp {
-        from { 
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to { 
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    /* Loading States */
-    .loading {
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .loading::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-        animation: loading 1.5s infinite;
-    }
-    
-    @keyframes loading {
-        0% { left: -100%; }
-        100% { left: 100%; }
+    @media (min-width: 769px) {
+        .mobile-view-container { display: none; }
     }
 </style>
 </head>
@@ -1080,17 +688,27 @@
     </div>
 </div>
 
-<!-- Enhanced Dropdown Components -->
-<div class="dropdown-backdrop" id="dropdown-backdrop"></div>
-<div class="dropdown-container" id="dropdown-container">
-    <div class="dropdown-header">
-        <h3 class="dropdown-title" id="dropdown-title">Select Option</h3>
-        <button class="dropdown-close" id="dropdown-close">
-            <span class="material-symbols-outlined">close</span>
-        </button>
+<!-- Advanced Dropdowns -->
+<div id="member-dropdown" class="advanced-dropdown" style="display: none;">
+    <div class="dropdown-header">Select Brother</div>
+    <div class="dropdown-search">
+        <input type="text" placeholder="Search brothers..." id="member-search">
     </div>
-    <div class="dropdown-content" id="dropdown-content">
-        <!-- Dropdown items will be injected here -->
+    <div class="dropdown-list" id="member-list"></div>
+</div>
+
+<div id="topic-dropdown" class="advanced-dropdown" style="display: none;">
+    <div class="dropdown-header">Select Topic</div>
+    <div class="dropdown-list" id="topic-list"></div>
+</div>
+
+<div id="event-dropdown" class="advanced-dropdown" style="display: none;">
+    <div class="dropdown-header">Event Type</div>
+    <div class="dropdown-list">
+        <button class="dropdown-item" data-event-type="normal">Normal</button>
+        <button class="dropdown-item" data-event-type="co-visit">CO Visit</button>
+        <button class="dropdown-item" data-event-type="assembly">Assembly</button>
+        <button class="dropdown-item" data-event-type="convention">Convention</button>
     </div>
 </div>
 
@@ -1131,19 +749,14 @@
     let activeRowForEvents = null;
     let members = { brothers: [], sisters: [] };
     let activeCellForDropdown = null;
-    let currentDropdownType = null;
-    let currentDropdownData = null;
+    let currentEventType = 'normal';
 
     const scheduleWrapper = document.getElementById('schedule-content-wrapper');
     const dateSelectionModal = document.getElementById('date-selection-modal');
+    const memberDropdown = document.getElementById('member-dropdown');
+    const topicDropdown = document.getElementById('topic-dropdown');
+    const eventDropdown = document.getElementById('event-dropdown');
     const statusIndicator = document.querySelector('.status-indicator');
-
-    // Enhanced dropdown elements
-    const dropdownBackdrop = document.getElementById('dropdown-backdrop');
-    const dropdownContainer = document.getElementById('dropdown-container');
-    const dropdownTitle = document.getElementById('dropdown-title');
-    const dropdownContent = document.getElementById('dropdown-content');
-    const dropdownClose = document.getElementById('dropdown-close');
 
     // Topic definitions
     const topics = {
@@ -1153,19 +766,13 @@
         'అంశం-4': 'this is talk-4'
     };
 
-    // Special event texts
+    // Event type texts
     const eventTexts = {
+        'normal': 'సాధారణ',
         'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం',
         'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో',
         'convention': 'ప్రాదేశిక సమావేశం'
     };
-
-    const eventTypes = [
-        { id: 'normal', name: 'Normal', icon: 'event', color: 'primary' },
-        { id: 'co-visit', name: 'CO Visit', icon: 'groups', color: 'co-visit' },
-        { id: 'assembly', name: 'Assembly', icon: 'celebration', color: 'assembly' },
-        { id: 'convention', name: 'Convention', icon: 'festival', color: 'convention' }
-    ];
 
     const debounce = (func, delay) => {
         let timeout;
@@ -1219,7 +826,6 @@
                 if (!document.activeElement || document.activeElement.tagName === 'BODY' || !scheduleWrapper.contains(document.activeElement)) {
                     renderSchedule(scheduleData);
                 }
-                updateStatus('Synced', 'synced');
             } else {
                 alert("This schedule may have been deleted.");
                 window.location.href = './sunday-dashboard.html';
@@ -1231,6 +837,8 @@
 
     function renderSchedule(data) {
         document.title = data.name;
+        currentEventType = data.eventType || 'normal';
+        
         scheduleWrapper.innerHTML = `
             <header class="schedule-display-header">
                 <div class="title-block">
@@ -1265,11 +873,11 @@
                         ${data.tableHTML}
                     </tbody>
                 </table>
-                <div class="mobile-view-container"></div>
+                <div class="mobile-view-container" id="mobile-view"></div>
             </main>
         `;
         
-        // Add dropdown functionality to desktop table cells
+        // Add dropdown functionality to desktop cells
         scheduleWrapper.querySelectorAll('tbody td').forEach((cell, index) => {
             const row = cell.parentElement;
             const cellIndex = cell.cellIndex;
@@ -1290,336 +898,141 @@
         });
 
         // Create mobile view
-        createMobileView();
-
+        createMobileView(data);
+        
         scheduleWrapper.addEventListener('input', debouncedSave);
         scheduleWrapper.querySelectorAll('.event-btn').forEach(btn => {
             btn.addEventListener('click', openEventMenu);
         });
         
         document.getElementById('app-container').classList.remove('hidden');
+        updateStatus('Synced', 'synced');
     }
 
-    function createMobileView() {
-        const mobileContainer = scheduleWrapper.querySelector('.mobile-view-container');
+    function createMobileView(data) {
+        const mobileView = document.getElementById('mobile-view');
         const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
+        const rows = Array.from(tableBody.querySelectorAll('tr'));
         
-        if (!tableBody) return;
+        mobileView.innerHTML = '';
         
-        mobileContainer.innerHTML = '';
-        
-        Array.from(tableBody.rows).forEach((row, rowIndex) => {
+        rows.forEach((row, rowIndex) => {
             const cells = Array.from(row.cells);
             const dateCell = cells[0];
             const topicCell = cells[1];
             const speakerCell = cells[2];
             const chairmanCell = cells[3];
             const readerCell = cells[4];
-            const actionsCell = cells[5];
             
-            const card = document.createElement('div');
-            card.className = 'mobile-week-card fade-in';
+            const weekCard = document.createElement('div');
+            weekCard.className = 'mobile-week-card';
+            weekCard.dataset.rowIndex = rowIndex;
             
-            // Check if this is a special event
-            const isSpecialEvent = topicCell.classList.contains('special-event') && topicCell.colSpan === 4;
-            const currentEventType = getEventTypeForRow(row);
-            
-            if (isSpecialEvent) {
-                card.innerHTML = `
-                    <h3 class="week-date">${dateCell.textContent}</h3>
-                    <div class="special-event-mobile">
-                        <p class="special-event-text-mobile">${topicCell.textContent}</p>
+            if (currentEventType !== 'normal') {
+                // Special event view
+                weekCard.innerHTML = `
+                    <div class="mobile-week-header">
+                        <div class="mobile-date">${dateCell.textContent}</div>
+                        <div class="mobile-event-type">${eventTexts[currentEventType]}</div>
                     </div>
-                    <div class="mobile-actions">
-                        <button class="mobile-action-btn secondary change-event-btn" data-row="${rowIndex}">
-                            <span class="material-symbols-outlined">swap_horiz</span>
-                            Change Event Type
-                        </button>
+                    <div class="mobile-special-event">
+                        ${eventTexts[currentEventType]}
                     </div>
                 `;
             } else {
-                card.innerHTML = `
-                    <h3 class="week-date">${dateCell.textContent}</h3>
-                    
-                    <div class="event-type-selector">
-                        ${eventTypes.map(event => `
-                            <button class="event-type-btn ${event.id} ${currentEventType === event.id ? 'active' : ''}" 
-                                    data-event-type="${event.id}" data-row="${rowIndex}">
-                                <span class="material-symbols-outlined event-type-icon">${event.icon}</span>
-                                <span>${event.name}</span>
-                            </button>
-                        `).join('')}
+                // Normal week view
+                weekCard.innerHTML = `
+                    <div class="mobile-week-header">
+                        <div class="mobile-date">${dateCell.textContent}</div>
+                        <div class="mobile-event-type">సాధారణ</div>
                     </div>
-                    
-                    <div class="week-fields">
-                        <div class="field-group">
+                    <div class="mobile-field-group">
+                        <div class="mobile-field">
                             <label>ప్రసంగ అంశం</label>
-                            <div class="mobile-field topic-field" data-row="${rowIndex}" data-cell="1">
-                                <span class="mobile-field-value ${topicCell.textContent ? '' : 'mobile-field-placeholder'}">
-                                    ${topicCell.textContent || 'Select Topic'}
-                                </span>
+                            <div class="mobile-select topic-select" data-row="${rowIndex}">
+                                ${topicCell.textContent || 'అంశం ఎంచుకోండి'}
                             </div>
                         </div>
-                        <div class="field-group">
+                        <div class="mobile-field">
                             <label>ప్రసంగీకుడు</label>
-                            <div class="mobile-field member-field" data-row="${rowIndex}" data-cell="2">
-                                <span class="mobile-field-value ${speakerCell.textContent ? '' : 'mobile-field-placeholder'}">
-                                    ${speakerCell.textContent || 'Select Brother'}
-                                </span>
+                            <div class="mobile-select speaker-select" data-row="${rowIndex}">
+                                ${speakerCell.textContent || 'ప్రసంగీకుడు ఎంచుకోండి'}
                             </div>
                         </div>
-                        <div class="field-group">
+                        <div class="mobile-field">
                             <label>చైర్మన్</label>
-                            <div class="mobile-field member-field" data-row="${rowIndex}" data-cell="3">
-                                <span class="mobile-field-value ${chairmanCell.textContent ? '' : 'mobile-field-placeholder'}">
-                                    ${chairmanCell.textContent || 'Select Brother'}
-                                </span>
+                            <div class="mobile-select chairman-select" data-row="${rowIndex}">
+                                ${chairmanCell.textContent || 'చైర్మన్ ఎంచుకోండి'}
                             </div>
                         </div>
-                        <div class="field-group">
+                        <div class="mobile-field">
                             <label>కావలికోట రీడర్</label>
-                            <div class="mobile-field member-field" data-row="${rowIndex}" data-cell="4">
-                                <span class="mobile-field-value ${readerCell.textContent ? '' : 'mobile-field-placeholder'}">
-                                    ${readerCell.textContent || 'Select Brother'}
-                                </span>
+                            <div class="mobile-select reader-select" data-row="${rowIndex}">
+                                ${readerCell.textContent || 'రీడర్ ఎంచుకోండి'}
                             </div>
                         </div>
                     </div>
                 `;
             }
             
-            mobileContainer.appendChild(card);
+            mobileView.appendChild(weekCard);
         });
 
-        // Add event listeners to mobile fields
-        mobileContainer.querySelectorAll('.topic-field').forEach(field => {
-            field.addEventListener('click', (e) => {
-                const rowIndex = field.dataset.row;
-                const cellIndex = field.dataset.cell;
-                const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
-                const cell = tableBody.rows[rowIndex].cells[cellIndex];
-                openEnhancedDropdown('topic', cell, field);
-            });
-        });
-
-        mobileContainer.querySelectorAll('.member-field').forEach(field => {
-            field.addEventListener('click', (e) => {
-                const rowIndex = field.dataset.row;
-                const cellIndex = field.dataset.cell;
-                const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
-                const cell = tableBody.rows[rowIndex].cells[cellIndex];
-                openEnhancedDropdown('member', cell, field);
-            });
-        });
-
-        // Add event listeners to event type buttons
-        mobileContainer.querySelectorAll('.event-type-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const eventType = btn.dataset.eventType;
-                const rowIndex = btn.dataset.row;
-                changeEventType(rowIndex, eventType);
-            });
-        });
-
-        // Add event listeners to change event buttons (for special events)
-        mobileContainer.querySelectorAll('.change-event-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const rowIndex = btn.dataset.row;
-                changeEventType(rowIndex, 'normal');
-            });
-        });
-    }
-
-    function getEventTypeForRow(row) {
-        const topicCell = row.cells[1];
-        if (topicCell.classList.contains('special-event')) {
-            const text = topicCell.textContent;
-            if (text.includes('పర్యవేక్షకుని')) return 'co-visit';
-            if (text.includes('సమావేశ కార్యక్రమం')) return 'assembly';
-            if (text.includes('సమావేశం')) return 'convention';
-        }
-        return 'normal';
-    }
-
-    function changeEventType(rowIndex, eventType) {
-        const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
-        const row = tableBody.rows[rowIndex];
-        const topicCell = row.cells[1];
-        const speakerCell = row.cells[2];
-        const chairmanCell = row.cells[3];
-        const readerCell = row.cells[4];
-        
-        // Reset all cells first
-        topicCell.colSpan = 1;
-        topicCell.classList.remove('special-event');
-        topicCell.classList.add('editable-cell');
-        [speakerCell, chairmanCell, readerCell].forEach(cell => {
-            cell.style.display = '';
-            cell.classList.add('editable-cell');
-        });
-        
-        if (eventType !== 'normal') {
-            // Save current content if any
-            if (topicCell.textContent && !topicCell.classList.contains('special-event')) {
-                topicCell.dataset.originalContent = topicCell.textContent;
-            }
-            [speakerCell, chairmanCell, readerCell].forEach(cell => {
-                if (cell.textContent) {
-                    cell.dataset.originalContent = cell.textContent;
-                }
-            });
-            
-            // Apply special event
-            topicCell.colSpan = 4;
-            topicCell.classList.add('special-event');
-            topicCell.classList.remove('editable-cell');
-            topicCell.textContent = eventTexts[eventType];
-            [speakerCell, chairmanCell, readerCell].forEach(cell => {
-                cell.style.display = 'none';
-                cell.classList.remove('editable-cell');
-                cell.textContent = '';
-            });
-        } else {
-            // Restore normal event
-            if (topicCell.dataset.originalContent) {
-                topicCell.innerHTML = topicCell.dataset.originalContent;
-            } else {
-                topicCell.innerHTML = '';
-            }
-            [speakerCell, chairmanCell, readerCell].forEach(cell => {
-                if (cell.dataset.originalContent) {
-                    cell.innerHTML = cell.dataset.originalContent;
+        // Add mobile dropdown functionality
+        mobileView.querySelectorAll('.mobile-select').forEach(select => {
+            select.addEventListener('click', (e) => {
+                const rowIndex = e.target.dataset.row;
+                const cellType = e.target.classList[1].split('-')[0]; // topic, speaker, chairman, reader
+                const rect = e.target.getBoundingClientRect();
+                
+                if (cellType === 'topic') {
+                    openTopicDropdown(null, rect, rowIndex, cellType);
                 } else {
-                    cell.innerHTML = '';
+                    openMemberDropdown(null, rect, rowIndex, cellType);
                 }
             });
-            topicCell.removeAttribute('data-original-content');
-            [speakerCell, chairmanCell, readerCell].forEach(cell => {
-                cell.removeAttribute('data-original-content');
-            });
-        }
-        
-        // Update mobile view
-        createMobileView();
-        debouncedSave();
-    }
-
-    function openEnhancedDropdown(type, cell, fieldElement) {
-        currentDropdownType = type;
-        activeCellForDropdown = { cell: cell, fieldElement: fieldElement };
-        
-        // Add active class to field
-        fieldElement.classList.add('active');
-        
-        if (type === 'member') {
-            showMemberDropdown();
-        } else if (type === 'topic') {
-            showTopicDropdown();
-        }
-        
-        // Prevent body scrolling
-        document.body.classList.add('dropdown-open');
-    }
-
-    function showMemberDropdown() {
-        dropdownTitle.textContent = 'Select Brother';
-        dropdownContent.innerHTML = '';
-        
-        // Sort brothers by name
-        const sortedBrothers = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
-        
-        if (sortedBrothers.length === 0) {
-            dropdownContent.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-secondary);">No brothers available</div>';
-        } else {
-            sortedBrothers.forEach(member => {
-                const item = document.createElement('button');
-                item.className = 'dropdown-item';
-                item.innerHTML = `
-                    <span>${member.name}</span>
-                    ${member.isServant ? '<span class="servant-tag">Servant</span>' : ''}
-                `;
-                item.addEventListener('click', () => selectDropdownItem(member.name));
-                dropdownContent.appendChild(item);
-            });
-        }
-        
-        showDropdown();
-    }
-
-    function showTopicDropdown() {
-        dropdownTitle.textContent = 'Select Topic';
-        dropdownContent.innerHTML = '';
-        
-        Object.entries(topics).forEach(([topicName, topicText]) => {
-            const item = document.createElement('button');
-            item.className = 'dropdown-item';
-            item.textContent = topicName;
-            item.addEventListener('click', () => selectDropdownItem(topicText));
-            dropdownContent.appendChild(item);
         });
-        
-        showDropdown();
-    }
 
-    function showDropdown() {
-        dropdownBackdrop.classList.add('active');
-        dropdownContainer.classList.add('active');
-    }
-
-    function hideDropdown() {
-        dropdownBackdrop.classList.remove('active');
-        dropdownContainer.classList.remove('active');
-        
-        // Remove active class from field
-        if (activeCellForDropdown && activeCellForDropdown.fieldElement) {
-            activeCellForDropdown.fieldElement.classList.remove('active');
+        // Add event type selector for mobile
+        if (rows.length > 0) {
+            const eventSelector = document.createElement('div');
+            eventSelector.className = 'mobile-actions';
+            eventSelector.innerHTML = `
+                <button class="mobile-action-btn ${currentEventType === 'normal' ? 'active' : ''}" data-event="normal">సాధారణ</button>
+                <button class="mobile-action-btn ${currentEventType === 'co-visit' ? 'active' : ''}" data-event="co-visit">CO సందర్శన</button>
+                <button class="mobile-action-btn ${currentEventType === 'assembly' ? 'active' : ''}" data-event="assembly">సమావేశం</button>
+                <button class="mobile-action-btn ${currentEventType === 'convention' ? 'active' : ''}" data-event="convention">సమ్మేళనం</button>
+            `;
+            
+            mobileView.appendChild(eventSelector);
+            
+            eventSelector.querySelectorAll('.mobile-action-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const eventType = e.target.dataset.event;
+                    applyEventType(eventType);
+                    
+                    // Update active state
+                    eventSelector.querySelectorAll('.mobile-action-btn').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                });
+            });
         }
-        
-        // Restore body scrolling
-        document.body.classList.remove('dropdown-open');
-        
-        currentDropdownType = null;
-        activeCellForDropdown = null;
     }
-
-    function selectDropdownItem(value) {
-        if (activeCellForDropdown) {
-            activeCellForDropdown.cell.textContent = value;
-            if (activeCellForDropdown.fieldElement) {
-                const valueSpan = activeCellForDropdown.fieldElement.querySelector('.mobile-field-value');
-                valueSpan.textContent = value;
-                valueSpan.classList.remove('mobile-field-placeholder');
-            }
-            debouncedSave();
-        }
-        hideDropdown();
-    }
-
-    // Enhanced dropdown event listeners
-    dropdownBackdrop.addEventListener('click', hideDropdown);
-    dropdownClose.addEventListener('click', hideDropdown);
-
-    // Prevent dropdown container click from closing dropdown
-    dropdownContainer.addEventListener('click', (e) => {
-        e.stopPropagation();
-    });
 
     const debouncedSave = debounce(() => {
         const subtitleEl = scheduleWrapper.querySelector('.subtitle');
         const tableBodyEl = scheduleWrapper.querySelector('.schedule-table tbody');
         if (!subtitleEl || !tableBodyEl) return;
 
-        updateStatus('Syncing...', 'syncing');
-        
         const payload = {
             dateRange: subtitleEl.textContent,
-            tableHTML: tableBodyEl.innerHTML
+            tableHTML: tableBodyEl.innerHTML,
+            eventType: currentEventType
         };
         
+        updateStatus('Syncing...', 'syncing');
         userSchedulesCollection.doc(currentScheduleId).update(payload)
-            .then(() => {
-                updateStatus('Synced', 'synced');
-            })
+            .then(() => updateStatus('Synced', 'synced'))
             .catch(err => {
                 console.error("Save failed:", err);
                 updateStatus('Error', 'error');
@@ -1636,9 +1049,6 @@
             dateList.appendChild(li);
         });
         dateSelectionModal.style.display = 'flex';
-        setTimeout(() => {
-            dateSelectionModal.classList.add('active');
-        }, 10);
     }
     
     function generateNextSundays(count) {
@@ -1687,6 +1097,7 @@
                 name: scheduleName,
                 dateRange: dateRange,
                 tableHTML: tableBodyHTML,
+                eventType: 'normal',
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
             window.location.href = `./sunday-editor.html?id=${newDocRef.id}`;
@@ -1700,68 +1111,179 @@
         const btn = e.currentTarget;
         activeRowForEvents = btn.closest('tr');
         const rect = btn.getBoundingClientRect();
-        eventContextMenu.style.display = 'block';
-        eventContextMenu.style.top = `${rect.bottom}px`;
-        eventContextMenu.style.left = `${rect.left - eventContextMenu.offsetWidth + rect.width}px`;
+        
+        eventDropdown.style.display = 'block';
+        eventDropdown.style.top = `${rect.bottom}px`;
+        eventDropdown.style.left = `${rect.left}px`;
+        
+        // Set active event
+        eventDropdown.querySelectorAll('.dropdown-item').forEach(item => {
+            item.classList.toggle('active', item.dataset.eventType === currentEventType);
+        });
     }
     
     function applyEventType(eventType) {
-        if (!activeRowForEvents) return;
-        const cells = Array.from(activeRowForEvents.cells);
-        const topicCell = cells[1];
-        const otherCells = cells.slice(2, 5);
-        topicCell.colSpan = 1;
-        topicCell.classList.remove('special-event');
-        topicCell.classList.add('editable-cell');
-        if(topicCell.dataset.originalContent) {
-           topicCell.innerHTML = topicCell.dataset.originalContent;
-        } else if (eventType !== 'normal') {
-           topicCell.innerHTML = '';
-        }
-        topicCell.removeAttribute('data-original-content');
-        otherCells.forEach((cell) => {
-            cell.style.display = '';
-            cell.classList.add('editable-cell');
-            if(cell.dataset.originalContent) cell.innerHTML = cell.dataset.originalContent;
-            cell.removeAttribute('data-original-content');
-        });
+        currentEventType = eventType;
         
-        if (eventType !== 'normal') {
-            topicCell.dataset.originalContent = topicCell.innerHTML;
-            otherCells.forEach(cell => cell.dataset.originalContent = cell.innerHTML);
-            topicCell.colSpan = 4;
-            topicCell.classList.add('special-event');
-            topicCell.classList.remove('editable-cell');
-            topicCell.textContent = eventTexts[eventType];
-            otherCells.forEach(cell => {
-                cell.style.display = 'none';
-                cell.classList.remove('editable-cell');
+        if (activeRowForEvents) {
+            const cells = Array.from(activeRowForEvents.cells);
+            const topicCell = cells[1];
+            const otherCells = cells.slice(2, 5);
+            
+            topicCell.colSpan = 1;
+            topicCell.classList.remove('special-event');
+            topicCell.classList.add('editable-cell');
+            
+            if(topicCell.dataset.originalContent) {
+               topicCell.innerHTML = topicCell.dataset.originalContent;
+            } else if (eventType !== 'normal') {
+               topicCell.innerHTML = '';
+            }
+            topicCell.removeAttribute('data-original-content');
+            
+            otherCells.forEach((cell) => {
+                cell.style.display = '';
+                cell.classList.add('editable-cell');
+                if(cell.dataset.originalContent) cell.innerHTML = cell.dataset.originalContent;
+                cell.removeAttribute('data-original-content');
             });
+            
+            if (eventType !== 'normal') {
+                topicCell.dataset.originalContent = topicCell.innerHTML;
+                otherCells.forEach(cell => cell.dataset.originalContent = cell.innerHTML);
+                topicCell.colSpan = 4;
+                topicCell.classList.add('special-event');
+                topicCell.classList.remove('editable-cell');
+                topicCell.textContent = eventTexts[eventType];
+                otherCells.forEach(cell => {
+                    cell.style.display = 'none';
+                    cell.classList.remove('editable-cell');
+                });
+            }
         }
         
         // Update mobile view
-        createMobileView();
+        createMobileView({});
         debouncedSave();
     }
     
-    function openMemberDropdown(cell, mobileElement = null) {
-        // Using enhanced dropdown instead
-        if (mobileElement) {
-            openEnhancedDropdown('member', cell, mobileElement);
+    function openMemberDropdown(cell, rect = null, rowIndex = null, cellType = null) {
+        const sortedBrothers = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
+        
+        // Populate member list
+        const memberList = document.getElementById('member-list');
+        memberList.innerHTML = '';
+        
+        sortedBrothers.forEach(member => { 
+            const item = document.createElement('button');
+            item.className = 'dropdown-item';
+            item.dataset.name = member.name;
+            item.innerHTML = `<span>${member.name}</span>` + (member.isServant ? '<span class="servant-tag">Servant</span>' : '');
+            memberList.appendChild(item);
+        });
+
+        // Position dropdown
+        if (cell) {
+            const rect = cell.getBoundingClientRect();
+            memberDropdown.style.top = `${rect.bottom}px`;
+            memberDropdown.style.left = `${rect.left}px`;
+            activeCellForDropdown = { type: 'desktop', element: cell };
+        } else if (rect) {
+            memberDropdown.style.top = `${rect.bottom}px`;
+            memberDropdown.style.left = `${rect.left}px`;
+            memberDropdown.style.width = `${rect.width}px`;
+            activeCellForDropdown = { type: 'mobile', rowIndex, cellType };
         }
+
+        memberDropdown.style.display = 'block';
+        
+        // Setup search functionality
+        const searchInput = document.getElementById('member-search');
+        searchInput.value = '';
+        searchInput.focus();
+        
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            memberList.querySelectorAll('.dropdown-item').forEach(item => {
+                const name = item.dataset.name.toLowerCase();
+                item.style.display = name.includes(searchTerm) ? 'flex' : 'none';
+            });
+        });
     }
 
-    function openTopicDropdown(cell, mobileElement = null) {
-        // Using enhanced dropdown instead
-        if (mobileElement) {
-            openEnhancedDropdown('topic', cell, mobileElement);
+    function openTopicDropdown(cell, rect = null, rowIndex = null, cellType = null) {
+        // Populate topic list
+        const topicList = document.getElementById('topic-list');
+        topicList.innerHTML = '';
+        
+        Object.entries(topics).forEach(([topicName, topicText]) => {
+            const item = document.createElement('button');
+            item.className = 'dropdown-item';
+            item.dataset.topic = topicText;
+            item.dataset.topicName = topicName;
+            item.innerHTML = `<span>${topicName}</span><span style="color: var(--text-secondary); font-size: 0.9em;">${topicText}</span>`;
+            topicList.appendChild(item);
+        });
+
+        // Position dropdown
+        if (cell) {
+            const rect = cell.getBoundingClientRect();
+            topicDropdown.style.top = `${rect.bottom}px`;
+            topicDropdown.style.left = `${rect.left}px`;
+            activeCellForDropdown = { type: 'desktop', element: cell };
+        } else if (rect) {
+            topicDropdown.style.top = `${rect.bottom}px`;
+            topicDropdown.style.left = `${rect.left}px`;
+            topicDropdown.style.width = `${rect.width}px`;
+            activeCellForDropdown = { type: 'mobile', rowIndex, cellType };
         }
+
+        topicDropdown.style.display = 'block';
+    }
+
+    function handleDropdownSelection(value, displayValue = null) {
+        if (!activeCellForDropdown) return;
+        
+        if (activeCellForDropdown.type === 'desktop') {
+            activeCellForDropdown.element.textContent = displayValue || value;
+        } else {
+            // Mobile selection
+            const { rowIndex, cellType } = activeCellForDropdown;
+            const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
+            const mobileView = document.getElementById('mobile-view');
+            
+            if (tableBody && tableBody.rows[rowIndex]) {
+                let cellIndex;
+                switch (cellType) {
+                    case 'topic': cellIndex = 1; break;
+                    case 'speaker': cellIndex = 2; break;
+                    case 'chairman': cellIndex = 3; break;
+                    case 'reader': cellIndex = 4; break;
+                }
+                
+                if (cellIndex !== undefined) {
+                    tableBody.rows[rowIndex].cells[cellIndex].textContent = displayValue || value;
+                }
+            }
+            
+            // Update mobile view
+            if (mobileView) {
+                const mobileSelect = mobileView.querySelector(`[data-row="${rowIndex}"].${cellType}-select`);
+                if (mobileSelect) {
+                    mobileSelect.textContent = displayValue || value;
+                }
+            }
+        }
+        
+        debouncedSave();
+        hideAllDropdowns();
+        activeCellForDropdown = null;
     }
     
     async function generatePdf() {
         const printButton = document.getElementById('print-button');
         printButton.disabled = true;
-        printButton.innerHTML = '<span class="material-symbols-outlined">pending</span><span>Generating PDF...</span>';
+        printButton.querySelector('span:last-child').textContent = 'Generating...';
 
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('l', 'mm', 'a4');
@@ -1778,8 +1300,6 @@
             tempContainer.style.position = 'absolute';
             tempContainer.style.left = '-9999px';
             tempContainer.style.top = '0';
-            tempContainer.style.background = 'white';
-            tempContainer.style.padding = '20px';
             document.body.appendChild(tempContainer);
 
             // Get the current schedule data
@@ -1788,7 +1308,7 @@
             const subtitle = scheduleData.querySelector('.subtitle').textContent;
             const tableRows = Array.from(scheduleData.querySelectorAll('tbody tr'));
 
-            // Define rows per page
+            // Define rows per page: 15 for first page, 17 for subsequent pages
             const rowsFirstPage = 15;
             const rowsOtherPages = 17;
 
@@ -1827,23 +1347,45 @@
                 table.className = 'pdf-table';
                 table.style.tableLayout = 'fixed';
 
-                // Add table header
+                // Calculate column widths from the original table (only on first page)
+                let columnWidths = [];
+                if (pageCount === 0) {
+                    const originalTable = scheduleData.querySelector('.schedule-table');
+                    if (originalTable) {
+                        const headerCells = originalTable.querySelectorAll('thead th');
+                        columnWidths = Array.from(headerCells).map(cell => {
+                            const rect = cell.getBoundingClientRect();
+                            return rect.width;
+                        });
+                        // Remove the actions column width (last column)
+                        if (columnWidths.length > 5) {
+                            columnWidths = columnWidths.slice(0, 5);
+                        }
+                    }
+                }
+
+                // Add table header with consistent column widths
                 const thead = document.createElement('thead');
-                const headerHTML = `
-                    <tr>
-                        <th style="width: 15%">తేదీ</th>
-                        <th style="width: 35%">ప్రసంగ అంశం</th>
-                        <th style="width: 20%">ప్రసంగీకుడు</th>
-                        <th style="width: 15%">చైర్మన్</th>
-                        <th style="width: 15%">కావలికోట రీడర్</th>
-                    </tr>
-                `;
+                let headerHTML = '<tr>';
+                const columns = ['తేదీ', 'ప్రసంగ అంశం', 'ప్రసంగీకుడు', 'చైర్మన్', 'కావలికోట రీడర్'];
+                const defaultWidths = ['15%', '35%', '20%', '15%', '15%'];
+
+                columns.forEach((col, index) => {
+                    let width = defaultWidths[index];
+                    if (columnWidths.length > 0 && pageCount > 0) {
+                        const totalWidth = columnWidths.reduce((sum, w) => sum + w, 0);
+                        width = `${(columnWidths[index] / totalWidth * 100).toFixed(1)}%`;
+                    }
+                    headerHTML += `<th style="width: ${width}">${col}</th>`;
+                });
+                headerHTML += '</tr>';
                 thead.innerHTML = headerHTML;
                 table.appendChild(thead);
                 
                 // Add rows for this page
                 const tbody = document.createElement('tbody');
                 
+                // Calculate how many rows to show on this page
                 const rowsThisPage = pageCount === 0 ? rowsFirstPage : rowsOtherPages;
                 const endRow = Math.min(currentRow + rowsThisPage, tableRows.length);
                 
@@ -1855,6 +1397,17 @@
                     for (let j = 0; j < originalRow.cells.length - 1; j++) {
                         const cell = document.createElement(j === 0 ? 'th' : 'td');
                         cell.innerHTML = originalRow.cells[j].innerHTML;
+                        
+                        // Apply consistent width styling
+                        if (columnWidths.length > 0 || defaultWidths.length > 0) {
+                            const widths = columnWidths.length > 0 ? columnWidths : defaultWidths;
+                            let width = defaultWidths[j];
+                            if (columnWidths.length > 0) {
+                                const totalWidth = columnWidths.reduce((sum, w) => sum + w, 0);
+                                width = `${(columnWidths[j] / totalWidth * 100).toFixed(1)}%`;
+                            }
+                            cell.style.width = width;
+                        }
                         
                         // Apply special event styling if needed
                         if (originalRow.cells[1].classList.contains('special-event')) {
@@ -1923,8 +1476,14 @@
             alert("Sorry, there was an error creating the PDF. Please try again.");
         } finally {
             printButton.disabled = false;
-            printButton.innerHTML = '<span class="material-symbols-outlined">picture_as_pdf</span><span>Download PDF</span>';
+            printButton.querySelector('span:last-child').textContent = 'Download PDF';
         }
+    }
+
+    function hideAllDropdowns() {
+        memberDropdown.style.display = 'none';
+        topicDropdown.style.display = 'none';
+        eventDropdown.style.display = 'none';
     }
 
     function setupGlobalUI() {
@@ -1953,39 +1512,49 @@
 
         // App-specific UI
         document.getElementById('print-button').addEventListener('click', generatePdf);
-        document.getElementById('cancel-creation').addEventListener('click', () => {
-            dateSelectionModal.classList.remove('active');
-            setTimeout(() => {
-                dateSelectionModal.style.display = 'none';
-                window.location.href = './sunday-dashboard.html';
-            }, 300);
-        });
+        document.getElementById('cancel-creation').addEventListener('click', () => window.location.href = './sunday-dashboard.html');
         document.getElementById('confirm-creation').addEventListener('click', handleCreateSchedule);
 
-        // Enhanced modal handling
-        const modalOverlays = document.querySelectorAll('.modal-overlay');
-        modalOverlays.forEach(modal => {
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    modal.classList.remove('active');
-                    setTimeout(() => {
-                        modal.style.display = 'none';
-                    }, 300);
-                }
-            });
+        // Dropdown event handlers
+        memberDropdown.addEventListener('click', (e) => {
+            const item = e.target.closest('.dropdown-item');
+            if (item) {
+                handleDropdownSelection(item.dataset.name);
+            }
         });
 
+        topicDropdown.addEventListener('click', (e) => {
+            const item = e.target.closest('.dropdown-item');
+            if (item) {
+                handleDropdownSelection(item.dataset.topic, item.dataset.topicName);
+            }
+        });
+
+        eventDropdown.addEventListener('click', (e) => {
+            const item = e.target.closest('.dropdown-item');
+            if (item) {
+                applyEventType(item.dataset.eventType);
+                eventDropdown.style.display = 'none';
+            }
+        });
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!memberDropdown.contains(e.target) && !e.target.closest('.editable-cell') && !e.target.closest('.mobile-select')) {
+                memberDropdown.style.display = 'none';
+            }
+            if (!topicDropdown.contains(e.target) && !e.target.closest('.editable-cell') && !e.target.closest('.mobile-select')) {
+                topicDropdown.style.display = 'none';
+            }
+            if (!eventDropdown.contains(e.target) && !e.target.closest('.event-btn')) {
+                eventDropdown.style.display = 'none';
+            }
+        });
+
+        // Close dropdowns on escape key
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                if (dropdownContainer.classList.contains('active')) {
-                    hideDropdown();
-                }
-                if (dateSelectionModal.style.display === 'flex') {
-                    dateSelectionModal.classList.remove('active');
-                    setTimeout(() => {
-                        dateSelectionModal.style.display = 'none';
-                    }, 300);
-                }
+                hideAllDropdowns();
             }
         });
     }
