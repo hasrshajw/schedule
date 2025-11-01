@@ -23,13 +23,16 @@
 
 <style>
     :root {
-        --primary-color: #4a6da7;
+        --primary-color: #012726;
+        --primary-hover: #024443;
+        --primary-light: #e6f6f6;
+        --danger-color: #d32f2f;
+        --danger-hover: #b71c1c;
         --border-color: #e5e7eb;
         --background-color: #f8fafc;
-        --surface-color: #ffffff;
         --text-primary: #1f2937;
-        --danger-color: #d32f2f;
-        --danger-light: #fde8e8;
+        --text-secondary: #6b7280;
+        --surface-color: #ffffff;
         --radius-md: 8px;
         --radius-lg: 16px;
         --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
@@ -37,13 +40,14 @@
     *, *::before, *::after { box-sizing: border-box; }
     html { -webkit-font-smoothing: antialiased; }
     body { font-family: 'Noto Sans Telugu', sans-serif; background-color: var(--background-color); margin: 0; padding: 88px 20px 20px; color: var(--text-primary); }
+    .hidden { display: none !important; }
+
     main { margin-top: 0; }
-    
     #app-header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border-color); padding: 12px 20px; }
     .header-content { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
     .header-actions { display: flex; align-items: center; gap: 12px; }
     .toolbar-btn { font-family: 'Inter', sans-serif; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); text-decoration: none; color: var(--text-secondary); }
-    .toolbar-btn:hover { background-color: #f9fafb; color: var(--text-primary); }
+    .toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; color: var(--text-primary); }
     .toolbar-btn:disabled { cursor: not-allowed; opacity: 0.5; }
     #logout-button { font-family: 'Inter', sans-serif; background: transparent; border: 1px solid var(--border-color); padding: 8px 16px; border-radius: var(--radius-md); cursor: pointer; font-weight: 600; font-size: 14px; }
     #logout-button:hover { background-color: var(--danger-light); color: var(--danger-hover); border-color: var(--danger-hover); }
@@ -51,6 +55,7 @@
     .master-container { max-width: 1100px; margin: 0 auto; background: var(--surface-color); padding: 40px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
     
     .schedule-display-header { text-align: center; margin-bottom: 0; }
+    .title-block { text-align: center; }
     .title-block h1 { margin: 0; font-size: 1.8em; font-weight: 700; color: rgb(97, 40, 0); }
     .subtitle-svg-container { position: relative; display: inline-block; margin-top: 0; }
     .subtitle { margin: 0; font-size: 1.0em; font-weight: 500; color: #333; background-color: #ffffff; padding: 2px 8px; display: inline-block; position: relative; z-index: 2; white-space: nowrap; border-radius: var(--radius-md); }
@@ -63,8 +68,8 @@
     .schedule-table thead th { background-color: #F3E5D7; font-size: 1.0em; padding: 10px 5px; }
     .schedule-table [contenteditable="true"]:focus { background-color: #fffbe5; outline: 1px solid #f59e0b; }
     .special-event { color: red; font-weight: 700; text-align: center; padding-left: 5px; }
-    .schedule-table .top-empty-row { background-color: #ffffff; border-bottom: 2px solid #000; border-top: none; border-left: 2px solid white; border-right: 2px solid white; height: 25px; }
     
+    .schedule-table .top-empty-row { background-color: #ffffff; border-bottom: 2px solid #000; border-top: none; border-left: 2px solid white; border-right: 2px solid white; height: 25px; }
     .event-btn { background: none; border: none; cursor: pointer; padding: 4px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
     .event-btn:hover { background-color: #f0f0f0; }
     #event-context-menu { position: fixed; display: none; background: var(--surface-color); border-radius: var(--radius-md); box-shadow: var(--shadow-md); z-index: 1001; padding: 6px; min-width: 180px; border: 1px solid var(--border-color); }
@@ -73,6 +78,7 @@
 
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 16px; }
     .modal-content { background: white; padding: 24px; border-radius: var(--radius-lg); width: 100%; max-width: 500px; max-height: 90vh; display: flex; flex-direction: column; gap: 16px; }
+    .modal-content h2 { margin-top: 0; }
     #new-schedule-name { width: 100%; padding: 12px; font-size: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); }
     #date-checklist { list-style: none; padding: 0; margin: 0; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md); max-height: 40vh; }
     #date-checklist label { display: flex; align-items: center; gap: 10px; font-size: 16px; cursor: pointer; font-weight: 500; }
@@ -88,15 +94,23 @@
     <header id="app-header">
         <div class="header-content">
              <div class="header-actions">
-                <a href="./sunday-dashboard.html" class="toolbar-btn"><span class="material-symbols-outlined">arrow_back</span><span>Dashboard</span></a>
-                <button id="print-button" class="toolbar-btn"><span class="material-symbols-outlined">picture_as_pdf</span><span>Download PDF</span></button>
+                <a href="./sunday-dashboard.html" class="toolbar-btn">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                    <span>Dashboard</span>
+                </a>
+                <button id="print-button" class="toolbar-btn">
+                    <span class="material-symbols-outlined">picture_as_pdf</span>
+                    <span>Download PDF</span>
+                </button>
             </div>
             <button id="logout-button">Logout</button>
         </div>
     </header>
 
     <div class="master-container">
-        <div id="schedule-content-wrapper"></div>
+        <div id="schedule-content-wrapper">
+            <!-- Schedule will be rendered here -->
+        </div>
     </div>
 </div>
 
@@ -362,53 +376,59 @@
         
         debouncedSave();
     }
-
+    
     async function generatePdf() {
         const printButton = document.getElementById('print-button');
         printButton.disabled = true;
         printButton.querySelector('span:last-child').textContent = 'Generating...';
 
         const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const contentToPrint = document.getElementById('schedule-content-wrapper');
-
-        const A4_WIDTH_MM = 210;
-        const MARGIN_MM = 10;
+        const pdf = new jsPDF('l', 'mm', 'a4'); // 'l' for landscape
+        const A4_WIDTH_MM = 297;
+        const A4_HEIGHT_MM = 210;
+        const MARGIN_MM = 15;
         const USABLE_WIDTH = A4_WIDTH_MM - (MARGIN_MM * 2);
 
-        // Temporarily hide action columns for printing
-        contentToPrint.querySelectorAll('.actions-col').forEach(el => el.style.display = 'none');
+        // Create an off-screen container for consistent rendering
+        const printContainer = document.createElement('div');
+        printContainer.style.position = 'absolute';
+        printContainer.style.left = '-9999px';
+        printContainer.style.width = '1100px'; // A good desktop width for rendering
+        printContainer.style.background = 'white';
+        document.body.appendChild(printContainer);
+
+        // Clone the content into the off-screen container
+        const contentToPrint = scheduleWrapper.cloneNode(true);
+        Array.from(contentToPrint.querySelectorAll('.actions-col, .event-btn')).forEach(el => el.remove());
+        printContainer.appendChild(contentToPrint);
 
         const canvas = await html2canvas(contentToPrint, {
             scale: 2,
             useCORS: true,
-            backgroundColor: '#ffffff',
-            width: contentToPrint.scrollWidth,
-            windowWidth: contentToPrint.scrollWidth
+            backgroundColor: '#ffffff'
         });
 
-        // Show action columns again
-        contentToPrint.querySelectorAll('.actions-col').forEach(el => el.style.display = '');
+        // Clean up the off-screen container
+        document.body.removeChild(printContainer);
 
-        const imgData = canvas.toDataURL('image/jpeg', 0.85);
+        const imgData = canvas.toDataURL('image/jpeg', 0.9);
         const imgProps = pdf.getImageProperties(imgData);
         const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
-        
-        let heightLeft = imgHeight;
-        let position = 0;
-        const A4_USABLE_HEIGHT = 297 - (MARGIN_MM * 2);
 
+        let heightLeft = imgHeight;
+        let position = MARGIN_MM;
+        
         pdf.addImage(imgData, 'JPEG', MARGIN_MM, position, USABLE_WIDTH, imgHeight);
-        heightLeft -= A4_USABLE_HEIGHT;
+        heightLeft -= (A4_HEIGHT_MM - (MARGIN_MM * 2));
 
         while (heightLeft > 0) {
-            position = heightLeft - imgHeight;
+            position -= (A4_HEIGHT_MM - (MARGIN_MM * 2));
             pdf.addPage();
             pdf.addImage(imgData, 'JPEG', MARGIN_MM, position, USABLE_WIDTH, imgHeight);
-            heightLeft -= A4_USABLE_HEIGHT;
+            heightLeft -= (A4_HEIGHT_MM - (MARGIN_MM * 2));
         }
 
-        const fileName = `${document.title}.pdf`;
+        const fileName = `${document.title || 'sunday-schedule'}.pdf`;
         pdf.save(fileName);
 
         printButton.disabled = false;
