@@ -431,8 +431,8 @@
             // This is the most reliable way and fixes the 'atob' error.
             printButton.querySelector('span:last-child').textContent = 'Downloading fonts...';
             const [regularBase64, boldBase64] = await Promise.all([
-                fetchFontAsBase64('https://raw.githubusercontent.com/google/fonts/main/ofl/notosanstelugu/NotoSansTelugu-Regular.ttf'),
-                fetchFontAsBase64('https://raw.githubusercontent.com/google/fonts/main/ofl/notosanstelugu/NotoSansTelugu-Bold.ttf')
+                fetchFontAsBase64('NotoSansTelugu-Regular.ttf'),
+                fetchFontAsBase64('NotoSansTelugu-Bold.ttf')
             ]);
             // --- END: NEW FONT LOADING ---
             
