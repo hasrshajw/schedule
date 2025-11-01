@@ -344,7 +344,7 @@
         }
         debouncedSave();
     }
-    
+
     async function generatePdf() {
         const printButton = document.getElementById('print-button');
         printButton.disabled = true;
@@ -352,7 +352,7 @@
         printButton.querySelector('span:last-of-type').textContent = 'Generating...';
 
         const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('l', 'mm', 'a4'); // 'l' for landscape
+        const pdf = new jsPDF('l', 'mm', 'a4'); 
         const A4_WIDTH_MM = 297;
         const A4_HEIGHT_MM = 210;
         const MARGIN_MM = 15;
@@ -361,59 +361,48 @@
         const printContainer = document.createElement('div');
         printContainer.style.position = 'absolute';
         printContainer.style.left = '-9999px';
-        printContainer.style.width = '1100px';
+        printContainer.style.width = '1200px'; 
+        printContainer.style.padding = '40px';
         printContainer.style.background = 'white';
         document.body.appendChild(printContainer);
         
         const contentClone = scheduleWrapper.cloneNode(true);
         Array.from(contentClone.querySelectorAll('.actions-col, .event-btn')).forEach(el => el.remove());
+        
+        // Embed fonts for high-fidelity rendering
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;500;700&display=swap');
+            body { font-family: 'Noto Sans Telugu', sans-serif; }
+        `;
+        contentClone.appendChild(style);
         printContainer.appendChild(contentClone);
 
-        const mainHeaderEl = contentClone.querySelector('.schedule-display-header');
-        const tableHeaderEl = contentClone.querySelector('.schedule-table thead');
-        const tableBodyRows = Array.from(contentClone.querySelectorAll('.schedule-table tbody tr'));
-
-        const mainHeaderCanvas = await html2canvas(mainHeaderEl, { scale: 2 });
-        const mainHeaderImg = {
-            data: mainHeaderCanvas.toDataURL('image/jpeg', 0.9),
-            height: (mainHeaderCanvas.height * USABLE_WIDTH) / mainHeaderCanvas.width
-        };
-
-        const tableHeaderCanvas = await html2canvas(tableHeaderEl, { scale: 2, backgroundColor: '#ffffff' });
-        const tableHeaderImg = {
-            data: tableHeaderCanvas.toDataURL('image/jpeg', 0.9),
-            height: (tableHeaderCanvas.height * USABLE_WIDTH) / tableHeaderCanvas.width
-        };
-
-        let currentY = MARGIN_MM;
-        
-        // Add main header only to the first page
-        pdf.addImage(mainHeaderImg.data, 'JPEG', MARGIN_MM, currentY, USABLE_WIDTH, mainHeaderImg.height);
-        currentY += mainHeaderImg.height;
-
-        // Add table header to the first page
-        pdf.addImage(tableHeaderImg.data, 'JPEG', MARGIN_MM, currentY, USABLE_WIDTH, tableHeaderImg.height);
-        currentY += tableHeaderImg.height;
-
-        for (const row of tableBodyRows) {
-            const rowCanvas = await html2canvas(row, { scale: 2, backgroundColor: '#ffffff' });
-            const rowImgData = rowCanvas.toDataURL('image/jpeg', 0.9);
-            const rowProps = pdf.getImageProperties(rowImgData);
-            const rowHeight = (rowProps.height * USABLE_WIDTH) / rowProps.width;
-
-            if (currentY + rowHeight > A4_HEIGHT_MM - MARGIN_MM) {
-                pdf.addPage();
-                currentY = MARGIN_MM;
-                // Add table header to the new page
-                pdf.addImage(tableHeaderImg.data, 'JPEG', MARGIN_MM, currentY, USABLE_WIDTH, tableHeaderImg.height);
-                currentY += tableHeaderImg.height;
-            }
-            
-            pdf.addImage(rowImgData, 'JPEG', MARGIN_MM, currentY, USABLE_WIDTH, rowHeight);
-            currentY += rowHeight;
-        }
+        const canvas = await html2canvas(contentClone, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: '#ffffff'
+        });
 
         document.body.removeChild(printContainer);
+
+        const imgData = canvas.toDataURL('image/jpeg', 0.9);
+        const imgProps = pdf.getImageProperties(imgData);
+        const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
+
+        let heightLeft = imgHeight;
+        let position = 0;
+        
+        pdf.addImage(imgData, 'JPEG', MARGIN_MM, position + MARGIN_MM, USABLE_WIDTH, imgHeight);
+        heightLeft -= (A4_HEIGHT_MM - MARGIN_MM * 2);
+
+        while (heightLeft > 0) {
+            position -= (A4_HEIGHT_MM - MARGIN_MM * 2);
+            pdf.addPage();
+            pdf.addImage(imgData, 'JPEG', MARGIN_MM, position + MARGIN_MM, USABLE_WIDTH, imgHeight);
+            heightLeft -= (A4_HEIGHT_MM - MARGIN_MM * 2);
+        }
+
         const fileName = `${document.title || 'sunday-schedule'}.pdf`;
         pdf.save(fileName);
 
