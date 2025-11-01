@@ -132,7 +132,7 @@
 (function() {
     'use strict';
     const firebaseConfig = {
-      apiKey: "AIzaSyDLK5f4C-nfGfz0ajqqay1q9TTN6rxgmQ",
+      apiKey: "AIzaSyDLK5f4C-nfG6fz0ajqqay1q9TTN6rxgmQ",
       authDomain: "schedule-harsha.firebaseapp.com",
       projectId: "schedule-harsha",
       storageBucket: "schedule-harsha.firebasestorage.app",
@@ -362,7 +362,7 @@
         debouncedSave();
     }
     
-    // --- START: MODIFIED PDF FUNCTION ---
+    // --- START: REPLACED PDF FUNCTION ---
     async function generatePdf() {
         const printButton = document.getElementById('print-button');
         printButton.disabled = true;
@@ -416,7 +416,7 @@
             // Check if the *entire* image is shorter than one page
             if (totalImgHeight <= pdfPageHeight) {
                 // --- Case 1: Short content (fits on one page) ---
-                // Apply vertical centering logic from our previous example
+                // Apply vertical centering logic
                 const remainingSpace = pdfPageHeight - totalImgHeight;
                 const startY = MARGIN_MM + (remainingSpace / 2); // Center it
                 pdf.addImage(imgData, 'JPEG', MARGIN_MM, startY, pdfWidth, totalImgHeight);
@@ -457,7 +457,7 @@
             printButton.querySelector('span:last-child').textContent = 'Download PDF';
         }
     }
-    // --- END: MODIFIED PDF FUNCTION ---
+    // --- END: REPLACED PDF FUNCTION ---
 
     document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
     document.getElementById('print-button').addEventListener('click', generatePdf);
