@@ -74,40 +74,36 @@
     .header-icons .close-icon { display: none; }
     body.menu-open .header-icons .hamburger-icon { display: none; }
     body.menu-open .header-icons .close-icon { display: block; }
-
     .menu-overlay { position: fixed; top: 56px; left: 0; width: 100%; height: calc(100% - 56px); background-color: rgba(0, 0, 0, 0.6); z-index: 998; opacity: 0; visibility: hidden; transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; }
     .menu-overlay.is-open { opacity: 1; visibility: visible; }
     .slide-menu { position: fixed; top: 56px; right: 0; height: calc(100dvh - 56px); width: 320px; max-width: 90%; background-color: var(--menu-new-bg); z-index: 999; transform: translateX(100%); transition: transform 0.3s ease-in-out; display: flex; flex-direction: column; border-left: 1px solid var(--menu-new-border); }
     .slide-menu.is-open { transform: translateX(0); }
-
     .menu-links { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex-grow: 1; }
     .menu-links li a { display: flex; align-items: center; color: var(--menu-new-text); background-color: var(--menu-new-bg); height: 50px; padding: 12px 5px 12px 12px; box-sizing: border-box; text-decoration: none; font-size: 1rem; transition: background-color 0.2s; border-top: 1px dotted #a7a7a7; }
     .menu-links li:first-child a { border-top: none; }
     .menu-links li a:hover { background-color: var(--menu-new-hover); }
-
     .profile-section { padding: 16px; border-top: 1px solid var(--menu-new-border); flex-shrink: 0; background-color: #fafafa; margin-top: auto; }
     .profile-info { display: flex; align-items: center; }
     .profile-name { font-weight: bold; font-size: 1rem; color: #333; word-break: break-all; }
-
     .iconLink-icon { font-family: "jw-icons-external"; font-size: 24px; display: inline-block; color: #757575; width: 30px; margin-right: 10px; text-align: center; }
     .home-icon::before { content: "\e661"; }
     .midweek-icon::before { content: "\e625"; }
     .sunday-icon::before { content: "\e610"; }
     .members-icon::before { content: "\e695"; }
-
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; border-radius: var(--radius-md); font-size: 1rem; font-weight: 600; cursor: pointer; border: none; text-decoration: none; background-color: var(--primary-color); color: white; transition: background-color 0.2s; }
-    .btn:hover:not(:disabled) { background-color: var(--primary-hover); }
-    .btn:disabled { cursor: not-allowed; opacity: 0.6; }
     /* END: NEW NAVBAR STYLES */
 
     /* START: ORIGINAL EDITOR STYLES */
     *, *::before, *::after { box-sizing: border-box; }
     html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
     
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; border-radius: var(--radius-md); font-size: 1rem; font-weight: 600; cursor: pointer; border: none; text-decoration: none; background-color: var(--primary-color); color: white; transition: background-color 0.2s; }
+    .btn:hover:not(:disabled) { background-color: var(--primary-hover); }
+    .btn:disabled { cursor: not-allowed; opacity: 0.6; }
+    
     .hidden { display: none !important; }
     main { padding: calc(56px + 20px) 20px 20px; }
     .editor-main { max-width: 1100px; margin: 0 auto; }
-    .page-controls { margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; }
+    .page-controls { margin-bottom: 24px; }
     .master-container { background: var(--surface-color); padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
     
     .schedule-display-header { text-align: center; margin-bottom: 0; }
@@ -131,28 +127,6 @@
     .toolbar-btn { font-family: 'Inter', sans-serif; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); text-decoration: none; color: var(--text-secondary); }
     .toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; color: var(--text-primary); }
     .toolbar-btn:disabled { cursor: not-allowed; opacity: 0.5; }
-
-    /* Status Indicator */
-    .status-indicator { 
-        font-size: 12px; 
-        font-weight: 600; 
-        padding: 4px 10px; 
-        border-radius: 999px; 
-        display: flex; 
-        align-items: center; 
-        gap: 6px; 
-        color: var(--text-light);
-    }
-    .status-indicator::before { 
-        content: ''; 
-        width: 8px; 
-        height: 8px; 
-        border-radius: 50%; 
-        background-color: currentColor; 
-    }
-    .status-indicator[data-status="synced"] { color: var(--success-color); }
-    .status-indicator[data-status="syncing"] { color: var(--warning-color); }
-    .status-indicator[data-status="error"] { color: var(--danger-color); }
 
     #event-context-menu, #member-dropdown, #topic-dropdown { 
         position: fixed; 
@@ -205,113 +179,6 @@
     .modal-actions button { font-family: 'Inter', sans-serif; padding: 10px 20px; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); }
     #cancel-creation { background-color: var(--surface-color); }
     #confirm-creation { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
-
-    /* Mobile View Styles */
-    .mobile-view-container { display: none; }
-    .mobile-week-card {
-        background: var(--surface-color);
-        border: 1px solid var(--border-color);
-        border-radius: var(--radius-lg);
-        padding: 16px;
-        margin-bottom: 16px;
-        box-shadow: var(--shadow-md);
-    }
-    .mobile-week-card:last-child {
-        margin-bottom: 0;
-    }
-    .week-date {
-        font-size: 1.2rem;
-        font-weight: 700;
-        color: var(--text-primary);
-        margin: 0 0 16px 0;
-        padding-bottom: 8px;
-        border-bottom: 2px solid var(--border-color);
-        text-align: center;
-        font-family: 'Noto Sans Telugu', sans-serif;
-    }
-    .week-fields {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
-    .field-group {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-    }
-    .field-group label {
-        font-size: 0.9rem;
-        font-weight: 600;
-        color: var(--text-secondary);
-        font-family: 'Noto Sans Telugu', sans-serif;
-    }
-    .mobile-dropdown {
-        padding: 12px;
-        border: 1px solid var(--border-color);
-        border-radius: var(--radius-md);
-        background-color: #f9fafb;
-        cursor: pointer;
-        font-family: 'Noto Sans Telugu', sans-serif;
-        font-weight: 500;
-        position: relative;
-    }
-    .mobile-dropdown::after {
-        content: '▼';
-        position: absolute;
-        right: 12px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 0.8rem;
-        color: var(--text-secondary);
-    }
-    .special-event-mobile {
-        text-align: center;
-        padding: 16px;
-        background-color: #fff5f5;
-        border-radius: var(--radius-md);
-        border: 1px solid #fed7d7;
-    }
-    .special-event-text-mobile {
-        color: var(--danger-color);
-        font-weight: 700;
-        font-size: 1rem;
-        margin: 0;
-        font-family: 'Noto Sans Telugu', sans-serif;
-    }
-/* Add these rules to your existing CSS */
-
-/* Desktop table font */
-.schedule-table {
-    font-family: 'Noto Sans Telugu', sans-serif;
-}
-
-/* Desktop header font */
-.schedule-display-header h1,
-.schedule-display-header .subtitle {
-    font-family: 'Noto Sans Telugu', sans-serif;
-}
-
-/* Desktop table cells */
-.schedule-table th,
-.schedule-table td {
-    font-family: 'Noto Sans Telugu', sans-serif;
-}
-
-/* Ensure editable cells also use the font */
-.schedule-table [contenteditable="true"] {
-    font-family: 'Noto Sans Telugu', sans-serif;
-}
-    @media (max-width: 768px) {
-        main { padding: 56px 0 0 0; }
-        .master-container { padding: 16px; border-radius: 0; box-shadow: none; }
-        .page-controls { padding: 0 16px; margin-bottom: 16px; }
-        .schedule-table { display: none; }
-        .mobile-view-container { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 1rem; 
-        }
-    }
 
     /* PDF-specific styles */
     .pdf-page-container {
@@ -422,7 +289,6 @@
     <div class="top-bar">
         <a href="./sunday-dashboard.html" class="mobileLogo" title="Sunday Schedules"></a>
         <div class="header-right-controls">
-            <div class="status-indicator" data-status="synced">Synced</div>
             <div class="header-icons" id="menu-toggle-button">
                 <svg class="hamburger-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M22.5 7h-21a.5.5 0 010-1h21a.5.5 0 010 1zM22.5 13h-21a.5.5 0 010-1h21a.5.5 0 010 1zM22.5 19h-21a.5.5 0 010-1h21a.5.5 0 010 1z"></path></svg>
                 <svg class="close-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12.707 12l6.146-6.146a.5.5 0 00-.707-.707L12 11.293 5.854 5.146a.5.5 0 00-.707.707L11.293 12l-6.147 6.146a.5.5 0 10.707.707L12 12.707l6.146 6.146a.5.5 0 00.707-.707z"></path></svg>
@@ -448,27 +314,15 @@
 
 <div id="app-container" class="editor-main hidden">
     <div class="page-controls">
-    <a href="./sunday-dashboard.html" class="toolbar-btn">
-        <span class="material-symbols-outlined">arrow_back</span>
-        <span>Dashboard</span>
-    </a>
-    <div style="display: flex; gap: 10px;">
-        <!-- Add these two buttons -->
-        <button id="print-desktop" class="btn">
-            <span class="material-symbols-outlined">print</span>
-            <span>Print Desktop</span>
-        </button>
-        <button id="print-mobile" class="btn">
-            <span class="material-symbols-outlined">print</span>
-            <span>Print Mobile</span>
-        </button>
-        <!-- Existing PDF button -->
+        <a href="./sunday-dashboard.html" class="toolbar-btn">
+            <span class="material-symbols-outlined">arrow_back</span>
+            <span>Dashboard</span>
+        </a>
         <button id="print-button" class="btn">
             <span class="material-symbols-outlined">picture_as_pdf</span>
             <span>Download PDF</span>
         </button>
     </div>
-</div>
     <div class="master-container">
         <div id="schedule-content-wrapper">
             <!-- Schedule will be rendered here -->
@@ -529,7 +383,6 @@
     const eventContextMenu = document.getElementById('event-context-menu');
     const memberDropdown = document.getElementById('member-dropdown');
     const topicDropdown = document.getElementById('topic-dropdown');
-    const statusIndicator = document.querySelector('.status-indicator');
 
     // Topic definitions
     const topics = {
@@ -539,22 +392,10 @@
         'అంశం-4': 'this is talk-4'
     };
 
-    // Special event texts
-    const eventTexts = {
-        'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం',
-        'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో',
-        'convention': 'ప్రాదేశిక సమావేశం'
-    };
-
     const debounce = (func, delay) => {
         let timeout;
         return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), delay); };
     };
-
-    function updateStatus(text, status) {
-        statusIndicator.textContent = text;
-        statusIndicator.dataset.status = status;
-    }
 
     async function fetchMembers() {
         if (!currentUser) return;
@@ -598,13 +439,10 @@
                 if (!document.activeElement || document.activeElement.tagName === 'BODY' || !scheduleWrapper.contains(document.activeElement)) {
                     renderSchedule(scheduleData);
                 }
-                updateStatus('Synced', 'synced');
             } else {
                 alert("This schedule may have been deleted.");
                 window.location.href = './sunday-dashboard.html';
             }
-        }, error => {
-            updateStatus('Error', 'error');
         });
     }
 
@@ -644,11 +482,10 @@
                         ${data.tableHTML}
                     </tbody>
                 </table>
-                <div class="mobile-view-container"></div>
             </main>
         `;
         
-        // Add dropdown functionality to desktop table cells
+        // Add dropdown functionality to cells
         scheduleWrapper.querySelectorAll('tbody td').forEach((cell, index) => {
             const row = cell.parentElement;
             const cellIndex = cell.cellIndex;
@@ -668,9 +505,6 @@
             });
         });
 
-        // Create mobile view
-        createMobileView();
-
         scheduleWrapper.addEventListener('input', debouncedSave);
         scheduleWrapper.querySelectorAll('.event-btn').forEach(btn => {
             btn.addEventListener('click', openEventMenu);
@@ -679,112 +513,17 @@
         document.getElementById('app-container').classList.remove('hidden');
     }
 
-    function createMobileView() {
-        const mobileContainer = scheduleWrapper.querySelector('.mobile-view-container');
-        const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
-        
-        if (!tableBody) return;
-        
-        mobileContainer.innerHTML = '';
-        
-        Array.from(tableBody.rows).forEach((row, rowIndex) => {
-            const cells = Array.from(row.cells);
-            const dateCell = cells[0];
-            const topicCell = cells[1];
-            const speakerCell = cells[2];
-            const chairmanCell = cells[3];
-            const readerCell = cells[4];
-            
-            const card = document.createElement('div');
-            card.className = 'mobile-week-card';
-            
-            // Check if this is a special event
-            const isSpecialEvent = topicCell.classList.contains('special-event') && topicCell.colSpan === 4;
-            
-            if (isSpecialEvent) {
-                card.innerHTML = `
-                    <h3 class="week-date">${dateCell.textContent}</h3>
-                    <div class="special-event-mobile">
-                        <p class="special-event-text-mobile">${topicCell.textContent}</p>
-                    </div>
-                `;
-            } else {
-                card.innerHTML = `
-                    <h3 class="week-date">${dateCell.textContent}</h3>
-                    <div class="week-fields">
-                        <div class="field-group">
-                            <label>ప్రసంగ అంశం</label>
-                            <div class="mobile-dropdown topic-dropdown" data-row="${rowIndex}" data-cell="1">
-                                ${topicCell.textContent || 'Select Topic'}
-                            </div>
-                        </div>
-                        <div class="field-group">
-                            <label>ప్రసంగీకుడు</label>
-                            <div class="mobile-dropdown member-dropdown" data-row="${rowIndex}" data-cell="2">
-                                ${speakerCell.textContent || 'Select Brother'}
-                            </div>
-                        </div>
-                        <div class="field-group">
-                            <label>చైర్మన్</label>
-                            <div class="mobile-dropdown member-dropdown" data-row="${rowIndex}" data-cell="3">
-                                ${chairmanCell.textContent || 'Select Brother'}
-                            </div>
-                        </div>
-                        <div class="field-group">
-                            <label>కావలికోట రీడర్</label>
-                            <div class="mobile-dropdown member-dropdown" data-row="${rowIndex}" data-cell="4">
-                                ${readerCell.textContent || 'Select Brother'}
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            mobileContainer.appendChild(card);
-        });
-
-        // Add event listeners to mobile dropdowns
-        mobileContainer.querySelectorAll('.topic-dropdown').forEach(dropdown => {
-            dropdown.addEventListener('click', (e) => {
-                const rowIndex = dropdown.dataset.row;
-                const cellIndex = dropdown.dataset.cell;
-                const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
-                const cell = tableBody.rows[rowIndex].cells[cellIndex];
-                openTopicDropdown(cell, dropdown);
-            });
-        });
-
-        mobileContainer.querySelectorAll('.member-dropdown').forEach(dropdown => {
-            dropdown.addEventListener('click', (e) => {
-                const rowIndex = dropdown.dataset.row;
-                const cellIndex = dropdown.dataset.cell;
-                const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
-                const cell = tableBody.rows[rowIndex].cells[cellIndex];
-                openMemberDropdown(cell, dropdown);
-            });
-        });
-    }
-
     const debouncedSave = debounce(() => {
         const subtitleEl = scheduleWrapper.querySelector('.subtitle');
         const tableBodyEl = scheduleWrapper.querySelector('.schedule-table tbody');
         if (!subtitleEl || !tableBodyEl) return;
 
-        updateStatus('Syncing...', 'syncing');
-        
         const payload = {
             dateRange: subtitleEl.textContent,
             tableHTML: tableBodyEl.innerHTML
         };
-        
         userSchedulesCollection.doc(currentScheduleId).update(payload)
-            .then(() => {
-                updateStatus('Synced', 'synced');
-            })
-            .catch(err => {
-                console.error("Save failed:", err);
-                updateStatus('Error', 'error');
-            });
+            .catch(err => console.error("Save failed:", err));
     }, 1500);
 
     function initCreationFlow() {
@@ -883,7 +622,11 @@
             if(cell.dataset.originalContent) cell.innerHTML = cell.dataset.originalContent;
             cell.removeAttribute('data-original-content');
         });
-        
+        const eventTexts = {
+            'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం',
+            'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో',
+            'convention': 'ప్రాదేశిక సమావేశం'
+        };
         if (eventType !== 'normal') {
             topicCell.dataset.originalContent = topicCell.innerHTML;
             otherCells.forEach(cell => cell.dataset.originalContent = cell.innerHTML);
@@ -896,13 +639,10 @@
                 cell.classList.remove('editable-cell');
             });
         }
-        
-        // Update mobile view
-        createMobileView();
         debouncedSave();
     }
     
-    function openMemberDropdown(cell, mobileElement = null) {
+    function openMemberDropdown(cell) {
         memberDropdown.innerHTML = '';
         
         // Sort brothers by name
@@ -916,29 +656,15 @@
             memberDropdown.appendChild(item);
         });
 
-        const rect = (mobileElement || cell).getBoundingClientRect();
+        const rect = cell.getBoundingClientRect();
         memberDropdown.style.display = 'block';
         memberDropdown.style.top = `${rect.bottom}px`;
         memberDropdown.style.left = `${rect.left}px`;
         memberDropdown.style.width = `${rect.width}px`;
-        activeCellForDropdown = { cell: cell, mobileElement: mobileElement };
-
-        // Handle member selection
-        memberDropdown.addEventListener('click', (e) => {
-            const item = e.target.closest('.member-dropdown-item');
-            if (item && activeCellForDropdown) {
-                const selectedName = item.dataset.name;
-                activeCellForDropdown.cell.textContent = selectedName;
-                if (activeCellForDropdown.mobileElement) {
-                    activeCellForDropdown.mobileElement.textContent = selectedName;
-                }
-                debouncedSave();
-            }
-            memberDropdown.style.display = 'none';
-        }, { once: true });
+        activeCellForDropdown = cell;
     }
 
-    function openTopicDropdown(cell, mobileElement = null) {
+    function openTopicDropdown(cell) {
         topicDropdown.innerHTML = '';
         
         Object.entries(topics).forEach(([topicName, topicText]) => {
@@ -949,26 +675,12 @@
             topicDropdown.appendChild(item);
         });
 
-        const rect = (mobileElement || cell).getBoundingClientRect();
+        const rect = cell.getBoundingClientRect();
         topicDropdown.style.display = 'block';
         topicDropdown.style.top = `${rect.bottom}px`;
         topicDropdown.style.left = `${rect.left}px`;
         topicDropdown.style.width = `${rect.width}px`;
-        activeCellForDropdown = { cell: cell, mobileElement: mobileElement };
-
-        // Handle topic selection
-        topicDropdown.addEventListener('click', (e) => {
-            const item = e.target.closest('.topic-dropdown-item');
-            if (item && activeCellForDropdown) {
-                const selectedTopic = item.dataset.topic;
-                activeCellForDropdown.cell.textContent = selectedTopic;
-                if (activeCellForDropdown.mobileElement) {
-                    activeCellForDropdown.mobileElement.textContent = selectedTopic;
-                }
-                debouncedSave();
-            }
-            topicDropdown.style.display = 'none';
-        }, { once: true });
+        activeCellForDropdown = cell;
     }
     
     async function generatePdf() {
@@ -1178,7 +890,6 @@
         const menuOverlay = document.getElementById('menu-overlay');
         const body = document.body;
         
-        
         function closeMenu() {
             slideMenu.classList.remove('is-open');
             menuOverlay.classList.remove('is-open');
@@ -1200,9 +911,6 @@
         document.getElementById('print-button').addEventListener('click', generatePdf);
         document.getElementById('cancel-creation').addEventListener('click', () => window.location.href = './sunday-dashboard.html');
         document.getElementById('confirm-creation').addEventListener('click', handleCreateSchedule);
-        // Add these lines in the setupGlobalUI() function
-document.getElementById('print-desktop').addEventListener('click', printDesktopView);
-document.getElementById('print-mobile').addEventListener('click', printMobileView);
 
         eventContextMenu.addEventListener('click', (e) => {
             const target = e.target.closest('.context-menu-item');
@@ -1212,60 +920,40 @@ document.getElementById('print-mobile').addEventListener('click', printMobileVie
             }
         });
 
+        memberDropdown.addEventListener('click', (e) => {
+            const item = e.target.closest('.member-dropdown-item');
+            if (item && activeCellForDropdown) {
+                activeCellForDropdown.textContent = item.dataset.name;
+                debouncedSave();
+            }
+            memberDropdown.style.display = 'none';
+            activeCellForDropdown = null;
+        });
+
+        topicDropdown.addEventListener('click', (e) => {
+            const item = e.target.closest('.topic-dropdown-item');
+            if (item && activeCellForDropdown) {
+                activeCellForDropdown.textContent = item.dataset.topic;
+                debouncedSave();
+            }
+            topicDropdown.style.display = 'none';
+            activeCellForDropdown = null;
+        });
+
         document.addEventListener('click', (e) => {
             if (!eventContextMenu.contains(e.target) && !e.target.closest('.event-btn')) {
                 eventContextMenu.style.display = 'none';
             }
-            if (!memberDropdown.contains(e.target) && !e.target.closest('.editable-cell, .member-dropdown')) {
+            if (!memberDropdown.contains(e.target) && !e.target.closest('.editable-cell')) {
                 memberDropdown.style.display = 'none';
             }
-            if (!topicDropdown.contains(e.target) && !e.target.closest('.editable-cell, .topic-dropdown')) {
+            if (!topicDropdown.contains(e.target) && !e.target.closest('.editable-cell')) {
                 topicDropdown.style.display = 'none';
             }
         });
     }
 
 })();
-
-
-
-
-function printDesktopView() {
-    // Hide mobile view and show desktop table for printing
-    const mobileContainer = document.querySelector('.mobile-view-container');
-    const scheduleTable = document.querySelector('.schedule-table');
-    
-    if (mobileContainer) mobileContainer.style.display = 'none';
-    if (scheduleTable) scheduleTable.style.display = 'table';
-    
-    window.print();
-    
-    // Restore mobile view after printing (if on mobile)
-    if (window.innerWidth <= 768) {
-        if (mobileContainer) mobileContainer.style.display = 'flex';
-        if (scheduleTable) scheduleTable.style.display = 'none';
-    }
-}
-
-function printMobileView() {
-    // Show mobile view and hide desktop table for printing
-    const mobileContainer = document.querySelector('.mobile-view-container');
-    const scheduleTable = document.querySelector('.schedule-table');
-    
-    if (mobileContainer) mobileContainer.style.display = 'flex';
-    if (scheduleTable) scheduleTable.style.display = 'none';
-    
-    window.print();
-    
-    // Restore original view after printing
-    if (window.innerWidth <= 768) {
-        if (mobileContainer) mobileContainer.style.display = 'flex';
-        if (scheduleTable) scheduleTable.style.display = 'none';
-    } else {
-        if (mobileContainer) mobileContainer.style.display = 'none';
-        if (scheduleTable) scheduleTable.style.display = 'table';
-    }
-}
 </script>
 </body>
 </html>
