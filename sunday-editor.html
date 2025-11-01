@@ -371,6 +371,9 @@
         printButton.disabled = true;
         printButton.querySelector('span:last-child').textContent = 'Generating...';
 
+        // --- NEW LOGIC: Wait for fonts to be ready ---
+        await document.fonts.ready;
+
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('l', 'mm', 'a4'); // 'l' for landscape
         const contentToPrint = document.getElementById('schedule-content-wrapper');
@@ -378,11 +381,13 @@
         const actionElements = contentToPrint.querySelectorAll('.actions-col, .event-btn');
         actionElements.forEach(el => el.style.display = 'none');
         
-        await html2canvas(contentToPrint, {
-            scale: 2,
-            useCORS: true,
-            backgroundColor: '#ffffff'
-        }).then(canvas => {
+        try {
+            const canvas = await html2canvas(contentToPrint, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: '#ffffff'
+            });
+
             const imgData = canvas.toDataURL('image/jpeg', 0.9);
             const A4_WIDTH_MM = 297;
             const A4_HEIGHT_MM = 210;
@@ -392,15 +397,18 @@
             const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
             
             pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
-        });
-        
-        actionElements.forEach(el => el.style.display = '');
-
-        const fileName = `${document.title}.pdf`;
-        pdf.save(fileName);
-
-        printButton.disabled = false;
-        printButton.querySelector('span:last-child').textContent = 'Download PDF';
+        } catch (error) {
+            console.error("PDF generation failed:", error);
+            alert("Sorry, there was an error creating the PDF.");
+        } finally {
+            // This block ensures elements are restored even if an error occurs
+            actionElements.forEach(el => el.style.display = '');
+            const fileName = `${document.title}.pdf`;
+            pdf.save(fileName);
+    
+            printButton.disabled = false;
+            printButton.querySelector('span:last-child').textContent = 'Download PDF';
+        }
     }
 
     document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
