@@ -248,28 +248,19 @@
         }
 
         setupEventListeners() {
- you've requested.
-
-### Summary of New Features:
-
-1.  **Member Data Integration:** The page now fetches the            this.element.addEventListener('input', () => this.parentProject.triggerSave());
-            this.event user's member list (brothers and sisters) from the `users/{userId}/members` collection in Firestore as soon asBtn.addEventListener('click', (e) => {
+            this.element.addEventListener('input', () => this.parentProject.triggerSave());
+            this.eventBtn.addEventListener('click', (e) => {
                 activeEventScheduleTable = this;
-                const rect it loads.
-2.  **Smart Dropdowns:**
-    *   All cells that were previously `contenteditable` (except = e.currentTarget.getBoundingClientRect();
+                const rect = e.currentTarget.getBoundingClientRect();
                 eventContextMenu.style.display = 'block';
                 eventContextMenu.style.top = `${rect.bottom}px`;
-                eventContextMenu.style.left = `${rect.left}px`; the date cell in the first row) have been transformed.
-    *   Clicking on one of these cells now
+                eventContextMenu.style.left = `${rect.left}px`;
             });
 
             this.element.addEventListener('click', e => {
-                const editableCell = e. opens a dropdown menu (`<select>`) populated with the appropriate names.
-3.  **Context-Aware Liststarget.closest('.editable-cell');
+                const editableCell = e.target.closest('.editable-cell');
                 if (editableCell) {
-                    openMemberMenu(editableCell:**
-    *   For cells in the "చక్కగా సువార్త ప్రకటించాలి" (Apply Yourself to the Field);
+                    openMemberMenu(editableCell);
                 }
             });
             
@@ -280,14 +271,12 @@
                     editableCell.focus();
                 }
             });
-
- Ministry) section, the dropdown shows **both brothers and sisters**.
-    *   For **all other editable cells** (Chairman, Prayer, etc.), the dropdown shows **only brothers**.
-4.  **Data Persistence:** When you select a name             this.element.addEventListener('blur', e => {
+            
+             this.element.addEventListener('blur', e => {
                 const editableCell = e.target.closest('.editable-cell');
                  if (editableCell) {
                     editableCell.setAttribute('contenteditable', 'false');
- from a dropdown, the choice is instantly saved to the table's HTML content and then synced to Firestore. The selected                }
+                }
             }, true);
         }
     }
