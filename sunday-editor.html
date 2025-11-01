@@ -36,7 +36,6 @@
     }
     *, *::before, *::after { box-sizing: border-box; }
     html { -webkit-font-smoothing: antialiased; }
-    /* This body rule is CRITICAL for the webpage font */
     body { font-family: 'Noto Sans Telugu', sans-serif; background-color: var(--background-color); margin: 0; padding: 88px 20px 20px; color: var(--text-primary); }
     
     main { margin-top: 0; }
@@ -133,34 +132,33 @@
 (function() {
     'use strict';
     
-    // --- START: NEW FONT LOADING HELPER ---
+    // --- START: NEW HELPER FUNCTION ---
     /**
-     * Fetches a font from a URL and converts it to a Base64 string.
-     * jspdf requires this format to embed fonts.
+     * Fetches a local file and converts it to a Base64 string.
+     * @param {string} url The path to the font file (e.g., 'NotoSansTelugu-Regular.ttf')
+     * @returns {Promise<string>} A promise that resolves with the Base64 data.
      */
-    async function loadFontAsBase64(url) {
-        try {
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`Failed to fetch font: ${response.status} ${response.statusText}`);
-            }
-            const blob = await response.blob();
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                    // We need to strip the "data:font/ttf;base64," prefix
-                    const base64data = reader.result.split(',')[1];
-                    resolve(base64data);
-                };
-                reader.onerror = reject;
-                reader.readAsDataURL(blob);
+    function fetchFontAsBase64(url) {
+        return fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch font: ${response.statusText}`);
+                }
+                return response.arrayBuffer();
+            })
+            .then(arrayBuffer => {
+                // This is a reliable way to convert ArrayBuffer to Base64
+                let binary = '';
+                const bytes = new Uint8Array(arrayBuffer);
+                const len = bytes.byteLength;
+                for (let i = 0; i < len; i++) {
+                    binary += String.fromCharCode(bytes[i]);
+                }
+                return window.btoa(binary);
             });
-        } catch (error) {
-            console.error("Font loading error:", error);
-            throw error; // Propagate the error
-        }
     }
-    // --- END: NEW FONT LOADING HELPER ---
+    // --- END: NEW HELPER FUNCTION ---
+    
 
     const firebaseConfig = {
       apiKey: "AIzaSyDLK5f4C-nfG6fz0ajqqay1q9TTN6rxgmQ",
@@ -407,15 +405,14 @@
         debouncedSave();
     }
     
-    // --- START: FINAL jspdf-autotable PDF FUNCTION ---
+    // --- START: FINAL PDF FUNCTION (FETCHING LOCAL .TTF FILES) ---
     async function generatePdf() {
         const printButton = document.getElementById('print-button');
         printButton.disabled = true;
-        printButton.querySelector('span:last-child').textContent = 'Loading Fonts...';
+        printButton.querySelector('span:last-child').textContent = 'Generating...';
 
         try {
             // --- FIX FOR THE 'null' ERROR ---
-            // Check if content has loaded before trying to read it
             const titleEl = document.querySelector('.title-block h1');
             const subtitleEl = document.querySelector('.subtitle');
             const tableEl = document.querySelector('.schedule-table');
@@ -424,36 +421,36 @@
                 alert("The schedule is still loading. Please wait a moment and try again.");
                 printButton.disabled = false;
                 printButton.querySelector('span:last-child').textContent = 'Download PDF';
-                return; // Stop the function
+                return; 
             }
             // --- END OF FIX ---
 
-            // 1. --- NEW: Load fonts dynamically ---
-            // We fetch the fonts from a reliable CDN. This avoids all Base64 errors.
-            const regularFontBase64 = await loadFontAsBase64('https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/notosanstelugu/NotoSansTelugu-Regular.ttf');
-            const boldFontBase64 = await loadFontAsBase64('https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/notosanstelugu/NotoSansTelugu-Bold.ttf');
-            
-            printButton.querySelector('span:last-child').textContent = 'Generating...';
+            // --- NEW: Load font files from your folder ---
+            // This assumes 'NotoSansTelugu-Regular.ttf' and 'NotoSansTelugu-Bold.ttf'
+            // are in the SAME FOLDER as this HTML file.
+            const [regularBase64, boldBase64] = await Promise.all([
+                fetchFontAsBase64('NotoSansTelugu-Regular.ttf'),
+                fetchFontAsBase64('NotoSansTelugu-Bold.ttf')
+            ]);
+            // --- END: NEW FONT LOADING ---
 
             const { jsPDF } = window.jspdf;
             const autoTable = window.jspdf.jsPDF.autoTable;
             
-            // 2. Create new PDF in Landscape
-            const pdf = new jsPDF('l', 'mm', 'a4'); // 'l' for landscape
+            const pdf = new jsPDF('l', 'mm', 'a4'); 
 
-            // 3. Add the VALID Telugu font files to the PDF
-            pdf.addFileToVFS('NotoSansTelugu-Regular.ttf', regularFontBase64);
-            pdf.addFileToVFS('NotoSansTelugu-Bold.ttf', boldFontBase64);
+            // 2. Add the *fetched and valid* Base64 data to the PDF
+            pdf.addFileToVFS('NotoSansTelugu-Regular.ttf', regularBase64);
+            pdf.addFileToVFS('NotoSansTelugu-Bold.ttf', boldBase64);
             
-            // 4. Add font definitions to jspdf
+            // 3. Add font definitions to jspdf
             pdf.addFont('NotoSansTelugu-Regular.ttf', 'NotoSansTelugu', 'normal');
             pdf.addFont('NotoSansTelugu-Bold.ttf', 'NotoSansTelugu', 'bold');
 
-            // --- Page Margins ---
             const A4_WIDTH_MM = 297;
             const MARGIN_MM = 10;
 
-            // 5. Add Title and Subtitle (using the safe variables)
+            // 4. Add Title and Subtitle
             const title = titleEl.textContent;
             const subtitle = subtitleEl.textContent;
             
@@ -465,10 +462,10 @@
             pdf.setFontSize(14);
             pdf.text(subtitle, A4_WIDTH_MM / 2, 28, { align: 'center' });
 
-            // 6. Generate the table
+            // 5. Generate the table
             autoTable(pdf, {
-                html: tableEl, // Use the safe variable
-                startY: 35, // Position to start the table
+                html: tableEl, 
+                startY: 35,
                 theme: 'grid', 
                 styles: {
                     font: 'NotoSansTelugu', // Use the embedded font!
@@ -484,13 +481,11 @@
                     fontStyle: 'bold', // Use the bold font
                 },
                 columnStyles: {
-                    // Align text columns to the left
-                    1: { halign: 'left' }, // Column 1 (Prasanga Amsam)
-                    2: { halign: 'left' }, // Column 2 (Prasangeekudu)
-                    3: { halign: 'left' }, // Column 3 (Chairman)
-                    4: { halign: 'left' }, // Column 4 (Reader)
+                    1: { halign: 'left' }, 
+                    2: { halign: 'left' }, 
+                    3: { halign: 'left' }, 
+                    4: { halign: 'left' }, 
                 },
-                // This function automatically skips the 6th column (Actions)
                 columns: [
                     { header: 'తేదీ', dataKey: '0' },
                     { header: 'ప్రసంగ అంశం', dataKey: '1' },
@@ -498,27 +493,29 @@
                     { header: 'చైర్మన్', dataKey: '3' },
                     { header: 'కావలికోట రీడర్', dataKey: '4' },
                 ],
-                // This function handles special event rows (CO visit, etc.)
                 didParseCell: function (data) {
                     if (data.cell.raw.classList.contains('special-event')) {
                         data.cell.styles.halign = 'center';
-                        data.cell.styles.textColor = [255, 0, 0]; // Red text
-                        data.cell.styles.fontStyle = 'bold'; // Make special events bold
+                        data.cell.styles.textColor = [255, 0, 0]; 
+                        data.cell.styles.fontStyle = 'bold';
                     }
-                    // Center-align all header text
                     if (data.cell.raw.tagName === 'TH') {
                          data.cell.styles.halign = 'center';
                     }
                 }
             });
 
-            // 7. Save the PDF
+            // 6. Save the PDF
             const fileName = `${document.title || 'sunday-schedule'}.pdf`;
             pdf.save(fileName);
 
         } catch (error) {
             console.error("PDF generation failed:", error);
-            alert("Sorry, there was an error creating the PDF. Check the console.");
+            if (error.message.includes('fetch')) {
+                 alert("Font files not found. Make sure 'NotoSansTelugu-Regular.ttf' and 'NotoSansTelugu-Bold.ttf' are in the same folder as this HTML file.");
+            } else {
+                alert("Sorry, there was an error creating the PDF. Check the console.");
+            }
         } finally {
             // Re-enable the button
             printButton.disabled = false;
