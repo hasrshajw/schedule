@@ -362,61 +362,128 @@
         debouncedSave();
     }
     
-    // --- START: MODIFIED PDF FUNCTION (NEW METHOD) ---
+    // --- START: NEW PDF FUNCTION WITH FONT EMBEDDING ---
+
+    // Helper function to fetch a font and convert it to a Data URI
+    async function getFontAsDataURI(url) {
+        try {
+            const response = await fetch(url);
+            const blob = await response.blob();
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+            });
+        } catch (e) {
+            console.error(`Failed to fetch font: ${url}`, e);
+            return null;
+        }
+    }
+
+    // Helper function to find all font links in the <head>
+    function getFontHrefs() {
+        const fontLinks = [];
+        document.querySelectorAll('link[href*="fonts.googleapis.com"]').forEach(link => {
+            fontLinks.push(link.href);
+        });
+        return fontLinks;
+    }
+
     async function generatePdf() {
         const printButton = document.getElementById('print-button');
         printButton.disabled = true;
-        printButton.querySelector('span:last-child').textContent = 'Generating...';
+        let originalSpanText = printButton.querySelector('span:last-child').textContent;
+        printButton.querySelector('span:last-child').textContent = 'Preparing fonts...';
 
-        // 1. Wait for fonts and give a 1-second paint delay
+        const styleElement = document.createElement('style');
+        styleElement.id = 'temp-pdf-fonts'; // To remove it later
+        
+        let embeddedCssText = '';
+
         try {
-            await document.fonts.ready;
-        } catch (e) {
-            console.warn("Error waiting for document.fonts.ready:", e);
-        }
-        await new Promise(resolve => setTimeout(resolve, 1000)); // 1 second delay
+            // 1. Get all Google Font CSS URLs from the <head>
+            const fontCssHrefs = getFontHrefs();
+            
+            for (const href of fontCssHrefs) {
+                // 2. Fetch the Google Font CSS file
+                const cssResponse = await fetch(href);
+                let cssText = await cssResponse.text();
 
+                // 3. Find all font file URLs (e.g., .woff2) within the CSS
+                const fontFileUrls = cssText.match(/url\((https:\/\/[^)]+\.woff2)\)/g);
+                if (!fontFileUrls) continue;
+
+                const cleanedUrls = fontFileUrls.map(url => url.replace('url(', '').replace(')', ''));
+                
+                // 4. Fetch each font file and convert it to a Data URI
+                const dataUris = await Promise.all(cleanedUrls.map(url => getFontAsDataURI(url)));
+
+                // 5. Replace the original .woff2 URL with the new Base64 Data URI
+                cleanedUrls.forEach((url, index) => {
+                    if (dataUris[index]) {
+                        cssText = cssText.replace(url, dataUris[index]);
+                    }
+                });
+                
+                embeddedCssText += cssText + '\n';
+            }
+
+            // 6. Inject the new <style> tag with embedded fonts into the <head>
+            styleElement.textContent = embeddedCssText;
+            document.head.appendChild(styleElement);
+
+            // 7. Wait 1 second for the browser to register and paint these new fonts
+            printButton.querySelector('span:last-child').textContent = 'Generating...';
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+        } catch (e) {
+            console.error("Font embedding failed:", e);
+            alert("Could not prepare fonts for PDF. PDF generation cancelled.");
+            printButton.disabled = false;
+            printButton.querySelector('span:last-child').textContent = originalSpanText;
+            if (document.head.contains(styleElement)) {
+                document.head.removeChild(styleElement);
+            }
+            return; // Stop here
+        }
+
+        // --- Start PDF Generation (using the clone method) ---
+        
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('l', 'mm', 'a4'); // 'l' for landscape
 
-        // 2. Create an *ON-SCREEN* but *INVISIBLE* print container
+        // Create an on-screen but invisible print container
         const printContainer = document.createElement('div');
         printContainer.id = 'print-container-temp';
         printContainer.style.position = 'absolute';
-        printContainer.style.top = '0'; // <-- On-screen
-        printContainer.style.left = '0'; // <-- On-screen
-        printContainer.style.zIndex = '-1'; // <-- Behind everything
-        printContainer.style.opacity = '0'; // <-- Invisible
-        printContainer.style.pointerEvents = 'none'; // <-- Not interactive
-        printContainer.style.width = '1100px'; // Match the content width
+        printContainer.style.top = '0';
+        printContainer.style.left = '0';
+        printContainer.style.zIndex = '-1';
+        printContainer.style.opacity = '0';
+        printContainer.style.pointerEvents = 'none';
+        printContainer.style.width = '1100px'; 
         printContainer.style.background = '#ffffff';
         document.body.appendChild(printContainer);
         
-        // 3. Clone the content into the on-screen invisible container
         const contentToClone = document.getElementById('schedule-content-wrapper');
         const clone = contentToClone.cloneNode(true);
-        
-        // 4. Clean the clone for printing
-        clone.style.width = '1100px'; // Ensure the clone itself has the width
+        clone.style.width = '1100px'; 
         clone.querySelectorAll('.actions-col, .event-btn').forEach(el => el.style.display = 'none');
-        
-        printContainer.appendChild(clone); // Add the clean clone
+        printContainer.appendChild(clone);
 
         try {
-            // 5. Capture the CLONE
+            // Capture the CLONE
             const canvas = await html2canvas(clone, {
                 scale: 2,
                 useCORS: true,
                 backgroundColor: '#ffffff',
                 letterRendering: true,
-                windowWidth: clone.scrollWidth, // Use clone's dimensions
+                windowWidth: clone.scrollWidth,
                 windowHeight: clone.scrollHeight,
-                scrollX: 0, // <-- Add scroll fix
-                scrollY: -window.scrollY // <-- Add scroll fix
+                scrollX: 0,
+                scrollY: -window.scrollY
             });
-
-            // 6. Clean up the container *immediately* after capture
-            document.body.removeChild(printContainer);
 
             const imgData = canvas.toDataURL('image/jpeg', 0.9);
             
@@ -424,10 +491,8 @@
             const A4_WIDTH_MM = 297;  
             const A4_HEIGHT_MM = 210; 
             const MARGIN_MM = 10;     
-            
-            const pdfWidth = A4_WIDTH_MM - (MARGIN_MM * 2);    // 277mm
-            const pdfPageHeight = A4_HEIGHT_MM - (MARGIN_MM * 2); // 190mm
-            
+            const pdfWidth = A4_WIDTH_MM - (MARGIN_MM * 2);
+            const pdfPageHeight = A4_HEIGHT_MM - (MARGIN_MM * 2);
             const imgProps = pdf.getImageProperties(imgData);
             const totalImgHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
@@ -451,22 +516,26 @@
                 }
             }
             // --- End Layout Logic ---
+            
+            const fileName = `${document.title || 'sunday-schedule'}.pdf`;
+            pdf.save(fileName);
 
         } catch (error) {
             console.error("PDF generation failed:", error);
             alert("Sorry, there was an error creating the PDF.");
-            // Ensure cleanup even if it fails
+        } finally {
+            // --- CLEANUP ---
+            // Remove the temporary print container
             if (document.body.contains(printContainer)) {
                 document.body.removeChild(printContainer);
             }
-        } finally {
-            // Save the file
-            const fileName = `${document.title || 'sunday-schedule'}.pdf`;
-            pdf.save(fileName);
-        
+            // Remove the temporary embedded font styles
+            if (document.head.contains(styleElement)) {
+                document.head.removeChild(styleElement);
+            }
             // Re-enable the button
             printButton.disabled = false;
-            printButton.querySelector('span:last-child').textContent = 'Download PDF';
+            printButton.querySelector('span:last-child').textContent = originalSpanText;
         }
     }
     // --- END: MODIFIED PDF FUNCTION ---
