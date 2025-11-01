@@ -40,8 +40,8 @@
     *, *::before, *::after { box-sizing: border-box; }
     html { -webkit-font-smoothing: antialiased; }
     body { font-family: 'Noto Sans Telugu', sans-serif; background-color: var(--background-color); margin: 0; padding: 88px 20px 20px; color: var(--text-primary); }
-    main { margin-top: 0; }
     
+    main { margin-top: 0; }
     #app-header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border-color); padding: 12px 20px; }
     .header-content { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
     .header-actions { display: flex; align-items: center; gap: 12px; }
@@ -54,6 +54,7 @@
     .master-container { max-width: 1100px; margin: 0 auto; background: var(--surface-color); padding: 40px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
     
     .schedule-display-header { text-align: center; margin-bottom: 0; }
+    .title-block { text-align: center; }
     .title-block h1 { margin: 0; font-size: 1.8em; font-weight: 700; color: rgb(97, 40, 0); }
     .subtitle-svg-container { position: relative; display: inline-block; margin-top: 0; }
     .subtitle { margin: 0; font-size: 1.0em; font-weight: 500; color: #333; background-color: #ffffff; padding: 2px 8px; display: inline-block; position: relative; z-index: 2; white-space: nowrap; border-radius: var(--radius-md); }
@@ -67,13 +68,12 @@
     .schedule-table [contenteditable="true"]:focus { background-color: #fffbe5; outline: 1px solid #f59e0b; }
     .special-event { color: red; font-weight: 700; text-align: center; padding-left: 5px; }
     .schedule-table .top-empty-row { background-color: #ffffff; border-bottom: 2px solid #000; border-top: none; border-left: 2px solid white; border-right: 2px solid white; height: 25px; }
-    
+
     .event-btn { background: none; border: none; cursor: pointer; padding: 4px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
     .event-btn:hover { background-color: #f0f0f0; }
     #event-context-menu { position: fixed; display: none; background: var(--surface-color); border-radius: var(--radius-md); box-shadow: var(--shadow-md); z-index: 1001; padding: 6px; min-width: 180px; border: 1px solid var(--border-color); }
     .context-menu-item { font-family: 'Inter', sans-serif; display: block; width: 100%; padding: 8px 12px; cursor: pointer; font-size: 14px; border-radius: 6px; background: none; border: none; text-align: left; }
     .context-menu-item:hover { background: #f9fafb; }
-    .actions-col { width: 80px; }
 
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 16px; }
     .modal-content { background: white; padding: 24px; border-radius: var(--radius-lg); width: 100%; max-width: 500px; max-height: 90vh; display: flex; flex-direction: column; gap: 16px; }
@@ -84,25 +84,31 @@
     .modal-actions button { font-family: 'Inter', sans-serif; padding: 10px 20px; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); }
     #cancel-creation { background-color: var(--surface-color); }
     #confirm-creation { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
-
-    #print-container { position: absolute; left: -9999px; top: auto; width: 1100px; background: white; }
 </style>
 </head>
 <body>
 
-<div id="app-container" class="hidden">
+<div id="app-container">
     <header id="app-header">
         <div class="header-content">
              <div class="header-actions">
-                <a href="./sunday-dashboard.html" class="toolbar-btn"><span class="material-symbols-outlined">arrow_back</span><span>Dashboard</span></a>
-                <button id="print-button" class="toolbar-btn"><span class="material-symbols-outlined">picture_as_pdf</span><span>Download PDF</span></button>
+                <a href="./sunday-dashboard.html" class="toolbar-btn">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                    <span>Dashboard</span>
+                </a>
+                <button id="print-button" class="toolbar-btn">
+                    <span class="material-symbols-outlined">picture_as_pdf</span>
+                    <span>Download PDF</span>
+                </button>
             </div>
             <button id="logout-button">Logout</button>
         </div>
     </header>
 
     <div class="master-container">
-        <div id="schedule-content-wrapper"></div>
+        <div id="schedule-content-wrapper">
+            <!-- Schedule will be rendered here -->
+        </div>
     </div>
 </div>
 
@@ -148,7 +154,6 @@
     let currentListener = null;
     let activeRowForEvents = null;
 
-    const appContainer = document.getElementById('app-container');
     const scheduleWrapper = document.getElementById('schedule-content-wrapper');
     const dateSelectionModal = document.getElementById('date-selection-modal');
     const eventContextMenu = document.getElementById('event-context-menu');
@@ -162,7 +167,6 @@
         if (user) {
             currentUser = user;
             userSchedulesCollection = db.collection(`userSundaySchedules/${currentUser.uid}/schedules`);
-            appContainer.classList.remove('hidden');
             const params = new URLSearchParams(window.location.search);
             currentScheduleId = params.get('id');
             if (currentScheduleId) initEditor(); else initCreationFlow();
@@ -324,11 +328,9 @@
     
     function applyEventType(eventType) {
         if (!activeRowForEvents) return;
-
         const cells = Array.from(activeRowForEvents.cells);
         const topicCell = cells[1];
         const otherCells = cells.slice(2, 5);
-
         topicCell.colSpan = 1;
         topicCell.classList.remove('special-event');
         topicCell.setAttribute('contenteditable', 'true');
@@ -338,24 +340,20 @@
            topicCell.innerHTML = '';
         }
         topicCell.removeAttribute('data-original-content');
-
         otherCells.forEach((cell) => {
             cell.style.display = '';
             cell.setAttribute('contenteditable', 'true');
             if(cell.dataset.originalContent) cell.innerHTML = cell.dataset.originalContent;
             cell.removeAttribute('data-original-content');
         });
-
         const eventTexts = {
             'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం',
             'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో',
             'convention': 'ప్రాదేశిక సమావేశం'
         };
-
         if (eventType !== 'normal') {
             topicCell.dataset.originalContent = topicCell.innerHTML;
             otherCells.forEach(cell => cell.dataset.originalContent = cell.innerHTML);
-            
             topicCell.colSpan = 4;
             topicCell.classList.add('special-event');
             topicCell.setAttribute('contenteditable', 'false');
@@ -365,8 +363,44 @@
                 cell.setAttribute('contenteditable', 'false');
             });
         }
-        
         debouncedSave();
+    }
+    
+    async function generatePdf() {
+        const printButton = document.getElementById('print-button');
+        printButton.disabled = true;
+        printButton.querySelector('span:last-child').textContent = 'Generating...';
+
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('l', 'mm', 'a4'); // 'l' for landscape
+        const contentToPrint = document.getElementById('schedule-content-wrapper');
+        
+        const actionElements = contentToPrint.querySelectorAll('.actions-col, .event-btn');
+        actionElements.forEach(el => el.style.display = 'none');
+        
+        await html2canvas(contentToPrint, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: '#ffffff'
+        }).then(canvas => {
+            const imgData = canvas.toDataURL('image/jpeg', 0.9);
+            const A4_WIDTH_MM = 297;
+            const A4_HEIGHT_MM = 210;
+            
+            const imgProps = pdf.getImageProperties(imgData);
+            const pdfWidth = A4_WIDTH_MM;
+            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+            
+            pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+        });
+        
+        actionElements.forEach(el => el.style.display = '');
+
+        const fileName = `${document.title}.pdf`;
+        pdf.save(fileName);
+
+        printButton.disabled = false;
+        printButton.querySelector('span:last-child').textContent = 'Download PDF';
     }
 
     document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
@@ -387,64 +421,6 @@
             eventContextMenu.style.display = 'none';
         }
     });
-
-    async function generatePdf() {
-        const printButton = document.getElementById('print-button');
-        printButton.disabled = true;
-        printButton.querySelector('span:last-child').textContent = 'Generating...';
-
-        // --- NEW LOGIC: Wait for fonts to be ready ---
-        await document.fonts.ready;
-
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('l', 'mm', 'a4'); // 'l' for landscape
-        const contentToPrint = document.getElementById('schedule-content-wrapper');
-        
-        const actionButtons = contentToPrint.querySelectorAll('.actions-col, .event-btn');
-        actionButtons.forEach(btn => btn.style.display = 'none');
-        
-        try {
-            const canvas = await html2canvas(contentToPrint, {
-                scale: 2,
-                useCORS: true,
-                backgroundColor: '#ffffff'
-            });
-            
-            const imgData = canvas.toDataURL('image/jpeg', 0.9);
-            const A4_WIDTH_MM = 297;
-            const A4_HEIGHT_MM = 210;
-            const MARGIN_MM = 15;
-
-            const imgProps = pdf.getImageProperties(imgData);
-            const pdfWidth = A4_WIDTH_MM - (MARGIN_MM * 2);
-            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-            let heightLeft = pdfHeight;
-            let position = MARGIN_MM;
-
-            pdf.addImage(imgData, 'JPEG', MARGIN_MM, position, pdfWidth, pdfHeight);
-            heightLeft -= (A4_HEIGHT_MM - (MARGIN_MM * 2));
-
-            while (heightLeft > 0) {
-                pdf.addPage();
-                position = -A4_HEIGHT_MM + (MARGIN_MM * 2) - heightLeft;
-                pdf.addImage(imgData, 'JPEG', MARGIN_MM, position, pdfWidth, pdfHeight);
-                heightLeft -= (A4_HEIGHT_MM - (MARGIN_MM * 2));
-            }
-        } catch (error) {
-            console.error("PDF generation failed:", error);
-            alert("Sorry, the PDF could not be created.");
-        } finally {
-            // Restore the action buttons
-            actionButtons.forEach(btn => btn.style.display = '');
-
-            const fileName = `${document.title}.pdf`;
-            pdf.save(fileName);
-
-            printButton.disabled = false;
-            printButton.querySelector('span:last-child').textContent = 'Download PDF';
-        }
-    }
 
 })();
 </script>
