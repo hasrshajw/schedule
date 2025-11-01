@@ -50,8 +50,12 @@
     /* Main Layout */
     .master-container { max-width: 1100px; margin: 0 auto; background: var(--surface-color); padding: 40px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
     
-    .schedule-display-header { text-align: center; margin-bottom: 0; }
-    main { margin-top: 0; }
+    /* STYLES FROM STATIC EXAMPLE */
+/* STYLES FROM STATIC EXAMPLE */
+.schedule-display-header {
+    text-align: center;
+    margin-bottom: 0; /* Step 1: Remove bottom margin from header */
+}
     .title-block { text-align: center; }
     .title-block h1 { margin: 0; font-size: 1.8em; font-weight: 700; color: rgb(97, 40, 0); }
     .subtitle-svg-container { position: relative; display: inline-block; margin-top: 0; }
@@ -60,26 +64,53 @@
     .svg-divider { width: 400px; height: 5px; display: block; position: absolute; left: 50%; transform: translateX(-50%); top: 50%; margin-top: -2.5px; z-index: 1; }
     
     /* Table Styling */
-    .schedule-table { width: 100%; border-collapse: collapse; font-size: 0.9em; border-left: 2px solid #000; border-right: 2px solid #000; border-bottom: 2px solid #000; }
+    .schedule-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9em;
+        /* UPDATED BORDER LOGIC */
+        border-left: 2px solid #000;
+        border-right: 2px solid #000;
+        border-bottom: 2px solid #000;
+    }
     .schedule-table th, .schedule-table td { border: 1px solid #000; padding: 8px 5px; text-align: center; vertical-align: middle; font-weight: 700; }
     .schedule-table tbody td:not(:first-child):not(.special-event) { text-align: left; padding-left: 10px; }
     .schedule-table thead th { background-color: #F3E5D7; font-size: 1.0em; padding: 10px 5px; }
     .schedule-table [contenteditable="true"]:focus { background-color: #fffbe5; outline: 1px solid #f59e0b; }
     .special-event { color: red; font-weight: 700; text-align: center; padding-left: 5px; }
-    .schedule-table .top-empty-row { background-color: #ffffff; border-bottom: 2px solid #000; border-top: none; border-left: 2px solid white; border-right: 2px solid white; height: 25px; }
-
-    /* Menus */
-    #event-context-menu, #topic-context-menu { position: fixed; display: none; background: var(--surface-color); border-radius: var(--radius-md); box-shadow: var(--shadow-md); z-index: 1001; padding: 6px; min-width: 180px; border: 1px solid var(--border-color); }
-    .context-menu-item { font-family: 'Inter', sans-serif; display: block; width: 100%; padding: 8px 12px; cursor: pointer; font-size: 14px; border-radius: 6px; background: none; border: none; text-align: left; }
-    .context-menu-item:hover { background: #f9fafb; }
+    
+    /* --- UPDATED --- Logic for the empty top row and the title row */
+    /* --- UPDATED --- Logic for the empty top row and the title row */
+/* --- UPDATED --- Logic for the empty top row and the title row */
+/* --- UPDATED --- Logic for the empty top row and the title row */
+/* --- UPDATED --- Logic for the empty top row and the title row */
+.schedule-table .top-empty-row {
+    background-color: #ffffff;
+    border-top: none;
+    border-left: 2px solid white;
+    border-right: 2px solid white;
+    /* --- CHANGE HERE --- */
+    border-bottom: 2px solid #000; /* Set the bottom border to be 2px thick */
+    height: 25px;
+}
+.schedule-table thead tr:nth-of-type(2) th {
+    border-top: 2px solid #000; /* This ensures the top border is 2px thick */
+}
+    /* Event Button & Menu */
     .event-btn { background: none; border: none; cursor: pointer; padding: 4px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
     .event-btn:hover { background-color: #f0f0f0; }
-    
+    #event-context-menu { position: fixed; display: none; background: var(--surface-color); border-radius: var(--radius-md); box-shadow: var(--shadow-md); z-index: 1001; padding: 6px; min-width: 180px; border: 1px solid var(--border-color); }
+    .context-menu-item { font-family: 'Inter', sans-serif; display: block; width: 100%; padding: 8px 12px; cursor: pointer; font-size: 14px; border-radius: 6px; background: none; border: none; text-align: left; }
+    .context-menu-item:hover { background: #f9fafb; }
+
     /* Modal Styles */
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 16px; }
     .modal-content { background: white; padding: 24px; border-radius: var(--radius-lg); width: 100%; max-width: 500px; max-height: 90vh; display: flex; flex-direction: column; gap: 16px; }
+    .modal-content h2 { margin-top: 0; }
     #new-schedule-name { width: 100%; padding: 12px; font-size: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); }
     #date-checklist { list-style: none; padding: 0; margin: 0; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md); max-height: 40vh; }
+    #date-checklist li { padding: 10px 12px; border-bottom: 1px solid var(--border-color); }
+    #date-checklist li:last-child { border-bottom: none; }
     #date-checklist label { display: flex; align-items: center; gap: 10px; font-size: 16px; cursor: pointer; font-weight: 500; }
     .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px; }
     .modal-actions button { font-family: 'Inter', sans-serif; padding: 10px 20px; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); }
@@ -89,9 +120,27 @@
     /* Print Styles */
     @media print {
         @page { size: A4 landscape; margin: 0; }
-        html, body { width: 100%; height: 100%; background-color: #ffffff !important; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        html, body {
+            width: 100%;
+            height: 100%;
+            background-color: #ffffff !important;
+            padding: 0;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
         #app-header, .actions-col { display: none !important; }
-        .master-container { margin: 0; border: none; box-shadow: none; width: 100%; height: 100%; padding: 40px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .master-container {
+            margin: 0;
+            border: none;
+            box-shadow: none;
+            width: 100%;
+            height: 100%;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
     }
 </style>
 </head>
@@ -115,7 +164,9 @@
     </header>
 
     <div class="master-container">
-        <div id="schedule-content-wrapper"></div>
+        <div id="schedule-content-wrapper">
+            <!-- Schedule will be rendered here -->
+        </div>
     </div>
 </div>
 
@@ -124,14 +175,6 @@
     <button class="context-menu-item" data-event-type="co-visit">CO Visit</button>
     <button class="context-menu-item" data-event-type="assembly">Assembly</button>
     <button class="context-menu-item" data-event-type="convention">Convention</button>
-</div>
-
-<!-- NEW: Topic Selection Menu -->
-<div id="topic-context-menu">
-    <button class="context-menu-item" data-topic-text="selected 1">Topic 1</button>
-    <button class="context-menu-item" data-topic-text="selected 2">Topic 2</button>
-    <button class="context-menu-item" data-topic-text="selected 3">Topic 3</button>
-    <button class="context-menu-item" data-topic-text="selected 4">Topic 4</button>
 </div>
 
 <div id="date-selection-modal" class="modal-overlay">
@@ -168,13 +211,11 @@
     let userSchedulesCollection = null;
     let currentListener = null;
     let activeRowForEvents = null;
-    let activeTopicCell = null; // NEW: Variable to hold the topic cell being edited
 
     const appContainer = document.getElementById('app-container');
     const scheduleWrapper = document.getElementById('schedule-content-wrapper');
     const dateSelectionModal = document.getElementById('date-selection-modal');
     const eventContextMenu = document.getElementById('event-context-menu');
-    const topicContextMenu = document.getElementById('topic-context-menu'); // NEW: Get topic menu element
 
     const debounce = (func, delay) => {
         let timeout;
@@ -251,15 +292,20 @@
             </main>
         `;
         scheduleWrapper.addEventListener('input', debouncedSave);
-        // NEW: Consolidated click handler for the entire wrapper
-        scheduleWrapper.addEventListener('click', handleWrapperClick);
+        scheduleWrapper.querySelectorAll('.event-btn').forEach(btn => {
+            btn.addEventListener('click', openEventMenu);
+        });
     }
 
     const debouncedSave = debounce(() => {
         const subtitleEl = scheduleWrapper.querySelector('.subtitle');
         const tableBodyEl = scheduleWrapper.querySelector('.schedule-table tbody');
         if (!subtitleEl || !tableBodyEl) return;
-        const payload = { dateRange: subtitleEl.textContent, tableHTML: tableBodyEl.innerHTML };
+
+        const payload = {
+            dateRange: subtitleEl.textContent,
+            tableHTML: tableBodyEl.innerHTML
+        };
         userSchedulesCollection.doc(currentScheduleId).update(payload)
             .catch(err => console.error("Save failed:", err));
     }, 1500);
@@ -280,7 +326,9 @@
         const sundays = [];
         let currentDate = new Date();
         let dayOfWeek = currentDate.getDay();
-        if (dayOfWeek !== 0) { currentDate.setDate(currentDate.getDate() + (7 - dayOfWeek)); }
+        if (dayOfWeek !== 0) { 
+            currentDate.setDate(currentDate.getDate() + (7 - dayOfWeek));
+        }
         for (let i = 0; i < count; i++) {
             const day = String(currentDate.getDate()).padStart(2, '0');
             const month = String(currentDate.getMonth() + 1).padStart(2, '0');
@@ -308,83 +356,83 @@
                 <td contenteditable="true"></td>
                 <td contenteditable="true"></td>
                 <td class="actions-col">
-                    <button class="event-btn"><span class="material-symbols-outlined">more_vert</span></button>
+                    <button class="event-btn">
+                        <span class="material-symbols-outlined">more_vert</span>
+                    </button>
                 </td>
             </tr>
         `).join('');
 
         try {
-            const newDocRef = await userSchedulesCollection.add({ name: scheduleName, dateRange: dateRange, tableHTML: tableBodyHTML, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+            const newDocRef = await userSchedulesCollection.add({
+                name: scheduleName,
+                dateRange: dateRange,
+                tableHTML: tableBodyHTML,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
             window.location.href = `./sunday-editor.html?id=${newDocRef.id}`;
-        } catch (error) { console.error("Error creating schedule:", error); alert("Could not create schedule."); }
-    }
-
-    // --- NEW: Central click handler for table interactions ---
-    function handleWrapperClick(e) {
-        const cell = e.target.closest('td');
-        const eventBtn = e.target.closest('.event-btn');
-
-        if (eventBtn) {
-            openEventMenu(e);
-            return;
-        }
-
-        if (cell && cell.cellIndex === 1 && !cell.classList.contains('special-event')) {
-            e.preventDefault(); // Prevent default text editing focus
-            openTopicMenu(e, cell);
+        } catch (error) {
+            console.error("Error creating new schedule:", error);
+            alert("Could not create schedule. Please try again.");
         }
     }
     
     function openEventMenu(e) {
-        activeRowForEvents = e.target.closest('tr');
-        const rect = e.target.closest('.event-btn').getBoundingClientRect();
+        const btn = e.currentTarget;
+        activeRowForEvents = btn.closest('tr');
+        const rect = btn.getBoundingClientRect();
         eventContextMenu.style.display = 'block';
         eventContextMenu.style.top = `${rect.bottom}px`;
         eventContextMenu.style.left = `${rect.left - eventContextMenu.offsetWidth + rect.width}px`;
-        topicContextMenu.style.display = 'none'; // Hide other menu
-    }
-
-    // NEW: Function to open the topic menu
-    function openTopicMenu(e, cell) {
-        activeTopicCell = cell;
-        const rect = cell.getBoundingClientRect();
-        topicContextMenu.style.display = 'block';
-        topicContextMenu.style.top = `${rect.top}px`;
-        topicContextMenu.style.left = `${rect.left}px`;
-        eventContextMenu.style.display = 'none'; // Hide other menu
     }
     
     function applyEventType(eventType) {
         if (!activeRowForEvents) return;
+
         const cells = Array.from(activeRowForEvents.cells);
         const topicCell = cells[1];
         const otherCells = cells.slice(2, 5);
+
         topicCell.colSpan = 1;
         topicCell.classList.remove('special-event');
         topicCell.setAttribute('contenteditable', 'true');
-        if(topicCell.dataset.originalContent) { topicCell.innerHTML = topicCell.dataset.originalContent; } 
-        else if (eventType !== 'normal') { topicCell.innerHTML = ''; }
+        if(topicCell.dataset.originalContent) {
+           topicCell.innerHTML = topicCell.dataset.originalContent;
+        } else if (eventType !== 'normal') {
+           topicCell.innerHTML = '';
+        }
         topicCell.removeAttribute('data-original-content');
+
         otherCells.forEach((cell) => {
             cell.style.display = '';
             cell.setAttribute('contenteditable', 'true');
             if(cell.dataset.originalContent) cell.innerHTML = cell.dataset.originalContent;
             cell.removeAttribute('data-original-content');
         });
-        const eventTexts = { 'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం', 'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో', 'convention': 'ప్రాదేశిక సమావేశం' };
+
+        const eventTexts = {
+            'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం',
+            'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో',
+            'convention': 'ప్రాదేశిక సమావేశం'
+        };
+
         if (eventType !== 'normal') {
             topicCell.dataset.originalContent = topicCell.innerHTML;
             otherCells.forEach(cell => cell.dataset.originalContent = cell.innerHTML);
+            
             topicCell.colSpan = 4;
             topicCell.classList.add('special-event');
             topicCell.setAttribute('contenteditable', 'false');
             topicCell.textContent = eventTexts[eventType];
-            otherCells.forEach(cell => { cell.style.display = 'none'; cell.setAttribute('contenteditable', 'false'); });
+            otherCells.forEach(cell => {
+                cell.style.display = 'none';
+                cell.setAttribute('contenteditable', 'false');
+            });
         }
+        
         debouncedSave();
     }
 
-    // --- Global UI Listeners ---
     document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
     document.getElementById('print-button').addEventListener('click', () => window.print());
     document.getElementById('cancel-creation').addEventListener('click', () => window.location.href = './sunday-dashboard.html');
@@ -392,27 +440,15 @@
 
     eventContextMenu.addEventListener('click', (e) => {
         const target = e.target.closest('.context-menu-item');
-        if (target) { applyEventType(target.dataset.eventType); eventContextMenu.style.display = 'none'; }
-    });
-
-    // NEW: Listener for the topic menu
-    topicContextMenu.addEventListener('click', (e) => {
-        const target = e.target.closest('[data-topic-text]');
-        if (target && activeTopicCell) {
-            activeTopicCell.textContent = target.dataset.topicText;
-            topicContextMenu.style.display = 'none';
-            debouncedSave();
+        if (target) {
+            applyEventType(target.dataset.eventType);
+            eventContextMenu.style.display = 'none';
         }
     });
 
     document.addEventListener('click', (e) => {
         if (!eventContextMenu.contains(e.target) && !e.target.closest('.event-btn')) {
             eventContextMenu.style.display = 'none';
-        }
-        // NEW: Hide topic menu on outside click
-        const topicCell = e.target.closest('td');
-        if (!topicContextMenu.contains(e.target) && (!topicCell || topicCell.cellIndex !== 1)) {
-            topicContextMenu.style.display = 'none';
         }
     });
 
