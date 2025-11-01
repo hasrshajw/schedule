@@ -18,7 +18,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;500;700&display=block" rel="stylesheet">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 
 <style>
@@ -37,6 +36,29 @@
         --radius-lg: 16px;
         --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
     }
+    /* START: Add these @font-face rules to your <style> block */
+@font-face {
+  font-family: 'Noto Sans Telugu';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url(https://fonts.gstatic.com/s/notosanstelugu/v29/0FlPVI-9c7c0hcJ5-9bT1sBY0E-e6mNZS-0.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Noto Sans Telugu';
+  font-style: normal;
+  font-weight: 500;
+  font-display: block;
+  src: url(https://fonts.gstatic.com/s/notosanstelugu/v29/0FlPVI-9c7c0hcJ5-9bT1sBY0E-e8GJZS-0.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Noto Sans Telugu';
+  font-style: normal;
+  font-weight: 700;
+  font-display: block;
+  src: url(https://fonts.gstatic.com/s/notosanstelugu/v29/0FlPVI-9c7c0hcJ5-9bT1sBY0E-eHmRZ_a0.woff2) format('woff2');
+}
+/* END: Font face rules */
     *, *::before, *::after { box-sizing: border-box; }
     html { -webkit-font-smoothing: antialiased; }
     body { font-family: 'Noto Sans Telugu', sans-serif; background-color: var(--background-color); margin: 0; padding: 88px 20px 20px; color: var(--text-primary); }
@@ -371,34 +393,35 @@
         printButton.disabled = true;
         printButton.querySelector('span:last-child').textContent = 'Generating...';
 
-        // 1. Wait for the browser to say fonts are ready
+        // 1. Wait for browser to *say* fonts are ready
         await document.fonts.ready;
 
-        // 2. Add a short, forced delay to allow 'display:block' to work
-        // This forces the code to wait 300ms for the font to paint
-        await new Promise(resolve => setTimeout(resolve, 300)); 
+        // 2. Force a 1-second (1000ms) delay.
+        // This is the most critical fix to allow the browser to paint the font.
+        await new Promise(resolve => setTimeout(resolve, 1000)); 
 
         const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('l', 'mm', 'a4'); // 'l' for landscape
+        const pdf = new jsPDF('l', 'mm', 'a4');
         const contentToPrint = document.getElementById('schedule-content-wrapper');
         
-        // Hide actions buttons
+        // Hide action buttons
         const actionElements = contentToPrint.querySelectorAll('.actions-col, .event-btn');
         actionElements.forEach(el => el.style.display = 'none');
         
-        // --- Key Fixes for capturing ---
-        // Set a fixed width before capture to ensure consistent layout
+        // Set a fixed width before capture
         const originalWidth = contentToPrint.style.width;
         contentToPrint.style.width = '1100px'; 
         
         try {
             const canvas = await html2canvas(contentToPrint, {
-                scale: 2, // Use a high scale for better quality
-                useCORS: true, // This is essential for Google Fonts
-                allowTaint: false, // Must be false when useCORS is true
+                // --- New/Important Settings ---
+                logging: true,  // Print debug info to the console (F12)
+                useCORS: true,  // Still needed for fonts.gstatic.com
+                // ---
+                scale: 2, 
+                allowTaint: false,
                 backgroundColor: '#ffffff',
-                // This option often helps with font rendering
-                letterRendering: true 
+                letterRendering: true
             });
 
             // --- Restore the page immediately ---
@@ -407,9 +430,9 @@
 
             // --- Multi-page PDF logic ---
             const imgData = canvas.toDataURL('image/jpeg', 0.9);
-            const A4_WIDTH_MM = 297;  // Landscape width
-            const A4_HEIGHT_MM = 210; // Landscape height
-            const MARGIN_MM = 10;     // Page margin
+            const A4_WIDTH_MM = 297;  
+            const A4_HEIGHT_MM = 210; 
+            const MARGIN_MM = 10;     
             
             const pdfWidth = A4_WIDTH_MM - (MARGIN_MM * 2);
             const pdfPageHeight = A4_HEIGHT_MM - (MARGIN_MM * 2);
@@ -418,13 +441,11 @@
             const totalImgHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
             let heightLeft = totalImgHeight;
-            let position = MARGIN_MM; // Start at the top margin
+            let position = MARGIN_MM; 
 
-            // Add the first page
             pdf.addImage(imgData, 'JPEG', MARGIN_MM, position, pdfWidth, totalImgHeight);
             heightLeft -= pdfPageHeight;
 
-            // Keep adding pages as long as the image is taller
             while (heightLeft > 0) {
                 position = -heightLeft - MARGIN_MM;
                 pdf.addPage();
@@ -434,16 +455,15 @@
 
         } catch (error) {
             console.error("PDF generation failed:", error);
-            alert("Sorry, there was an error creating the PDF.");
+            alert("Sorry, there was an error creating the PDF. Check the console (F12) for details.");
+            
             // Restore styles even if it fails
             actionElements.forEach(el => el.style.display = '');
             contentToPrint.style.width = originalWidth;
         } finally {
-            // Save the file
             const fileName = `${document.title}.pdf`;
             pdf.save(fileName);
         
-            // Re-enable the button
             printButton.disabled = false;
             printButton.querySelector('span:last-child').textContent = 'Download PDF';
         }
