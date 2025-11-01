@@ -238,7 +238,7 @@
             } else {
                 const eventTexts = { 'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం', 'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో', 'convention': 'ప్రాదేశిక సమావేశం' };
                 allRows.forEach((row, index) => { row.style.display = (index === 0) ? '' : 'none'; });
-                if (firstRow && !firstRow.dataset.originalContent)Under { firstRow.dataset.originalContent = firstRow.innerHTML; }
+                if (firstRow && !firstRow.dataset.originalContent) { firstRow.dataset.originalContent = firstRow.innerHTML; }
                 firstRow.innerHTML = `<thstood. This is a complex but powerful integration, combining your member management with the mid colspan="1" class="special-event-text">${eventTexts[eventType]}</th><td style="text-align: right; font-weight: 700;">తేదీ:</td><td contenteditable="true"></td>`;
             }
 
