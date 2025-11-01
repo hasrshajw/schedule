@@ -36,8 +36,6 @@
         --radius-md: 8px;
         --radius-lg: 16px;
         --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-        
-        /* New variables for navigation */
         --header-bg: #292929;
         --text-light: #fff;
         --menu-new-text: #4a6da7;
@@ -45,7 +43,7 @@
         --menu-new-border: #eeeeee;
         --menu-new-hover: #f5f5f5;
     }
-
+    
     @font-face {
         font-family: "jw-icons-external";
         src: url("./jw-icons-external-d876da3.woff") format("woff");
@@ -55,20 +53,19 @@
     *, *::before, *::after { box-sizing: border-box; }
     html { -webkit-font-smoothing: antialiased; }
     
-    body { 
-        font-family: 'Noto Sans Telugu', sans-serif; 
-        background-color: var(--background-color); 
-        margin: 0; 
-        padding: 0;
+    body {
+        margin: 0; padding: 0;
+        font-family: 'Noto Sans Telugu', sans-serif;
+        background-color: var(--background-color);
         color: var(--text-primary);
-        visibility: hidden; 
-        opacity: 0;
+        visibility: hidden; opacity: 0;
         transition: opacity 0.3s ease-in;
+        padding-top: 56px;
     }
     body.auth-ready { visibility: visible; opacity: 1; }
     body.menu-open { overflow: hidden; }
 
-    /* Header & Menu - NEW */
+    /* Header & Menu */
     .site-header { background-color: var(--header-bg); padding: 0; color: var(--text-light); position: fixed; top: 0; left: 0; width: 100%; z-index: 900; }
     .top-bar { display: flex; justify-content: space-between; align-items: center; height: 56px; padding: 0 15px 0 0; max-width: 1200px; margin: 0 auto; }
     #mobileNavTopBar .mobileLogo { display: block; width: 75px; height: 56px; background-image: url(https://www.jw.org/assets/ct/46605f23da/images/siteLogo-jworg-mobile.svg), none; background-repeat: no-repeat; background-size: contain; background-position: center left; flex-shrink: 0; }
@@ -95,38 +92,9 @@
     .sunday-icon::before { content: "\e610"; }
     .members-icon::before { content: "\e695"; }
 
-    /* Existing styles - KEEP ALL */
     main { margin-top: 0; }
     
-    /* Updated header styles */
-    #app-header { 
-        position: fixed; 
-        top: 56px; /* Position below navigation */
-        left: 0; 
-        right: 0; 
-        z-index: 100; 
-        background-color: rgba(255, 255, 255, 0.8); 
-        backdrop-filter: blur(8px); 
-        border-bottom: 1px solid var(--border-color); 
-        padding: 12px 20px; 
-    }
-    .header-content { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
-    .header-actions { display: flex; align-items: center; gap: 12px; }
-    .toolbar-btn { font-family: 'Inter', sans-serif; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); text-decoration: none; color: var(--text-secondary); }
-    .toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; color: var(--text-primary); }
-    .toolbar-btn:disabled { cursor: not-allowed; opacity: 0.5; }
-    #logout-button { font-family: 'Inter', sans-serif; background: transparent; border: 1px solid var(--border-color); padding: 8px 16px; border-radius: var(--radius-md); cursor: pointer; font-weight: 600; font-size: 14px; }
-    #logout-button:hover { background-color: var(--danger-light); color: var(--danger-hover); border-color: var(--danger-hover); }
-
-    .master-container { 
-        max-width: 1100px; 
-        margin: 0 auto; 
-        background: var(--surface-color); 
-        padding: 40px; 
-        border-radius: var(--radius-lg); 
-        box-shadow: var(--shadow-md); 
-        margin-top: 120px; /* Adjusted for both headers */
-    }
+    .master-container { max-width: 1100px; margin: 0 auto; background: var(--surface-color); padding: 40px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
     
     .schedule-display-header { text-align: center; margin-bottom: 0; }
     .title-block { text-align: center; }
@@ -145,24 +113,6 @@
     
     .event-btn { background: none; border: none; cursor: pointer; padding: 4px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
     .event-btn:hover { background-color: #f0f0f0; }
-    
-    /* Dropdown styles - NEW */
-    .dropdown-cell { position: relative; }
-    .dropdown-cell select {
-        width: 100%;
-        border: none;
-        background: transparent;
-        font-family: 'Noto Sans Telugu', sans-serif;
-        font-size: 0.9em;
-        font-weight: 700;
-        cursor: pointer;
-        padding: 4px;
-    }
-    .dropdown-cell select:focus {
-        outline: 1px solid #f59e0b;
-        background-color: #fffbe5;
-    }
-
     #event-context-menu { position: fixed; display: none; background: var(--surface-color); border-radius: var(--radius-md); box-shadow: var(--shadow-md); z-index: 1001; padding: 6px; min-width: 180px; border: 1px solid var(--border-color); }
     .context-menu-item { font-family: 'Inter', sans-serif; display: block; width: 100%; padding: 8px 12px; cursor: pointer; font-size: 14px; border-radius: 6px; background: none; border: none; text-align: left; }
     .context-menu-item:hover { background: #f9fafb; }
@@ -176,6 +126,16 @@
     .modal-actions button { font-family: 'Inter', sans-serif; padding: 10px 20px; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); }
     #cancel-creation { background-color: var(--surface-color); }
     #confirm-creation { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
+
+    /* Dropdown styles */
+    .dropdown-container { position: relative; width: 100%; }
+    .dropdown-toggle { width: 100%; text-align: left; padding: 8px 10px; border: 1px solid transparent; background: transparent; cursor: pointer; font-family: 'Noto Sans Telugu', sans-serif; font-size: 0.9em; font-weight: 700; }
+    .dropdown-toggle:focus { outline: 1px solid #f59e0b; background-color: #fffbe5; }
+    .dropdown-menu { position: absolute; top: 100%; left: 0; width: 100%; background: white; border: 1px solid var(--border-color); border-radius: var(--radius-md); box-shadow: var(--shadow-md); z-index: 1002; max-height: 200px; overflow-y: auto; display: none; }
+    .dropdown-item { padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #f0f0f0; font-family: 'Noto Sans Telugu', sans-serif; }
+    .dropdown-item:last-child { border-bottom: none; }
+    .dropdown-item:hover { background-color: #f5f5f5; }
+    .dropdown-open .dropdown-menu { display: block; }
 
     /* PDF-specific styles */
     .pdf-page-container {
@@ -196,10 +156,10 @@
     .pdf-table th,
     .pdf-table td {
         border: 1px solid #000;
-        padding: 8px 6px;
+        padding: 8px 6px; /* Reduced padding for smaller cell height */
         font-family: 'Noto Sans Telugu', sans-serif;
         font-weight: 700;
-        height: 35px;
+        height: 35px; /* Reduced cell height */
         vertical-align: middle;
         box-sizing: border-box;
     }
@@ -207,7 +167,7 @@
     .pdf-table thead th {
         background-color: #F3E5D7;
         font-size: 1.0em;
-        padding: 8px 6px;
+        padding: 8px 6px; /* Reduced padding */
     }
     
     .pdf-header {
@@ -251,21 +211,21 @@
     }
     
     .pdf-table {
-        table-layout: fixed !important;
-        width: 100% !important;
-    }
+    table-layout: fixed !important;
+    width: 100% !important;
+}
 
-    .pdf-table th,
-    .pdf-table td {
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
-        white-space: nowrap !important;
-    }
+.pdf-table th,
+.pdf-table td {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
 </style>
 </head>
 <body>
 
-<!-- NEW Navigation Header -->
+<!-- New Header and Menu -->
 <header class="site-header">
     <div class="top-bar" id="mobileNavTopBar">
         <a href="./home.html" class="mobileLogo" title="Home"></a>
@@ -288,33 +248,14 @@
     </ul>
     <div class="profile-section">
         <div class="profile-info">
-            <div class="profile-name">Loading...</div>
+             <div class="profile-name">Loading...</div>
         </div>
     </div>
 </div>
 
-<!-- Existing App Container -->
-<div id="app-container">
-    <header id="app-header">
-        <div class="header-content">
-             <div class="header-actions">
-                <a href="./sunday-dashboard.html" class="toolbar-btn">
-                    <span class="material-symbols-outlined">arrow_back</span>
-                    <span>Dashboard</span>
-                </a>
-                <button id="print-button" class="toolbar-btn">
-                    <span class="material-symbols-outlined">picture_as_pdf</span>
-                    <span>Download PDF</span>
-                </button>
-            </div>
-            <button id="logout-button">Logout</button>
-        </div>
-    </header>
-
-    <div class="master-container">
-        <div id="schedule-content-wrapper">
-            <!-- Schedule will be rendered here -->
-        </div>
+<div class="master-container">
+    <div id="schedule-content-wrapper">
+        <!-- Schedule will be rendered here -->
     </div>
 </div>
 
@@ -360,62 +301,41 @@
     let membersCollection = null;
     let currentListener = null;
     let activeRowForEvents = null;
+    let brothersList = [];
+    let talkTopics = [
+        { id: 'topic-1', display: 'అంశం-1', text: 'this is talk-1' },
+        { id: 'topic-2', display: 'అంశం-2', text: 'this is talk-2' },
+        { id: 'topic-3', display: 'అంశం-3', text: 'this is talk-3' },
+        { id: 'topic-4', display: 'అంశం-4', text: 'this is talk-4' }
+    ];
 
     const scheduleWrapper = document.getElementById('schedule-content-wrapper');
     const dateSelectionModal = document.getElementById('date-selection-modal');
     const eventContextMenu = document.getElementById('event-context-menu');
-
-    // NEW: Topic mapping
-    const topicMap = {
-        'అంశం-1': 'this is talk-1',
-        'అంశం-2': 'this is talk-2', 
-        'అంశం-3': 'this is talk-3',
-        'అంశం-4': 'this is talk-4'
-    };
 
     const debounce = (func, delay) => {
         let timeout;
         return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), delay); };
     };
 
-    // NEW: Menu functionality
-    const menuToggleButton = document.getElementById('menu-toggle-button');
-    const slideMenu = document.getElementById('slide-menu');
-    const menuOverlay = document.getElementById('menu-overlay');
-    const body = document.body;
-    
-    function closeMenu() {
-        slideMenu.classList.remove('is-open');
-        menuOverlay.classList.remove('is-open');
-        body.classList.remove('menu-open');
-    }
-
-    menuToggleButton.addEventListener('click', () => {
-        if (body.classList.contains('menu-open')) {
-            closeMenu();
-        } else {
-            slideMenu.classList.add('is-open');
-            menuOverlay.classList.add('is-open');
-            body.classList.add('menu-open');
-        }
-    });
-    menuOverlay.addEventListener('click', closeMenu);
-
     auth.onAuthStateChanged(user => {
         if (user) {
             currentUser = user;
             userSchedulesCollection = db.collection(`userSundaySchedules/${currentUser.uid}/schedules`);
-            membersCollection = db.collection(`users/${currentUser.uid}/members`); // NEW
+            membersCollection = db.collection(`users/${currentUser.uid}/members`);
             const params = new URLSearchParams(window.location.search);
             currentScheduleId = params.get('id');
             
-            // NEW: Update profile name
+            // Set profile name
             const profileNameEl = document.querySelector('.profile-name');
             if (profileNameEl && user.displayName) {
                 profileNameEl.textContent = user.displayName;
             }
             
             document.body.classList.add('auth-ready');
+            
+            // Fetch brothers list
+            fetchBrothers();
             
             if (currentScheduleId) initEditor(); else initCreationFlow();
         } else {
@@ -435,124 +355,6 @@
                 alert("This schedule may have been deleted.");
                 window.location.href = './sunday-dashboard.html';
             }
-        });
-    }
-
-    // NEW: Function to get brothers for dropdown
-    async function getBrothers() {
-        try {
-            const snapshot = await membersCollection
-                .where('type', '==', 'brother')
-                .orderBy('name')
-                .get();
-            
-            return snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
-        } catch (error) {
-            console.error("Error fetching brothers:", error);
-            return [];
-        }
-    }
-
-    // NEW: Function to create dropdown for talk topics
-    function createTopicDropdown(currentValue = '') {
-        const select = document.createElement('select');
-        select.className = 'topic-dropdown';
-        
-        // Add empty option
-        const emptyOption = document.createElement('option');
-        emptyOption.value = '';
-        emptyOption.textContent = '-- ఎంచుకోండి --';
-        select.appendChild(emptyOption);
-        
-        // Add topic options
-        Object.keys(topicMap).forEach(topicKey => {
-            const option = document.createElement('option');
-            option.value = topicKey;
-            option.textContent = topicKey;
-            if (currentValue === topicMap[topicKey]) {
-                option.selected = true;
-            }
-            select.appendChild(option);
-        });
-        
-        select.addEventListener('change', function() {
-            const cell = this.parentElement;
-            if (this.value) {
-                cell.textContent = topicMap[this.value];
-            } else {
-                cell.textContent = '';
-            }
-            cell.setAttribute('contenteditable', 'true');
-            debouncedSave();
-        });
-        
-        return select;
-    }
-
-    // NEW: Function to create dropdown for brothers
-    function createBrotherDropdown(brothers, currentValue = '') {
-        const select = document.createElement('select');
-        select.className = 'brother-dropdown';
-        
-        // Add empty option
-        const emptyOption = document.createElement('option');
-        emptyOption.value = '';
-        emptyOption.textContent = '-- ఎంచుకోండి --';
-        select.appendChild(emptyOption);
-        
-        // Add brother options
-        brothers.forEach(brother => {
-            const option = document.createElement('option');
-            option.value = brother.name;
-            option.textContent = brother.name;
-            if (currentValue === brother.name) {
-                option.selected = true;
-            }
-            select.appendChild(option);
-        });
-        
-        select.addEventListener('change', function() {
-            const cell = this.parentElement;
-            cell.textContent = this.value;
-            cell.setAttribute('contenteditable', 'true');
-            debouncedSave();
-        });
-        
-        return select;
-    }
-
-    // NEW: Function to setup dropdown cells
-    async function setupDropdownCells() {
-        const brothers = await getBrothers();
-        
-        // Setup topic dropdown cells (column index 1)
-        const topicCells = scheduleWrapper.querySelectorAll('tbody td:nth-child(2):not(.special-event)');
-        topicCells.forEach(cell => {
-            if (!cell.querySelector('.topic-dropdown')) {
-                const currentValue = cell.textContent.trim();
-                cell.classList.add('dropdown-cell');
-                const select = createTopicDropdown(currentValue);
-                cell.innerHTML = '';
-                cell.appendChild(select);
-            }
-        });
-        
-        // Setup brother dropdown cells (columns 3, 4, 5)
-        const brotherColumns = [3, 4, 5]; // ప్రసంగీకుడు, చైర్మన్, కావలికోట రీడర్
-        brotherColumns.forEach(colIndex => {
-            const cells = scheduleWrapper.querySelectorAll(`tbody td:nth-child(${colIndex})`);
-            cells.forEach(cell => {
-                if (!cell.querySelector('.brother-dropdown') && cell.style.display !== 'none') {
-                    const currentValue = cell.textContent.trim();
-                    cell.classList.add('dropdown-cell');
-                    const select = createBrotherDropdown(brothers, currentValue);
-                    cell.innerHTML = '';
-                    cell.appendChild(select);
-                }
-            });
         });
     }
 
@@ -589,20 +391,106 @@
                         </tr>
                     </thead>
                     <tbody>
-                        ${data.tableHTML}
+                        ${data.tableHTML || ''}
                     </tbody>
                 </table>
             </main>
         `;
         
-        // NEW: Setup dropdowns after rendering
-        setTimeout(() => {
-            setupDropdownCells();
-        }, 100);
+        // Initialize dropdowns for cells
+        initializeDropdowns();
         
         scheduleWrapper.addEventListener('input', debouncedSave);
         scheduleWrapper.querySelectorAll('.event-btn').forEach(btn => {
             btn.addEventListener('click', openEventMenu);
+        });
+    }
+
+    function initializeDropdowns() {
+        // Add dropdowns to topic cells
+        const topicCells = scheduleWrapper.querySelectorAll('tbody td:nth-child(2)');
+        topicCells.forEach(cell => {
+            if (!cell.classList.contains('special-event')) {
+                const currentValue = cell.textContent.trim();
+                const dropdownId = `topic-dropdown-${Math.random().toString(36).substr(2, 9)}`;
+                
+                cell.innerHTML = `
+                    <div class="dropdown-container">
+                        <button class="dropdown-toggle" type="button" data-dropdown="${dropdownId}">
+                            ${currentValue || 'Select topic...'}
+                        </button>
+                        <div class="dropdown-menu" id="${dropdownId}">
+                            ${talkTopics.map(topic => 
+                                `<div class="dropdown-item" data-value="${topic.text}">${topic.display}</div>`
+                            ).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+        });
+        
+        // Add dropdowns to brother cells (columns 3, 4, 5)
+        const brotherColumns = [3, 4, 5];
+        brotherColumns.forEach(colIndex => {
+            const cells = scheduleWrapper.querySelectorAll(`tbody td:nth-child(${colIndex})`);
+            cells.forEach(cell => {
+                if (cell.style.display !== 'none') {
+                    const currentValue = cell.textContent.trim();
+                    const dropdownId = `brother-dropdown-${Math.random().toString(36).substr(2, 9)}`;
+                    
+                    cell.innerHTML = `
+                        <div class="dropdown-container">
+                            <button class="dropdown-toggle" type="button" data-dropdown="${dropdownId}">
+                                ${currentValue || 'Select brother...'}
+                            </button>
+                            <div class="dropdown-menu" id="${dropdownId}">
+                                ${brothersList.map(brother => 
+                                    `<div class="dropdown-item" data-value="${brother.name}">${brother.name}</div>`
+                                ).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+        });
+        
+        // Add event listeners for dropdowns
+        document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
+            toggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const dropdownId = this.getAttribute('data-dropdown');
+                const dropdownMenu = document.getElementById(dropdownId);
+                const container = this.closest('.dropdown-container');
+                
+                // Close all other dropdowns
+                document.querySelectorAll('.dropdown-container').forEach(c => {
+                    if (c !== container) c.classList.remove('dropdown-open');
+                });
+                
+                // Toggle current dropdown
+                container.classList.toggle('dropdown-open');
+            });
+        });
+        
+        document.querySelectorAll('.dropdown-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const value = this.getAttribute('data-value');
+                const container = this.closest('.dropdown-container');
+                const toggle = container.querySelector('.dropdown-toggle');
+                
+                toggle.textContent = value;
+                container.classList.remove('dropdown-open');
+                
+                // Trigger save
+                debouncedSave();
+            });
+        });
+        
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function() {
+            document.querySelectorAll('.dropdown-container').forEach(container => {
+                container.classList.remove('dropdown-open');
+            });
         });
     }
 
@@ -611,17 +499,39 @@
         const tableBodyEl = scheduleWrapper.querySelector('.schedule-table tbody');
         if (!subtitleEl || !tableBodyEl) return;
 
-        // NEW: Convert dropdowns back to text content before saving
-        const tableBodyClone = tableBodyEl.cloneNode(true);
-        tableBodyClone.querySelectorAll('.dropdown-cell').forEach(cell => {
-            const text = cell.textContent;
-            cell.innerHTML = text;
-            cell.classList.remove('dropdown-cell');
+        // Extract values from dropdowns
+        const tableRows = tableBodyEl.querySelectorAll('tr');
+        let tableHTML = '';
+        
+        tableRows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            let rowHTML = '<tr>';
+            
+            cells.forEach((cell, index) => {
+                if (index === 0) {
+                    // Date cell
+                    rowHTML += `<td>${cell.textContent}</td>`;
+                } else if (index === 1 && cell.classList.contains('special-event')) {
+                    // Special event cell
+                    rowHTML += `<td class="special-event" colspan="4">${cell.textContent}</td>`;
+                } else {
+                    // Regular cells with dropdowns
+                    const dropdownToggle = cell.querySelector('.dropdown-toggle');
+                    if (dropdownToggle) {
+                        rowHTML += `<td>${dropdownToggle.textContent}</td>`;
+                    } else {
+                        rowHTML += `<td>${cell.textContent}</td>`;
+                    }
+                }
+            });
+            
+            rowHTML += '</tr>';
+            tableHTML += rowHTML;
         });
 
         const payload = {
             dateRange: subtitleEl.textContent,
-            tableHTML: tableBodyClone.innerHTML
+            tableHTML: tableHTML
         };
         userSchedulesCollection.doc(currentScheduleId).update(payload)
             .catch(err => console.error("Save failed:", err));
@@ -741,12 +651,36 @@
             });
         }
         
-        // NEW: Re-setup dropdowns after event type change
+        // Reinitialize dropdowns after event type change
         setTimeout(() => {
-            setupDropdownCells();
-        }, 100);
+            initializeDropdowns();
+        }, 0);
         
         debouncedSave();
+    }
+    
+    async function fetchBrothers() {
+        try {
+            const snapshot = await membersCollection
+                .where('type', '==', 'brother')
+                .orderBy('name')
+                .get();
+            
+            brothersList = [];
+            snapshot.forEach(doc => {
+                brothersList.push({
+                    id: doc.id,
+                    ...doc.data()
+                });
+            });
+            
+            // Reinitialize dropdowns if schedule is already rendered
+            if (scheduleWrapper.querySelector('.schedule-table')) {
+                initializeDropdowns();
+            }
+        } catch (error) {
+            console.error("Error fetching brothers:", error);
+        }
     }
     
     async function generatePdf() {
@@ -814,7 +748,7 @@
                 // Create table for this page
                 const table = document.createElement('table');
                 table.className = 'pdf-table';
-                table.style.tableLayout = 'fixed';
+                table.style.tableLayout = 'fixed'; // Add fixed layout
 
                 // Calculate column widths from the original table (only on first page)
                 let columnWidths = [];
@@ -837,11 +771,12 @@
                 const thead = document.createElement('thead');
                 let headerHTML = '<tr>';
                 const columns = ['తేదీ', 'ప్రసంగ అంశం', 'ప్రసంగీకుడు', 'చైర్మన్', 'కావలికోట రీడర్'];
-                const defaultWidths = ['15%', '35%', '20%', '15%', '15%'];
+                const defaultWidths = ['15%', '35%', '20%', '15%', '15%']; // Default percentages if calculation fails
 
                 columns.forEach((col, index) => {
                     let width = defaultWidths[index];
                     if (columnWidths.length > 0 && pageCount > 0) {
+                        // Use calculated widths for subsequent pages
                         const totalWidth = columnWidths.reduce((sum, w) => sum + w, 0);
                         width = `${(columnWidths[index] / totalWidth * 100).toFixed(1)}%`;
                     }
@@ -850,7 +785,7 @@
                 headerHTML += '</tr>';
                 thead.innerHTML = headerHTML;
                 table.appendChild(thead);
-
+                
                 // Add rows for this page
                 const tbody = document.createElement('tbody');
                 
@@ -865,9 +800,11 @@
                     // Copy cells, excluding the actions column
                     for (let j = 0; j < originalRow.cells.length - 1; j++) {
                         const cell = document.createElement(j === 0 ? 'th' : 'td');
-                        // NEW: Get text content from dropdown cells
-                        if (originalRow.cells[j].classList.contains('dropdown-cell')) {
-                            cell.innerHTML = originalRow.cells[j].textContent;
+                        
+                        // Get the text content from dropdown toggle if available
+                        const dropdownToggle = originalRow.cells[j].querySelector('.dropdown-toggle');
+                        if (dropdownToggle) {
+                            cell.innerHTML = dropdownToggle.textContent;
                         } else {
                             cell.innerHTML = originalRow.cells[j].innerHTML;
                         }
@@ -888,7 +825,8 @@
                             if (j === 1) {
                                 cell.className = 'special-event';
                                 cell.colSpan = 4;
-                                cell.style.width = '85%';
+                                cell.style.width = '85%'; // Combined width for 4 columns
+                                // Skip creating the next 3 cells
                                 j += 3;
                             }
                         }
@@ -954,6 +892,30 @@
         }
     }
 
+    // Menu functionality
+    const menuToggleButton = document.getElementById('menu-toggle-button');
+    const slideMenu = document.getElementById('slide-menu');
+    const menuOverlay = document.getElementById('menu-overlay');
+    const body = document.body;
+    
+    function closeMenu() {
+        slideMenu.classList.remove('is-open');
+        menuOverlay.classList.remove('is-open');
+        body.classList.remove('menu-open');
+    }
+
+    menuToggleButton.addEventListener('click', () => {
+        if (body.classList.contains('menu-open')) {
+            closeMenu();
+        } else {
+            slideMenu.classList.add('is-open');
+            menuOverlay.classList.add('is-open');
+            body.classList.add('menu-open');
+        }
+    });
+    menuOverlay.addEventListener('click', closeMenu);
+
+    // Event listeners
     document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
     document.getElementById('print-button').addEventListener('click', generatePdf);
     document.getElementById('cancel-creation').addEventListener('click', () => window.location.href = './sunday-dashboard.html');
