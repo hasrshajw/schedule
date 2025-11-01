@@ -415,7 +415,7 @@
             
             // Wait for fonts and rendering
             await document.fonts.ready;
-            await new Promise(resolve => setTimeout(resolve, 100));
+            await new Promise(resolve => setTimeout(resolve, 5000));
 
             const canvas = await html2canvas(clone, { 
                 scale: 2, 
