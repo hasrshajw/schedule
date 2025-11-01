@@ -67,7 +67,6 @@
     .schedule-table thead th { background-color: #F3E5D7; font-size: 1.0em; padding: 10px 5px; }
     .schedule-table [contenteditable="true"]:focus { background-color: #fffbe5; outline: 1px solid #f59e0b; }
     .special-event { color: red; font-weight: 700; text-align: center; padding-left: 5px; }
-    .schedule-table .top-empty-row { background-color: #ffffff; border-bottom: 2px solid #000; border-top: none; border-left: 2px solid white; border-right: 2px solid white; height: 25px; }
     
     .event-btn { background: none; border: none; cursor: pointer; padding: 4px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
     .event-btn:hover { background-color: #f0f0f0; }
@@ -85,9 +84,6 @@
     #cancel-creation { background-color: var(--surface-color); }
     #confirm-creation { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 
-    /* Print container for PDF generation */
-    #print-container { position: absolute; left: -9999px; top: auto; width: 1100px; background: white; }
-    
     /* PDF-specific styles */
     .pdf-page-container {
         background: white;
@@ -107,23 +103,18 @@
     .pdf-table th,
     .pdf-table td {
         border: 1px solid #000;
-        padding: 12px 8px;
+        padding: 8px 6px; /* Reduced padding for smaller cell height */
         font-family: 'Noto Sans Telugu', sans-serif;
         font-weight: 700;
-        height: 45px;
+        height: 35px; /* Reduced cell height */
         vertical-align: middle;
         box-sizing: border-box;
     }
     
-    .pdf-table .top-empty-row {
-        border: none;
-        border-bottom: 2px solid #000;
-    }
-    
-    .pdf-table .top-empty-row th {
-        border: none;
-        border-bottom: 2px solid #000;
-        background: white;
+    .pdf-table thead th {
+        background-color: #F3E5D7;
+        font-size: 1.0em;
+        padding: 8px 6px; /* Reduced padding */
     }
     
     .pdf-header {
@@ -294,9 +285,6 @@
             <main>
                 <table class="schedule-table">
                     <thead>
-                        <tr>
-                            <th class="top-empty-row" colspan="6">&nbsp;</th>
-                        </tr>
                         <tr>
                             <th>తేదీ</th>
                             <th>ప్రసంగ అంశం</th>
@@ -476,8 +464,8 @@
             const tableRows = Array.from(scheduleData.querySelectorAll('tbody tr'));
 
             // Define rows per page: 15 for first page, 17 for subsequent pages
-            const firstPageRows = 15;
-            const otherPageRows = 17;
+            const rowsFirstPage = 15;
+            const rowsOtherPages = 17;
 
             let currentRow = 0;
             let pageCount = 0;
@@ -487,15 +475,11 @@
                     pdf.addPage();
                 }
 
-                // Determine rows for this page
-                const rowsThisPage = pageCount === 0 ? firstPageRows : otherPageRows;
-                const endRow = Math.min(currentRow + rowsThisPage, tableRows.length);
-
                 // Create page container
                 const pageContainer = document.createElement('div');
                 pageContainer.className = 'pdf-page-container';
 
-                // Add title block ONLY for the first page
+                // Add header only for first page
                 if (pageCount === 0) {
                     const header = document.createElement('div');
                     header.className = 'pdf-header';
@@ -521,12 +505,9 @@
                 const table = document.createElement('table');
                 table.className = 'pdf-table';
 
-                // Add table header (on every page)
+                // Add table header (without top-empty-row)
                 const thead = document.createElement('thead');
                 thead.innerHTML = `
-                    <tr>
-                        <th class="top-empty-row" colspan="5">&nbsp;</th>
-                    </tr>
                     <tr>
                         <th>తేదీ</th>
                         <th>ప్రసంగ అంశం</th>
@@ -540,31 +521,30 @@
                 // Add rows for this page
                 const tbody = document.createElement('tbody');
                 
+                // Calculate how many rows to show on this page
+                const rowsThisPage = pageCount === 0 ? rowsFirstPage : rowsOtherPages;
+                const endRow = Math.min(currentRow + rowsThisPage, tableRows.length);
+                
                 for (let i = currentRow; i < endRow; i++) {
                     const originalRow = tableRows[i];
                     const row = document.createElement('tr');
                     
-                    // Check if this is a special event row
-                    const isSpecialEvent = originalRow.cells[1].classList.contains('special-event');
-                    
-                    if (isSpecialEvent) {
-                        // Handle special event row with colspan
-                        const dateCell = document.createElement('th');
-                        dateCell.textContent = originalRow.cells[0].textContent;
-                        row.appendChild(dateCell);
+                    // Copy cells, excluding the actions column
+                    for (let j = 0; j < originalRow.cells.length - 1; j++) {
+                        const cell = document.createElement(j === 0 ? 'th' : 'td');
+                        cell.innerHTML = originalRow.cells[j].innerHTML;
                         
-                        const eventCell = document.createElement('td');
-                        eventCell.className = 'special-event';
-                        eventCell.colSpan = 4;
-                        eventCell.textContent = originalRow.cells[1].textContent;
-                        row.appendChild(eventCell);
-                    } else {
-                        // Normal row - copy all cells except the actions column
-                        for (let j = 0; j < originalRow.cells.length - 1; j++) {
-                            const cell = document.createElement(j === 0 ? 'th' : 'td');
-                            cell.textContent = originalRow.cells[j].textContent;
-                            row.appendChild(cell);
+                        // Apply special event styling if needed
+                        if (originalRow.cells[1].classList.contains('special-event')) {
+                            if (j === 1) {
+                                cell.className = 'special-event';
+                                cell.colSpan = 4;
+                                // Skip creating the next 3 cells
+                                j += 3;
+                            }
                         }
+                        
+                        row.appendChild(cell);
                     }
                     
                     tbody.appendChild(row);
@@ -591,15 +571,8 @@
                 const imgProps = pdf.getImageProperties(imgData);
                 const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
 
-                // Calculate vertical position - adjust based on whether we have title or not
-                let verticalPosition = 0;
-                if (pageCount === 0) {
-                    // First page with title - center the content
-                    verticalPosition = Math.max(0, (USABLE_HEIGHT - imgHeight) / 2);
-                } else {
-                    // Subsequent pages without title - position at top
-                    verticalPosition = 0;
-                }
+                // Center the content vertically on the page
+                const verticalPosition = Math.max(0, (USABLE_HEIGHT - imgHeight) / 2);
                 
                 pdf.addImage(
                     imgData, 
