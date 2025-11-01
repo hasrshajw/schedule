@@ -371,40 +371,79 @@
         printButton.disabled = true;
         printButton.querySelector('span:last-child').textContent = 'Generating...';
 
+        // 1. WAIT FOR FONTS TO BE READY
         await document.fonts.ready;
+        
+        // 2. SOLVES FONT PROBLEM: Add a small delay for the browser to *paint* the fonts
+        // This is the most important fix for your font issue.
+        await new Promise(resolve => setTimeout(resolve, 100));
 
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('l', 'mm', 'a4'); // 'l' for landscape
         const contentToPrint = document.getElementById('schedule-content-wrapper');
         
+        // --- PREPARE FOR CAPTURE ---
         const actionElements = contentToPrint.querySelectorAll('.actions-col, .event-btn');
         actionElements.forEach(el => el.style.display = 'none');
         
+        // 3. SOLVES "NOT EXACTLY" (Part 1): Force a consistent width
+        // This makes the screenshot capture more reliable. 1100px matches your .master-container.
+        const originalWidth = contentToPrint.style.width;
+        contentToPrint.style.width = '1100px';
+
         try {
             const canvas = await html2canvas(contentToPrint, {
-                scale: 2,
+                scale: 2, // Keep high resolution
                 useCORS: true,
-                backgroundColor: '#ffffff'
+                backgroundColor: '#ffffff',
+                // 4. HELPS FONT PROBLEM: This option improves font rendering
+                letterRendering: true 
             });
 
+            // Restore original styles *immediately* after capture
+            actionElements.forEach(el => el.style.display = '');
+            contentToPrint.style.width = originalWidth;
+
             const imgData = canvas.toDataURL('image/jpeg', 0.9);
-            const A4_WIDTH_MM = 297;
-            const A4_HEIGHT_MM = 210;
+            const A4_WIDTH_MM = 297;  // Landscape width
+            const A4_HEIGHT_MM = 210; // Landscape height
+            const MARGIN_MM = 10;     // Page margin
+            
+            // Usable width and height of the page
+            const pdfWidth = A4_WIDTH_MM - (MARGIN_MM * 2);
+            const pdfPageHeight = A4_HEIGHT_MM - (MARGIN_MM * 2);
             
             const imgProps = pdf.getImageProperties(imgData);
-            const pdfWidth = A4_WIDTH_MM;
-            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+            // Calculate the total height of the image scaled to the PDF width
+            const totalImgHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+            let heightLeft = totalImgHeight;
+            let position = MARGIN_MM; // Top margin
+
+            // 5. SOLVES "NOT EXACTLY" (Part 2): This logic adds multiple pages
             
-            pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+            // Add the first page
+            pdf.addImage(imgData, 'JPEG', MARGIN_MM, position, pdfWidth, totalImgHeight);
+            heightLeft -= pdfPageHeight; // Subtract the height of the first page
+
+            // Add new pages as long as there is image height left
+            while (heightLeft > 0) {
+                position = -heightLeft - MARGIN_MM; // Move the image "up" to show the next part
+                pdf.addPage();
+                pdf.addImage(imgData, 'JPEG', MARGIN_MM, position, pdfWidth, totalImgHeight);
+                heightLeft -= pdfPageHeight;
+            }
 
         } catch (error) {
             console.error("PDF generation failed:", error);
             alert("Sorry, there was an error creating the PDF.");
-        } finally {
+            // Restore styles even if it fails
             actionElements.forEach(el => el.style.display = '');
+            contentToPrint.style.width = originalWidth;
+        } finally {
             const fileName = `${document.title}.pdf`;
             pdf.save(fileName);
-    
+        
             printButton.disabled = false;
             printButton.querySelector('span:last-child').textContent = 'Download PDF';
         }
