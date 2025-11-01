@@ -55,7 +55,7 @@
 
     body {
         margin: 0; padding: 0;
-        font-family: 'Noto Sans Telugu', sans-serif;
+        font-family: 'Inter', sans-serif;
         background-color: var(--body-bg);
         color: var(--text-primary);
         visibility: hidden; opacity: 0;
@@ -98,23 +98,6 @@
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; border-radius: var(--radius-md); font-size: 1rem; font-weight: 600; cursor: pointer; border: none; text-decoration: none; background-color: var(--primary-color); color: white; transition: background-color 0.2s; }
     .btn:hover:not(:disabled) { background-color: var(--primary-hover); }
     .btn:disabled { cursor: not-allowed; opacity: 0.6; }
-
-    .status-indicator { 
-        font-size: 12px; 
-        font-weight: 600; 
-        padding: 4px 10px; 
-        border-radius: 999px; 
-        display: flex; 
-        align-items: center; 
-        gap: 6px; 
-        cursor: pointer;
-        transition: background-color 0.2s;
-    }
-    .status-indicator::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background-color: currentColor; }
-    .status-indicator[data-status="synced"] { color: var(--success-color); background-color: #eaf5ea; }
-    .status-indicator[data-status="syncing"] { color: var(--warning-color); background-color: #fffbeb; }
-    .status-indicator[data-status="error"] { color: var(--danger-color); background-color: #fde8e8; }
-    .status-indicator:hover { opacity: 0.9; }
     /* END: NEW NAVBAR STYLES */
 
     /* START: ORIGINAL EDITOR STYLES */
@@ -124,23 +107,23 @@
     .hidden { display: none !important; }
     main { padding: calc(56px + 20px) 20px 20px; }
     .editor-main { max-width: 1100px; margin: 0 auto; }
-    .page-controls { margin-bottom: 24px; }
+    .page-controls { margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; }
     .master-container { background: var(--surface-color); padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
     
     .schedule-display-header { text-align: center; margin-bottom: 0; }
     .title-block { text-align: center; }
-    .title-block h1 { margin: 0; font-size: 1.8em; font-weight: 700; color: rgb(97, 40, 0); }
+    .title-block h1 { margin: 0; font-size: 1.8em; font-weight: 700; color: rgb(97, 40, 0); font-family: 'Noto Sans Telugu', sans-serif; }
     .subtitle-svg-container { position: relative; display: inline-block; margin-top: 0; }
-    .subtitle { margin: 0; font-size: 1.0em; font-weight: 500; color: #333; background-color: #ffffff; padding: 2px 8px; display: inline-block; position: relative; z-index: 2; white-space: nowrap; border-radius: var(--radius-md); }
+    .subtitle { margin: 0; font-size: 1.0em; font-weight: 500; color: #333; background-color: #ffffff; padding: 2px 8px; display: inline-block; position: relative; z-index: 2; white-space: nowrap; border-radius: var(--radius-md); font-family: 'Noto Sans Telugu', sans-serif; }
     .subtitle:focus { outline: 2px solid var(--primary-color); background-color: #f0f0f0; }
     .svg-divider { width: 400px; height: 5px; display: block; position: absolute; left: 50%; transform: translateX(-50%); top: 50%; margin-top: -2.5px; z-index: 1; }
     
-    .schedule-table { width: 100%; border-collapse: collapse; font-size: 0.9em; border-left: 2px solid #000; border-right: 2px solid #000; border-bottom: 2px solid #000; }
-    .schedule-table th, .schedule-table td { border: 1px solid #000; padding: 8px 5px; text-align: center; vertical-align: middle; font-weight: 700; }
+    .schedule-table { width: 100%; border-collapse: collapse; font-size: 0.9em; border-left: 2px solid #000; border-right: 2px solid #000; border-bottom: 2px solid #000; font-family: 'Noto Sans Telugu', sans-serif; }
+    .schedule-table th, .schedule-table td { border: 1px solid #000; padding: 8px 5px; text-align: center; vertical-align: middle; font-weight: 700; font-family: 'Noto Sans Telugu', sans-serif; }
     .schedule-table tbody td:not(:first-child):not(.special-event) { text-align: left; padding-left: 10px; }
-    .schedule-table thead th { background-color: #F3E5D7; font-size: 1.0em; padding: 10px 5px; }
+    .schedule-table thead th { background-color: #F3E5D7; font-size: 1.0em; padding: 10px 5px; font-family: 'Noto Sans Telugu', sans-serif; }
     .schedule-table [contenteditable="true"]:focus { background-color: #fffbe5; outline: 1px solid #f59e0b; }
-    .special-event { color: red; font-weight: 700; text-align: center; padding-left: 5px; }
+    .special-event { color: red; font-weight: 700; text-align: center; padding-left: 5px; font-family: 'Noto Sans Telugu', sans-serif; }
     
     .event-btn { background: none; border: none; cursor: pointer; padding: 4px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
     .event-btn:hover { background-color: #f0f0f0; }
@@ -148,6 +131,28 @@
     .toolbar-btn { font-family: 'Inter', sans-serif; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); text-decoration: none; color: var(--text-secondary); }
     .toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; color: var(--text-primary); }
     .toolbar-btn:disabled { cursor: not-allowed; opacity: 0.5; }
+
+    /* Status Indicator */
+    .status-indicator { 
+        font-size: 12px; 
+        font-weight: 600; 
+        padding: 4px 10px; 
+        border-radius: 999px; 
+        display: flex; 
+        align-items: center; 
+        gap: 6px; 
+        color: var(--text-light);
+    }
+    .status-indicator::before { 
+        content: ''; 
+        width: 8px; 
+        height: 8px; 
+        border-radius: 50%; 
+        background-color: currentColor; 
+    }
+    .status-indicator[data-status="synced"] { color: var(--success-color); }
+    .status-indicator[data-status="syncing"] { color: var(--warning-color); }
+    .status-indicator[data-status="error"] { color: var(--danger-color); }
 
     #event-context-menu, #member-dropdown, #topic-dropdown { 
         position: fixed; 
@@ -200,6 +205,102 @@
     .modal-actions button { font-family: 'Inter', sans-serif; padding: 10px 20px; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); }
     #cancel-creation { background-color: var(--surface-color); }
     #confirm-creation { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
+
+    /* Mobile View Styles */
+    .mobile-view-container { display: none; }
+    .mobile-week-card {
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 16px;
+        margin-bottom: 16px;
+        box-shadow: var(--shadow-md);
+    }
+    .mobile-week-card:last-child {
+        margin-bottom: 0;
+    }
+    .week-date {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0 0 16px 0;
+        padding-bottom: 8px;
+        border-bottom: 2px solid var(--border-color);
+        text-align: center;
+        font-family: 'Noto Sans Telugu', sans-serif;
+    }
+    .week-fields {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    .field-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+    .field-group label {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        font-family: 'Noto Sans Telugu', sans-serif;
+    }
+    .mobile-dropdown {
+        padding: 12px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        background-color: #f9fafb;
+        cursor: pointer;
+        font-family: 'Noto Sans Telugu', sans-serif;
+        font-weight: 500;
+        position: relative;
+    }
+    .mobile-dropdown::after {
+        content: '▼';
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+    }
+    .special-event-mobile {
+        text-align: center;
+        padding: 16px;
+        background-color: #fff5f5;
+        border-radius: var(--radius-md);
+        border: 1px solid #fed7d7;
+    }
+    .special-event-text-mobile {
+        color: var(--danger-color);
+        font-weight: 700;
+        font-size: 1rem;
+        margin: 0;
+        font-family: 'Noto Sans Telugu', sans-serif;
+    }
+
+    @media (max-width: 768px) {
+        main { padding: 56px 0 0 0; }
+        .master-container { padding: 16px; border-radius: 0; box-shadow: none; }
+        .page-controls { 
+            padding: 0 16px; 
+            margin-bottom: 16px; 
+            flex-direction: column;
+            gap: 12px;
+            align-items: stretch;
+        }
+        .page-controls .btn {
+            width: 100%;
+            justify-content: center;
+        }
+        .schedule-table { display: none; }
+        .mobile-view-container { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 1rem; 
+            padding: 0 16px;
+        }
+    }
 
     /* PDF-specific styles */
     .pdf-page-container {
@@ -278,87 +379,6 @@
         z-index: 1;
     }
 
-    /* Mobile View Styles */
-    .mobile-view-container { display: none; }
-    
-    @media (max-width: 768px) {
-        main { padding: 56px 0 0 0; }
-        .master-container { padding: 16px; border-radius: 0; box-shadow: none; }
-        .page-controls { padding: 0 16px; margin-bottom: 16px; }
-        .schedule-table { display: none; }
-        .mobile-view-container { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 1.5rem; 
-        }
-        
-        .mobile-week-card {
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 16px;
-            background: var(--surface-color);
-            box-shadow: var(--shadow-md);
-        }
-        
-        .mobile-week-header {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 16px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid var(--primary-color);
-            text-align: center;
-        }
-        
-        .mobile-field-group {
-            margin-bottom: 16px;
-        }
-        
-        .mobile-field-label {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 8px;
-            display: block;
-        }
-        
-        .mobile-dropdown {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            background-color: #f9fafb;
-            font-size: 1rem;
-            font-weight: 500;
-            color: var(--text-secondary);
-            font-family: 'Noto Sans Telugu', sans-serif;
-        }
-        
-        .mobile-special-event {
-            color: red;
-            font-weight: 700;
-            text-align: center;
-            font-size: 1.1rem;
-            margin: 16px 0;
-            padding: 12px;
-            background-color: #fff5f5;
-            border-radius: var(--radius-md);
-            border: 1px solid #fed7d7;
-        }
-        
-        .mobile-date-input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            background-color: #f9fafb;
-            font-size: 1rem;
-            font-weight: 500;
-            color: var(--text-secondary);
-            font-family: 'Noto Sans Telugu', sans-serif;
-        }
-    }
-
     /* Add to your existing CSS */
     .pdf-header .title-block {
         text-align: center;
@@ -391,9 +411,7 @@
     <div class="top-bar">
         <a href="./sunday-dashboard.html" class="mobileLogo" title="Sunday Schedules"></a>
         <div class="header-right-controls">
-            <div class="status-indicator" data-status="synced" id="sync-button" title="Click to sync">
-                <span>Synced</span>
-            </div>
+            <div class="status-indicator" data-status="synced">Synced</div>
             <div class="header-icons" id="menu-toggle-button">
                 <svg class="hamburger-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M22.5 7h-21a.5.5 0 010-1h21a.5.5 0 010 1zM22.5 13h-21a.5.5 0 010-1h21a.5.5 0 010 1zM22.5 19h-21a.5.5 0 010-1h21a.5.5 0 010 1z"></path></svg>
                 <svg class="close-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12.707 12l6.146-6.146a.5.5 0 00-.707-.707L12 11.293 5.854 5.146a.5.5 0 00-.707.707L11.293 12l-6.147 6.146a.5.5 0 10.707.707L12 12.707l6.146 6.146a.5.5 0 00.707-.707z"></path></svg>
@@ -423,10 +441,16 @@
             <span class="material-symbols-outlined">arrow_back</span>
             <span>Dashboard</span>
         </a>
-        <button id="print-button" class="btn">
-            <span class="material-symbols-outlined">picture_as_pdf</span>
-            <span>Download PDF</span>
-        </button>
+        <div style="display: flex; gap: 12px;">
+            <button id="print-button" class="btn">
+                <span class="material-symbols-outlined">picture_as_pdf</span>
+                <span>Download PDF</span>
+            </button>
+            <button id="download-excel" class="btn" style="background-color: #2e7d32;">
+                <span class="material-symbols-outlined">download</span>
+                <span>Download Excel</span>
+            </button>
+        </div>
     </div>
     <div class="master-container">
         <div id="schedule-content-wrapper">
@@ -482,14 +506,13 @@
     let activeRowForEvents = null;
     let members = { brothers: [], sisters: [] };
     let activeCellForDropdown = null;
-    let isSaving = false;
 
     const scheduleWrapper = document.getElementById('schedule-content-wrapper');
     const dateSelectionModal = document.getElementById('date-selection-modal');
     const eventContextMenu = document.getElementById('event-context-menu');
     const memberDropdown = document.getElementById('member-dropdown');
     const topicDropdown = document.getElementById('topic-dropdown');
-    const syncButton = document.getElementById('sync-button');
+    const statusIndicator = document.querySelector('.status-indicator');
 
     // Topic definitions
     const topics = {
@@ -499,14 +522,21 @@
         'అంశం-4': 'this is talk-4'
     };
 
+    // Special event texts
+    const eventTexts = {
+        'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం',
+        'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో',
+        'convention': 'ప్రాదేశిక సమావేశం'
+    };
+
     const debounce = (func, delay) => {
         let timeout;
         return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), delay); };
     };
 
     function updateStatus(text, status) {
-        syncButton.innerHTML = `<span>${text}</span>`;
-        syncButton.dataset.status = status;
+        statusIndicator.textContent = text;
+        statusIndicator.dataset.status = status;
     }
 
     async function fetchMembers() {
@@ -551,10 +581,13 @@
                 if (!document.activeElement || document.activeElement.tagName === 'BODY' || !scheduleWrapper.contains(document.activeElement)) {
                     renderSchedule(scheduleData);
                 }
+                updateStatus('Synced', 'synced');
             } else {
                 alert("This schedule may have been deleted.");
                 window.location.href = './sunday-dashboard.html';
             }
+        }, error => {
+            updateStatus('Error', 'error');
         });
     }
 
@@ -594,14 +627,11 @@
                         ${data.tableHTML}
                     </tbody>
                 </table>
-                <div class="mobile-view-container" id="mobile-view-container"></div>
+                <div class="mobile-view-container"></div>
             </main>
         `;
         
-        // Create mobile view
-        createMobileView();
-        
-        // Add dropdown functionality to desktop cells
+        // Add dropdown functionality to desktop table cells
         scheduleWrapper.querySelectorAll('tbody td').forEach((cell, index) => {
             const row = cell.parentElement;
             const cellIndex = cell.cellIndex;
@@ -621,6 +651,9 @@
             });
         });
 
+        // Create mobile view
+        createMobileView();
+
         scheduleWrapper.addEventListener('input', debouncedSave);
         scheduleWrapper.querySelectorAll('.event-btn').forEach(btn => {
             btn.addEventListener('click', openEventMenu);
@@ -630,13 +663,14 @@
     }
 
     function createMobileView() {
-        const mobileContainer = document.getElementById('mobile-view-container');
+        const mobileContainer = scheduleWrapper.querySelector('.mobile-view-container');
         const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
-        const rows = Array.from(tableBody.querySelectorAll('tr'));
+        
+        if (!tableBody) return;
         
         mobileContainer.innerHTML = '';
         
-        rows.forEach((row, rowIndex) => {
+        Array.from(tableBody.rows).forEach((row, rowIndex) => {
             const cells = Array.from(row.cells);
             const dateCell = cells[0];
             const topicCell = cells[1];
@@ -644,93 +678,83 @@
             const chairmanCell = cells[3];
             const readerCell = cells[4];
             
-            const weekCard = document.createElement('div');
-            weekCard.className = 'mobile-week-card';
-            weekCard.dataset.rowIndex = rowIndex;
+            const card = document.createElement('div');
+            card.className = 'mobile-week-card';
             
-            // Check if this is a special event row
-            const isSpecialEvent = topicCell.classList.contains('special-event');
+            // Check if this is a special event
+            const isSpecialEvent = topicCell.classList.contains('special-event') && topicCell.colSpan === 4;
             
             if (isSpecialEvent) {
-                // Special event layout
-                weekCard.innerHTML = `
-                    <div class="mobile-week-header">${dateCell.textContent}</div>
-                    <div class="mobile-special-event">${topicCell.textContent}</div>
+                card.innerHTML = `
+                    <h3 class="week-date">${dateCell.textContent}</h3>
+                    <div class="special-event-mobile">
+                        <p class="special-event-text-mobile">${topicCell.textContent}</p>
+                    </div>
                 `;
             } else {
-                // Normal week layout
-                weekCard.innerHTML = `
-                    <div class="mobile-week-header">${dateCell.textContent}</div>
-                    <div class="mobile-field-group">
-                        <label class="mobile-field-label">ప్రసంగ అంశం</label>
-                        <select class="mobile-dropdown mobile-topic" data-row="${rowIndex}" data-cell="1">
-                            <option value="">Select Topic</option>
-                            ${Object.entries(topics).map(([topicName, topicText]) => 
-                                `<option value="${topicText}" ${topicCell.textContent === topicText ? 'selected' : ''}>${topicName}</option>`
-                            ).join('')}
-                        </select>
-                    </div>
-                    <div class="mobile-field-group">
-                        <label class="mobile-field-label">ప్రసంగీకుడు</label>
-                        <select class="mobile-dropdown mobile-speaker" data-row="${rowIndex}" data-cell="2">
-                            <option value="">Select Speaker</option>
-                            ${members.brothers.map(brother => 
-                                `<option value="${brother.name}" ${speakerCell.textContent === brother.name ? 'selected' : ''}>${brother.name}${brother.isServant ? ' (Servant)' : ''}</option>`
-                            ).join('')}
-                        </select>
-                    </div>
-                    <div class="mobile-field-group">
-                        <label class="mobile-field-label">చైర్మన్</label>
-                        <select class="mobile-dropdown mobile-chairman" data-row="${rowIndex}" data-cell="3">
-                            <option value="">Select Chairman</option>
-                            ${members.brothers.map(brother => 
-                                `<option value="${brother.name}" ${chairmanCell.textContent === brother.name ? 'selected' : ''}>${brother.name}${brother.isServant ? ' (Servant)' : ''}</option>`
-                            ).join('')}
-                        </select>
-                    </div>
-                    <div class="mobile-field-group">
-                        <label class="mobile-field-label">కావలికోట రీడర్</label>
-                        <select class="mobile-dropdown mobile-reader" data-row="${rowIndex}" data-cell="4">
-                            <option value="">Select Reader</option>
-                            ${members.brothers.map(brother => 
-                                `<option value="${brother.name}" ${readerCell.textContent === brother.name ? 'selected' : ''}>${brother.name}${brother.isServant ? ' (Servant)' : ''}</option>`
-                            ).join('')}
-                        </select>
+                card.innerHTML = `
+                    <h3 class="week-date">${dateCell.textContent}</h3>
+                    <div class="week-fields">
+                        <div class="field-group">
+                            <label>ప్రసంగ అంశం</label>
+                            <div class="mobile-dropdown topic-dropdown" data-row="${rowIndex}" data-cell="1">
+                                ${topicCell.textContent || 'Select Topic'}
+                            </div>
+                        </div>
+                        <div class="field-group">
+                            <label>ప్రసంగీకుడు</label>
+                            <div class="mobile-dropdown member-dropdown" data-row="${rowIndex}" data-cell="2">
+                                ${speakerCell.textContent || 'Select Brother'}
+                            </div>
+                        </div>
+                        <div class="field-group">
+                            <label>చైర్మన్</label>
+                            <div class="mobile-dropdown member-dropdown" data-row="${rowIndex}" data-cell="3">
+                                ${chairmanCell.textContent || 'Select Brother'}
+                            </div>
+                        </div>
+                        <div class="field-group">
+                            <label>కావలికోట రీడర్</label>
+                            <div class="mobile-dropdown member-dropdown" data-row="${rowIndex}" data-cell="4">
+                                ${readerCell.textContent || 'Select Brother'}
+                            </div>
+                        </div>
                     </div>
                 `;
             }
             
-            mobileContainer.appendChild(weekCard);
+            mobileContainer.appendChild(card);
         });
-        
+
         // Add event listeners to mobile dropdowns
-        mobileContainer.querySelectorAll('.mobile-dropdown').forEach(dropdown => {
-            dropdown.addEventListener('change', function() {
-                const rowIndex = this.dataset.row;
-                const cellIndex = this.dataset.cell;
+        mobileContainer.querySelectorAll('.topic-dropdown').forEach(dropdown => {
+            dropdown.addEventListener('click', (e) => {
+                const rowIndex = dropdown.dataset.row;
+                const cellIndex = dropdown.dataset.cell;
                 const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
-                const targetCell = tableBody.rows[rowIndex].cells[cellIndex];
-                targetCell.textContent = this.value;
-                debouncedSave();
+                const cell = tableBody.rows[rowIndex].cells[cellIndex];
+                openTopicDropdown(cell, dropdown);
+            });
+        });
+
+        mobileContainer.querySelectorAll('.member-dropdown').forEach(dropdown => {
+            dropdown.addEventListener('click', (e) => {
+                const rowIndex = dropdown.dataset.row;
+                const cellIndex = dropdown.dataset.cell;
+                const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
+                const cell = tableBody.rows[rowIndex].cells[cellIndex];
+                openMemberDropdown(cell, dropdown);
             });
         });
     }
 
     const debouncedSave = debounce(() => {
-        if (isSaving) return;
-        manualSave();
-    }, 1500);
-
-    function manualSave() {
-        if (isSaving) return;
-        
-        isSaving = true;
-        updateStatus('Syncing...', 'syncing');
-        
         const subtitleEl = scheduleWrapper.querySelector('.subtitle');
         const tableBodyEl = scheduleWrapper.querySelector('.schedule-table tbody');
         if (!subtitleEl || !tableBodyEl) return;
 
+        updateStatus('Syncing...', 'syncing');
+        
         const payload = {
             dateRange: subtitleEl.textContent,
             tableHTML: tableBodyEl.innerHTML
@@ -739,14 +763,12 @@
         userSchedulesCollection.doc(currentScheduleId).update(payload)
             .then(() => {
                 updateStatus('Synced', 'synced');
-                isSaving = false;
             })
             .catch(err => {
                 console.error("Save failed:", err);
                 updateStatus('Error', 'error');
-                isSaving = false;
             });
-    }
+    }, 1500);
 
     function initCreationFlow() {
         const dateList = document.getElementById('date-checklist');
@@ -844,11 +866,7 @@
             if(cell.dataset.originalContent) cell.innerHTML = cell.dataset.originalContent;
             cell.removeAttribute('data-original-content');
         });
-        const eventTexts = {
-            'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం',
-            'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో',
-            'convention': 'ప్రాదేశిక సమావేశం'
-        };
+        
         if (eventType !== 'normal') {
             topicCell.dataset.originalContent = topicCell.innerHTML;
             otherCells.forEach(cell => cell.dataset.originalContent = cell.innerHTML);
@@ -861,12 +879,13 @@
                 cell.classList.remove('editable-cell');
             });
         }
+        
         // Update mobile view
         createMobileView();
         debouncedSave();
     }
     
-    function openMemberDropdown(cell) {
+    function openMemberDropdown(cell, mobileElement = null) {
         memberDropdown.innerHTML = '';
         
         // Sort brothers by name
@@ -880,15 +899,29 @@
             memberDropdown.appendChild(item);
         });
 
-        const rect = cell.getBoundingClientRect();
+        const rect = (mobileElement || cell).getBoundingClientRect();
         memberDropdown.style.display = 'block';
         memberDropdown.style.top = `${rect.bottom}px`;
         memberDropdown.style.left = `${rect.left}px`;
         memberDropdown.style.width = `${rect.width}px`;
-        activeCellForDropdown = cell;
+        activeCellForDropdown = { cell: cell, mobileElement: mobileElement };
+
+        // Handle member selection
+        memberDropdown.addEventListener('click', (e) => {
+            const item = e.target.closest('.member-dropdown-item');
+            if (item && activeCellForDropdown) {
+                const selectedName = item.dataset.name;
+                activeCellForDropdown.cell.textContent = selectedName;
+                if (activeCellForDropdown.mobileElement) {
+                    activeCellForDropdown.mobileElement.textContent = selectedName;
+                }
+                debouncedSave();
+            }
+            memberDropdown.style.display = 'none';
+        }, { once: true });
     }
 
-    function openTopicDropdown(cell) {
+    function openTopicDropdown(cell, mobileElement = null) {
         topicDropdown.innerHTML = '';
         
         Object.entries(topics).forEach(([topicName, topicText]) => {
@@ -899,12 +932,26 @@
             topicDropdown.appendChild(item);
         });
 
-        const rect = cell.getBoundingClientRect();
+        const rect = (mobileElement || cell).getBoundingClientRect();
         topicDropdown.style.display = 'block';
         topicDropdown.style.top = `${rect.bottom}px`;
         topicDropdown.style.left = `${rect.left}px`;
         topicDropdown.style.width = `${rect.width}px`;
-        activeCellForDropdown = cell;
+        activeCellForDropdown = { cell: cell, mobileElement: mobileElement };
+
+        // Handle topic selection
+        topicDropdown.addEventListener('click', (e) => {
+            const item = e.target.closest('.topic-dropdown-item');
+            if (item && activeCellForDropdown) {
+                const selectedTopic = item.dataset.topic;
+                activeCellForDropdown.cell.textContent = selectedTopic;
+                if (activeCellForDropdown.mobileElement) {
+                    activeCellForDropdown.mobileElement.textContent = selectedTopic;
+                }
+                debouncedSave();
+            }
+            topicDropdown.style.display = 'none';
+        }, { once: true });
     }
     
     async function generatePdf() {
@@ -1107,6 +1154,46 @@
         }
     }
 
+    function downloadExcel() {
+        // Simple Excel download implementation
+        const scheduleData = document.getElementById('schedule-content-wrapper');
+        const table = scheduleData.querySelector('.schedule-table');
+        
+        let csv = [];
+        const rows = table.querySelectorAll('tr');
+        
+        for (let i = 0; i < rows.length; i++) {
+            const row = [], cols = rows[i].querySelectorAll('td, th');
+            
+            for (let j = 0; j < cols.length; j++) {
+                // Skip actions column
+                if (j === 5) continue;
+                
+                let data = cols[j].textContent.replace(/(\r\n|\n|\r)/gm, "").replace(/(\s\s)/gm, " ");
+                data = data.replace(/"/g, '""');
+                row.push('"' + data + '"');
+            }
+            
+            csv.push(row.join(","));
+        }
+
+        const csvString = csv.join('\n');
+        const filename = `${document.title || 'sunday-schedule'}.csv`;
+        
+        const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        
+        if (link.download !== undefined) {
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", filename);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    }
+
     function setupGlobalUI() {
         // Menu Toggle Logic
         const menuToggleButton = document.getElementById('menu-toggle-button');
@@ -1131,11 +1218,9 @@
         });
         menuOverlay.addEventListener('click', closeMenu);
 
-        // Sync button functionality
-        syncButton.addEventListener('click', manualSave);
-
         // App-specific UI
         document.getElementById('print-button').addEventListener('click', generatePdf);
+        document.getElementById('download-excel').addEventListener('click', downloadExcel);
         document.getElementById('cancel-creation').addEventListener('click', () => window.location.href = './sunday-dashboard.html');
         document.getElementById('confirm-creation').addEventListener('click', handleCreateSchedule);
 
@@ -1147,38 +1232,14 @@
             }
         });
 
-        memberDropdown.addEventListener('click', (e) => {
-            const item = e.target.closest('.member-dropdown-item');
-            if (item && activeCellForDropdown) {
-                activeCellForDropdown.textContent = item.dataset.name;
-                // Update mobile view
-                createMobileView();
-                debouncedSave();
-            }
-            memberDropdown.style.display = 'none';
-            activeCellForDropdown = null;
-        });
-
-        topicDropdown.addEventListener('click', (e) => {
-            const item = e.target.closest('.topic-dropdown-item');
-            if (item && activeCellForDropdown) {
-                activeCellForDropdown.textContent = item.dataset.topic;
-                // Update mobile view
-                createMobileView();
-                debouncedSave();
-            }
-            topicDropdown.style.display = 'none';
-            activeCellForDropdown = null;
-        });
-
         document.addEventListener('click', (e) => {
             if (!eventContextMenu.contains(e.target) && !e.target.closest('.event-btn')) {
                 eventContextMenu.style.display = 'none';
             }
-            if (!memberDropdown.contains(e.target) && !e.target.closest('.editable-cell')) {
+            if (!memberDropdown.contains(e.target) && !e.target.closest('.editable-cell, .member-dropdown')) {
                 memberDropdown.style.display = 'none';
             }
-            if (!topicDropdown.contains(e.target) && !e.target.closest('.editable-cell')) {
+            if (!topicDropdown.contains(e.target) && !e.target.closest('.editable-cell, .topic-dropdown')) {
                 topicDropdown.style.display = 'none';
             }
         });
