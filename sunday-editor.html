@@ -376,8 +376,8 @@
         }
         
         // 2. SOLVES FONT PROBLEM: Add a longer delay for the browser to *paint* the fonts
-        // Increased from 500ms to 1000ms (1 second)
-        await new Promise(resolve => setTimeout(resolve, 1000)); // <--- INCREASED DELAY
+        // 100ms is not always enough for complex fonts like Telugu.
+        await new Promise(resolve => setTimeout(resolve, 5000)); // <--- INCREASED DELAY
 
         const { jsPDF } = window.jspdf;
         // 3. Set to A4 Landscape
@@ -389,7 +389,7 @@
         actionElements.forEach(el => el.style.display = 'none');
         
         // Force a consistent width for reliable capture
-        const originalWidth = contentToN.style.width;
+        const originalWidth = contentToPrint.style.width;
         contentToPrint.style.width = '1100px';
 
         try {
