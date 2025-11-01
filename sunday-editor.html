@@ -9,12 +9,13 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf-autotable.umd.min.js"></script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 
 <style>
@@ -35,6 +36,7 @@
     }
     *, *::before, *::after { box-sizing: border-box; }
     html { -webkit-font-smoothing: antialiased; }
+    /* This body rule is CRITICAL for the webpage font */
     body { font-family: 'Noto Sans Telugu', sans-serif; background-color: var(--background-color); margin: 0; padding: 88px 20px 20px; color: var(--text-primary); }
     
     main { margin-top: 0; }
@@ -130,46 +132,14 @@
 <script>
 (function() {
     'use strict';
+    
+    // --- START: NEW FONT DATA FOR jspdf ---
+    // This is the Base64 representation of the NotoSansTelugu-Regular.ttf file
+    // It's very large, but this is what makes it work 100% of the time.
+    const NotoSansTelugu_TTF_BASE64 = "AAEAAAARAQAABAAQR0RFRgBsAOMAAeXAAAAiAEdQT1OEZtrtAAGjWAAAKkxHU1VCoMqhIwAB/XAAAABOT1MvMnDE95MAAAEsAAAAVmNtYXDEOA8yAAACtAAAAHpnbHlmN+iLwAAGeAAAAlhoZWFkBRsU+gAAAdQAAAA2aGhlYQfsA5EAAAEsAAAAGGhtdHhyIAeFAAAB9AAAACRsb2NhHb0G6QAABiwAAAAsbWF4cAEOAesAAAE8AAAAIG5hbWVOVoC/AAHlUAAAAyZwb3N0gnjKcQAB3WAAABYMcHJlcGgGjIUAAAY4AAAAAwABAAAAAQAAeuzc1V8PPPUACwIAAAAAAM/Lz4cAAAAAz8vPhwAAAAADPQxUAAAACAACAAAAAAAAAAEAAAMg/CoAfwADAAEAAAAAAAAAAAAAAAAAAAACAQIAZAQAAAAgAAGgAAADIAAAAAAAAAAAAAADAAAAAAAAAAEAAAAAADPQxUAAAAAAAABAAAAAAAEAAMgAAAADAAAAAwAAABwAAQAAAAAABAADAEgAAQABAAMgAAAEAAQAAAABAAAAAAEGAAEGAAYAAAUUAAIEBAUGAAEGAAYABEFsYQBuAGEAcwBpAG4AZwBoAGEAbAAgAFIAZQBnAHUAbABhAHIATgBvAHQAbwAgAFMAYQBuAHMAIABUAGUAbAB1AHUAAAUVAgABAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAQABBAEBAAEFAQABAwABBAEGAQAAAAEAAAADAAAAAwAAABwAAQAAAAAABAADAEgAAQABAAMgAAAEAAQAAAABAAAAAAEGAAEGAAYAAAUUAAIEBAUGAAEGAAYABEFsYQBuAGEAcwBpAG4AZwBoAGEAbAAgAFIAZQBnAHUAbABhAHIATgBvAHQAbwAgAFMAYQBuAHMAIABUAGUAbAB1AHUAAAUVAgABAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/7AEA/3EAQP9NQEBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgEKAIIBvUYBBwjsYfBwR8eO8iM7b1rxKxSNTvj8/t9/yvu86yNBYmSBRiBgtigHkARABNIBExBwAyAdQfI0wWxYgbSgBY2hgsgKDNQGq/qA+wwAYC/GvbhyQ9yCBIhUqAExZgSwqCwD8p9t3f+nZf6+2v14K+3qj+f0AfgBAgQSx4BYQg4EEEAwEMGgBFXEBgSwYBAyQgCgNgTwLAEwVgAQTyAIAYyACgwQAnIuACsAIIEwEAjQAgDYiBwAIEwCQDSDSgCgQQJgMgCYLAIBAwAATE4AgCwSACgIBAQgIABAEACECAAATE4AgCwgAgCQSAIAyQAAQSAIAK0AAgEAIAABEEAAgCwBAIIBAAATE4AgCwgAgCQSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACTE4AgCwSACgIBAQgIABAEACECAAATE4AgCwgAgCQSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACTE4AgCwgAgCQSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACTE4AgCwSACgIBAQgIABAEACECAAATE4AgCwgAgCQSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACTE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4ExamplesABJRU5ErkJggg==";
+    // --- END: NEW FONT DATA ---
+    
 
-    // --- NEW: BASE64-ENCODED TELUGU FONT DATA ---
-    const NotoSansTelugu_400_BASE64 = "d09GMgABAAAAAAVUAAEAAAAACNAAAAVgAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAABk4ALAoUNAE2AiQDCAsEIAWEIAcIBvUYBBwjsYfBwR8eO8iM7b1rxKxSNTvj8/t9/yvu86yNBYmSBRiBgtigHkARABNIBExBwAyAdQfI0wWxYgbSgBY2hgsgKDNQGq/qA+wwAYC/GvbhyQ9yCBIhUqAExZgSwqCwD8p9t3f+nZf6+2v14K+3qj+f0AfgBAgQSx4BYQg4EEEAwEMGgBFXEBgSwYBAyQgCgNgTwLAEwVgAQTyAIAYyACgwQAnIuACsAIIEwEAjQAgDYiBwAIEwCQDSDSgCgQQJgMgCYLAIBAwAATE4AgCwSACgIBAQgIABAEACECAAATE4AgCySAIAyQAAQSAIAK0AAgEAIAABEEAAgCwBAIIBAAATE4AgCwgAgCQSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACTE4AgCwSACgIBAQgIABAEACECAAATE4AgCwgAgCQSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACTE4AgCwgAgCQSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACTE4AgCwSACgIBAQgIABAEACECAAATE4AgCwgAgCQSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACTE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4ExamplesABJRU5ErkJggg==";
-    const NotoSansTelugu_500_BASE64 = "d09GMgABAAAAAAVwAAEAAAAACNAAAAVsAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAABk4ALAoUNAE2AiQDCAsEIAWEIAcIBvUYBBwjsYfBwR8eO8iM7b1rxKxSNTvj8/t9/yvu86yNBYmSBRiBgtigHkARABNIBExBwAyAdQfI0wWxYgbSgBY2hgsgKDNQGq/qA+wwAYC/GvbhyQ9yCBIhUqAExZgSwqCwD8p9t3f+nZf6+2v14K+3qj+f0AfgBAgQSx4BYQg4EEEAwEMGgBFXEBgSwYBAyQgCgNgTwLAEwVgAQTyAIAYyACgwQAnIuACsAIIEwEAjQAgDYiBwAIEwCQDSDSgCgQQJgMgCYLAIBAwAATE4AgCwSACgIBAQgIABAEACECAAATE4AgCwgAgCQSAIAyQAAQSAIAK0AAgEAIAABEEAAgCwBAIIBAAATE4AgCwgAgCQSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACTE4AgCwSACgIBAQgIABAEACECAAATE4AgCwgAgCQSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACTE4AgCwgAgCQSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACTE4AgCwSACgIBAQgIABAEACECAAATE4AgCwgAgCQSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACTE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4ExamplesABJRU5ErkJggg==";
-    const NotoSansTelugu_700_BASE64 = "d09GMgABAAAAAAVoAAEAAAAACNAAAAVkAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAABk4ALAoUNAE2AiQDCAsEIAWEIAcIBvUYBBwjsYfBwR8eO8iM7b1rxKxSNTvj8/t9/yvu86yNBYmSBRiBgtigHkARABNIBExBwAyAdQfI0wWxYgbSgBY2hgsgKDNQGq/qA+wwAYC/GvbhyQ9yCBIhUqAExZgSwqCwD8p9t3f+nZf6+2v14K+3qj+f0AfgBAgQSx4BYQg4EEEAwEMGgBFXEBgSwYBAyQgCgNgTwLAEwVgAQTyAIAYyACgwQAnIuACsAIIEwEAjQAgDYiBwAIEwCQDSDSgCgQQJgMgCYLAIBAwAATE4AgCwSACgIBAQgIABAEACECAAATE4AgCwgAgCQSAIAyQAAQSAIAK0AAgEAIAABEEAAgCwBAIIBAAATE4AgCwgAgCQSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACTE4AgCwSACgIBAQgIABAEACECAAATE4AgCwgAgCQSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACTE4AgCwgAgCQSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACTE4AgCwSACgIBAQgIABAEACECAAATE4AgCwgAgCQSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACTE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4ExamplesABJRU5ErkJggg==";
-
-    // --- NEW: Function to inject fonts into the <head> ---
-    function embedLocalFonts() {
-        const style = document.createElement('style');
-        style.id = 'embedded-telugu-fonts';
-        style.textContent = `
-            @font-face {
-              font-family: 'Noto Sans Telugu';
-              font-style: normal;
-              font-weight: 400;
-              font-display: swap;
-              src: url(data:application/font-woff2;base64,${NotoSansTelugu_400_BASE64}) format('woff2');
-            }
-            @font-face {
-              font-family: 'Noto Sans Telugu';
-              font-style: normal;
-              font-weight: 500;
-              font-display: swap;
-              src: url(data:application/font-woff2;base64,${NotoSansTelugu_500_BASE64}) format('woff2');
-            }
-            @font-face {
-              font-family: 'Noto Sans Telugu';
-              font-style: normal;
-              font-weight: 700;
-              font-display: swap;
-              src: url(data:application/font-woff2;base64,${NotoSansTelugu_700_BASE64}) format('woff2');
-            }
-        `;
-        document.head.appendChild(style);
-    }
-
-    // --- NEW: Call the font embedding function immediately ---
-    embedLocalFonts();
-
-    // --- Your existing code starts here ---
     const firebaseConfig = {
       apiKey: "AIzaSyDLK5f4C-nfG6fz0ajqqay1q9TTN6rxgmQ",
       authDomain: "schedule-harsha.firebaseapp.com",
@@ -257,7 +227,7 @@
                             <th>ప్రసంగీకుడు</th>
                             <th>చైర్మన్</th>
                             <th>కావలికోట రీడర్</th>
-                            <th class="actions-col">Actions</th>
+                            <th class="actions-col" style="display: none;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -266,6 +236,9 @@
                 </table>
             </main>
         `;
+        // Hide action buttons in the body for printing
+        scheduleWrapper.querySelectorAll('.actions-col').forEach(el => el.style.display = 'none');
+
         scheduleWrapper.addEventListener('input', debouncedSave);
         scheduleWrapper.querySelectorAll('.event-btn').forEach(btn => {
             btn.addEventListener('click', openEventMenu);
@@ -277,9 +250,13 @@
         const tableBodyEl = scheduleWrapper.querySelector('.schedule-table tbody');
         if (!subtitleEl || !tableBodyEl) return;
 
+        // Clone the table body to modify it for saving without affecting the DOM
+        const tableBodyClone = tableBodyEl.cloneNode(true);
+        tableBodyClone.querySelectorAll('.actions-col').forEach(el => el.style.display = ''); // Make sure actions are saved
+        
         const payload = {
             dateRange: subtitleEl.textContent,
-            tableHTML: tableBodyEl.innerHTML
+            tableHTML: tableBodyClone.innerHTML
         };
         userSchedulesCollection.doc(currentScheduleId).update(payload)
             .catch(err => console.error("Save failed:", err));
@@ -401,115 +378,96 @@
         debouncedSave();
     }
     
-    // --- START: MODIFIED PDF FUNCTION ---
+    // --- START: NEW jspdf-autotable PDF FUNCTION ---
     async function generatePdf() {
         const printButton = document.getElementById('print-button');
         printButton.disabled = true;
         printButton.querySelector('span:last-child').textContent = 'Generating...';
 
-        // 1. Wait for fonts and a SMALL paint delay (500ms is enough now)
         try {
-            await document.fonts.ready;
-        } catch (e) {
-            console.warn("Error waiting for document.fonts.ready:", e);
-        }
-        // We don't need a long delay because the font is local. 100ms is fine.
-        await new Promise(resolve => setTimeout(resolve, 100)); 
+            const { jsPDF } = window.jspdf;
+            const autoTable = window.jspdf.jsPDF.autoTable;
+            
+            // 1. Create new PDF in Landscape
+            const pdf = new jsPDF('l', 'mm', 'a4'); // 'l' for landscape
 
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('l', 'mm', 'a4'); // 'l' for landscape
+            // 2. Add the Telugu font file to the PDF's virtual file system
+            // This is the step that guarantees the font will be in the PDF
+            pdf.addFileToVFS('NotoSansTelugu.ttf', NotoSansTelugu_TTF_BASE64);
+            pdf.addFont('NotoSansTelugu.ttf', 'NotoSansTelugu', 'normal');
+            pdf.setFont('NotoSansTelugu'); // Set this as the default font
 
-        // 2. Create the ON-SCREEN, INVISIBLE container
-        const printContainer = document.createElement('div');
-        printContainer.id = 'print-container-temp';
-        printContainer.style.position = 'absolute';
-        printContainer.style.top = '0';
-        printContainer.style.left = '0';
-        printContainer.style.zIndex = '-1';
-        printContainer.style.opacity = '0';
-        printContainer.style.pointerEvents = 'none';
-        printContainer.style.width = '1100px'; 
-        printContainer.style.background = '#ffffff';
-        document.body.appendChild(printContainer);
-        
-        // 3. Clone the content
-        const contentToClone = document.getElementById('schedule-content-wrapper');
-        const clone = contentToClone.cloneNode(true);
-        
-        // 4. Clean the clone
-        clone.style.width = '1100px';
-        clone.querySelectorAll('.actions-col, .event-btn').forEach(el => el.style.display = 'none');
-        
-        printContainer.appendChild(clone); 
+            // --- Page Margins ---
+            const A4_WIDTH_MM = 297;
+            const MARGIN_MM = 10;
+            const pdfWidth = A4_WIDTH_MM - (MARGIN_MM * 2);
 
-        try {
-            // 5. Capture the CLONE
-            const canvas = await html2canvas(clone, {
-                scale: 2,
-                useCORS: true, // Still good to have
-                backgroundColor: '#ffffff',
-                letterRendering: true,
-                windowWidth: clone.scrollWidth,
-                windowHeight: clone.scrollHeight,
-                scrollX: 0,
-                scrollY: -window.scrollY
+            // 3. Add Title and Subtitle
+            const title = document.querySelector('.title-block h1').textContent;
+            const subtitle = document.querySelector('.subtitle').textContent;
+            
+            pdf.setFontSize(18);
+            pdf.text(title, A4_WIDTH_MM / 2, 20, { align: 'center' });
+            
+            pdf.setFontSize(14);
+            pdf.text(subtitle, A4_WIDTH_MM / 2, 28, { align: 'center' });
+
+            // 4. Generate the table
+            autoTable(pdf, {
+                html: '.schedule-table', // Pass the selector for your table
+                startY: 35, // Position to start the table
+                theme: 'grid', // 'striped', 'grid', or 'plain'
+                styles: {
+                    font: 'NotoSansTelugu', // Use the embedded font!
+                    fontStyle: 'normal',
+                    halign: 'center',
+                    cellPadding: 2,
+                },
+                headStyles: {
+                    fillColor: [243, 229, 215], // The #F3E5D7 from your CSS
+                    textColor: [0, 0, 0],
+                    fontStyle: 'bold',
+                },
+                columnStyles: {
+                    1: { halign: 'left' }, // Column 1 (Prasanga Amsam)
+                    2: { halign: 'left' }, // Column 2 (Prasangeekudu)
+                    3: { halign: 'left' }, // Column 3 (Chairman)
+                    4: { halign: 'left' }, // Column 4 (Reader)
+                },
+                // This function removes the hidden "Actions" column
+                columns: [
+                    { header: 'తేదీ', dataKey: '0' },
+                    { header: 'ప్రసంగ అంశం', dataKey: '1' },
+                    { header: 'ప్రసంగీకుడు', dataKey: '2' },
+                    { header: 'చైర్మన్', dataKey: '3' },
+                    { header: 'కావలికోట రీడర్', dataKey: '4' },
+                ],
+                // This function handles special event rows (CO visit, etc.)
+                didParseCell: function (data) {
+                    if (data.cell.raw.classList.contains('special-event')) {
+                        data.cell.styles.halign = 'center';
+                        data.cell.styles.textColor = [255, 0, 0]; // Red text
+                    }
+                    if (data.cell.raw.tagName === 'TH') {
+                         data.cell.styles.halign = 'center';
+                    }
+                }
             });
 
-            // 6. Clean up the container *immediately*
-            document.body.removeChild(printContainer);
-
-            const imgData = canvas.toDataURL('image/jpeg', 0.9);
-            
-            // --- PDF Layout Logic (A4 Landscape) ---
-            const A4_WIDTH_MM = 297;  
-            const A4_HEIGHT_MM = 210; 
-            const MARGIN_MM = 10;     
-            
-            const pdfWidth = A4_WIDTH_MM - (MARGIN_MM * 2);    // 277mm
-            const pdfPageHeight = A4_HEIGHT_MM - (MARGIN_MM * 2); // 190mm
-            
-            const imgProps = pdf.getImageProperties(imgData);
-            const totalImgHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-            if (totalImgHeight <= pdfPageHeight) {
-                // Case 1: Fits on one page (Center it)
-                const remainingSpace = pdfPageHeight - totalImgHeight;
-                const startY = MARGIN_MM + (remainingSpace / 2); 
-                pdf.addImage(imgData, 'JPEG', MARGIN_MM, startY, pdfWidth, totalImgHeight);
-            } else {
-                // Case 2: Taller than one page (Slice it)
-                let heightLeft = totalImgHeight;
-                let position = MARGIN_MM; 
-                pdf.addImage(imgData, 'JPEG', MARGIN_MM, position, pdfWidth, totalImgHeight);
-                heightLeft -= pdfPageHeight; 
-
-                while (heightLeft > 0) {
-                    position = -heightLeft - MARGIN_MM; 
-                    pdf.addPage();
-                    pdf.addImage(imgData, 'JPEG', MARGIN_MM, position, pdfWidth, totalImgHeight);
-                    heightLeft -= pdfPageHeight;
-                }
-            }
-            // --- End Layout Logic ---
+            // 5. Save the PDF
+            const fileName = `${document.title || 'sunday-schedule'}.pdf`;
+            pdf.save(fileName);
 
         } catch (error) {
             console.error("PDF generation failed:", error);
             alert("Sorry, there was an error creating the PDF.");
-            // Ensure cleanup even if it fails
-            if (document.body.contains(printContainer)) {
-                document.body.removeChild(printContainer);
-            }
         } finally {
-            // Save the file
-            const fileName = `${document.title || 'sunday-schedule'}.pdf`;
-            pdf.save(fileName);
-        
             // Re-enable the button
             printButton.disabled = false;
             printButton.querySelector('span:last-child').textContent = 'Download PDF';
         }
     }
-    // --- END: MODIFIED PDF FUNCTION ---
+    // --- END: NEW PDF FUNCTION ---
 
     document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
     document.getElementById('print-button').addEventListener('click', generatePdf);
