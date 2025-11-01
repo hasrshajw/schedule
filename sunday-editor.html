@@ -244,13 +244,8 @@
         const subtitleEl = scheduleWrapper.querySelector('.subtitle');
         const tableBodyEl = scheduleWrapper.querySelector('.schedule-table tbody');
         if (!subtitleEl || !tableBodyEl) return;
-
-        const payload = {
-            dateRange: subtitleEl.textContent,
-            tableHTML: tableBodyEl.innerHTML
-        };
-        userSchedulesCollection.doc(currentScheduleId).update(payload)
-            .catch(err => console.error("Save failed:", err));
+        const payload = { dateRange: subtitleEl.textContent, tableHTML: tableBodyEl.innerHTML };
+        userSchedulesCollection.doc(currentScheduleId).update(payload).catch(err => console.error("Save failed:", err));
     }, 1500);
 
     function initCreationFlow() {
@@ -269,9 +264,7 @@
         const sundays = [];
         let currentDate = new Date();
         let dayOfWeek = currentDate.getDay();
-        if (dayOfWeek !== 0) { 
-            currentDate.setDate(currentDate.getDate() + (7 - dayOfWeek));
-        }
+        if (dayOfWeek !== 0) { currentDate.setDate(currentDate.getDate() + (7 - dayOfWeek)); }
         for (let i = 0; i < count; i++) {
             const day = String(currentDate.getDate()).padStart(2, '0');
             const month = String(currentDate.getMonth() + 1).padStart(2, '0');
@@ -299,25 +292,14 @@
                 <td contenteditable="true"></td>
                 <td contenteditable="true"></td>
                 <td class="actions-col">
-                    <button class="event-btn">
-                        <span class="material-symbols-outlined">more_vert</span>
-                    </button>
+                    <button class="event-btn"><span class="material-symbols-outlined">more_vert</span></button>
                 </td>
-            </tr>
-        `).join('');
+            </tr>`).join('');
 
         try {
-            const newDocRef = await userSchedulesCollection.add({
-                name: scheduleName,
-                dateRange: dateRange,
-                tableHTML: tableBodyHTML,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
+            const newDocRef = await userSchedulesCollection.add({ name: scheduleName, dateRange: dateRange, tableHTML: tableBodyHTML, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
             window.location.href = `./sunday-editor.html?id=${newDocRef.id}`;
-        } catch (error) {
-            console.error("Error creating new schedule:", error);
-            alert("Could not create schedule. Please try again.");
-        }
+        } catch (error) { console.error("Error creating schedule:", error); alert("Could not create schedule."); }
     }
     
     function openEventMenu(e) {
@@ -358,10 +340,7 @@
             topicCell.classList.add('special-event');
             topicCell.setAttribute('contenteditable', 'false');
             topicCell.textContent = eventTexts[eventType];
-            otherCells.forEach(cell => {
-                cell.style.display = 'none';
-                cell.setAttribute('contenteditable', 'false');
-            });
+            otherCells.forEach(cell => { cell.style.display = 'none'; cell.setAttribute('contenteditable', 'false'); });
         }
         debouncedSave();
     }
@@ -369,40 +348,54 @@
     async function generatePdf() {
         const printButton = document.getElementById('print-button');
         printButton.disabled = true;
-        printButton.querySelector('span').textContent = 'Generating...';
+        const originalButtonText = printButton.querySelector('span:last-of-type').textContent;
+        printButton.querySelector('span:last-of-type').textContent = 'Generating...';
 
         const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('l', 'mm', 'a4'); 
+        const pdf = new jsPDF('l', 'mm', 'a4'); // 'l' for landscape
         const A4_WIDTH_MM = 297;
         const A4_HEIGHT_MM = 210;
         const MARGIN_MM = 15;
         const USABLE_WIDTH = A4_WIDTH_MM - (MARGIN_MM * 2);
-        const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_MM * 2);
 
         const printContainer = document.createElement('div');
         printContainer.style.position = 'absolute';
         printContainer.style.left = '-9999px';
-        printContainer.style.width = '1100px'; 
+        printContainer.style.width = '1100px';
         printContainer.style.background = 'white';
         document.body.appendChild(printContainer);
-
-        const contentToPrint = scheduleWrapper.cloneNode(true);
-        Array.from(contentToPrint.querySelectorAll('.actions-col, .event-btn, .toolbar-btn')).forEach(el => el.remove());
-        printContainer.appendChild(contentToPrint);
-
-        const scheduleHeader = contentToPrint.querySelector('.schedule-display-header');
-        const table = contentToPrint.querySelector('.schedule-table');
-        const allRows = Array.from(table.querySelectorAll('thead > tr, tbody > tr'));
-
-        const headerCanvas = await html2canvas(scheduleHeader, { scale: 2 });
-        const headerImgData = headerCanvas.toDataURL('image/jpeg', 0.9);
-        const headerProps = pdf.getImageProperties(headerImgData);
-        const headerHeight = (headerProps.height * USABLE_WIDTH) / headerProps.width;
         
-        pdf.addImage(headerImgData, 'JPEG', MARGIN_MM, MARGIN_MM, USABLE_WIDTH, headerHeight);
-        let currentY = MARGIN_MM + headerHeight;
+        const contentClone = scheduleWrapper.cloneNode(true);
+        Array.from(contentClone.querySelectorAll('.actions-col, .event-btn')).forEach(el => el.remove());
+        printContainer.appendChild(contentClone);
 
-        for (const row of allRows) {
+        const mainHeaderEl = contentClone.querySelector('.schedule-display-header');
+        const tableHeaderEl = contentClone.querySelector('.schedule-table thead');
+        const tableBodyRows = Array.from(contentClone.querySelectorAll('.schedule-table tbody tr'));
+
+        const mainHeaderCanvas = await html2canvas(mainHeaderEl, { scale: 2 });
+        const mainHeaderImg = {
+            data: mainHeaderCanvas.toDataURL('image/jpeg', 0.9),
+            height: (mainHeaderCanvas.height * USABLE_WIDTH) / mainHeaderCanvas.width
+        };
+
+        const tableHeaderCanvas = await html2canvas(tableHeaderEl, { scale: 2, backgroundColor: '#ffffff' });
+        const tableHeaderImg = {
+            data: tableHeaderCanvas.toDataURL('image/jpeg', 0.9),
+            height: (tableHeaderCanvas.height * USABLE_WIDTH) / tableHeaderCanvas.width
+        };
+
+        let currentY = MARGIN_MM;
+        
+        // Add main header only to the first page
+        pdf.addImage(mainHeaderImg.data, 'JPEG', MARGIN_MM, currentY, USABLE_WIDTH, mainHeaderImg.height);
+        currentY += mainHeaderImg.height;
+
+        // Add table header to the first page
+        pdf.addImage(tableHeaderImg.data, 'JPEG', MARGIN_MM, currentY, USABLE_WIDTH, tableHeaderImg.height);
+        currentY += tableHeaderImg.height;
+
+        for (const row of tableBodyRows) {
             const rowCanvas = await html2canvas(row, { scale: 2, backgroundColor: '#ffffff' });
             const rowImgData = rowCanvas.toDataURL('image/jpeg', 0.9);
             const rowProps = pdf.getImageProperties(rowImgData);
@@ -410,9 +403,10 @@
 
             if (currentY + rowHeight > A4_HEIGHT_MM - MARGIN_MM) {
                 pdf.addPage();
-                currentY = MARGIN_MM; 
-                pdf.addImage(headerImgData, 'JPEG', MARGIN_MM, currentY, USABLE_WIDTH, headerHeight);
-                currentY += headerHeight;
+                currentY = MARGIN_MM;
+                // Add table header to the new page
+                pdf.addImage(tableHeaderImg.data, 'JPEG', MARGIN_MM, currentY, USABLE_WIDTH, tableHeaderImg.height);
+                currentY += tableHeaderImg.height;
             }
             
             pdf.addImage(rowImgData, 'JPEG', MARGIN_MM, currentY, USABLE_WIDTH, rowHeight);
@@ -422,8 +416,9 @@
         document.body.removeChild(printContainer);
         const fileName = `${document.title || 'sunday-schedule'}.pdf`;
         pdf.save(fileName);
+
         printButton.disabled = false;
-        printButton.querySelector('span').textContent = 'Download PDF';
+        printButton.querySelector('span:last-of-type').textContent = originalButtonText;
     }
 
     document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
