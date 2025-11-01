@@ -88,44 +88,82 @@
     /* Print container for PDF generation */
     #print-container { position: absolute; left: -9999px; top: auto; width: 1100px; background: white; }
     
-    /* Enhanced print styles for PDF */
-    #print-container .schedule-table .top-empty-row {
-        border: none !important;
-        border-bottom: 2px solid #000 !important;
+    /* PDF-specific styles */
+    .pdf-page-container {
+        background: white;
+        padding: 20px;
+        font-family: 'Noto Sans Telugu', sans-serif;
+        width: 1100px;
+        margin-bottom: 20px;
     }
-
-    #print-container .schedule-table .top-empty-row th {
-        border: none !important;
-        border-bottom: 2px solid #000 !important;
-        background: white !important;
+    
+    .pdf-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: 'Noto Sans Telugu', sans-serif;
+        border: 2px solid #000;
     }
-
-    /* Ensure SVG divider visibility */
-    #print-container .svg-divider {
-        display: block !important;
-        visibility: visible !important;
-        opacity: 1 !important;
+    
+    .pdf-table th,
+    .pdf-table td {
+        border: 1px solid #000;
+        padding: 12px 8px;
+        font-family: 'Noto Sans Telugu', sans-serif;
+        font-weight: 700;
+        height: 45px;
+        vertical-align: middle;
+        box-sizing: border-box;
     }
-
-    /* Backup divider in case SVG doesn't render */
-    .svg-divider-backup {
-        background: linear-gradient(to right, #093261, #ffffff, #093261) !important;
-        height: 5px !important;
-        width: 400px !important;
-        margin: 0 auto !important;
+    
+    .pdf-table .top-empty-row {
+        border: none;
+        border-bottom: 2px solid #000;
     }
-
-    /* Better table cell rendering */
-    #print-container .schedule-table th,
-    #print-container .schedule-table td {
-        border: 1px solid #000 !important;
-        page-break-inside: avoid !important;
+    
+    .pdf-table .top-empty-row th {
+        border: none;
+        border-bottom: 2px solid #000;
+        background: white;
     }
-
-    /* Special handling for the first row */
-    #print-container .schedule-table thead tr:first-child th {
-        border: none !important;
-        border-bottom: 2px solid #000 !important;
+    
+    .pdf-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    
+    .pdf-title {
+        font-family: 'Noto Sans Telugu', sans-serif;
+        font-weight: 700;
+        color: rgb(97, 40, 0);
+        margin: 0;
+    }
+    
+    .pdf-subtitle-container {
+        position: relative;
+        display: inline-block;
+        margin-top: 0;
+    }
+    
+    .pdf-subtitle {
+        font-family: 'Noto Sans Telugu', sans-serif;
+        font-weight: 500;
+        background: white;
+        padding: 2px 8px;
+        display: inline-block;
+        position: relative;
+        z-index: 2;
+    }
+    
+    .pdf-divider {
+        width: 400px;
+        height: 5px;
+        display: block;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        top: 50%;
+        margin-top: -2.5px;
+        z-index: 1;
     }
 </style>
 </head>
@@ -419,190 +457,237 @@
         const A4_WIDTH_MM = 297;
         const A4_HEIGHT_MM = 210;
         const MARGIN_MM = 10;
-        const PAGE_SPACING_MM = 5;
         
         const USABLE_WIDTH = A4_WIDTH_MM - (MARGIN_MM * 2);
         const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_MM * 2);
 
-        const printContainer = document.createElement('div');
-        printContainer.id = 'print-container';
-        printContainer.style.position = 'absolute';
-        printContainer.style.left = '-9999px';
-        printContainer.style.top = 'auto';
-        printContainer.style.width = '1100px';
-        printContainer.style.background = 'white';
-        printContainer.style.padding = '20px';
-        printContainer.style.fontFamily = "'Noto Sans Telugu', sans-serif";
-        
-        document.body.appendChild(printContainer);
-
         try {
-            // Clone the entire schedule content
+            // Get the original schedule content
             const contentToPrint = document.getElementById('schedule-content-wrapper');
-            const clone = contentToPrint.cloneNode(true);
             
-            // Hide action elements
-            const actionElements = clone.querySelectorAll('.actions-col, .event-btn');
-            actionElements.forEach(el => el.style.display = 'none');
+            // Extract header information
+            const title = contentToPrint.querySelector('.title-block h1')?.textContent || 'బహిరంగ ప్రసంగాల పట్టిక';
+            const subtitle = contentToPrint.querySelector('.subtitle')?.textContent || '';
+            const tableElement = contentToPrint.querySelector('.schedule-table');
             
-            // 2. Hide borders for the first cell (top-empty-row)
-            const topEmptyRow = clone.querySelector('.top-empty-row');
-            if (topEmptyRow) {
-                topEmptyRow.style.border = 'none';
-                topEmptyRow.style.borderBottom = '2px solid #000'; // Keep only bottom border
-                const firstCell = topEmptyRow.querySelector('th');
-                if (firstCell) {
-                    firstCell.style.border = 'none';
-                    firstCell.style.borderBottom = '2px solid #000';
-                }
+            if (!tableElement) {
+                throw new Error('Table not found');
             }
 
-            // Ensure SVG divider is properly rendered
-            const svgDivider = clone.querySelector('.svg-divider');
-            if (svgDivider) {
-                // Make sure SVG is visible and properly sized
-                svgDivider.style.display = 'block';
-                svgDivider.style.visibility = 'visible';
-                svgDivider.style.opacity = '1';
-                
-                // Create a backup div in case SVG doesn't render
-                const svgParent = svgDivider.parentElement;
-                const backupDiv = document.createElement('div');
-                backupDiv.className = 'svg-divider-backup';
-                backupDiv.style.width = '400px';
-                backupDiv.style.height = '5px';
-                backupDiv.style.background = 'linear-gradient(to right, #093261, #ffffff, #093261)';
-                backupDiv.style.margin = '0 auto';
-                backupDiv.style.display = 'none'; // Hidden by default
-                
-                svgParent.appendChild(backupDiv);
-            }
+            // Get all data rows (excluding header rows)
+            const tbody = tableElement.querySelector('tbody');
+            const dataRows = Array.from(tbody.querySelectorAll('tr')).filter(row => 
+                !row.classList.contains('header-row') && 
+                !row.querySelector('.actions-col')
+            );
 
-            // Explicitly set Telugu font for all elements
-            const allElements = clone.querySelectorAll('*');
-            allElements.forEach(el => {
-                el.style.fontFamily = "'Noto Sans Telugu', sans-serif";
-                el.style.fontWeight = '700';
-            });
-
-            // Ensure table styling
-            const table = clone.querySelector('.schedule-table');
-            if (table) {
-                table.style.fontFamily = "'Noto Sans Telugu', sans-serif";
-                table.style.border = '2px solid #000';
-                table.style.borderCollapse = 'collapse';
+            // Calculate approximate row height
+            let rowHeight = 15; // Default row height in mm
+            
+            if (dataRows.length > 0) {
+                // Create a temporary container to measure row height
+                const tempContainer = document.createElement('div');
+                tempContainer.style.position = 'absolute';
+                tempContainer.style.left = '-9999px';
+                tempContainer.style.top = '0';
+                tempContainer.style.width = '1100px';
+                tempContainer.style.background = 'white';
+                tempContainer.style.padding = '20px';
                 
-                // Enhance cell styling for better PDF rendering
-                const allCells = clone.querySelectorAll('th, td');
-                allCells.forEach(cell => {
-                    cell.style.fontFamily = "'Noto Sans Telugu', sans-serif";
-                    cell.style.fontWeight = '700';
-                    cell.style.height = '45px';
-                    cell.style.padding = '12px 8px';
-                    cell.style.border = '1px solid #000';
-                    cell.style.verticalAlign = 'middle';
+                const tempTable = document.createElement('table');
+                tempTable.className = 'pdf-table';
+                tempTable.style.width = '100%';
+                
+                // Add header
+                const thead = tableElement.querySelector('thead').cloneNode(true);
+                tempTable.appendChild(thead);
+                
+                // Add one sample row
+                const sampleRow = dataRows[0].cloneNode(true);
+                const sampleTbody = document.createElement('tbody');
+                sampleTbody.appendChild(sampleRow);
+                tempTable.appendChild(sampleTbody);
+                
+                tempContainer.appendChild(tempTable);
+                document.body.appendChild(tempContainer);
+                
+                // Measure the height
+                const canvas = await html2canvas(tempContainer, {
+                    scale: 1,
+                    useCORS: true,
+                    backgroundColor: '#ffffff',
+                    logging: false
                 });
-
-                // Remove borders from first cell (top-empty-row) specifically
-                const topEmptyCells = clone.querySelectorAll('.top-empty-row th');
-                topEmptyCells.forEach(cell => {
-                    cell.style.border = 'none';
-                    cell.style.borderBottom = '2px solid #000';
-                });
+                
+                const imgProps = { width: canvas.width, height: canvas.height };
+                const totalHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
+                rowHeight = totalHeight - 60; // Subtract header height
+                
+                document.body.removeChild(tempContainer);
             }
 
-            printContainer.appendChild(clone);
-
-            // Preload and wait for fonts with extended timeout
-            await document.fonts.ready;
+            // Calculate how many rows fit per page
+            const headerHeight = 60; // Approximate header height in mm
+            const availableRowHeight = USABLE_HEIGHT - headerHeight;
+            const rowsPerPage = Math.floor(availableRowHeight / rowHeight);
             
-            // Additional delay to ensure fonts are rendered
-            await new Promise(resolve => {
-                setTimeout(resolve, 500);
-            });
+            // Ensure at least 5 rows per page
+            const finalRowsPerPage = Math.max(5, rowsPerPage);
 
-            // 1. Capture the entire content as one continuous image
-            const canvas = await html2canvas(printContainer, {
-                scale: 3,
-                useCORS: true,
-                backgroundColor: '#ffffff',
-                letterRendering: true,
-                allowTaint: true,
-                logging: false,
-                onclone: function(clonedDoc) {
-                    // Ensure fonts are applied in the cloned document
-                    const clonedElements = clonedDoc.querySelectorAll('*');
-                    clonedElements.forEach(el => {
-                        el.style.fontFamily = "'Noto Sans Telugu', sans-serif";
-                    });
+            console.log(`Row height: ${rowHeight}mm, Rows per page: ${finalRowsPerPage}`);
 
-                    // Check if SVG rendered, if not use backup
-                    const clonedSvg = clonedDoc.querySelector('.svg-divider');
-                    const clonedBackup = clonedDoc.querySelector('.svg-divider-backup');
-                    if (clonedSvg && clonedBackup) {
-                        // Force SVG to be visible
-                        clonedSvg.style.display = 'block';
-                        clonedSvg.style.visibility = 'visible';
-                        clonedSvg.style.opacity = '1';
-                        
-                        // If SVG might not render, show backup after a brief delay
-                        setTimeout(() => {
-                            const svgRect = clonedSvg.getBoundingClientRect();
-                            if (svgRect.width === 0 || svgRect.height === 0) {
-                                clonedBackup.style.display = 'block';
-                                clonedSvg.style.display = 'none';
-                            }
-                        }, 100);
-                    }
-                }
-            });
-
-            const imgData = canvas.toDataURL('image/png', 1.0);
-            const imgProps = pdf.getImageProperties(imgData);
-            const totalImgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
-
-            // 1. Continuous content across pages without breaking cells
-            let currentPosition = 0;
+            let currentRow = 0;
             let pageNumber = 0;
 
-            while (currentPosition < totalImgHeight) {
+            while (currentRow < dataRows.length) {
                 if (pageNumber > 0) {
                     pdf.addPage();
                 }
 
-                // Calculate the portion of image to show on current page
-                const pageImgHeight = Math.min(USABLE_HEIGHT, totalImgHeight - currentPosition);
+                // Create page container
+                const pageContainer = document.createElement('div');
+                pageContainer.className = 'pdf-page-container';
+
+                // Create header for this page
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'pdf-header';
                 
-                // Create a temporary canvas for the current page segment
-                const tempCanvas = document.createElement('canvas');
-                const tempCtx = tempCanvas.getContext('2d');
-                tempCanvas.width = canvas.width;
-                tempCanvas.height = (pageImgHeight / USABLE_HEIGHT) * canvas.height;
+                const titleDiv = document.createElement('div');
+                titleDiv.className = 'pdf-title';
+                titleDiv.textContent = title;
+                headerDiv.appendChild(titleDiv);
                 
-                // Calculate source coordinates for the current page segment
-                const sourceY = (currentPosition / totalImgHeight) * canvas.height;
-                const sourceHeight = (pageImgHeight / totalImgHeight) * canvas.height;
+                const subtitleContainer = document.createElement('div');
+                subtitleContainer.className = 'pdf-subtitle-container';
                 
-                // Draw the segment onto temporary canvas
-                tempCtx.drawImage(
-                    canvas,
-                    0, sourceY, canvas.width, sourceHeight,
-                    0, 0, tempCanvas.width, tempCanvas.height
-                );
+                const subtitleDiv = document.createElement('div');
+                subtitleDiv.className = 'pdf-subtitle';
+                subtitleDiv.textContent = subtitle;
+                subtitleContainer.appendChild(subtitleDiv);
                 
-                const pageImgData = tempCanvas.toDataURL('image/png', 1.0);
+                // Create SVG divider
+                const svgDivider = document.createElement('svg');
+                svgDivider.className = 'pdf-divider';
+                svgDivider.setAttribute('viewBox', '0 0 24039.797 260');
+                svgDivider.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+                svgDivider.innerHTML = `
+                    <defs>
+                        <radialGradient id="pdfGradient" gradientUnits="userSpaceOnUse" r="12020.601" cx="12019.898" cy="130" fx="12019.898" fy="130">
+                            <stop stop-color="#093261" stop-opacity="1" offset="0"></stop>
+                            <stop stop-color="#ffffff" stop-opacity="1" offset="1"></stop>
+                        </radialGradient>
+                    </defs>
+                    <rect x="0" y="0" width="24039.797" height="260" fill="url(#pdfGradient)"></rect>
+                `;
+                subtitleContainer.appendChild(svgDivider);
                 
-                // Add to PDF
+                headerDiv.appendChild(subtitleContainer);
+                pageContainer.appendChild(headerDiv);
+
+                // Create table for this page
+                const pageTable = document.createElement('table');
+                pageTable.className = 'pdf-table';
+
+                // Clone table header
+                const theadClone = tableElement.querySelector('thead').cloneNode(true);
+                
+                // Fix first cell borders
+                const topEmptyRow = theadClone.querySelector('.top-empty-row');
+                if (topEmptyRow) {
+                    topEmptyRow.className = 'top-empty-row';
+                    topEmptyRow.style.border = 'none';
+                    topEmptyRow.style.borderBottom = '2px solid #000';
+                    
+                    const firstCell = topEmptyRow.querySelector('th');
+                    if (firstCell) {
+                        firstCell.style.border = 'none';
+                        firstCell.style.borderBottom = '2px solid #000';
+                    }
+                }
+
+                // Remove action column from header
+                const headerRows = theadClone.querySelectorAll('tr');
+                headerRows.forEach(row => {
+                    const actionCol = row.querySelector('.actions-col');
+                    if (actionCol) {
+                        actionCol.remove();
+                    }
+                });
+
+                pageTable.appendChild(theadClone);
+
+                // Create tbody for data rows
+                const tbodyClone = document.createElement('tbody');
+                
+                // Add rows for current page
+                const endRow = Math.min(currentRow + finalRowsPerPage, dataRows.length);
+                for (let i = currentRow; i < endRow; i++) {
+                    const rowClone = dataRows[i].cloneNode(true);
+                    
+                    // Remove action column from data rows
+                    const actionCol = rowClone.querySelector('.actions-col');
+                    if (actionCol) {
+                        actionCol.remove();
+                    }
+                    
+                    // Ensure proper styling
+                    const cells = rowClone.querySelectorAll('th, td');
+                    cells.forEach(cell => {
+                        cell.style.fontFamily = "'Noto Sans Telugu', sans-serif";
+                        cell.style.fontWeight = '700';
+                        cell.style.height = '45px';
+                        cell.style.padding = '12px 8px';
+                        cell.style.border = '1px solid #000';
+                        cell.style.verticalAlign = 'middle';
+                    });
+                    
+                    tbodyClone.appendChild(rowClone);
+                }
+
+                pageTable.appendChild(tbodyClone);
+                pageContainer.appendChild(pageTable);
+
+                // Create temporary container for capturing
+                const tempContainer = document.createElement('div');
+                tempContainer.style.position = 'absolute';
+                tempContainer.style.left = '-9999px';
+                tempContainer.style.top = '0';
+                tempContainer.appendChild(pageContainer);
+                document.body.appendChild(tempContainer);
+
+                // Wait for fonts and rendering
+                await document.fonts.ready;
+                await new Promise(resolve => setTimeout(resolve, 100));
+
+                // Capture the page
+                const canvas = await html2canvas(pageContainer, {
+                    scale: 2,
+                    useCORS: true,
+                    backgroundColor: '#ffffff',
+                    letterRendering: true,
+                    logging: false
+                });
+
+                const imgData = canvas.toDataURL('image/png', 1.0);
+                const imgProps = pdf.getImageProperties(imgData);
+                const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
+
+                // Center the content vertically
+                const verticalPosition = Math.max(0, (USABLE_HEIGHT - imgHeight) / 2);
+                
                 pdf.addImage(
-                    pageImgData, 
+                    imgData, 
                     'PNG', 
                     MARGIN_MM, 
-                    MARGIN_MM, 
+                    MARGIN_MM + verticalPosition, 
                     USABLE_WIDTH, 
-                    pageImgHeight
+                    imgHeight
                 );
 
-                currentPosition += pageImgHeight;
+                // Clean up
+                document.body.removeChild(tempContainer);
+                
+                currentRow = endRow;
                 pageNumber++;
             }
 
@@ -610,14 +695,6 @@
             console.error("PDF generation failed:", error);
             alert("Sorry, there was an error creating the PDF. Please try again.");
         } finally {
-            // Clean up
-            if (document.body.contains(printContainer)) {
-                document.body.removeChild(printContainer);
-            }
-            
-            const fileName = `${document.title || 'sunday-schedule'}.pdf`;
-            pdf.save(fileName);
-            
             printButton.disabled = false;
             printButton.querySelector('span:last-child').textContent = 'Download PDF';
         }
