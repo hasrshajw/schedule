@@ -36,7 +36,6 @@
     }
     *, *::before, *::after { box-sizing: border-box; }
     html { -webkit-font-smoothing: antialiased; }
-    /* This body rule is CRITICAL for the webpage font */
     body { font-family: 'Noto Sans Telugu', sans-serif; background-color: var(--background-color); margin: 0; padding: 88px 20px 20px; color: var(--text-primary); }
     
     main { margin-top: 0; }
@@ -135,15 +134,15 @@
     
     // --- START: NEW HELPER FUNCTION ---
     /**
-     * Fetches a file from a URL and converts it to a Base64 string.
-     * @param {string} url The URL of the font file
+     * Fetches a local file and converts it to a Base64 string.
+     * @param {string} url The path to the font file (e.g., 'NotoSansTelugu-Regular.ttf')
      * @returns {Promise<string>} A promise that resolves with the Base64 data.
      */
     function fetchFontAsBase64(url) {
         return fetch(url)
             .then(response => {
                 if (!response.ok) {
-                    throw new Error(`Failed to fetch font: ${response.statusText}`);
+                    throw new Error(`Network response was not ok for font: ${url}`);
                 }
                 return response.arrayBuffer();
             })
@@ -155,7 +154,6 @@
                 for (let i = 0; i < len; i++) {
                     binary += String.fromCharCode(bytes[i]);
                 }
-                // This function is the correct one to use, not window.atob
                 return window.btoa(binary);
             });
     }
@@ -407,7 +405,7 @@
         debouncedSave();
     }
     
-    // --- START: FINAL PDF FUNCTION (FETCHING FROM GITHUB) ---
+    // --- START: FINAL PDF FUNCTION (FETCHING LOCAL .TTF FILES) ---
     async function generatePdf() {
         const printButton = document.getElementById('print-button');
         printButton.disabled = true;
@@ -426,19 +424,18 @@
                 return; 
             }
             // --- END OF FIX ---
-            
-            // --- NEW: Load font files from GitHub CDN ---
-            // This is the most reliable way and fixes the 'atob' error.
-            printButton.querySelector('span:last-child').textContent = 'Downloading fonts...';
+
+            // --- NEW: Load font files from your folder ---
+            // This assumes 'NotoSansTelugu-Regular.ttf' and 'NotoSansTelugu-Bold.ttf'
+            // are in the SAME FOLDER as this HTML file.
             const [regularBase64, boldBase64] = await Promise.all([
                 fetchFontAsBase64('NotoSansTelugu-Regular.ttf'),
                 fetchFontAsBase64('NotoSansTelugu-Bold.ttf')
             ]);
             // --- END: NEW FONT LOADING ---
-            
-            printButton.querySelector('span:last-child').textContent = 'Creating PDF...';
-            
+
             const { jsPDF } = window.jspdf;
+            
             const pdf = new jsPDF('l', 'mm', 'a4'); 
 
             // 2. Add the *fetched and valid* Base64 data to the PDF
@@ -466,10 +463,10 @@
 
             // 5. Generate the table
             // *** THIS IS THE FIX for 'autoTable is not a function' ***
-            // Call `pdf.autoTable`, not a separate `autoTable` function.
+            // We call `pdf.autoTable`, which was added by the plugin.
             pdf.autoTable({
-                html: tableEl, // Use the safe variable
-                startY: 35, // Position to start the table
+                html: tableEl, 
+                startY: 35,
                 theme: 'grid', 
                 styles: {
                     font: 'NotoSansTelugu', // Use the embedded font!
@@ -485,11 +482,10 @@
                     fontStyle: 'bold', // Use the bold font
                 },
                 columnStyles: {
-                    // Align text columns to the left
-                    1: { halign: 'left' }, // Column 1 (Prasanga Amsam)
-                    2: { halign: 'left' }, // Column 2 (Prasangeekudu)
-                    3: { halign: 'left' }, // Column 3 (Chairman)
-                    4: { halign: 'left' }, // Column 4 (Reader)
+                    1: { halign: 'left' }, 
+                    2: { halign: 'left' }, 
+                    3: { halign: 'left' }, 
+                    4: { halign: 'left' }, 
                 },
                 // This function automatically skips the 6th column (Actions)
                 columns: [
@@ -497,16 +493,14 @@
                     { header: 'ప్రసంగ అంశం', dataKey: '1' },
                     { header: 'ప్రసంగీకుడు', dataKey: '2' },
                     { header: 'చైర్మన్', dataKey: '3' },
-                    { header: 'కావలికోట రీడER', dataKey: '4' },
+                    { header: 'కావలికోట రీడర్', dataKey: '4' },
                 ],
-                // This function handles special event rows (CO visit, etc.)
                 didParseCell: function (data) {
                     if (data.cell.raw.classList.contains('special-event')) {
                         data.cell.styles.halign = 'center';
-                        data.cell.styles.textColor = [255, 0, 0]; // Red text
-                        data.cell.styles.fontStyle = 'bold'; // Make special events bold
+                        data.cell.styles.textColor = [255, 0, 0]; 
+                        data.cell.styles.fontStyle = 'bold';
                     }
-                    // Center-align all header text
                     if (data.cell.raw.tagName === 'TH') {
                          data.cell.styles.halign = 'center';
                     }
@@ -519,8 +513,9 @@
 
         } catch (error) {
             console.error("PDF generation failed:", error);
-            if (error.message.includes('fetch')) {
-                 alert("Font files could not be downloaded. Please check your internet connection and try again.");
+            // NEW: Better error message
+            if (error.message.includes('fetch') || error.message.includes('Network response')) {
+                 alert("ERROR: Font files not found.\n\nPlease make sure 'NotoSansTelugu-Regular.ttf' and 'NotoSansTelugu-Bold.ttf' are in the same folder as this HTML file.");
             } else {
                 alert("Sorry, there was an error creating the PDF. Check the console.");
             }
