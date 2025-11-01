@@ -426,16 +426,17 @@
             }
             // --- END OF FIX ---
 
-            // --- NEW: Load font files from your folder ---
-            // This assumes 'NotoSansTelugu-Regular.ttf' and 'NotoSansTelugu-Bold.ttf'
-            // are in the SAME FOLDER as this HTML file.
+            // --- Load font files from your folder ---
             const [regularBase64, boldBase64] = await Promise.all([
                 fetchFontAsBase64('NotoSansTelugu-Regular.ttf'),
                 fetchFontAsBase64('NotoSansTelugu-Bold.ttf')
             ]);
-            // --- END: NEW FONT LOADING ---
-
-            const { jsPDF } = window.jspdf;
+            
+            // --- START: THIS IS THE FIX ---
+            // Do NOT destructure. Get the class directly from the window
+            // object *after* the plugin script has loaded.
+            const jsPDF = window.jspdf.jsPDF;
+            // --- END: THIS IS THE FIX ---
             
             const pdf = new jsPDF('l', 'mm', 'a4'); 
 
@@ -463,8 +464,7 @@
             pdf.text(subtitle, A4_WIDTH_MM / 2, 28, { align: 'center' });
 
             // 5. Generate the table
-            // *** THIS IS THE FIX for 'autoTable is not a function' ***
-            // We call `pdf.autoTable`, which was added by the compatible plugin.
+            // We call `pdf.autoTable`, which now exists.
             pdf.autoTable({
                 html: tableEl, 
                 startY: 35,
@@ -488,7 +488,6 @@
                     3: { halign: 'left' }, 
                     4: { halign: 'left' }, 
                 },
-                // This function automatically skips the 6th column (Actions)
                 columns: [
                     { header: 'తేదీ', dataKey: '0' },
                     { header: 'ప్రసంగ అంశం', dataKey: '1' },
@@ -514,7 +513,6 @@
 
         } catch (error) {
             console.error("PDF generation failed:", error);
-            // NEW: Better error message
             if (error.message.includes('fetch') || error.message.includes('Network response')) {
                  alert("ERROR: Font files not found.\n\nPlease make sure 'NotoSansTelugu-Regular.ttf' and 'NotoSansTelugu-Bold.ttf' are in the same folder as this HTML file.");
             } else {
