@@ -362,34 +362,37 @@
         debouncedSave();
     }
     
-    // --- START: NEW, MORE ROBUST PDF FUNCTION ---
+    // --- START: MODIFIED PDF FUNCTION (NEW METHOD) ---
     async function generatePdf() {
         const printButton = document.getElementById('print-button');
         printButton.disabled = true;
         printButton.querySelector('span:last-child').textContent = 'Generating...';
 
-        // 1. Wait for fonts to be ready and add a small paint delay
+        // 1. Wait for fonts and give a 1-second paint delay
         try {
             await document.fonts.ready;
         } catch (e) {
             console.warn("Error waiting for document.fonts.ready:", e);
         }
-        await new Promise(resolve => setTimeout(resolve, 5000)); // 0.5s delay is still good practice
+        await new Promise(resolve => setTimeout(resolve, 1000)); // 1 second delay
 
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('l', 'mm', 'a4'); // 'l' for landscape
 
-        // 2. Create an off-screen print container (this is the key change)
+        // 2. Create an *ON-SCREEN* but *INVISIBLE* print container
         const printContainer = document.createElement('div');
-        printContainer.id = 'print-container-temp'; // Temporary ID
+        printContainer.id = 'print-container-temp';
         printContainer.style.position = 'absolute';
-        printContainer.style.left = '-9999px';
-        printContainer.style.top = 'auto';
+        printContainer.style.top = '0'; // <-- On-screen
+        printContainer.style.left = '0'; // <-- On-screen
+        printContainer.style.zIndex = '-1'; // <-- Behind everything
+        printContainer.style.opacity = '0'; // <-- Invisible
+        printContainer.style.pointerEvents = 'none'; // <-- Not interactive
         printContainer.style.width = '1100px'; // Match the content width
         printContainer.style.background = '#ffffff';
         document.body.appendChild(printContainer);
         
-        // 3. Clone the *content* into the off-screen container
+        // 3. Clone the content into the on-screen invisible container
         const contentToClone = document.getElementById('schedule-content-wrapper');
         const clone = contentToClone.cloneNode(true);
         
@@ -397,15 +400,19 @@
         clone.style.width = '1100px'; // Ensure the clone itself has the width
         clone.querySelectorAll('.actions-col, .event-btn').forEach(el => el.style.display = 'none');
         
-        printContainer.appendChild(clone); // Add the clean clone to the off-screen container
+        printContainer.appendChild(clone); // Add the clean clone
 
         try {
-            // 5. Capture the CLONE, not the live element
-            const canvas = await html2canvas(clone, { // <-- Run canvas on the clone
+            // 5. Capture the CLONE
+            const canvas = await html2canvas(clone, {
                 scale: 2,
                 useCORS: true,
                 backgroundColor: '#ffffff',
-                letterRendering: true 
+                letterRendering: true,
+                windowWidth: clone.scrollWidth, // Use clone's dimensions
+                windowHeight: clone.scrollHeight,
+                scrollX: 0, // <-- Add scroll fix
+                scrollY: -window.scrollY // <-- Add scroll fix
             });
 
             // 6. Clean up the container *immediately* after capture
