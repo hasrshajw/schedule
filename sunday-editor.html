@@ -362,18 +362,25 @@
         debouncedSave();
     }
     
-    // --- START: REPLACED PDF FUNCTION ---
+    // --- START: MODIFIED PDF FUNCTION ---
     async function generatePdf() {
         const printButton = document.getElementById('print-button');
         printButton.disabled = true;
         printButton.querySelector('span:last-child').textContent = 'Generating...';
 
-        // 1. Wait for fonts to be loaded and painted
-        await document.fonts.ready;
-        await new Promise(resolve => setTimeout(resolve, 100)); // Paint delay
+        // 1. WAIT FOR FONTS TO BE READY
+        try {
+            await document.fonts.ready;
+        } catch (e) {
+            console.warn("Error waiting for document.fonts.ready:", e);
+        }
+        
+        // 2. SOLVES FONT PROBLEM: Add a longer delay for the browser to *paint* the fonts
+        // 100ms is not always enough for complex fonts like Telugu.
+        await new Promise(resolve => setTimeout(resolve, 500)); // <--- INCREASED DELAY
 
         const { jsPDF } = window.jspdf;
-        // 2. Set to A4 Landscape
+        // 3. Set to A4 Landscape
         const pdf = new jsPDF('l', 'mm', 'a4'); // 'l' for landscape
         const contentToPrint = document.getElementById('schedule-content-wrapper');
         
@@ -399,7 +406,7 @@
 
             const imgData = canvas.toDataURL('image/jpeg', 0.9);
             
-            // 3. Define LANDSCAPE page dimensions
+            // 4. Define LANDSCAPE page dimensions
             const A4_WIDTH_MM = 297;  // Landscape width
             const A4_HEIGHT_MM = 210; // Landscape height
             const MARGIN_MM = 10;     // 10mm margin
@@ -412,7 +419,7 @@
             // Calculate the total height of the image scaled to the PDF width
             const totalImgHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-            // 4. --- NEW LAYOUT LOGIC ---
+            // 5. --- INTELLIGENT LAYOUT LOGIC ---
             // Check if the *entire* image is shorter than one page
             if (totalImgHeight <= pdfPageHeight) {
                 // --- Case 1: Short content (fits on one page) ---
@@ -457,7 +464,7 @@
             printButton.querySelector('span:last-child').textContent = 'Download PDF';
         }
     }
-    // --- END: REPLACED PDF FUNCTION ---
+    // --- END: MODIFIED PDF FUNCTION ---
 
     document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
     document.getElementById('print-button').addEventListener('click', generatePdf);
