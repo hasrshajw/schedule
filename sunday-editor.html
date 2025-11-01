@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;500;700&display=block" rel="stylesheet">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 
 <style>
@@ -371,64 +371,62 @@
         printButton.disabled = true;
         printButton.querySelector('span:last-child').textContent = 'Generating...';
 
-        // 1. WAIT FOR FONTS TO BE READY
+        // 1. Wait for the browser to say fonts are ready
         await document.fonts.ready;
-        
-        // 2. SOLVES FONT PROBLEM: Add a small delay for the browser to *paint* the fonts
-        // This is the most important fix for your font issue.
-        await new Promise(resolve => setTimeout(resolve, 100));
+
+        // 2. Add a short, forced delay to allow 'display:block' to work
+        // This forces the code to wait 300ms for the font to paint
+        await new Promise(resolve => setTimeout(resolve, 300)); 
 
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('l', 'mm', 'a4'); // 'l' for landscape
         const contentToPrint = document.getElementById('schedule-content-wrapper');
         
-        // --- PREPARE FOR CAPTURE ---
+        // Hide actions buttons
         const actionElements = contentToPrint.querySelectorAll('.actions-col, .event-btn');
         actionElements.forEach(el => el.style.display = 'none');
         
-        // 3. SOLVES "NOT EXACTLY" (Part 1): Force a consistent width
-        // This makes the screenshot capture more reliable. 1100px matches your .master-container.
+        // --- Key Fixes for capturing ---
+        // Set a fixed width before capture to ensure consistent layout
         const originalWidth = contentToPrint.style.width;
-        contentToPrint.style.width = '1100px';
-
+        contentToPrint.style.width = '1100px'; 
+        
         try {
             const canvas = await html2canvas(contentToPrint, {
-                scale: 2, // Keep high resolution
-                useCORS: true,
+                scale: 2, // Use a high scale for better quality
+                useCORS: true, // This is essential for Google Fonts
+                allowTaint: false, // Must be false when useCORS is true
                 backgroundColor: '#ffffff',
-                // 4. HELPS FONT PROBLEM: This option improves font rendering
+                // This option often helps with font rendering
                 letterRendering: true 
             });
 
-            // Restore original styles *immediately* after capture
+            // --- Restore the page immediately ---
             actionElements.forEach(el => el.style.display = '');
             contentToPrint.style.width = originalWidth;
 
+            // --- Multi-page PDF logic ---
             const imgData = canvas.toDataURL('image/jpeg', 0.9);
             const A4_WIDTH_MM = 297;  // Landscape width
             const A4_HEIGHT_MM = 210; // Landscape height
             const MARGIN_MM = 10;     // Page margin
             
-            // Usable width and height of the page
             const pdfWidth = A4_WIDTH_MM - (MARGIN_MM * 2);
             const pdfPageHeight = A4_HEIGHT_MM - (MARGIN_MM * 2);
             
             const imgProps = pdf.getImageProperties(imgData);
-            // Calculate the total height of the image scaled to the PDF width
             const totalImgHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
             let heightLeft = totalImgHeight;
-            let position = MARGIN_MM; // Top margin
+            let position = MARGIN_MM; // Start at the top margin
 
-            // 5. SOLVES "NOT EXACTLY" (Part 2): This logic adds multiple pages
-            
             // Add the first page
             pdf.addImage(imgData, 'JPEG', MARGIN_MM, position, pdfWidth, totalImgHeight);
-            heightLeft -= pdfPageHeight; // Subtract the height of the first page
+            heightLeft -= pdfPageHeight;
 
-            // Add new pages as long as there is image height left
+            // Keep adding pages as long as the image is taller
             while (heightLeft > 0) {
-                position = -heightLeft - MARGIN_MM; // Move the image "up" to show the next part
+                position = -heightLeft - MARGIN_MM;
                 pdf.addPage();
                 pdf.addImage(imgData, 'JPEG', MARGIN_MM, position, pdfWidth, totalImgHeight);
                 heightLeft -= pdfPageHeight;
@@ -441,9 +439,11 @@
             actionElements.forEach(el => el.style.display = '');
             contentToPrint.style.width = originalWidth;
         } finally {
+            // Save the file
             const fileName = `${document.title}.pdf`;
             pdf.save(fileName);
         
+            // Re-enable the button
             printButton.disabled = false;
             printButton.querySelector('span:last-child').textContent = 'Download PDF';
         }
