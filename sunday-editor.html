@@ -84,6 +84,32 @@
     #cancel-creation { background-color: var(--surface-color); }
     #confirm-creation { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 
+
+/* Add to your existing CSS */
+.pdf-header .title-block {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.pdf-header .subtitle-svg-container {
+    position: relative;
+    display: inline-block;
+    margin-top: 0;
+}
+
+.pdf-header .svg-divider {
+    width: 400px;
+    height: 5px;
+    display: block;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 50%;
+    margin-top: -2.5px;
+    z-index: 1;
+}
+
+
     /* PDF-specific styles */
     .pdf-page-container {
         background: white;
@@ -485,18 +511,20 @@ if (pageCount === 0) {
     const header = document.createElement('div');
     header.className = 'pdf-header';
     header.innerHTML = `
-        <h1 class="pdf-title">${title}</h1>
-        <div class="pdf-subtitle-container">
-            <p class="pdf-subtitle">${subtitle}</p>
-            <svg class="pdf-svg-divider" role="presentation" viewBox="0 0 24039.797 260" preserveAspectRatio="xMidYMid slice">
-                <defs>
-                    <radialGradient id="pdf-gradient-${pageCount}" gradientUnits="userSpaceOnUse" r="12020.601" cx="12019.898" cy="130" fx="12019.898" fy="130">
-                        <stop stop-color="#093261" stop-opacity="1" offset="0"></stop>
-                        <stop stop-color="#ffffff" stop-opacity="1" offset="1"></stop>
-                    </radialGradient>
-                </defs>
-                <rect x="0" y="0" width="24039.797" height="260" fill="url(#pdf-gradient-${pageCount})"></rect>
-            </svg>
+        <div class="title-block">
+            <h1 class="pdf-title">${title}</h1>
+            <div class="subtitle-svg-container">
+                <p class="subtitle">${subtitle}</p>
+                <svg class="svg-divider" role="presentation" viewBox="0 0 24039.797 260" preserveAspectRatio="xMidYMid slice">
+                    <defs>
+                        <radialGradient id="pdf-gradient-${pageCount}" gradientUnits="userSpaceOnUse" r="12020.601" cx="12019.898" cy="130" fx="12019.898" fy="130">
+                            <stop stop-color="#093261" stop-opacity="1" offset="0"></stop>
+                            <stop stop-color="#ffffff" stop-opacity="1" offset="1"></stop>
+                        </radialGradient>
+                    </defs>
+                    <rect x="0" y="0" width="24039.797" height="260" fill="url(#pdf-gradient-${pageCount})"></rect>
+                </svg>
+            </div>
         </div>
     `;
     pageContainer.appendChild(header);
