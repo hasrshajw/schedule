@@ -5,16 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sunday Schedule Editor</title>
 
-<!-- FIREBASE SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
-<!-- PDF Generation Libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-<!-- FONTS AND ICONS -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -107,8 +104,7 @@
 
     <div class="master-container">
         <div id="schedule-content-wrapper">
-            <!-- Schedule will be rendered here -->
-        </div>
+            </div>
     </div>
 </div>
 
@@ -136,7 +132,7 @@
 (function() {
     'use strict';
     const firebaseConfig = {
-      apiKey: "AIzaSyDLK5f4C-nfG6fz0ajqqay1q9TTN6rxgmQ",
+      apiKey: "AIzaSyDLK5f4C-nfGfz0ajqqay1q9TTN6rxgmQ",
       authDomain: "schedule-harsha.firebaseapp.com",
       projectId: "schedule-harsha",
       storageBucket: "schedule-harsha.firebasestorage.app",
@@ -366,19 +362,18 @@
         debouncedSave();
     }
     
+    // --- START: MODIFIED PDF FUNCTION ---
     async function generatePdf() {
         const printButton = document.getElementById('print-button');
         printButton.disabled = true;
         printButton.querySelector('span:last-child').textContent = 'Generating...';
 
-        // 1. WAIT FOR FONTS TO BE READY
+        // 1. Wait for fonts to be loaded and painted
         await document.fonts.ready;
-        
-        // 2. SOLVES FONT PROBLEM: Add a small delay for the browser to *paint* the fonts
-        // This is the most important fix for your font issue.
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise(resolve => setTimeout(resolve, 100)); // Paint delay
 
         const { jsPDF } = window.jspdf;
+        // 2. Set to A4 Landscape
         const pdf = new jsPDF('l', 'mm', 'a4'); // 'l' for landscape
         const contentToPrint = document.getElementById('schedule-content-wrapper');
         
@@ -386,53 +381,65 @@
         const actionElements = contentToPrint.querySelectorAll('.actions-col, .event-btn');
         actionElements.forEach(el => el.style.display = 'none');
         
-        // 3. SOLVES "NOT EXACTLY" (Part 1): Force a consistent width
-        // This makes the screenshot capture more reliable. 1100px matches your .master-container.
+        // Force a consistent width for reliable capture
         const originalWidth = contentToPrint.style.width;
         contentToPrint.style.width = '1100px';
 
         try {
             const canvas = await html2canvas(contentToPrint, {
-                scale: 2, // Keep high resolution
+                scale: 2, // High resolution
                 useCORS: true,
                 backgroundColor: '#ffffff',
-                // 4. HELPS FONT PROBLEM: This option improves font rendering
-                letterRendering: true 
+                letterRendering: true // Helps with font rendering
             });
 
-            // Restore original styles *immediately* after capture
+            // Restore original styles immediately after capture
             actionElements.forEach(el => el.style.display = '');
             contentToPrint.style.width = originalWidth;
 
             const imgData = canvas.toDataURL('image/jpeg', 0.9);
+            
+            // 3. Define LANDSCAPE page dimensions
             const A4_WIDTH_MM = 297;  // Landscape width
             const A4_HEIGHT_MM = 210; // Landscape height
-            const MARGIN_MM = 10;     // Page margin
+            const MARGIN_MM = 10;     // 10mm margin
             
             // Usable width and height of the page
-            const pdfWidth = A4_WIDTH_MM - (MARGIN_MM * 2);
-            const pdfPageHeight = A4_HEIGHT_MM - (MARGIN_MM * 2);
+            const pdfWidth = A4_WIDTH_MM - (MARGIN_MM * 2);    // 277mm
+            const pdfPageHeight = A4_HEIGHT_MM - (MARGIN_MM * 2); // 190mm
             
             const imgProps = pdf.getImageProperties(imgData);
             // Calculate the total height of the image scaled to the PDF width
             const totalImgHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-            let heightLeft = totalImgHeight;
-            let position = MARGIN_MM; // Top margin
-
-            // 5. SOLVES "NOT EXACTLY" (Part 2): This logic adds multiple pages
+            // 4. --- NEW LAYOUT LOGIC ---
+            // Check if the *entire* image is shorter than one page
+            if (totalImgHeight <= pdfPageHeight) {
+                // --- Case 1: Short content (fits on one page) ---
+                // Apply vertical centering logic from our previous example
+                const remainingSpace = pdfPageHeight - totalImgHeight;
+                const startY = MARGIN_MM + (remainingSpace / 2); // Center it
+                pdf.addImage(imgData, 'JPEG', MARGIN_MM, startY, pdfWidth, totalImgHeight);
             
-            // Add the first page
-            pdf.addImage(imgData, 'JPEG', MARGIN_MM, position, pdfWidth, totalImgHeight);
-            heightLeft -= pdfPageHeight; // Subtract the height of the first page
+            } else {
+                // --- Case 2: Tall content (needs multiple pages) ---
+                // Use the "slicing" logic to split it across pages
+                let heightLeft = totalImgHeight;
+                let position = MARGIN_MM; // Start at the top margin
 
-            // Add new pages as long as there is image height left
-            while (heightLeft > 0) {
-                position = -heightLeft - MARGIN_MM; // Move the image "up" to show the next part
-                pdf.addPage();
+                // Add the first slice
                 pdf.addImage(imgData, 'JPEG', MARGIN_MM, position, pdfWidth, totalImgHeight);
-                heightLeft -= pdfPageHeight;
+                heightLeft -= pdfPageHeight; // Subtract the height of the first page
+
+                // Add new pages as long as there is image height left
+                while (heightLeft > 0) {
+                    position = -heightLeft - MARGIN_MM; // "Pull up" the image to show the next part
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'JPEG', MARGIN_MM, position, pdfWidth, totalImgHeight);
+                    heightLeft -= pdfPageHeight;
+                }
             }
+            // --- END NEW LOGIC ---
 
         } catch (error) {
             console.error("PDF generation failed:", error);
@@ -441,13 +448,16 @@
             actionElements.forEach(el => el.style.display = '');
             contentToPrint.style.width = originalWidth;
         } finally {
-            const fileName = `${document.title}.pdf`;
+            // Save the file
+            const fileName = `${document.title || 'sunday-schedule'}.pdf`;
             pdf.save(fileName);
         
+            // Re-enable the button
             printButton.disabled = false;
             printButton.querySelector('span:last-child').textContent = 'Download PDF';
         }
     }
+    // --- END: MODIFIED PDF FUNCTION ---
 
     document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
     document.getElementById('print-button').addEventListener('click', generatePdf);
