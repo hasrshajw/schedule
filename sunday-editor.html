@@ -86,6 +86,7 @@
 
 
 /* Add to your existing CSS */
+/* Add this to your existing CSS */
 .pdf-header .title-block {
     text-align: center;
     margin-bottom: 20px;
@@ -94,12 +95,13 @@
 .pdf-header .subtitle-svg-container {
     position: relative;
     display: inline-block;
-    margin-top: 0;
+    margin-top: 10px;
 }
 
 .pdf-header .svg-divider {
     width: 400px;
     height: 5px;
+    background: linear-gradient(to right, #093261, #ffffff, #093261);
     display: block;
     position: absolute;
     left: 50%;
@@ -507,23 +509,18 @@
 
                 // Add header only for first page
                 // Add header only for first page
+// Add header only for first page
 if (pageCount === 0) {
     const header = document.createElement('div');
     header.className = 'pdf-header';
     header.innerHTML = `
-        <div class="title-block">
-            <h1 class="pdf-title">${title}</h1>
-            <div class="subtitle-svg-container">
-                <p class="subtitle">${subtitle}</p>
-                <svg class="svg-divider" role="presentation" viewBox="0 0 24039.797 260" preserveAspectRatio="xMidYMid slice">
-                    <defs>
-                        <radialGradient id="pdf-gradient-${pageCount}" gradientUnits="userSpaceOnUse" r="12020.601" cx="12019.898" cy="130" fx="12019.898" fy="130">
-                            <stop stop-color="#093261" stop-opacity="1" offset="0"></stop>
-                            <stop stop-color="#ffffff" stop-opacity="1" offset="1"></stop>
-                        </radialGradient>
-                    </defs>
-                    <rect x="0" y="0" width="24039.797" height="260" fill="url(#pdf-gradient-${pageCount})"></rect>
-                </svg>
+        <div class="title-block" style="text-align: center; margin-bottom: 20px;">
+            <h1 style="font-family: 'Noto Sans Telugu', sans-serif; font-weight: 700; color: rgb(97, 40, 0); margin: 0; font-size: 1.8em;">${title}</h1>
+            <div style="position: relative; display: inline-block; margin-top: 10px;">
+                <p style="font-family: 'Noto Sans Telugu', sans-serif; font-weight: 500; color: #333; background-color: #ffffff; padding: 2px 8px; display: inline-block; position: relative; z-index: 2; white-space: nowrap; border-radius: 8px; margin: 0;">
+                    ${subtitle}
+                </p>
+                <div style="width: 400px; height: 5px; background: linear-gradient(to right, #093261, #ffffff, #093261); position: absolute; left: 50%; transform: translateX(-50%); top: 50%; margin-top: -2.5px; z-index: 1;"></div>
             </div>
         </div>
     `;
