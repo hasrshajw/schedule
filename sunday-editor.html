@@ -475,11 +475,9 @@
             const subtitle = scheduleData.querySelector('.subtitle').textContent;
             const tableRows = Array.from(scheduleData.querySelectorAll('tbody tr'));
 
-            // Calculate how many rows can fit on a page
-            // We'll estimate based on row count and page height
-            const headerHeight = 80; // Approximate header height in mm
-            const rowHeight = 15; // Approximate row height in mm
-            const maxRowsPerPage = Math.floor((USABLE_HEIGHT - headerHeight) / rowHeight);
+            // Define rows per page: 15 for first page, 17 for subsequent pages
+            const firstPageRows = 15;
+            const otherPageRows = 17;
 
             let currentRow = 0;
             let pageCount = 0;
@@ -489,39 +487,45 @@
                     pdf.addPage();
                 }
 
+                // Determine rows for this page
+                const rowsThisPage = pageCount === 0 ? firstPageRows : otherPageRows;
+                const endRow = Math.min(currentRow + rowsThisPage, tableRows.length);
+
                 // Create page container
                 const pageContainer = document.createElement('div');
                 pageContainer.className = 'pdf-page-container';
 
-                // Add header
-                const header = document.createElement('div');
-                header.className = 'pdf-header';
-                header.innerHTML = `
-                    <h1 class="pdf-title">${title}</h1>
-                    <div class="pdf-subtitle-container">
-                        <p class="pdf-subtitle">${subtitle}</p>
-                        <svg class="pdf-svg-divider" role="presentation" viewBox="0 0 24039.797 260" preserveAspectRatio="xMidYMid slice">
-                            <defs>
-                                <radialGradient id="pdf-gradient-${pageCount}" gradientUnits="userSpaceOnUse" r="12020.601" cx="12019.898" cy="130" fx="12019.898" fy="130">
-                                    <stop stop-color="#093261" stop-opacity="1" offset="0"></stop>
-                                    <stop stop-color="#ffffff" stop-opacity="1" offset="1"></stop>
-                                </radialGradient>
-                            </defs>
-                            <rect x="0" y="0" width="24039.797" height="260" fill="url(#pdf-gradient-${pageCount})"></rect>
-                        </svg>
-                    </div>
-                `;
-                pageContainer.appendChild(header);
+                // Add title block ONLY for the first page
+                if (pageCount === 0) {
+                    const header = document.createElement('div');
+                    header.className = 'pdf-header';
+                    header.innerHTML = `
+                        <h1 class="pdf-title">${title}</h1>
+                        <div class="pdf-subtitle-container">
+                            <p class="pdf-subtitle">${subtitle}</p>
+                            <svg class="pdf-svg-divider" role="presentation" viewBox="0 0 24039.797 260" preserveAspectRatio="xMidYMid slice">
+                                <defs>
+                                    <radialGradient id="pdf-gradient-${pageCount}" gradientUnits="userSpaceOnUse" r="12020.601" cx="12019.898" cy="130" fx="12019.898" fy="130">
+                                        <stop stop-color="#093261" stop-opacity="1" offset="0"></stop>
+                                        <stop stop-color="#ffffff" stop-opacity="1" offset="1"></stop>
+                                    </radialGradient>
+                                </defs>
+                                <rect x="0" y="0" width="24039.797" height="260" fill="url(#pdf-gradient-${pageCount})"></rect>
+                            </svg>
+                        </div>
+                    `;
+                    pageContainer.appendChild(header);
+                }
 
                 // Create table for this page
                 const table = document.createElement('table');
                 table.className = 'pdf-table';
 
-                // Add table header
+                // Add table header (on every page)
                 const thead = document.createElement('thead');
                 thead.innerHTML = `
                     <tr>
-                        <th class="top-empty-row" colspan="6">&nbsp;</th>
+                        <th class="top-empty-row" colspan="5">&nbsp;</th>
                     </tr>
                     <tr>
                         <th>తేదీ</th>
@@ -535,28 +539,32 @@
 
                 // Add rows for this page
                 const tbody = document.createElement('tbody');
-                const endRow = Math.min(currentRow + maxRowsPerPage, tableRows.length);
                 
                 for (let i = currentRow; i < endRow; i++) {
                     const originalRow = tableRows[i];
                     const row = document.createElement('tr');
                     
-                    // Copy cells, excluding the actions column
-                    for (let j = 0; j < originalRow.cells.length - 1; j++) {
-                        const cell = document.createElement(j === 0 ? 'th' : 'td');
-                        cell.innerHTML = originalRow.cells[j].innerHTML;
+                    // Check if this is a special event row
+                    const isSpecialEvent = originalRow.cells[1].classList.contains('special-event');
+                    
+                    if (isSpecialEvent) {
+                        // Handle special event row with colspan
+                        const dateCell = document.createElement('th');
+                        dateCell.textContent = originalRow.cells[0].textContent;
+                        row.appendChild(dateCell);
                         
-                        // Apply special event styling if needed
-                        if (originalRow.cells[1].classList.contains('special-event')) {
-                            if (j === 1) {
-                                cell.className = 'special-event';
-                                cell.colSpan = 4;
-                                // Skip creating the next 3 cells
-                                j += 3;
-                            }
+                        const eventCell = document.createElement('td');
+                        eventCell.className = 'special-event';
+                        eventCell.colSpan = 4;
+                        eventCell.textContent = originalRow.cells[1].textContent;
+                        row.appendChild(eventCell);
+                    } else {
+                        // Normal row - copy all cells except the actions column
+                        for (let j = 0; j < originalRow.cells.length - 1; j++) {
+                            const cell = document.createElement(j === 0 ? 'th' : 'td');
+                            cell.textContent = originalRow.cells[j].textContent;
+                            row.appendChild(cell);
                         }
-                        
-                        row.appendChild(cell);
                     }
                     
                     tbody.appendChild(row);
@@ -583,8 +591,15 @@
                 const imgProps = pdf.getImageProperties(imgData);
                 const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
 
-                // Center the content vertically on the page
-                const verticalPosition = Math.max(0, (USABLE_HEIGHT - imgHeight) / 2);
+                // Calculate vertical position - adjust based on whether we have title or not
+                let verticalPosition = 0;
+                if (pageCount === 0) {
+                    // First page with title - center the content
+                    verticalPosition = Math.max(0, (USABLE_HEIGHT - imgHeight) / 2);
+                } else {
+                    // Subsequent pages without title - position at top
+                    verticalPosition = 0;
+                }
                 
                 pdf.addImage(
                     imgData, 
