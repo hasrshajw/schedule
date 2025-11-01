@@ -2,17 +2,19 @@
 <html lang="te">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale-1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sunday Schedule Editor</title>
 
+<!-- FIREBASE SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
+<!-- PDF Generation Libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf-autotable.umd.min.js"></script>
 
-
+<!-- FONTS AND ICONS -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -82,6 +84,9 @@
     .modal-actions button { font-family: 'Inter', sans-serif; padding: 10px 20px; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); }
     #cancel-creation { background-color: var(--surface-color); }
     #confirm-creation { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
+
+    /* Print container for PDF generation */
+    #print-container { position: absolute; left: -9999px; top: auto; width: 1100px; background: white; }
 </style>
 </head>
 <body>
@@ -105,7 +110,8 @@
 
     <div class="master-container">
         <div id="schedule-content-wrapper">
-            </div>
+            <!-- Schedule will be rendered here -->
+        </div>
     </div>
 </div>
 
@@ -132,35 +138,6 @@
 <script>
 (function() {
     'use strict';
-    
-    // --- START: HELPER FUNCTION ---
-    /**
-     * Fetches a local file and converts it to a Base64 string.
-     * @param {string} url The path to the font file (e.g., 'NotoSansTelugu-Regular.ttf')
-     * @returns {Promise<string>} A promise that resolves with the Base64 data.
-     */
-    function fetchFontAsBase64(url) {
-        return fetch(url)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Network response was not ok for font: ${url}`);
-                }
-                return response.arrayBuffer();
-            })
-            .then(arrayBuffer => {
-                // This is a reliable way to convert ArrayBuffer to Base64
-                let binary = '';
-                const bytes = new Uint8Array(arrayBuffer);
-                const len = bytes.byteLength;
-                for (let i = 0; i < len; i++) {
-                    binary += String.fromCharCode(bytes[i]);
-                }
-                return window.btoa(binary);
-            });
-    }
-    // --- END: HELPER FUNCTION ---
-    
-
     const firebaseConfig = {
       apiKey: "AIzaSyDLK5f4C-nfG6fz0ajqqay1q9TTN6rxgmQ",
       authDomain: "schedule-harsha.firebaseapp.com",
@@ -248,7 +225,7 @@
                             <th>ప్రసంగీకుడు</th>
                             <th>చైర్మన్</th>
                             <th>కావలికోట రీడర్</th>
-                            <th class="actions-col" style="display: none;">Actions</th>
+                            <th class="actions-col">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -257,16 +234,8 @@
                 </table>
             </main>
         `;
-        // Hide action columns in the body for printing
-        scheduleWrapper.querySelectorAll('.actions-col').forEach(el => el.style.display = 'none');
-        scheduleWrapper.querySelectorAll('.event-btn').forEach(el => el.style.display = 'none');
-
         scheduleWrapper.addEventListener('input', debouncedSave);
-        
-        // Re-find and attach event listeners *after* innerHTML is set
         scheduleWrapper.querySelectorAll('.event-btn').forEach(btn => {
-            btn.style.display = ''; // Make sure they are visible on the webpage
-            btn.closest('.actions-col').style.display = ''; // Make sure the column is visible
             btn.addEventListener('click', openEventMenu);
         });
     }
@@ -276,15 +245,9 @@
         const tableBodyEl = scheduleWrapper.querySelector('.schedule-table tbody');
         if (!subtitleEl || !tableBodyEl) return;
 
-        // Clone the table body to modify it for saving without affecting the DOM
-        const tableBodyClone = tableBodyEl.cloneNode(true);
-        // Ensure actions columns and buttons are visible in the *saved* HTML
-        tableBodyClone.querySelectorAll('.actions-col').forEach(el => el.style.display = ''); 
-        tableBodyClone.querySelectorAll('.event-btn').forEach(el => el.style.display = '');
-        
         const payload = {
             dateRange: subtitleEl.textContent,
-            tableHTML: tableBodyClone.innerHTML
+            tableHTML: tableBodyEl.innerHTML
         };
         userSchedulesCollection.doc(currentScheduleId).update(payload)
             .catch(err => console.error("Save failed:", err));
@@ -406,127 +369,125 @@
         debouncedSave();
     }
     
-    // --- START: FINAL PDF FUNCTION (FETCHING LOCAL .TTF FILES) ---
     async function generatePdf() {
         const printButton = document.getElementById('print-button');
         printButton.disabled = true;
         printButton.querySelector('span:last-child').textContent = 'Generating...';
 
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('l', 'mm', 'a4'); // Landscape A4
+        const A4_WIDTH_MM = 297;  // Landscape width
+        const A4_HEIGHT_MM = 210; // Landscape height
+        const MARGIN_MM = 10;
+        const PAGE_SPACING_MM = 5;
+        
+        const USABLE_WIDTH = A4_WIDTH_MM - (MARGIN_MM * 2);
+        const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_MM * 2);
+
+        const printContainer = document.createElement('div');
+        printContainer.id = 'print-container';
+        document.body.appendChild(printContainer);
+
         try {
-            // --- FIX FOR THE 'null' ERROR ---
-            const titleEl = document.querySelector('.title-block h1');
-            const subtitleEl = document.querySelector('.subtitle');
-            const tableEl = document.querySelector('.schedule-table');
-
-            if (!titleEl || !subtitleEl || !tableEl) {
-                alert("The schedule is still loading. Please wait a moment and try again.");
-                printButton.disabled = false;
-                printButton.querySelector('span:last-child').textContent = 'Download PDF';
-                return; 
+            // Clone the entire schedule content
+            const contentToPrint = document.getElementById('schedule-content-wrapper');
+            const clone = contentToPrint.cloneNode(true);
+            
+            // Hide action buttons and event buttons in the clone
+            const actionElements = clone.querySelectorAll('.actions-col, .event-btn');
+            actionElements.forEach(el => el.style.display = 'none');
+            
+            // Ensure table is visible and styled properly
+            const table = clone.querySelector('.schedule-table');
+            if (table) {
+                table.style.display = 'table';
+                table.style.width = '100%';
+                
+                // Increase cell height for better readability in PDF
+                const allCells = clone.querySelectorAll('th, td');
+                allCells.forEach(cell => {
+                    cell.style.height = '40px';
+                    cell.style.padding = '12px 8px';
+                });
             }
-            // --- END OF FIX ---
 
-            // --- Load font files from your folder ---
-            const [regularBase64, boldBase64] = await Promise.all([
-                fetchFontAsBase64('NotoSansTelugu-Regular.ttf'),
-                fetchFontAsBase64('NotoSansTelugu-Bold.ttf')
-            ]);
+            printContainer.appendChild(clone);
             
-            // --- START: THIS IS THE FIX ---
-            // We get the jsPDF class from the global window object
-            // and the autoTable function from the global window object.
-            const jsPDF = window.jspdf.jsPDF;
-            const autoTable = window.jspdf.autoTable;
-            // --- END: THIS IS THE FIX ---
-            
-            const pdf = new jsPDF('l', 'mm', 'a4'); 
+            // Wait for fonts and rendering
+            await document.fonts.ready;
+            await new Promise(resolve => setTimeout(resolve, 100));
 
-            // 2. Add the *fetched and valid* Base64 data to the PDF
-            pdf.addFileToVFS('NotoSansTelugu-Regular.ttf', regularBase64);
-            pdf.addFileToVFS('NotoSansTelugu-Bold.ttf', boldBase64);
-            
-            // 3. Add font definitions to jspdf
-            pdf.addFont('NotoSansTelugu-Regular.ttf', 'NotoSansTelugu', 'normal');
-            pdf.addFont('NotoSansTelugu-Bold.ttf', 'NotoSansTelugu', 'bold');
-
-            const A4_WIDTH_MM = 297;
-            const MARGIN_MM = 10;
-
-            // 4. Add Title and Subtitle
-            const title = titleEl.textContent;
-            const subtitle = subtitleEl.textContent;
-            
-            pdf.setFont('NotoSansTelugu', 'bold'); // Use Bold for Title
-            pdf.setFontSize(18);
-            pdf.text(title, A4_WIDTH_MM / 2, 20, { align: 'center' });
-            
-            pdf.setFont('NotoSansTelugu', 'normal'); // Use Regular for Subtitle
-            pdf.setFontSize(14);
-            pdf.text(subtitle, A4_WIDTH_MM / 2, 28, { align: 'center' });
-
-            // 5. Generate the table
-            // We call `autoTable(pdf, { ... })` which is the correct syntax
-            // for this version of the plugin.
-            autoTable(pdf, {
-                html: tableEl, 
-                startY: 35,
-                theme: 'grid', 
-                styles: {
-                    font: 'NotoSansTelugu', // Use the embedded font!
-                    fontStyle: 'normal',
-                    halign: 'center',
-                    cellPadding: 2,
-                    fontSize: 10,
-                },
-                headStyles: {
-                    fillColor: [243, 229, 215], // #F3E5D7
-                    textColor: [0, 0, 0],
-                    font: 'NotoSansTelugu',
-                    fontStyle: 'bold', // Use the bold font
-                },
-                columnStyles: {
-                    1: { halign: 'left' }, 
-                    2: { halign: 'left' }, 
-                    3: { halign: 'left' }, 
-                    4: { halign: 'left' }, 
-                },
-                columns: [
-                    { header: 'తేదీ', dataKey: '0' },
-                    { header: 'ప్రసంగ అంశం', dataKey: '1' },
-                    { header: 'ప్రసంగీకుడు', dataKey: '2' },
-                    { header: 'చైర్మన్', dataKey: '3' },
-                    { header: 'కావలికోట రీడర్', dataKey: '4' },
-                ],
-                didParseCell: function (data) {
-                    if (data.cell.raw.classList.contains('special-event')) {
-                        data.cell.styles.halign = 'center';
-                        data.cell.styles.textColor = [255, 0, 0]; 
-                        data.cell.styles.fontStyle = 'bold';
-                    }
-                    if (data.cell.raw.tagName === 'TH') {
-                         data.cell.styles.halign = 'center';
-                    }
-                }
+            const canvas = await html2canvas(clone, { 
+                scale: 2, 
+                useCORS: true, 
+                backgroundColor: '#ffffff',
+                letterRendering: true 
             });
 
-            // 6. Save the PDF
-            const fileName = `${document.title || 'sunday-schedule'}.pdf`;
-            pdf.save(fileName);
+            const imgData = canvas.toDataURL('image/jpeg', 0.8);
+            const imgProps = pdf.getImageProperties(imgData);
+            const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
+
+            // Advanced PDF layout logic
+            const pages = [];
+            let currentPageItems = [];
+            let currentPageHeight = 0;
+
+            // For Sunday schedule, we treat the entire content as one item
+            const contentItem = { imgData, width: USABLE_WIDTH, height: imgHeight };
+            
+            if (currentPageHeight + contentItem.height > USABLE_HEIGHT && currentPageItems.length > 0) {
+                pages.push(currentPageItems);
+                currentPageItems = [contentItem];
+                currentPageHeight = contentItem.height;
+            } else {
+                currentPageItems.push(contentItem);
+                currentPageHeight += contentItem.height;
+            }
+            
+            if (currentPageItems.length > 0) {
+                pages.push(currentPageItems);
+            }
+
+            // Render each page with calculated vertical alignment
+            pages.forEach((pageItems, pageIndex) => {
+                if (pageIndex > 0) {
+                    pdf.addPage();
+                }
+
+                const totalContentHeight = pageItems.reduce((sum, item) => sum + item.height, 0) + (PAGE_SPACING_MM * (pageItems.length - 1));
+                
+                let startY = MARGIN_MM;
+                
+                // Center content vertically if it doesn't fill the entire page
+                if (pageItems.length === 1) {
+                    const remainingSpace = USABLE_HEIGHT - totalContentHeight;
+                    if (remainingSpace > 0) {
+                        startY = MARGIN_MM + (remainingSpace / 2);
+                    }
+                }
+
+                let currentY = startY;
+                pageItems.forEach(item => {
+                    pdf.addImage(item.imgData, 'JPEG', MARGIN_MM, currentY, item.width, item.height);
+                    currentY += item.height + PAGE_SPACING_MM;
+                });
+            });
 
         } catch (error) {
             console.error("PDF generation failed:", error);
-            if (error.message.includes('fetch') || error.message.includes('Network response')) {
-                 alert("ERROR: Font files not found.\n\nPlease make sure 'NotoSansTelugu-Regular.ttf' and 'NotoSansTelugu-Bold.ttf' are in the same folder as this HTML file.");
-            } else {
-                alert("Sorry, there was an error creating the PDF. Check the console.");
-            }
+            alert("Sorry, there was an error creating the PDF.");
         } finally {
-            // Re-enable the button
+            // Clean up
+            document.body.removeChild(printContainer);
+            
+            const fileName = `${document.title}.pdf`;
+            pdf.save(fileName);
+            
             printButton.disabled = false;
             printButton.querySelector('span:last-child').textContent = 'Download PDF';
         }
     }
-    // --- END: NEW PDF FUNCTION ---
 
     document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
     document.getElementById('print-button').addEventListener('click', generatePdf);
