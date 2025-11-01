@@ -18,32 +18,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 
 <style>
-    /* Embedded Noto Sans Telugu Font */
-    @font-face {
-        font-family: 'Noto Sans Telugu';
-        font-style: normal;
-        font-weight: 400;
-        font-display: swap;
-        src: url(https://fonts.gstatic.com/s/notosanstelugu/v29/0FlxVOGZlE2Rrtr-HmgkMWJNjJ5_RyT8o8c7dOI.woff2) format('woff2');
-    }
-    @font-face {
-        font-family: 'Noto Sans Telugu';
-        font-style: normal;
-        font-weight: 500;
-        font-display: swap;
-        src: url(https://fonts.gstatic.com/s/notosanstelugu/v29/0FlxVOGZlE2Rrtr-HmgkMWJNjJ5_RST8o8c7dOI.woff2) format('woff2');
-    }
-    @font-face {
-        font-family: 'Noto Sans Telugu';
-        font-style: normal;
-        font-weight: 700;
-        font-display: swap;
-        src: url(https://fonts.gstatic.com/s/notosanstelugu/v29/0FlxVOGZlE2Rrtr-HmgkMWJNjJ5_Rcy-o8c7dOI.woff2) format('woff2');
-    }
-
     :root {
         --primary-color: #012726;
         --primary-hover: #024443;
@@ -84,32 +62,14 @@
     .subtitle:focus { outline: 2px solid var(--primary-color); background-color: #f0f0f0; }
     .svg-divider { width: 400px; height: 5px; display: block; position: absolute; left: 50%; transform: translateX(-50%); top: 50%; margin-top: -2.5px; z-index: 1; }
     
-    /* Table Styling */
-    .schedule-table {
-        width: 100%;
-        border-collapse: separate; /* Changed for better rendering */
-        border-spacing: 0;
-        border: 2px solid #000;
-        font-size: 0.9em;
-    }
-    .schedule-table th, .schedule-table td {
-        border-bottom: 1px solid #000;
-        border-right: 1px solid #000;
-        padding: 8px 5px;
-        text-align: center;
-        vertical-align: middle;
-        font-weight: 700;
-    }
-    .schedule-table th:first-child, .schedule-table td:first-child { border-left: none; }
-    .schedule-table th:last-child, .schedule-table td:last-child { border-right: none; }
-    .schedule-table tr:last-child td { border-bottom: none; }
-
+    .schedule-table { width: 100%; border-collapse: collapse; font-size: 0.9em; border-left: 2px solid #000; border-right: 2px solid #000; border-bottom: 2px solid #000; }
+    .schedule-table th, .schedule-table td { border: 1px solid #000; padding: 8px 5px; text-align: center; vertical-align: middle; font-weight: 700; }
     .schedule-table tbody td:not(:first-child):not(.special-event) { text-align: left; padding-left: 10px; }
-    .schedule-table thead th { background-color: #F3E5D7; font-size: 1.0em; padding: 10px 5px; border-top: 2px solid #000; }
+    .schedule-table thead th { background-color: #F3E5D7; font-size: 1.0em; padding: 10px 5px; }
     .schedule-table [contenteditable="true"]:focus { background-color: #fffbe5; outline: 1px solid #f59e0b; }
     .special-event { color: red; font-weight: 700; text-align: center; padding-left: 5px; }
     
-    .schedule-table .top-empty-row { background-color: #ffffff; border-bottom: 2px solid #000; height: 25px; border-right: none; }
+    .schedule-table .top-empty-row { background-color: #ffffff; border-bottom: 2px solid #000; border-top: none; border-left: 2px solid white; border-right: 2px solid white; height: 25px; }
     .event-btn { background: none; border: none; cursor: pointer; padding: 4px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
     .event-btn:hover { background-color: #f0f0f0; }
     #event-context-menu { position: fixed; display: none; background: var(--surface-color); border-radius: var(--radius-md); box-shadow: var(--shadow-md); z-index: 1001; padding: 6px; min-width: 180px; border: 1px solid var(--border-color); }
@@ -257,7 +217,7 @@
                 <table class="schedule-table">
                     <thead>
                         <tr>
-                            <th class="top-empty-row" colspan="6"></th>
+                            <th class="top-empty-row" colspan="6">&nbsp;</th>
                         </tr>
                         <tr>
                             <th>తేదీ</th>
@@ -284,8 +244,13 @@
         const subtitleEl = scheduleWrapper.querySelector('.subtitle');
         const tableBodyEl = scheduleWrapper.querySelector('.schedule-table tbody');
         if (!subtitleEl || !tableBodyEl) return;
-        const payload = { dateRange: subtitleEl.textContent, tableHTML: tableBodyEl.innerHTML };
-        userSchedulesCollection.doc(currentScheduleId).update(payload).catch(err => console.error("Save failed:", err));
+
+        const payload = {
+            dateRange: subtitleEl.textContent,
+            tableHTML: tableBodyEl.innerHTML
+        };
+        userSchedulesCollection.doc(currentScheduleId).update(payload)
+            .catch(err => console.error("Save failed:", err));
     }, 1500);
 
     function initCreationFlow() {
@@ -304,7 +269,9 @@
         const sundays = [];
         let currentDate = new Date();
         let dayOfWeek = currentDate.getDay();
-        if (dayOfWeek !== 0) { currentDate.setDate(currentDate.getDate() + (7 - dayOfWeek)); }
+        if (dayOfWeek !== 0) { 
+            currentDate.setDate(currentDate.getDate() + (7 - dayOfWeek));
+        }
         for (let i = 0; i < count; i++) {
             const day = String(currentDate.getDate()).padStart(2, '0');
             const month = String(currentDate.getMonth() + 1).padStart(2, '0');
@@ -332,14 +299,25 @@
                 <td contenteditable="true"></td>
                 <td contenteditable="true"></td>
                 <td class="actions-col">
-                    <button class="event-btn"><span class="material-symbols-outlined">more_vert</span></button>
+                    <button class="event-btn">
+                        <span class="material-symbols-outlined">more_vert</span>
+                    </button>
                 </td>
-            </tr>`).join('');
+            </tr>
+        `).join('');
 
         try {
-            const newDocRef = await userSchedulesCollection.add({ name: scheduleName, dateRange: dateRange, tableHTML: tableBodyHTML, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+            const newDocRef = await userSchedulesCollection.add({
+                name: scheduleName,
+                dateRange: dateRange,
+                tableHTML: tableBodyHTML,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
             window.location.href = `./sunday-editor.html?id=${newDocRef.id}`;
-        } catch (error) { console.error("Error creating schedule:", error); alert("Could not create schedule."); }
+        } catch (error) {
+            console.error("Error creating new schedule:", error);
+            alert("Could not create schedule. Please try again.");
+        }
     }
     
     function openEventMenu(e) {
@@ -380,7 +358,10 @@
             topicCell.classList.add('special-event');
             topicCell.setAttribute('contenteditable', 'false');
             topicCell.textContent = eventTexts[eventType];
-            otherCells.forEach(cell => { cell.style.display = 'none'; cell.setAttribute('contenteditable', 'false'); });
+            otherCells.forEach(cell => {
+                cell.style.display = 'none';
+                cell.setAttribute('contenteditable', 'false');
+            });
         }
         debouncedSave();
     }
@@ -388,8 +369,7 @@
     async function generatePdf() {
         const printButton = document.getElementById('print-button');
         printButton.disabled = true;
-        const originalButtonText = printButton.querySelector('span:last-of-type').textContent;
-        printButton.querySelector('span:last-of-type').textContent = 'Generating...';
+        printButton.querySelector('span').textContent = 'Generating...';
 
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('l', 'mm', 'a4'); 
@@ -397,6 +377,7 @@
         const A4_HEIGHT_MM = 210;
         const MARGIN_MM = 15;
         const USABLE_WIDTH = A4_WIDTH_MM - (MARGIN_MM * 2);
+        const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_MM * 2);
 
         const printContainer = document.createElement('div');
         printContainer.style.position = 'absolute';
@@ -404,37 +385,25 @@
         printContainer.style.width = '1100px'; 
         printContainer.style.background = 'white';
         document.body.appendChild(printContainer);
+
+        const contentToPrint = scheduleWrapper.cloneNode(true);
+        Array.from(contentToPrint.querySelectorAll('.actions-col, .event-btn, .toolbar-btn')).forEach(el => el.remove());
+        printContainer.appendChild(contentToPrint);
+
+        const scheduleHeader = contentToPrint.querySelector('.schedule-display-header');
+        const table = contentToPrint.querySelector('.schedule-table');
+        const allRows = Array.from(table.querySelectorAll('thead > tr, tbody > tr'));
+
+        const headerCanvas = await html2canvas(scheduleHeader, { scale: 2 });
+        const headerImgData = headerCanvas.toDataURL('image/jpeg', 0.9);
+        const headerProps = pdf.getImageProperties(headerImgData);
+        const headerHeight = (headerProps.height * USABLE_WIDTH) / headerProps.width;
         
-        const contentClone = scheduleWrapper.cloneNode(true);
-        Array.from(contentClone.querySelectorAll('.actions-col, .event-btn')).forEach(el => el.remove());
-        printContainer.appendChild(contentClone);
+        pdf.addImage(headerImgData, 'JPEG', MARGIN_MM, MARGIN_MM, USABLE_WIDTH, headerHeight);
+        let currentY = MARGIN_MM + headerHeight;
 
-        const mainHeaderEl = contentClone.querySelector('.schedule-display-header');
-        const tableHeaderEl = contentClone.querySelector('.schedule-table thead');
-        const tableBodyRows = Array.from(contentClone.querySelectorAll('.schedule-table tbody tr'));
-
-        const mainHeaderCanvas = await html2canvas(mainHeaderEl, { scale: 2, useCORS: true });
-        const mainHeaderImg = {
-            data: mainHeaderCanvas.toDataURL('image/jpeg', 0.9),
-            height: (mainHeaderCanvas.height * USABLE_WIDTH) / mainHeaderCanvas.width
-        };
-
-        const tableHeaderCanvas = await html2canvas(tableHeaderEl, { scale: 2, backgroundColor: '#ffffff', useCORS: true });
-        const tableHeaderImg = {
-            data: tableHeaderCanvas.toDataURL('image/jpeg', 0.9),
-            height: (tableHeaderCanvas.height * USABLE_WIDTH) / tableHeaderCanvas.width
-        };
-
-        let currentY = MARGIN_MM;
-        
-        pdf.addImage(mainHeaderImg.data, 'JPEG', MARGIN_MM, currentY, USABLE_WIDTH, mainHeaderImg.height);
-        currentY += mainHeaderImg.height;
-
-        pdf.addImage(tableHeaderImg.data, 'JPEG', MARGIN_MM, currentY, USABLE_WIDTH, tableHeaderImg.height);
-        currentY += tableHeaderImg.height;
-
-        for (const row of tableBodyRows) {
-            const rowCanvas = await html2canvas(row, { scale: 2, backgroundColor: '#ffffff', useCORS: true });
+        for (const row of allRows) {
+            const rowCanvas = await html2canvas(row, { scale: 2, backgroundColor: '#ffffff' });
             const rowImgData = rowCanvas.toDataURL('image/jpeg', 0.9);
             const rowProps = pdf.getImageProperties(rowImgData);
             const rowHeight = (rowProps.height * USABLE_WIDTH) / rowProps.width;
@@ -442,8 +411,8 @@
             if (currentY + rowHeight > A4_HEIGHT_MM - MARGIN_MM) {
                 pdf.addPage();
                 currentY = MARGIN_MM; 
-                pdf.addImage(tableHeaderImg.data, 'JPEG', MARGIN_MM, currentY, USABLE_WIDTH, tableHeaderImg.height);
-                currentY += tableHeaderImg.height;
+                pdf.addImage(headerImgData, 'JPEG', MARGIN_MM, currentY, USABLE_WIDTH, headerHeight);
+                currentY += headerHeight;
             }
             
             pdf.addImage(rowImgData, 'JPEG', MARGIN_MM, currentY, USABLE_WIDTH, rowHeight);
@@ -453,9 +422,8 @@
         document.body.removeChild(printContainer);
         const fileName = `${document.title || 'sunday-schedule'}.pdf`;
         pdf.save(fileName);
-        
         printButton.disabled = false;
-        printButton.querySelector('span:last-of-type').textContent = originalButtonText;
+        printButton.querySelector('span').textContent = 'Download PDF';
     }
 
     document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
