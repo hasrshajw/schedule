@@ -3,142 +3,203 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sunday Schedule Editor</title>
-
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf-autotable.umd.min.js"></script>
+<title>Admin - Schedule Template Editor</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+
+<script type="module" src="https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js"></script>
+<script type="module" src="https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js"></script>
+<script type="module" src="https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js"></script>
+<script type="module" src="https://www.gstatic.com/firebasejs/12.4.0/firebase-ai.js"></script>
 
 <style>
     :root {
-        --primary-color: #012726;
-        --primary-hover: #024443;
-        --primary-light: #e6f6f6;
-        --danger-color: #d32f2f;
-        --danger-hover: #b71c1c;
-        --border-color: #e5e7eb;
-        --background-color: #f8fafc;
+        --body-bg: #F9FAFB;
+        --widget-bg: #FFFFFF;
+        --border-color: #E5E7EB;
         --text-primary: #1f2937;
-        --text-secondary: #6b7280;
-        --surface-color: #ffffff;
-        --radius-md: 8px;
-        --radius-lg: 16px;
-        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --text-secondary: #6B7280;
+        --brand-color: #012726;
+        --danger-color: #EF4444;
+        --danger-light: #fef2f2;
+        --warning-color: #F59E0B;
+        --success-color: #10b981;
+        --ai-color: #673ab7;
+        --ai-light: #ede7f6;
+        --font-family: 'IBM Plex Sans', sans-serif;
     }
     *, *::before, *::after { box-sizing: border-box; }
-    html { -webkit-font-smoothing: antialiased; }
-    /* This body rule is CRITICAL for the webpage font */
-    body { font-family: 'Noto Sans Telugu', sans-serif; background-color: var(--background-color); margin: 0; padding: 88px 20px 20px; color: var(--text-primary); }
-    
-    main { margin-top: 0; }
-    #app-header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border-color); padding: 12px 20px; }
+    body {
+        font-family: var(--font-family);
+        background-color: var(--body-bg);
+        margin: 0;
+        padding: 88px 20px 20px 20px;
+        color: var(--text-primary);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    .hidden { display: none !important; }
+
+    #app-header {
+        position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+        background-color: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(8px);
+        border-bottom: 1px solid var(--border-color);
+        padding: 12px 20px;
+    }
     .header-content { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
-    .header-actions { display: flex; align-items: center; gap: 12px; }
-    .toolbar-btn { font-family: 'Inter', sans-serif; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); text-decoration: none; color: var(--text-secondary); }
-    .toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; color: var(--text-primary); }
+    #user-info { display: flex; align-items: center; gap: 12px; font-size: 14px; }
+    #user-avatar { width: 36px; height: 36px; border-radius: 50%; background-color: var(--border-color); display: flex; align-items: center; justify-content: center; font-weight: 600; color: var(--text-secondary); }
+    #user-email { font-weight: 600; color: var(--text-primary); }
+    #logout-button { background: transparent; color: var(--text-secondary); border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s ease; }
+    #logout-button:hover { background-color: var(--danger-light); color: var(--danger-color); border-color: var(--danger-color); }
+
+    .master-container { max-width: 1100px; margin: 0 auto; }
+    .page-title { font-size: 2rem; font-weight: 700; margin: 0 0 24px 0; }
+    
+    .schedule-block {
+        background: var(--widget-bg);
+        padding: 24px;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03), 0 2px 4px -1px rgba(0,0,0,0.02);
+        margin-bottom: 32px;
+        border: 1px solid var(--border-color);
+    }
+    .schedule-header { display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 20px; }
+    .schedule-title { font-size: 1.5rem; font-weight: 600; margin: 0; flex-grow: 1; border: none; padding: 4px 8px; margin: -4px -8px; border-radius: 8px; font-family: 'Noto Sans Telugu', sans-serif; color: var(--text-primary); }
+    .schedule-title:focus { outline: 2px solid var(--brand-color); background-color: #f3f4f6; }
+    
+    .status-indicator { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; display: flex; align-items: center; gap: 6px; transition: all 0.3s ease; white-space: nowrap; }
+    .status-indicator::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background-color: currentColor; }
+    .status-indicator[data-status="synced"] { color: var(--success-color); background-color: #ecfdf5; }
+    .status-indicator[data-status="syncing"] { color: var(--warning-color); background-color: #fffbeb; }
+    .status-indicator[data-status="error"] { color: var(--danger-color); background-color: var(--danger-light); }
+    .status-indicator[data-status="processing"] { color: var(--ai-color); background-color: var(--ai-light); animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
+
+    .toolbar { display: flex; align-items: center; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); flex-wrap: wrap; gap: 8px;}
+    .toolbar-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--widget-bg); border-radius: 8px; transition: all 0.2s ease; }
+    .toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; }
     .toolbar-btn:disabled { cursor: not-allowed; opacity: 0.5; }
-    #logout-button { font-family: 'Inter', sans-serif; background: transparent; border: 1px solid var(--border-color); padding: 8px 16px; border-radius: var(--radius-md); cursor: pointer; font-weight: 600; font-size: 14px; }
-    #logout-button:hover { background-color: var(--danger-light); color: var(--danger-hover); border-color: var(--danger-hover); }
+    .toolbar-btn .material-symbols-outlined, .toolbar-btn .bx { font-size: 20px; }
+    .delete-btn { margin-left: auto; }
+    .delete-btn:hover:not(:disabled) { background-color: var(--danger-light); color: var(--danger-color); border-color: var(--danger-color); }
+    .ai-fill-btn { color: var(--ai-color); border-color: #d1c4e9; }
+    .ai-fill-btn:hover:not(:disabled) { background-color: var(--ai-light); }
 
-    .master-container { max-width: 1100px; margin: 0 auto; background: var(--surface-color); padding: 40px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
-    
-    .schedule-display-header { text-align: center; margin-bottom: 0; }
-    .title-block { text-align: center; }
-    .title-block h1 { margin: 0; font-size: 1.8em; font-weight: 700; color: rgb(97, 40, 0); }
-    .subtitle-svg-container { position: relative; display: inline-block; margin-top: 0; }
-    .subtitle { margin: 0; font-size: 1.0em; font-weight: 500; color: #333; background-color: #ffffff; padding: 2px 8px; display: inline-block; position: relative; z-index: 2; white-space: nowrap; border-radius: var(--radius-md); }
-    .subtitle:focus { outline: 2px solid var(--primary-color); background-color: #f0f0f0; }
-    .svg-divider { width: 400px; height: 5px; display: block; position: absolute; left: 50%; transform: translateX(-50%); top: 50%; margin-top: -2.5px; z-index: 1; }
-    
-    .schedule-table { width: 100%; border-collapse: collapse; font-size: 0.9em; border-left: 2px solid #000; border-right: 2px solid #000; border-bottom: 2px solid #000; }
-    .schedule-table th, .schedule-table td { border: 1px solid #000; padding: 8px 5px; text-align: center; vertical-align: middle; font-weight: 700; }
-    .schedule-table tbody td:not(:first-child):not(.special-event) { text-align: left; padding-left: 10px; }
-    .schedule-table thead th { background-color: #F3E5D7; font-size: 1.0em; padding: 10px 5px; }
-    .schedule-table [contenteditable="true"]:focus { background-color: #fffbe5; outline: 1px solid #f59e0b; }
-    .special-event { color: red; font-weight: 700; text-align: center; padding-left: 5px; }
-    .schedule-table .top-empty-row { background-color: #ffffff; border-bottom: 2px solid #000; border-top: none; border-left: 2px solid white; border-right: 2px solid white; height: 25px; }
-    
-    .event-btn { background: none; border: none; cursor: pointer; padding: 4px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
-    .event-btn:hover { background-color: #f0f0f0; }
-    #event-context-menu { position: fixed; display: none; background: var(--surface-color); border-radius: var(--radius-md); box-shadow: var(--shadow-md); z-index: 1001; padding: 6px; min-width: 180px; border: 1px solid var(--border-color); }
-    .context-menu-item { font-family: 'Inter', sans-serif; display: block; width: 100%; padding: 8px 12px; cursor: pointer; font-size: 14px; border-radius: 6px; background: none; border: none; text-align: left; }
+    table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 12px; font-weight: 700; }
+    th, td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; }
+    [contenteditable="true"]:focus { background-color: #fffbe5; outline: 1px solid var(--warning-color); }
+    .row-handle { position: absolute; left: -30px; top: 0; width: 30px; height: 100%; display: flex; align-items: center; justify-content: center; cursor: grab; color: #aaa; user-select: none; }
+    .row-handle-icon { opacity: 0; transition: opacity 0.2s; font-size: 18px; }
+    tr:hover .row-handle-icon { opacity: 1; }
+    td:first-child .row-handle, th:first-child .row-handle { display: flex; }
+    td.cell-selected, th.cell-selected { outline: 2px solid var(--brand-color) !important; outline-offset: -2px; background-color: #e6f6f6; }
+    .header-row td { font-size: 14px; color: #ffffff; height: 42px; }
+    .header-row[data-section="treasures"] td { background-color: #3c7f8b; }
+    .header-row[data-section="ministry"] td { background-color: rgb(212, 162, 42); }
+    .header-row[data-section="living"] td { background-color: rgb(192, 66, 53); }
+    .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; }
+    .cell-icon { height: 75%; max-height: 24px; object-fit: contain; flex-shrink: 0; }
+    .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; }
+
+    .modal-overlay { position: fixed; inset: 0; background-color: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 999; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+    .modal-overlay.active { opacity: 1; pointer-events: auto; }
+    .modal-content { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95); background: var(--widget-bg); width: 90%; max-width: 600px; border-radius: 16px; padding: 24px; box-shadow: 0 10px 30px -5px rgba(0,0,0,0.1); transition: transform 0.3s ease; z-index: 1000; }
+    .modal-overlay.active .modal-content { transform: translate(-50%, -50%) scale(1); }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .modal-title { font-size: 1.25rem; font-weight: 600; display: flex; align-items: center; gap: 8px; color: var(--ai-color); }
+    .modal-close { background: none; border: none; cursor: pointer; color: var(--text-secondary); padding: 4px; border-radius: 50%; display: flex; }
+    #ai-input-text { width: 100%; height: 200px; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit; font-size: 14px; resize: vertical; margin-bottom: 16px; }
+    .modal-footer { display: flex; justify-content: flex-end; gap: 12px; }
+    .btn { padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; border: none; transition: background-color 0.2s ease; }
+    .btn:disabled { background-color: #cccccc; cursor: not-allowed; }
+    .btn-primary { background-color: var(--ai-color); color: white; }
+    .btn-secondary { background-color: var(--widget-bg); border: 1px solid var(--border-color); color: var(--text-primary); }
+
+    .context-menu { position: fixed; display: none; background: var(--widget-bg); border-radius: 8px; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); z-index: 1001; padding: 6px; min-width: 220px; border: 1px solid var(--border-color); }
+    .context-menu-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; cursor: pointer; font-size: 14px; border-radius: 6px; }
     .context-menu-item:hover { background: #f9fafb; }
-
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 16px; }
-    .modal-content { background: white; padding: 24px; border-radius: var(--radius-lg); width: 100%; max-width: 500px; max-height: 90vh; display: flex; flex-direction: column; gap: 16px; }
-    #new-schedule-name { width: 100%; padding: 12px; font-size: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); }
-    #date-checklist { list-style: none; padding: 0; margin: 0; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md); max-height: 40vh; }
-    #date-checklist label { display: flex; align-items: center; gap: 10px; font-size: 16px; cursor: pointer; font-weight: 500; }
-    .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px; }
-    .modal-actions button { font-family: 'Inter', sans-serif; padding: 10px 20px; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); }
-    #cancel-creation { background-color: var(--surface-color); }
-    #confirm-creation { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
+    .context-menu-item.disabled { color: #9ca3af; cursor: not-allowed; }
+    .context-menu-item.delete { color: var(--danger-color); }
+    .context-menu-item.delete:hover { background-color: var(--danger-light); }
+    .context-menu-item.active { background-color: #e6f6f6; color: var(--brand-color); font-weight: 600; }
+    .context-menu-item .material-symbols-outlined { font-size: 20px; color: var(--text-secondary); }
+    .context-menu-item.delete .material-symbols-outlined { color: var(--danger-color); }
+    .context-menu hr { border: none; height: 1px; background-color: var(--border-color); margin: 6px 0; }
 </style>
 </head>
 <body>
 
-<div id="app-container">
+<div id="app-container" class="hidden">
     <header id="app-header">
         <div class="header-content">
-             <div class="header-actions">
-                <a href="./sunday-dashboard.html" class="toolbar-btn">
-                    <span class="material-symbols-outlined">arrow_back</span>
-                    <span>Dashboard</span>
-                </a>
-                <button id="print-button" class="toolbar-btn">
-                    <span class="material-symbols-outlined">picture_as_pdf</span>
-                    <span>Download PDF</span>
-                </button>
+            <div id="user-info">
+                <div id="user-avatar"></div>
+                <span>Welcome, <span id="user-email"></span></span>
             </div>
             <button id="logout-button">Logout</button>
         </div>
     </header>
 
     <div class="master-container">
-        <div id="schedule-content-wrapper">
-            </div>
+        <h1 class="page-title">Schedule Template Editor</h1>
+        <div id="schedules-wrapper"></div>
+    </div>
+    
+    <div id="add-schedule-footer" style="max-width: 1100px; margin: 0 auto; padding: 20px;">
+        <button id="addNewScheduleBtn" style="width: 100%; padding: 16px; font-size: 16px; font-weight: 600; border-radius: 16px; cursor: pointer;">+ Add New Schedule Template</button>
     </div>
 </div>
 
-<div id="event-context-menu">
-    <button class="context-menu-item" data-event-type="normal">Normal</button>
-    <button class="context-menu-item" data-event-type="co-visit">CO Visit</button>
-    <button class="context-menu-item" data-event-type="assembly">Assembly</button>
-    <button class="context-menu-item" data-event-type="convention">Convention</button>
-</div>
-
-<div id="date-selection-modal" class="modal-overlay">
+<div id="ai-modal-overlay" class="modal-overlay">
     <div class="modal-content">
-        <h2>Create New Sunday Schedule</h2>
-        <p>Give your new schedule a name and select the weeks to include.</p>
-        <input type="text" id="new-schedule-name" placeholder="E.g., Nov & Dec 2025 Schedule">
-        <ul id="date-checklist"></ul>
-        <div class="modal-actions">
-            <button id="cancel-creation">Cancel</button>
-            <button id="confirm-creation">Create Schedule</button>
+        <div class="modal-header">
+            <h3 class="modal-title"><i class='bx bxs-magic-wand'></i> AI Auto-Fill</h3>
+            <button class="modal-close" id="close-ai-modal"><i class='bx bx-x' style="font-size: 24px;"></i></button>
+        </div>
+        <p style="margin-bottom: 12px; color: var(--text-secondary); font-size: 14px;">Paste the raw schedule text. The AI will extract details and fill the table.</p>
+        <textarea id="ai-input-text" placeholder="Paste raw Telugu text here..."></textarea>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" id="cancel-ai-modal">Cancel</button>
+            <button class="btn btn-primary" id="confirm-ai-fill">Generate & Fill</button>
         </div>
     </div>
 </div>
 
-<script>
-(function() {
-    'use strict';
-    
-    // --- START: NEW FONT DATA FOR jspdf ---
-    // This is the Base64 representation of the NotoSansTelugu-Regular.ttf file
-    // It's very large, but this is what makes it work 100% of the time.
-    const NotoSansTelugu_TTF_BASE64 = "AAEAAAARAQAABAAQR0RFRgBsAOMAAeXAAAAiAEdQT1OEZtrtAAGjWAAAKkxHU1VCoMqhIwAB/XAAAABOT1MvMnDE95MAAAEsAAAAVmNtYXDEOA8yAAACtAAAAHpnbHlmN+iLwAAGeAAAAlhoZWFkBRsU+gAAAdQAAAA2aGhlYQfsA5EAAAEsAAAAGGhtdHhyIAeFAAAB9AAAACRsb2NhHb0G6QAABiwAAAAsbWF4cAEOAesAAAE8AAAAIG5hbWVOVoC/AAHlUAAAAyZwb3N0gnjKcQAB3WAAABYMcHJlcGgGjIUAAAY4AAAAAwABAAAAAQAAeuzc1V8PPPUACwIAAAAAAM/Lz4cAAAAAz8vPhwAAAAADPQxUAAAACAACAAAAAAAAAAEAAAMg/CoAfwADAAEAAAAAAAAAAAAAAAAAAAACAQIAZAQAAAAgAAGgAAADIAAAAAAAAAAAAAADAAAAAAAAAAEAAAAAADPQxUAAAAAAAABAAAAAAAEAAMgAAAADAAAAAwAAABwAAQAAAAAABAADAEgAAQABAAMgAAAEAAQAAAABAAAAAAEGAAEGAAYAAAUUAAIEBAUGAAEGAAYABEFsYQBuAGEAcwBpAG4AZwBoAGEAbAAgAFIAZQBnAHUAbABhAHIATgBvAHQAbwAgAFMAYQBuAHMAIABUAGUAbAB1AHUAAAUVAgABAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAQABBAEBAAEFAQABAwABBAEGAQAAAAEAAAADAAAAAwAAABwAAQAAAAAABAADAEgAAQABAAMgAAAEAAQAAAABAAAAAAEGAAEGAAYAAAUUAAIEBAUGAAEGAAYABEFsYQBuAGEAcwBpAG4AZwBoAGEAbAAgAFIAZQBnAHUAbABhAHIATgBvAHQAbwAgAFMAYQBuAHMAIABUAGUAbAB1AHUAAAUVAgABAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/7AEA/3EAQP9NQEBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgECAQIBAgEKAIIBvUYBBwjsYfBwR8eO8iM7b1rxKxSNTvj8/t9/yvu86yNBYmSBRiBgtigHkARABNIBExBwAyAdQfI0wWxYgbSgBY2hgsgKDNQGq/qA+wwAYC/GvbhyQ9yCBIhUqAExZgSwqCwD8p9t3f+nZf6+2v14K+3qj+f0AfgBAgQSx4BYQg4EEEAwEMGgBFXEBgSwYBAyQgCgNgTwLAEwVgAQTyAIAYyACgwQAnIuACsAIIEwEAjQAgDYiBwAIEwCQDSDSgCgQQJgMgCYLAIBAwAATE4AgCwSACgIBAQgIABAEACECAAATE4AgCwgAgCQSAIAyQAAQSAIAK0AAgEAIAABEEAAgCwBAIIBAAATE4AgCwgAgCQSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACTE4AgCwSACgIBAQgIABAEACECAAATE4AgCwgAgCQSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACTE4AgCwgAgCQSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACTE4AgCwSACgIBAQgIABAEACECAAATE4AgCwgAgCQSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACTE4AgCwSAIAyQAAQSAIAK0AAgEAYAgEACECAAATE4ExamplesABJRU5ErkJggg==";
-    // --- END: NEW FONT DATA ---
-    
+<template id="schedule-template">
+    <div class="schedule-block">
+        <div class="schedule-header">
+            <h2 class="schedule-title" contenteditable="true"></h2>
+            <div class="status-indicator"></div>
+        </div>
+        <div class="toolbar">
+            <button class="toolbar-btn ai-fill-btn"><i class='bx bxs-magic-wand'></i><span class="btn-text">AI Auto-Fill</span></button>
+            <button class="toolbar-btn undo-btn" disabled><i class='bx bx-undo'></i><span class="btn-text">Undo</span></button>
+            <button class="toolbar-btn redo-btn" disabled><i class='bx bx-redo'></i><span class="btn-text">Redo</span></button>
+            <button class="toolbar-btn reset-btn"><span class="material-symbols-outlined">restart_alt</span><span class="btn-text">Reset</span></button>
+            <button class="toolbar-btn delete-btn"><i class='bx bx-trash'></i><span class="btn-text">Delete</span></button>
+        </div>
+        <table>
+            <colgroup><col style="width: 60%;"><col style="width: 20%;"><col style="width: 20%;"></colgroup>
+            <tbody class="schedule-table-body"></tbody>
+        </table>
+    </div>
+</template>
+
+<div id="rowContextMenu" class="context-menu"></div>
+<div id="cellContextMenu" class="context-menu"></div>
+
+<script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js';
+    import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js';
+    import { getFirestore, collection, doc, addDoc, onSnapshot, orderBy, query, serverTimestamp, setDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js';
+    import { getAI, getGenerativeModel } from 'https://www.gstatic.com/firebasejs/12.4.0/firebase-ai.js';
 
     const firebaseConfig = {
       apiKey: "AIzaSyDLK5f4C-nfG6fz0ajqqay1q9TTN6rxgmQ",
@@ -148,347 +209,470 @@
       messagingSenderId: "965478014820",
       appId: "1:965478014820:web:1c36c5d890a27e599aa471"
     };
+    const ADMIN_EMAIL = 'harshavardhanjw@gmail.com';
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    
-    let currentUser = null;
-    let currentScheduleId = null;
-    let userSchedulesCollection = null;
-    let currentListener = null;
-    let activeRowForEvents = null;
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const ai = getAI(app);
+    const model = getGenerativeModel(ai, { model: 'gemini-2.5-flash' });
+    const templatesCollection = collection(db, "templates");
 
-    const scheduleWrapper = document.getElementById('schedule-content-wrapper');
-    const dateSelectionModal = document.getElementById('date-selection-modal');
-    const eventContextMenu = document.getElementById('event-context-menu');
+    const ICON_SONG = 'https://schedule.wixo.in/assets/4.jpg';
+    const ICON_TREASURES = 'https://schedule.wixo.in/assets/1.png';
+    const ICON_MINISTRY = 'https://schedule.wixo.in/assets/2.png';
+    const ICON_LIVING = 'https://schedule.wixo.in/assets/3.png';
+
+    const DEFAULT_TABLE_HTML = `<tr class="no-actions"><th contenteditable="true" style="background-color: rgb(240, 248, 255);"><span class="row-handle"></span>బైబిలు అధ్యాయం...</th><th contenteditable="true" style="background-color: rgb(240, 248, 255);"></th><th contenteditable="true" style="background-color: rgb(240, 248, 255);"></th></tr><tr class="no-actions"><td contenteditable="true"><div class="cell-content-wrapper"><span class="row-handle"></span><img src="${ICON_SONG}" class="cell-icon"><span>పాట: ...</span></div></td><td contenteditable="true" style="text-align: right;">చైర్మన్</td><td contenteditable="true"></td></tr><tr class="no-actions"><td contenteditable="true"><span class="row-handle"></span>ఆరంభ మాటలు (1 నిమి.)</td><td contenteditable="true" style="text-align: right;">ప్రార్థన:</td><td contenteditable="true"></td></tr><tr class="header-row no-actions" data-section="treasures"><td colspan="3" contenteditable="true"><div class="header-content-wrapper"><span class="row-handle"></span><img src="${ICON_TREASURES}" class="cell-icon"><span>దేవుని వాక్యంలో ఉన్న సంపద</span></div></td></tr><tr><td colspan="3" contenteditable="true"><span class="row-handle"><span class="row-handle-icon">⠿</span></span>1. ...</td></tr><tr class="header-row no-actions" data-section="ministry"><td colspan="3" contenteditable="true"><div class="header-content-wrapper"><span class="row-handle"></span><img src="${ICON_MINISTRY}" class="cell-icon"><span>చక్కగా సువార్త ప్రకటించాలి</span></div></td></tr><tr><td colspan="3" contenteditable="true"><span class="row-handle"><span class="row-handle-icon">⠿</span></span>...</td></tr><tr class="header-row no-actions" data-section="living"><td colspan="3" contenteditable="true"><div class="header-content-wrapper"><span class="row-handle"></span><img src="${ICON_LIVING}" class="cell-icon"><span>మన క్రైస్తవ జీవితం</span></div></td></tr><tr><td contenteditable="true"><div class="cell-content-wrapper"><span class="row-handle"><span class="row-handle-icon">⠿</span></span><img src="${ICON_SONG}" class="cell-icon"><span>పాట: ...</span></div></td><td colspan="2" contenteditable="true"></td></tr><tr><td colspan="3" contenteditable="true"><span class="row-handle"><span class="row-handle-icon">⠿</span></span>...</td></tr><tr class="no-actions"><td contenteditable="true"><span class="row-handle"></span>ముగింపు మాటలు (3 నిమి.)</td><td contenteditable="true" style="text-align: right;">చైర్మన్</td><td contenteditable="true"></td></tr><tr class="no-actions"><td contenteditable="true"><div class="cell-content-wrapper"><span class="row-handle"></span><img src="${ICON_SONG}" class="cell-icon"><span>పాట: ...</span></div></td><td contenteditable="true" style="text-align: right;">ముగింపు ప్రార్థన:</td><td contenteditable="true"></td></tr>`.trim();
+
+    const appContainer = document.getElementById('app-container');
+    const userEmailEl = document.getElementById('user-email');
+    const userAvatarEl = document.getElementById('user-avatar');
+    const schedulesWrapper = document.getElementById('schedules-wrapper');
+    const scheduleTemplate = document.getElementById('schedule-template');
+    const aiModalOverlay = document.getElementById('ai-modal-overlay');
+    const aiInputText = document.getElementById('ai-input-text');
+    const confirmAIFillBtn = document.getElementById('confirm-ai-fill');
+    const rowContextMenu = document.getElementById('rowContextMenu');
+    const cellContextMenu = document.getElementById('cellContextMenu');
+
+    let activeSchedules = {};
+    let activeContextScheduleId = null;
+    let activeAIRequestScheduleId = null;
 
     const debounce = (func, delay) => {
         let timeout;
         return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), delay); };
     };
 
-    auth.onAuthStateChanged(user => {
-        if (user) {
-            currentUser = user;
-            userSchedulesCollection = db.collection(`userSundaySchedules/${currentUser.uid}/schedules`);
-            const params = new URLSearchParams(window.location.search);
-            currentScheduleId = params.get('id');
-            if (currentScheduleId) initEditor(); else initCreationFlow();
-        } else {
-            window.location.replace('./login.html');
+    class Schedule {
+        constructor(id, initialData) {
+            this.id = id;
+            this.undoHistory = [];
+            this.redoHistory = [];
+            this.selectedCells = [];
+            this.activeRow = null;
+            this.isUpdatingFromRemote = false;
+            this.debouncedSaveToFirestore = debounce(() => this.saveToFirestore(), 1500);
+            this.initDOM();
+            this.render(initialData);
+            this.setupEventListeners();
         }
-    });
 
-    function initEditor() {
-        if (currentListener) currentListener();
-        currentListener = userSchedulesCollection.doc(currentScheduleId).onSnapshot(doc => {
-            if (doc.exists) {
-                const scheduleData = doc.data();
-                if (!document.activeElement || document.activeElement.tagName === 'BODY' || !scheduleWrapper.contains(document.activeElement)) {
-                    renderSchedule(scheduleData);
-                }
+        initDOM() {
+            const templateClone = scheduleTemplate.content.cloneNode(true);
+            this.element = templateClone.querySelector('.schedule-block');
+            this.element.dataset.id = this.id;
+            this.titleEl = this.element.querySelector('.schedule-title');
+            this.tableBody = this.element.querySelector('.schedule-table-body');
+            this.statusIndicator = this.element.querySelector('.status-indicator');
+            this.undoBtn = this.element.querySelector('.undo-btn');
+            this.redoBtn = this.element.querySelector('.redo-btn');
+            schedulesWrapper.appendChild(this.element);
+        }
+
+        render(data) {
+            this.isUpdatingFromRemote = true;
+            if (document.activeElement !== this.titleEl) this.titleEl.textContent = data.name;
+            if (!this.tableBody.contains(document.activeElement)) this.tableBody.innerHTML = data.content;
+            this.reapplyHeaderColors();
+            this.pushState(data.content, false);
+            this.updateStatus('Synced', 'synced');
+            this.isUpdatingFromRemote = false;
+        }
+
+        reapplyHeaderColors() {
+            this.element.querySelectorAll('.header-row[data-section="treasures"] td').forEach(td => td.style.backgroundColor = 'rgb(70, 132, 153)');
+            this.element.querySelectorAll('.header-row[data-section="ministry"] td').forEach(td => td.style.backgroundColor = 'rgb(212, 162, 42)');
+            this.element.querySelectorAll('.header-row[data-section="living"] td').forEach(td => td.style.backgroundColor = 'rgb(192, 66, 53)');
+        }
+
+        getContent() {
+            const tempBody = this.tableBody.cloneNode(true);
+            tempBody.querySelectorAll('[style*="background-color"]:not(.header-row td):not(th)').forEach(el => el.style.backgroundColor = '');
+            return tempBody.innerHTML;
+        }
+
+        pushState(content, shouldDebounceSave = true) {
+            if (this.undoHistory.length > 0 && this.undoHistory[this.undoHistory.length - 1] === content) return;
+            this.undoHistory.push(content);
+            this.redoHistory = [];
+            this.updateUndoRedoButtons();
+            if (shouldDebounceSave) this.debouncedSaveToFirestore();
+        }
+
+        saveToFirestore() {
+            if (this.isUpdatingFromRemote) return;
+            this.updateStatus('Syncing...', 'syncing');
+            const payload = { name: this.titleEl.textContent, content: this.getContent() };
+            setDoc(doc(db, "templates", this.id), payload, { merge: true }).catch(err => this.updateStatus('Error', 'error'));
+        }
+
+        updateUndoRedoButtons() {
+            this.undoBtn.disabled = this.undoHistory.length <= 1;
+            this.redoBtn.disabled = this.redoHistory.length === 0;
+        }
+
+        updateStatus(text, status) { this.statusIndicator.textContent = text; this.statusIndicator.dataset.status = status; }
+
+        setupEventListeners() {
+            this.element.addEventListener('click', (e) => this.handleElementClick(e));
+            this.element.addEventListener('contextmenu', (e) => this.handleContextMenu(e));
+            this.titleEl.addEventListener('input', () => this.pushState(this.getContent()));
+            this.tableBody.addEventListener('input', () => this.pushState(this.getContent()));
+        }
+
+        handleElementClick(e) {
+            const target = e.target;
+            const button = target.closest('button');
+            const handle = target.closest('.row-handle');
+            if (button) {
+                if (button.classList.contains('ai-fill-btn')) this.openAIFill();
+                else if (button.classList.contains('undo-btn')) this.undo();
+                else if (button.classList.contains('redo-btn')) this.redo();
+                else if (button.classList.contains('reset-btn')) this.reset();
+                else if (button.classList.contains('delete-btn')) this.delete();
+            } else if (handle && !handle.closest('tr').classList.contains('no-actions')) {
+                e.preventDefault();
+                activeContextScheduleId = this.id;
+                this.activeRow = handle.closest('tr');
+                showRowContextMenu(e);
             } else {
-                alert("This schedule may have been deleted.");
-                window.location.href = './sunday-dashboard.html';
+                const cell = target.closest('td, th');
+                if (cell && (e.ctrlKey || e.metaKey)) {
+                    e.preventDefault();
+                    cell.classList.toggle('cell-selected');
+                    this.selectedCells = Array.from(this.tableBody.querySelectorAll('.cell-selected'));
+                } else if (cell && !cell.classList.contains('cell-selected')) {
+                    this.clearCellSelection();
+                }
+            }
+        }
+        
+        handleContextMenu(e) {
+            const cell = e.target.closest('td, th');
+            if (cell) {
+                e.preventDefault();
+                activeContextScheduleId = this.id;
+                if (!cell.classList.contains('cell-selected')) {
+                    this.clearCellSelection();
+                    cell.classList.add('cell-selected');
+                    this.selectedCells = [cell];
+                }
+                showCellContextMenu(e, this);
+            }
+        }
+        
+        clearCellSelection() { this.selectedCells.forEach(c => c.classList.remove('cell-selected')); this.selectedCells = []; }
+
+        openAIFill() {
+            activeAIRequestScheduleId = this.id;
+            aiInputText.value = '';
+            aiModalOverlay.classList.add('active');
+            setTimeout(() => aiInputText.focus(), 50);
+        }
+
+        async processAIFill(rawText) {
+            if (!rawText.trim()) return;
+            this.updateStatus('Processing with AI...', 'processing');
+            confirmAIFillBtn.disabled = true;
+            try {
+                const extractedData = await autoFillScheduleFromText(rawText);
+                this.applyAIDataToTable(extractedData);
+                this.updateStatus('AI Fill Complete', 'synced');
+                this.pushState(this.getContent(), false); 
+                this.saveToFirestore();
+            } catch (error) {
+                this.updateStatus('AI Error', 'error');
+                alert(`AI Error: ${error.message}`);
+            } finally {
+                confirmAIFillBtn.disabled = false;
+                closeAIModal();
+            }
+        }
+
+        applyAIDataToTable(data) {
+            if (data.scheduleTitle) this.titleEl.textContent = data.scheduleTitle;
+            const headerRow = this.tableBody.rows[0];
+            if (headerRow) {
+                if (data.scripture) updateCellContent(headerRow.cells[0], `బైబిలు అధ్యాయం : ${data.scripture}`);
+                if (headerRow.cells[1]) {
+                    headerRow.cells[1].innerHTML = 'తేదీ:';
+                    headerRow.cells[1].style.textAlign = 'right';
+                }
+            }
+
+            const updateSongCell = (row, songNumber) => {
+                if (!row || !songNumber) return;
+                const cell = row.cells[0];
+                if (!cell) return;
+                const handle = cell.querySelector('.row-handle');
+                cell.innerHTML = `<div class="cell-content-wrapper">${handle ? handle.outerHTML : ''}<img src="${ICON_SONG}" class="cell-icon"><span>పాట: ${songNumber}</span></div>`;
+            };
+            
+            updateSongCell(this.tableBody.rows[1], data.openingSong);
+
+            const updateSection = (startNode, endNode, items) => {
+                if (!items || !startNode) return;
+                let contentRows = [], currentNode = startNode.nextElementSibling;
+                while (currentNode && currentNode !== endNode) {
+                    if (!currentNode.classList.contains('header-row') && !currentNode.innerHTML.includes('cell-content-wrapper')) contentRows.push(currentNode);
+                    currentNode = currentNode.nextElementSibling;
+                }
+                items.forEach((itemText, index) => {
+                    if (index < contentRows.length) {
+                        updateCellContent(contentRows[index].cells[0], itemText);
+                    } else {
+                        const newRow = insertNewRow(contentRows.length > 0 ? contentRows[contentRows.length - 1] : startNode, 'afterend');
+                        updateCellContent(newRow.cells[0], itemText);
+                        contentRows.push(newRow);
+                    }
+                });
+                if (contentRows.length > items.length) {
+                    for (let i = items.length; i < contentRows.length; i++) contentRows[i].remove();
+                }
+            };
+            
+            const treasuresHeader = this.tableBody.querySelector('.header-row[data-section="treasures"]');
+            const ministryHeader = this.tableBody.querySelector('.header-row[data-section="ministry"]');
+            const livingHeader = this.tableBody.querySelector('.header-row[data-section="living"]');
+            
+            updateSection(treasuresHeader, ministryHeader, data.treasures);
+            updateSection(ministryHeader, livingHeader, data.ministry);
+
+            if(livingHeader) {
+                const middleSongRow = livingHeader.nextElementSibling;
+                if(data.middleSong && middleSongRow) {
+                     updateSongCell(middleSongRow, data.middleSong);
+                }
+                const closingCommentsRow = Array.from(this.tableBody.rows).find(r => r.textContent.includes('ముగింపు మాటలు'));
+                if(middleSongRow) updateSection(middleSongRow, closingCommentsRow, data.living);
+            }
+
+            const lastRow = this.tableBody.rows[this.tableBody.rows.length - 1];
+            if (data.closingSong && lastRow) {
+                updateSongCell(lastRow, data.closingSong);
+            }
+
+            this.reapplyHeaderColors();
+        }
+
+        undo() {
+            if (this.undoHistory.length <= 1) return;
+            this.redoHistory.push(this.undoHistory.pop());
+            const prevState = this.undoHistory[this.undoHistory.length - 1];
+            this.tableBody.innerHTML = prevState;
+            this.reapplyHeaderColors();
+            this.updateUndoRedoButtons();
+            this.debouncedSaveToFirestore();
+        }
+
+        redo() {
+            if (this.redoHistory.length === 0) return;
+            const nextState = this.redoHistory.pop();
+            this.undoHistory.push(nextState);
+            this.tableBody.innerHTML = nextState;
+            this.reapplyHeaderColors();
+            this.updateUndoRedoButtons();
+            this.debouncedSaveToFirestore();
+        }
+        
+        reset() { if (confirm('Are you sure? This will reset the table to the default empty state.')) { this.tableBody.innerHTML = DEFAULT_TABLE_HTML; this.reapplyHeaderColors(); this.pushState(this.getContent()); } }
+        delete() { if (confirm('Permanently delete this template?')) { deleteDoc(doc(db, "templates", this.id)); } }
+        destroy() { this.element.remove(); }
+    }
+
+    async function autoFillScheduleFromText(rawText) {
+        try {
+            const prompt = `From the Telugu text provided, extract schedule details. Return ONLY a valid JSON object.
+- "scheduleTitle": The date range (e.g., "అక్టోబరు 20-26").
+- "scripture": The Bible book(s) and chapters (e.g., "ప్రసంగి 11-12").
+- "openingSong": String with the number of the first song.
+- "treasures": Array of strings for items under "దేవుని వాక్యంలో ఉన్న సంపద". Extract the full line for each numbered item, including the number and time (e.g., "1. సమస్యల్ని సరైన దృష్టితో చూడండి (10 నిమి.)"). DO NOT include sub-points.
+- "ministry": Array of strings for items under "చక్కగా సువార్త ప్రకటించాలి". Extract the full line for each numbered item, including number and time. DO NOT include descriptive text after the time.
+- "middleSong": String with the number of the song under "మన క్రైస్తవ జీవితం".
+- "living": Array of strings for numbered items AFTER the middle song. Extract the full line for each, including number and time. DO NOT include descriptive text after the time.
+- "closingSong": String with the number of the concluding song.
+
+Telugu Text:
+${rawText}`;
+            const result = await model.generateContent(prompt);
+            if (!result.response || typeof result.response.text !== 'function') throw new Error("AI returned an invalid response structure.");
+            let textResponse = result.response.text().trim().replace(/^```json/, '').replace(/```$/, '').trim();
+            return JSON.parse(textResponse);
+        } catch (error) {
+            console.error("Full error from model.generateContent call:", error);
+            let errorMessage = error.message || "An unknown error occurred.";
+            if (errorMessage.includes("API key not valid")) errorMessage = "The API Key is not valid. Please check it in your Google Cloud project.";
+            else if (errorMessage.includes("permission denied") || errorMessage.includes("Billing account")) errorMessage = "Permission denied. Ensure the Generative Language API is enabled and billing is set up in your Google Cloud project.";
+            throw new Error(`The AI model failed. Reason: ${errorMessage}`);
+        }
+    }
+    
+    function setupGlobalUI() {
+        document.getElementById('logout-button').addEventListener('click', () => signOut(auth));
+        document.getElementById('addNewScheduleBtn').addEventListener('click', () => {
+            addDoc(templatesCollection, { name: "New Schedule", content: DEFAULT_TABLE_HTML, createdAt: serverTimestamp() });
+        });
+        document.getElementById('close-ai-modal').addEventListener('click', closeAIModal);
+        document.getElementById('cancel-ai-modal').addEventListener('click', closeAIModal);
+        aiModalOverlay.addEventListener('click', (e) => { if (e.target === aiModalOverlay) closeAIModal(); });
+        confirmAIFillBtn.addEventListener('click', () => {
+            const text = aiInputText.value;
+            if (activeAIRequestScheduleId && activeSchedules[activeAIRequestScheduleId]) {
+                activeSchedules[activeAIRequestScheduleId].processAIFill(text);
             }
         });
+        rowContextMenu.innerHTML = `<div class="context-menu-item" data-action="addAbove"><span class="material-symbols-outlined">arrow_upward</span>Add row above</div><div class="context-menu-item" data-action="addBelow"><span class="material-symbols-outlined">arrow_downward</span>Add row below</div><hr><div class="context-menu-item delete" data-action="delete"><span class="material-symbols-outlined">delete</span>Delete row</div>`;
+        cellContextMenu.innerHTML = `<div class="context-menu-item" data-action="merge"><span class="material-symbols-outlined">merge_type</span>Merge Cells</div><div class="context-menu-item" data-action="split"><span class="material-symbols-outlined">call_split</span>Split Cell</div><hr><div class="context-menu-item" data-action="align-left"><span class="material-symbols-outlined">format_align_left</span>Align Left</div><div class="context-menu-item" data-action="align-center"><span class="material-symbols-outlined">format_align_center</span>Align Center</div><div class="context-menu-item" data-action="align-right"><span class="material-symbols-outlined">format_align_right</span>Align Right</div>`;
+        rowContextMenu.addEventListener('click', handleContextMenuClick);
+        cellContextMenu.addEventListener('click', handleContextMenuClick);
     }
 
-    function renderSchedule(data) {
-        document.title = data.name;
-        scheduleWrapper.innerHTML = `
-            <header class="schedule-display-header">
-                <div class="title-block">
-                    <h1>బహిరంగ ప్రసంగాల పట్టిక</h1>
-                    <div class="subtitle-svg-container">
-                        <p class="subtitle" contenteditable="true">${data.dateRange || ''}</p>
-                        <svg class="svg-divider" role="presentation" viewBox="0 0 24039.797 260" preserveAspectRatio="xMidYMid slice">
-                            <defs>
-                                <radialGradient id="__id9__id4" gradientUnits="userSpaceOnUse" r="12020.601" cx="12019.898" cy="130" fx="12019.898" fy="130">
-                                    <stop stop-color="#093261" stop-opacity="1" offset="0"></stop>
-                                    <stop stop-color="#ffffff" stop-opacity="1" offset="1"></stop>
-                                </radialGradient>
-                            </defs>
-                            <rect x="0" y="0" width="24039.797" height="260" fill="url(#__id9__id4)"></rect>
-                        </svg>
-                    </div>
-                </div>
-            </header>
-            <main>
-                <table class="schedule-table">
-                    <thead>
-                        <tr>
-                            <th class="top-empty-row" colspan="6">&nbsp;</th>
-                        </tr>
-                        <tr>
-                            <th>తేదీ</th>
-                            <th>ప్రసంగ అంశం</th>
-                            <th>ప్రసంగీకుడు</th>
-                            <th>చైర్మన్</th>
-                            <th>కావలికోట రీడర్</th>
-                            <th class="actions-col" style="display: none;">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${data.tableHTML}
-                    </tbody>
-                </table>
-            </main>
-        `;
-        // Hide action buttons in the body for printing
-        scheduleWrapper.querySelectorAll('.actions-col').forEach(el => el.style.display = 'none');
-
-        scheduleWrapper.addEventListener('input', debouncedSave);
-        scheduleWrapper.querySelectorAll('.event-btn').forEach(btn => {
-            btn.addEventListener('click', openEventMenu);
-        });
+    function closeAIModal() { aiModalOverlay.classList.remove('active'); activeAIRequestScheduleId = null; }
+    
+    function insertNewRow(targetRow, position) {
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `<td colspan="3" contenteditable="true"><span class="row-handle"><span class="row-handle-icon">⠿</span></span>&nbsp;</td>`;
+        targetRow.insertAdjacentElement(position, newRow);
+        return newRow;
     }
 
-    const debouncedSave = debounce(() => {
-        const subtitleEl = scheduleWrapper.querySelector('.subtitle');
-        const tableBodyEl = scheduleWrapper.querySelector('.schedule-table tbody');
-        if (!subtitleEl || !tableBodyEl) return;
-
-        // Clone the table body to modify it for saving without affecting the DOM
-        const tableBodyClone = tableBodyEl.cloneNode(true);
-        tableBodyClone.querySelectorAll('.actions-col').forEach(el => el.style.display = ''); // Make sure actions are saved
+    function updateCellContent(cell, text) {
+        if (!cell) return;
+        const handle = cell.querySelector('.row-handle');
+        cell.innerHTML = (handle ? handle.outerHTML : '') + text;
+    }
+    
+    function handleContextMenuClick(e) {
+        const action = e.target.closest('[data-action]')?.dataset.action;
+        const schedule = activeSchedules[activeContextScheduleId];
+        if (!action || !schedule) return;
         
-        const payload = {
-            dateRange: subtitleEl.textContent,
-            tableHTML: tableBodyClone.innerHTML
-        };
-        userSchedulesCollection.doc(currentScheduleId).update(payload)
-            .catch(err => console.error("Save failed:", err));
-    }, 1500);
-
-    function initCreationFlow() {
-        const dateList = document.getElementById('date-checklist');
-        const upcomingSundays = generateNextSundays(30);
-        dateList.innerHTML = '';
-        upcomingSundays.forEach(dateStr => {
-            const li = document.createElement('li');
-            li.innerHTML = `<label><input type="checkbox" value="${dateStr}"> ${dateStr}</label>`;
-            dateList.appendChild(li);
-        });
-        dateSelectionModal.style.display = 'flex';
-    }
-    
-    function generateNextSundays(count) {
-        const sundays = [];
-        let currentDate = new Date();
-        let dayOfWeek = currentDate.getDay();
-        if (dayOfWeek !== 0) { 
-            currentDate.setDate(currentDate.getDate() + (7 - dayOfWeek));
+        let newRow;
+        if (schedule.activeRow) {
+            if (action === 'addAbove') newRow = insertNewRow(schedule.activeRow, 'beforebegin');
+            if (action === 'addBelow') newRow = insertNewRow(schedule.activeRow, 'afterend');
+            if (action === 'delete' && confirm('Delete row?')) schedule.activeRow.remove();
         }
-        for (let i = 0; i < count; i++) {
-            const day = String(currentDate.getDate()).padStart(2, '0');
-            const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-            const year = currentDate.getFullYear();
-            sundays.push(`${day}-${month}-${year}`);
-            currentDate.setDate(currentDate.getDate() + 7);
-        }
-        return sundays;
-    }
-
-    async function handleCreateSchedule() {
-        const scheduleName = document.getElementById('new-schedule-name').value.trim();
-        if (!scheduleName) return alert("Please enter a name for the schedule.");
-        const selectedCheckboxes = Array.from(document.querySelectorAll('#date-checklist input:checked'));
-        if (selectedCheckboxes.length === 0) return alert("Please select at least one Sunday.");
         
-        const selectedDates = selectedCheckboxes.map(cb => cb.value);
-        const dateRange = `${selectedDates[0]} నుండి ${selectedDates[selectedDates.length - 1]}`;
-
-        const tableBodyHTML = selectedDates.map(date => `
-            <tr>
-                <td>${date}</td>
-                <td contenteditable="true"></td>
-                <td contenteditable="true"></td>
-                <td contenteditable="true"></td>
-                <td contenteditable="true"></td>
-                <td class="actions-col">
-                    <button class="event-btn">
-                        <span class="material-symbols-outlined">more_vert</span>
-                    </button>
-                </td>
-            </tr>
-        `).join('');
-
-        try {
-            const newDocRef = await userSchedulesCollection.add({
-                name: scheduleName,
-                dateRange: dateRange,
-                tableHTML: tableBodyHTML,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            window.location.href = `./sunday-editor.html?id=${newDocRef.id}`;
-        } catch (error) {
-            console.error("Error creating new schedule:", error);
-            alert("Could not create schedule. Please try again.");
+        if (schedule.selectedCells.length > 0) {
+            if (action.startsWith('align-')) setCellAlignment(schedule, action.split('-')[1]);
+            else if (action === 'merge') mergeCells(schedule);
+            else if (action === 'split') splitCell(schedule);
         }
+        
+        schedule.pushState(schedule.getContent());
+        if (newRow) newRow.cells[0].focus();
+        rowContextMenu.style.display = 'none';
+        cellContextMenu.style.display = 'none';
+    }
+
+    function positionContextMenu(event, menuElement) {
+        const { clientX: mouseX, clientY: mouseY } = event;
+        const { innerWidth, innerHeight } = window;
+        const { offsetWidth: menuWidth, offsetHeight: menuHeight } = menuElement;
+        let x = mouseX + 5, y = mouseY + 5;
+        if (x + menuWidth > innerWidth) x = innerWidth - menuWidth - 5;
+        if (y + menuHeight > innerHeight) y = innerHeight - menuHeight - 5;
+        menuElement.style.top = `${y}px`;
+        menuElement.style.left = `${x}px`;
+    }
+
+    function showRowContextMenu(e) {
+        cellContextMenu.style.display = 'none';
+        rowContextMenu.style.display = 'block';
+        positionContextMenu(e, rowContextMenu);
+    }
+
+    function showCellContextMenu(e, schedule) {
+        cellContextMenu.querySelector('[data-action="merge"]').classList.toggle('disabled', !canMerge(schedule));
+        cellContextMenu.querySelector('[data-action="split"]').classList.toggle('disabled', schedule.selectedCells.length !== 1 || schedule.selectedCells[0].colSpan <= 1);
+        cellContextMenu.querySelectorAll('[data-action^="align-"]').forEach(item => item.classList.remove('active'));
+        if (schedule.selectedCells.length === 1) {
+            const alignment = schedule.selectedCells[0].style.textAlign || 'left';
+            const activeItem = cellContextMenu.querySelector(`[data-action="align-${alignment}"]`);
+            if (activeItem) activeItem.classList.add('active');
+        }
+        rowContextMenu.style.display = 'none';
+        cellContextMenu.style.display = 'block';
+        positionContextMenu(e, cellContextMenu);
     }
     
-    function openEventMenu(e) {
-        const btn = e.currentTarget;
-        activeRowForEvents = btn.closest('tr');
-        const rect = btn.getBoundingClientRect();
-        eventContextMenu.style.display = 'block';
-        eventContextMenu.style.top = `${rect.bottom}px`;
-        eventContextMenu.style.left = `${rect.left - eventContextMenu.offsetWidth + rect.width}px`;
+    function setCellAlignment(schedule, alignment) { schedule.selectedCells.forEach(cell => cell.style.textAlign = alignment); schedule.clearCellSelection(); }
+    
+    function canMerge(schedule) {
+        if (schedule.selectedCells.length < 2) return false;
+        const parentRow = schedule.selectedCells[0].parentElement;
+        const sortedCells = [...schedule.selectedCells].sort((a, b) => a.cellIndex - b.cellIndex);
+        for(let i = 0; i < sortedCells.length; i++) {
+            if (sortedCells[i].parentElement !== parentRow) return false;
+            if (i > 0 && (sortedCells[i-1].cellIndex + sortedCells[i-1].colSpan) !== sortedCells[i].cellIndex) return false;
+        }
+        return true;
     }
     
-    function applyEventType(eventType) {
-        if (!activeRowForEvents) return;
-        const cells = Array.from(activeRowForEvents.cells);
-        const topicCell = cells[1];
-        const otherCells = cells.slice(2, 5);
-        topicCell.colSpan = 1;
-        topicCell.classList.remove('special-event');
-        topicCell.setAttribute('contenteditable', 'true');
-        if(topicCell.dataset.originalContent) {
-           topicCell.innerHTML = topicCell.dataset.originalContent;
-        } else if (eventType !== 'normal') {
-           topicCell.innerHTML = '';
-        }
-        topicCell.removeAttribute('data-original-content');
-        otherCells.forEach((cell) => {
-            cell.style.display = '';
-            cell.setAttribute('contenteditable', 'true');
-            if(cell.dataset.originalContent) cell.innerHTML = cell.dataset.originalContent;
-            cell.removeAttribute('data-original-content');
+    function mergeCells(schedule) {
+        if (!canMerge(schedule)) return;
+        const sortedCells = [...schedule.selectedCells].sort((a, b) => a.cellIndex - b.cellIndex);
+        const firstCell = sortedCells[0];
+        let totalColSpan = 0;
+        const combinedContent = sortedCells.map(cell => {
+            const handle = cell.querySelector('.row-handle'); if (handle) handle.remove();
+            return cell.innerHTML.trim();
+        }).join('<br>');
+        sortedCells.forEach((cell, index) => {
+            totalColSpan += cell.colSpan;
+            if (index > 0) cell.remove();
         });
-        const eventTexts = {
-            'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం',
-            'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో',
-            'convention': 'ప్రాదేశిక సమావేశం'
-        };
-        if (eventType !== 'normal') {
-            topicCell.dataset.originalContent = topicCell.innerHTML;
-            otherCells.forEach(cell => cell.dataset.originalContent = cell.innerHTML);
-            topicCell.colSpan = 4;
-            topicCell.classList.add('special-event');
-            topicCell.setAttribute('contenteditable', 'false');
-            topicCell.textContent = eventTexts[eventType];
-            otherCells.forEach(cell => {
-                cell.style.display = 'none';
-                cell.setAttribute('contenteditable', 'false');
-            });
+        firstCell.colSpan = totalColSpan;
+        firstCell.innerHTML = `<span class="row-handle"><span class="row-handle-icon">⠿</span></span>` + combinedContent;
+        schedule.clearCellSelection();
+    }
+
+    function splitCell(schedule) {
+        if (schedule.selectedCells.length !== 1) return;
+        const cell = schedule.selectedCells[0];
+        const span = cell.colSpan;
+        if (span <= 1) return;
+        const handle = cell.querySelector('.row-handle'); if(handle) handle.remove();
+        let originalContent = cell.innerHTML;
+        cell.colSpan = 1;
+        cell.innerHTML = (handle ? handle.outerHTML : '') + originalContent;
+        for (let i = 1; i < span; i++) {
+            const newCell = document.createElement(cell.tagName);
+            newCell.setAttribute('contenteditable', 'true');
+            newCell.innerHTML = `&nbsp;`;
+            cell.insertAdjacentElement('afterend', newCell);
         }
-        debouncedSave();
+        schedule.clearCellSelection();
     }
     
-    // --- START: NEW jspdf-autotable PDF FUNCTION ---
-    async function generatePdf() {
-        const printButton = document.getElementById('print-button');
-        printButton.disabled = true;
-        printButton.querySelector('span:last-child').textContent = 'Generating...';
-
-        try {
-            const { jsPDF } = window.jspdf;
-            const autoTable = window.jspdf.jsPDF.autoTable;
+    onAuthStateChanged(auth, user => {
+        if (user && user.email === ADMIN_EMAIL) {
+            appContainer.classList.remove('hidden');
+            userEmailEl.textContent = user.email;
+            userAvatarEl.textContent = user.email.charAt(0).toUpperCase();
             
-            // 1. Create new PDF in Landscape
-            const pdf = new jsPDF('l', 'mm', 'a4'); // 'l' for landscape
-
-            // 2. Add the Telugu font file to the PDF's virtual file system
-            // This is the step that guarantees the font will be in the PDF
-            pdf.addFileToVFS('NotoSansTelugu.ttf', NotoSansTelugu_TTF_BASE64);
-            pdf.addFont('NotoSansTelugu.ttf', 'NotoSansTelugu', 'normal');
-            pdf.setFont('NotoSansTelugu'); // Set this as the default font
-
-            // --- Page Margins ---
-            const A4_WIDTH_MM = 297;
-            const MARGIN_MM = 10;
-            const pdfWidth = A4_WIDTH_MM - (MARGIN_MM * 2);
-
-            // 3. Add Title and Subtitle
-            const title = document.querySelector('.title-block h1').textContent;
-            const subtitle = document.querySelector('.subtitle').textContent;
-            
-            pdf.setFontSize(18);
-            pdf.text(title, A4_WIDTH_MM / 2, 20, { align: 'center' });
-            
-            pdf.setFontSize(14);
-            pdf.text(subtitle, A4_WIDTH_MM / 2, 28, { align: 'center' });
-
-            // 4. Generate the table
-            autoTable(pdf, {
-                html: '.schedule-table', // Pass the selector for your table
-                startY: 35, // Position to start the table
-                theme: 'grid', // 'striped', 'grid', or 'plain'
-                styles: {
-                    font: 'NotoSansTelugu', // Use the embedded font!
-                    fontStyle: 'normal',
-                    halign: 'center',
-                    cellPadding: 2,
-                },
-                headStyles: {
-                    fillColor: [243, 229, 215], // The #F3E5D7 from your CSS
-                    textColor: [0, 0, 0],
-                    fontStyle: 'bold',
-                },
-                columnStyles: {
-                    1: { halign: 'left' }, // Column 1 (Prasanga Amsam)
-                    2: { halign: 'left' }, // Column 2 (Prasangeekudu)
-                    3: { halign: 'left' }, // Column 3 (Chairman)
-                    4: { halign: 'left' }, // Column 4 (Reader)
-                },
-                // This function removes the hidden "Actions" column
-                columns: [
-                    { header: 'తేదీ', dataKey: '0' },
-                    { header: 'ప్రసంగ అంశం', dataKey: '1' },
-                    { header: 'ప్రసంగీకుడు', dataKey: '2' },
-                    { header: 'చైర్మన్', dataKey: '3' },
-                    { header: 'కావలికోట రీడర్', dataKey: '4' },
-                ],
-                // This function handles special event rows (CO visit, etc.)
-                didParseCell: function (data) {
-                    if (data.cell.raw.classList.contains('special-event')) {
-                        data.cell.styles.halign = 'center';
-                        data.cell.styles.textColor = [255, 0, 0]; // Red text
+            const q = query(templatesCollection, orderBy("createdAt"));
+            onSnapshot(q, snapshot => {
+                snapshot.docChanges().forEach(change => {
+                    const id = change.doc.id;
+                    const data = change.doc.data();
+                    if (change.type === 'added' && !activeSchedules[id]) activeSchedules[id] = new Schedule(id, data);
+                    if (change.type === 'modified' && activeSchedules[id]) activeSchedules[id].render(data);
+                    if (change.type === 'removed' && activeSchedules[id]) {
+                        activeSchedules[id].destroy();
+                        delete activeSchedules[id];
                     }
-                    if (data.cell.raw.tagName === 'TH') {
-                         data.cell.styles.halign = 'center';
-                    }
-                }
+                });
             });
-
-            // 5. Save the PDF
-            const fileName = `${document.title || 'sunday-schedule'}.pdf`;
-            pdf.save(fileName);
-
-        } catch (error) {
-            console.error("PDF generation failed:", error);
-            alert("Sorry, there was an error creating the PDF.");
-        } finally {
-            // Re-enable the button
-            printButton.disabled = false;
-            printButton.querySelector('span:last-child').textContent = 'Download PDF';
-        }
-    }
-    // --- END: NEW PDF FUNCTION ---
-
-    document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
-    document.getElementById('print-button').addEventListener('click', generatePdf);
-    document.getElementById('cancel-creation').addEventListener('click', () => window.location.href = './sunday-dashboard.html');
-    document.getElementById('confirm-creation').addEventListener('click', handleCreateSchedule);
-
-    eventContextMenu.addEventListener('click', (e) => {
-        const target = e.target.closest('.context-menu-item');
-        if (target) {
-            applyEventType(target.dataset.eventType);
-            eventContextMenu.style.display = 'none';
+        } else {
+             window.location.replace('./login.html');
         }
     });
 
-    document.addEventListener('click', (e) => {
-        if (!eventContextMenu.contains(e.target) && !e.target.closest('.event-btn')) {
-            eventContextMenu.style.display = 'none';
-        }
-    });
-
-})();
+    setupGlobalUI();
 </script>
 </body>
 </html>
