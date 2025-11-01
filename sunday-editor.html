@@ -18,10 +18,32 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 
 <style>
+    /* Embedded Noto Sans Telugu Font */
+    @font-face {
+        font-family: 'Noto Sans Telugu';
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url(https://fonts.gstatic.com/s/notosanstelugu/v29/0FlxVOGZlE2Rrtr-HmgkMWJNjJ5_RyT8o8c7dOI.woff2) format('woff2');
+    }
+    @font-face {
+        font-family: 'Noto Sans Telugu';
+        font-style: normal;
+        font-weight: 500;
+        font-display: swap;
+        src: url(https://fonts.gstatic.com/s/notosanstelugu/v29/0FlxVOGZlE2Rrtr-HmgkMWJNjJ5_RST8o8c7dOI.woff2) format('woff2');
+    }
+    @font-face {
+        font-family: 'Noto Sans Telugu';
+        font-style: normal;
+        font-weight: 700;
+        font-display: swap;
+        src: url(https://fonts.gstatic.com/s/notosanstelugu/v29/0FlxVOGZlE2Rrtr-HmgkMWJNjJ5_Rcy-o8c7dOI.woff2) format('woff2');
+    }
+
     :root {
         --primary-color: #012726;
         --primary-hover: #024443;
@@ -62,14 +84,32 @@
     .subtitle:focus { outline: 2px solid var(--primary-color); background-color: #f0f0f0; }
     .svg-divider { width: 400px; height: 5px; display: block; position: absolute; left: 50%; transform: translateX(-50%); top: 50%; margin-top: -2.5px; z-index: 1; }
     
-    .schedule-table { width: 100%; border-collapse: collapse; font-size: 0.9em; border-left: 2px solid #000; border-right: 2px solid #000; border-bottom: 2px solid #000; }
-    .schedule-table th, .schedule-table td { border: 1px solid #000; padding: 8px 5px; text-align: center; vertical-align: middle; font-weight: 700; }
+    /* Table Styling */
+    .schedule-table {
+        width: 100%;
+        border-collapse: separate; /* Changed for better rendering */
+        border-spacing: 0;
+        border: 2px solid #000;
+        font-size: 0.9em;
+    }
+    .schedule-table th, .schedule-table td {
+        border-bottom: 1px solid #000;
+        border-right: 1px solid #000;
+        padding: 8px 5px;
+        text-align: center;
+        vertical-align: middle;
+        font-weight: 700;
+    }
+    .schedule-table th:first-child, .schedule-table td:first-child { border-left: none; }
+    .schedule-table th:last-child, .schedule-table td:last-child { border-right: none; }
+    .schedule-table tr:last-child td { border-bottom: none; }
+
     .schedule-table tbody td:not(:first-child):not(.special-event) { text-align: left; padding-left: 10px; }
-    .schedule-table thead th { background-color: #F3E5D7; font-size: 1.0em; padding: 10px 5px; }
+    .schedule-table thead th { background-color: #F3E5D7; font-size: 1.0em; padding: 10px 5px; border-top: 2px solid #000; }
     .schedule-table [contenteditable="true"]:focus { background-color: #fffbe5; outline: 1px solid #f59e0b; }
     .special-event { color: red; font-weight: 700; text-align: center; padding-left: 5px; }
     
-    .schedule-table .top-empty-row { background-color: #ffffff; border-bottom: 2px solid #000; border-top: none; border-left: 2px solid white; border-right: 2px solid white; height: 25px; }
+    .schedule-table .top-empty-row { background-color: #ffffff; border-bottom: 2px solid #000; height: 25px; border-right: none; }
     .event-btn { background: none; border: none; cursor: pointer; padding: 4px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
     .event-btn:hover { background-color: #f0f0f0; }
     #event-context-menu { position: fixed; display: none; background: var(--surface-color); border-radius: var(--radius-md); box-shadow: var(--shadow-md); z-index: 1001; padding: 6px; min-width: 180px; border: 1px solid var(--border-color); }
@@ -165,20 +205,18 @@
         return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), delay); };
     };
 
-    window.onload = function() {
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                currentUser = user;
-                userSchedulesCollection = db.collection(`userSundaySchedules/${currentUser.uid}/schedules`);
-                appContainer.classList.remove('hidden');
-                const params = new URLSearchParams(window.location.search);
-                currentScheduleId = params.get('id');
-                if (currentScheduleId) initEditor(); else initCreationFlow();
-            } else {
-                window.location.replace('./login.html');
-            }
-        });
-    }
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            currentUser = user;
+            userSchedulesCollection = db.collection(`userSundaySchedules/${currentUser.uid}/schedules`);
+            appContainer.classList.remove('hidden');
+            const params = new URLSearchParams(window.location.search);
+            currentScheduleId = params.get('id');
+            if (currentScheduleId) initEditor(); else initCreationFlow();
+        } else {
+            window.location.replace('./login.html');
+        }
+    });
 
     function initEditor() {
         if (currentListener) currentListener();
@@ -219,7 +257,7 @@
                 <table class="schedule-table">
                     <thead>
                         <tr>
-                            <th class="top-empty-row" colspan="6">&nbsp;</th>
+                            <th class="top-empty-row" colspan="6"></th>
                         </tr>
                         <tr>
                             <th>తేదీ</th>
@@ -354,7 +392,7 @@
         printButton.querySelector('span:last-of-type').textContent = 'Generating...';
 
         const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('l', 'mm', 'a4');
+        const pdf = new jsPDF('l', 'mm', 'a4'); 
         const A4_WIDTH_MM = 297;
         const A4_HEIGHT_MM = 210;
         const MARGIN_MM = 15;
@@ -363,17 +401,17 @@
         const printContainer = document.createElement('div');
         printContainer.style.position = 'absolute';
         printContainer.style.left = '-9999px';
-        printContainer.style.width = '1100px';
+        printContainer.style.width = '1100px'; 
         printContainer.style.background = 'white';
         document.body.appendChild(printContainer);
-
+        
         const contentClone = scheduleWrapper.cloneNode(true);
         Array.from(contentClone.querySelectorAll('.actions-col, .event-btn')).forEach(el => el.remove());
         printContainer.appendChild(contentClone);
 
         const mainHeaderEl = contentClone.querySelector('.schedule-display-header');
-        const tableEl = contentClone.querySelector('.schedule-table');
-        const allRows = Array.from(tableEl.querySelectorAll('thead > tr, tbody > tr'));
+        const tableHeaderEl = contentClone.querySelector('.schedule-table thead');
+        const tableBodyRows = Array.from(contentClone.querySelectorAll('.schedule-table tbody tr'));
 
         const mainHeaderCanvas = await html2canvas(mainHeaderEl, { scale: 2, useCORS: true });
         const mainHeaderImg = {
@@ -381,79 +419,41 @@
             height: (mainHeaderCanvas.height * USABLE_WIDTH) / mainHeaderCanvas.width
         };
 
+        const tableHeaderCanvas = await html2canvas(tableHeaderEl, { scale: 2, backgroundColor: '#ffffff', useCORS: true });
+        const tableHeaderImg = {
+            data: tableHeaderCanvas.toDataURL('image/jpeg', 0.9),
+            height: (tableHeaderCanvas.height * USABLE_WIDTH) / tableHeaderCanvas.width
+        };
+
         let currentY = MARGIN_MM;
         
         pdf.addImage(mainHeaderImg.data, 'JPEG', MARGIN_MM, currentY, USABLE_WIDTH, mainHeaderImg.height);
         currentY += mainHeaderImg.height;
 
-        for (let i = 0; i < allRows.length; i++) {
-            const row = allRows[i];
-            
-            // Hide borders for canvas capture, we will draw them manually
-            const originalBorders = [];
-            Array.from(row.cells).forEach(cell => {
-                originalBorders.push(cell.style.border);
-                cell.style.border = '1px solid transparent';
-            });
+        pdf.addImage(tableHeaderImg.data, 'JPEG', MARGIN_MM, currentY, USABLE_WIDTH, tableHeaderImg.height);
+        currentY += tableHeaderImg.height;
 
-            const canvas = await html2canvas(row, { scale: 2, backgroundColor: '#ffffff' });
-            
-            // Restore borders on the cloned element
-            Array.from(row.cells).forEach((cell, index) => {
-                cell.style.border = originalBorders[index];
-            });
-
-            const imgData = canvas.toDataURL('image/jpeg', 0.9);
-            const props = pdf.getImageProperties(imgData);
-            const rowHeight = (props.height * USABLE_WIDTH) / props.width;
-            
-            const isHeaderRow = row.parentElement.tagName === 'THEAD';
+        for (const row of tableBodyRows) {
+            const rowCanvas = await html2canvas(row, { scale: 2, backgroundColor: '#ffffff', useCORS: true });
+            const rowImgData = rowCanvas.toDataURL('image/jpeg', 0.9);
+            const rowProps = pdf.getImageProperties(rowImgData);
+            const rowHeight = (rowProps.height * USABLE_WIDTH) / rowProps.width;
 
             if (currentY + rowHeight > A4_HEIGHT_MM - MARGIN_MM) {
                 pdf.addPage();
-                currentY = MARGIN_MM;
-                if (!isHeaderRow) { // Add table header to new page if it's a body row
-                    const tableHeaderRow = allRows[1]; // The actual titles
-                    const thCanvas = await html2canvas(tableHeaderRow, {scale: 2, backgroundColor: '#ffffff'});
-                    const thImgData = thCanvas.toDataURL('image/jpeg', 0.9);
-                    const thProps = pdf.getImageProperties(thImgData);
-                    const thHeight = (thProps.height * USABLE_WIDTH) / thProps.width;
-
-                    pdf.addImage(thImgData, 'JPEG', MARGIN_MM, currentY, USABLE_WIDTH, thHeight);
-                    pdf.setDrawColor(0);
-                    pdf.setLineWidth(0.2);
-                    pdf.rect(MARGIN_MM, currentY, USABLE_WIDTH, thHeight); // Outer border
-                    currentY += thHeight;
-                }
+                currentY = MARGIN_MM; 
+                pdf.addImage(tableHeaderImg.data, 'JPEG', MARGIN_MM, currentY, USABLE_WIDTH, tableHeaderImg.height);
+                currentY += tableHeaderImg.height;
             }
             
-            pdf.addImage(imgData, 'JPEG', MARGIN_MM, currentY, USABLE_WIDTH, rowHeight);
-            
-            // Draw vector borders for perfect clarity
-            pdf.setDrawColor(0);
-            pdf.setLineWidth(0.2); // Thin lines
-            pdf.rect(MARGIN_MM, currentY, USABLE_WIDTH, rowHeight); // Outer box for the row
-
-            let x_pos = MARGIN_MM;
-            for(let j=0; j < row.cells.length -1; j++){
-                const cell = row.cells[j];
-                const cellWidth = (cell.offsetWidth / tableEl.offsetWidth) * USABLE_WIDTH;
-                x_pos += cellWidth;
-                pdf.line(x_pos, currentY, x_pos, currentY + rowHeight); // Vertical lines
-            }
-
-            // Draw thick outer border for the whole table
-            if (i === 1) { // Title row
-                pdf.setLineWidth(0.5); // Thicker lines
-                pdf.rect(MARGIN_MM, currentY, USABLE_WIDTH, rowHeight);
-            }
-            
+            pdf.addImage(rowImgData, 'JPEG', MARGIN_MM, currentY, USABLE_WIDTH, rowHeight);
             currentY += rowHeight;
         }
 
         document.body.removeChild(printContainer);
         const fileName = `${document.title || 'sunday-schedule'}.pdf`;
         pdf.save(fileName);
+        
         printButton.disabled = false;
         printButton.querySelector('span:last-of-type').textContent = originalButtonText;
     }
