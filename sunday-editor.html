@@ -55,7 +55,7 @@
 
     body {
         margin: 0; padding: 0;
-        font-family: 'Inter', sans-serif;
+        font-family: 'Noto Sans Telugu', sans-serif;
         background-color: var(--body-bg);
         color: var(--text-primary);
         visibility: hidden; opacity: 0;
@@ -74,31 +74,52 @@
     .header-icons .close-icon { display: none; }
     body.menu-open .header-icons .hamburger-icon { display: none; }
     body.menu-open .header-icons .close-icon { display: block; }
+
     .menu-overlay { position: fixed; top: 56px; left: 0; width: 100%; height: calc(100% - 56px); background-color: rgba(0, 0, 0, 0.6); z-index: 998; opacity: 0; visibility: hidden; transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; }
     .menu-overlay.is-open { opacity: 1; visibility: visible; }
     .slide-menu { position: fixed; top: 56px; right: 0; height: calc(100dvh - 56px); width: 320px; max-width: 90%; background-color: var(--menu-new-bg); z-index: 999; transform: translateX(100%); transition: transform 0.3s ease-in-out; display: flex; flex-direction: column; border-left: 1px solid var(--menu-new-border); }
     .slide-menu.is-open { transform: translateX(0); }
+
     .menu-links { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex-grow: 1; }
     .menu-links li a { display: flex; align-items: center; color: var(--menu-new-text); background-color: var(--menu-new-bg); height: 50px; padding: 12px 5px 12px 12px; box-sizing: border-box; text-decoration: none; font-size: 1rem; transition: background-color 0.2s; border-top: 1px dotted #a7a7a7; }
     .menu-links li:first-child a { border-top: none; }
     .menu-links li a:hover { background-color: var(--menu-new-hover); }
+
     .profile-section { padding: 16px; border-top: 1px solid var(--menu-new-border); flex-shrink: 0; background-color: #fafafa; margin-top: auto; }
     .profile-info { display: flex; align-items: center; }
     .profile-name { font-weight: bold; font-size: 1rem; color: #333; word-break: break-all; }
+
     .iconLink-icon { font-family: "jw-icons-external"; font-size: 24px; display: inline-block; color: #757575; width: 30px; margin-right: 10px; text-align: center; }
     .home-icon::before { content: "\e661"; }
     .midweek-icon::before { content: "\e625"; }
     .sunday-icon::before { content: "\e610"; }
     .members-icon::before { content: "\e695"; }
+
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; border-radius: var(--radius-md); font-size: 1rem; font-weight: 600; cursor: pointer; border: none; text-decoration: none; background-color: var(--primary-color); color: white; transition: background-color 0.2s; }
+    .btn:hover:not(:disabled) { background-color: var(--primary-hover); }
+    .btn:disabled { cursor: not-allowed; opacity: 0.6; }
+
+    .status-indicator { 
+        font-size: 12px; 
+        font-weight: 600; 
+        padding: 4px 10px; 
+        border-radius: 999px; 
+        display: flex; 
+        align-items: center; 
+        gap: 6px; 
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    .status-indicator::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background-color: currentColor; }
+    .status-indicator[data-status="synced"] { color: var(--success-color); background-color: #eaf5ea; }
+    .status-indicator[data-status="syncing"] { color: var(--warning-color); background-color: #fffbeb; }
+    .status-indicator[data-status="error"] { color: var(--danger-color); background-color: #fde8e8; }
+    .status-indicator:hover { opacity: 0.9; }
     /* END: NEW NAVBAR STYLES */
 
     /* START: ORIGINAL EDITOR STYLES */
     *, *::before, *::after { box-sizing: border-box; }
     html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-    
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; border-radius: var(--radius-md); font-size: 1rem; font-weight: 600; cursor: pointer; border: none; text-decoration: none; background-color: var(--primary-color); color: white; transition: background-color 0.2s; }
-    .btn:hover:not(:disabled) { background-color: var(--primary-hover); }
-    .btn:disabled { cursor: not-allowed; opacity: 0.6; }
     
     .hidden { display: none !important; }
     main { padding: calc(56px + 20px) 20px 20px; }
@@ -142,7 +163,7 @@
         overflow-y: auto;
     }
     .context-menu-item, .member-dropdown-item, .topic-dropdown-item { 
-        font-family: 'Inter', sans-serif; 
+        font-family: 'Noto Sans Telugu', sans-serif; 
         display: block; 
         width: 100%; 
         padding: 8px 12px; 
@@ -257,6 +278,87 @@
         z-index: 1;
     }
 
+    /* Mobile View Styles */
+    .mobile-view-container { display: none; }
+    
+    @media (max-width: 768px) {
+        main { padding: 56px 0 0 0; }
+        .master-container { padding: 16px; border-radius: 0; box-shadow: none; }
+        .page-controls { padding: 0 16px; margin-bottom: 16px; }
+        .schedule-table { display: none; }
+        .mobile-view-container { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 1.5rem; 
+        }
+        
+        .mobile-week-card {
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            background: var(--surface-color);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .mobile-week-header {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--primary-color);
+            text-align: center;
+        }
+        
+        .mobile-field-group {
+            margin-bottom: 16px;
+        }
+        
+        .mobile-field-label {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            display: block;
+        }
+        
+        .mobile-dropdown {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background-color: #f9fafb;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-family: 'Noto Sans Telugu', sans-serif;
+        }
+        
+        .mobile-special-event {
+            color: red;
+            font-weight: 700;
+            text-align: center;
+            font-size: 1.1rem;
+            margin: 16px 0;
+            padding: 12px;
+            background-color: #fff5f5;
+            border-radius: var(--radius-md);
+            border: 1px solid #fed7d7;
+        }
+        
+        .mobile-date-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background-color: #f9fafb;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-family: 'Noto Sans Telugu', sans-serif;
+        }
+    }
+
     /* Add to your existing CSS */
     .pdf-header .title-block {
         text-align: center;
@@ -289,6 +391,9 @@
     <div class="top-bar">
         <a href="./sunday-dashboard.html" class="mobileLogo" title="Sunday Schedules"></a>
         <div class="header-right-controls">
+            <div class="status-indicator" data-status="synced" id="sync-button" title="Click to sync">
+                <span>Synced</span>
+            </div>
             <div class="header-icons" id="menu-toggle-button">
                 <svg class="hamburger-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M22.5 7h-21a.5.5 0 010-1h21a.5.5 0 010 1zM22.5 13h-21a.5.5 0 010-1h21a.5.5 0 010 1zM22.5 19h-21a.5.5 0 010-1h21a.5.5 0 010 1z"></path></svg>
                 <svg class="close-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12.707 12l6.146-6.146a.5.5 0 00-.707-.707L12 11.293 5.854 5.146a.5.5 0 00-.707.707L11.293 12l-6.147 6.146a.5.5 0 10.707.707L12 12.707l6.146 6.146a.5.5 0 00.707-.707z"></path></svg>
@@ -377,12 +482,14 @@
     let activeRowForEvents = null;
     let members = { brothers: [], sisters: [] };
     let activeCellForDropdown = null;
+    let isSaving = false;
 
     const scheduleWrapper = document.getElementById('schedule-content-wrapper');
     const dateSelectionModal = document.getElementById('date-selection-modal');
     const eventContextMenu = document.getElementById('event-context-menu');
     const memberDropdown = document.getElementById('member-dropdown');
     const topicDropdown = document.getElementById('topic-dropdown');
+    const syncButton = document.getElementById('sync-button');
 
     // Topic definitions
     const topics = {
@@ -396,6 +503,11 @@
         let timeout;
         return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), delay); };
     };
+
+    function updateStatus(text, status) {
+        syncButton.innerHTML = `<span>${text}</span>`;
+        syncButton.dataset.status = status;
+    }
 
     async function fetchMembers() {
         if (!currentUser) return;
@@ -482,10 +594,14 @@
                         ${data.tableHTML}
                     </tbody>
                 </table>
+                <div class="mobile-view-container" id="mobile-view-container"></div>
             </main>
         `;
         
-        // Add dropdown functionality to cells
+        // Create mobile view
+        createMobileView();
+        
+        // Add dropdown functionality to desktop cells
         scheduleWrapper.querySelectorAll('tbody td').forEach((cell, index) => {
             const row = cell.parentElement;
             const cellIndex = cell.cellIndex;
@@ -513,7 +629,104 @@
         document.getElementById('app-container').classList.remove('hidden');
     }
 
+    function createMobileView() {
+        const mobileContainer = document.getElementById('mobile-view-container');
+        const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
+        const rows = Array.from(tableBody.querySelectorAll('tr'));
+        
+        mobileContainer.innerHTML = '';
+        
+        rows.forEach((row, rowIndex) => {
+            const cells = Array.from(row.cells);
+            const dateCell = cells[0];
+            const topicCell = cells[1];
+            const speakerCell = cells[2];
+            const chairmanCell = cells[3];
+            const readerCell = cells[4];
+            
+            const weekCard = document.createElement('div');
+            weekCard.className = 'mobile-week-card';
+            weekCard.dataset.rowIndex = rowIndex;
+            
+            // Check if this is a special event row
+            const isSpecialEvent = topicCell.classList.contains('special-event');
+            
+            if (isSpecialEvent) {
+                // Special event layout
+                weekCard.innerHTML = `
+                    <div class="mobile-week-header">${dateCell.textContent}</div>
+                    <div class="mobile-special-event">${topicCell.textContent}</div>
+                `;
+            } else {
+                // Normal week layout
+                weekCard.innerHTML = `
+                    <div class="mobile-week-header">${dateCell.textContent}</div>
+                    <div class="mobile-field-group">
+                        <label class="mobile-field-label">ప్రసంగ అంశం</label>
+                        <select class="mobile-dropdown mobile-topic" data-row="${rowIndex}" data-cell="1">
+                            <option value="">Select Topic</option>
+                            ${Object.entries(topics).map(([topicName, topicText]) => 
+                                `<option value="${topicText}" ${topicCell.textContent === topicText ? 'selected' : ''}>${topicName}</option>`
+                            ).join('')}
+                        </select>
+                    </div>
+                    <div class="mobile-field-group">
+                        <label class="mobile-field-label">ప్రసంగీకుడు</label>
+                        <select class="mobile-dropdown mobile-speaker" data-row="${rowIndex}" data-cell="2">
+                            <option value="">Select Speaker</option>
+                            ${members.brothers.map(brother => 
+                                `<option value="${brother.name}" ${speakerCell.textContent === brother.name ? 'selected' : ''}>${brother.name}${brother.isServant ? ' (Servant)' : ''}</option>`
+                            ).join('')}
+                        </select>
+                    </div>
+                    <div class="mobile-field-group">
+                        <label class="mobile-field-label">చైర్మన్</label>
+                        <select class="mobile-dropdown mobile-chairman" data-row="${rowIndex}" data-cell="3">
+                            <option value="">Select Chairman</option>
+                            ${members.brothers.map(brother => 
+                                `<option value="${brother.name}" ${chairmanCell.textContent === brother.name ? 'selected' : ''}>${brother.name}${brother.isServant ? ' (Servant)' : ''}</option>`
+                            ).join('')}
+                        </select>
+                    </div>
+                    <div class="mobile-field-group">
+                        <label class="mobile-field-label">కావలికోట రీడర్</label>
+                        <select class="mobile-dropdown mobile-reader" data-row="${rowIndex}" data-cell="4">
+                            <option value="">Select Reader</option>
+                            ${members.brothers.map(brother => 
+                                `<option value="${brother.name}" ${readerCell.textContent === brother.name ? 'selected' : ''}>${brother.name}${brother.isServant ? ' (Servant)' : ''}</option>`
+                            ).join('')}
+                        </select>
+                    </div>
+                `;
+            }
+            
+            mobileContainer.appendChild(weekCard);
+        });
+        
+        // Add event listeners to mobile dropdowns
+        mobileContainer.querySelectorAll('.mobile-dropdown').forEach(dropdown => {
+            dropdown.addEventListener('change', function() {
+                const rowIndex = this.dataset.row;
+                const cellIndex = this.dataset.cell;
+                const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
+                const targetCell = tableBody.rows[rowIndex].cells[cellIndex];
+                targetCell.textContent = this.value;
+                debouncedSave();
+            });
+        });
+    }
+
     const debouncedSave = debounce(() => {
+        if (isSaving) return;
+        manualSave();
+    }, 1500);
+
+    function manualSave() {
+        if (isSaving) return;
+        
+        isSaving = true;
+        updateStatus('Syncing...', 'syncing');
+        
         const subtitleEl = scheduleWrapper.querySelector('.subtitle');
         const tableBodyEl = scheduleWrapper.querySelector('.schedule-table tbody');
         if (!subtitleEl || !tableBodyEl) return;
@@ -522,9 +735,18 @@
             dateRange: subtitleEl.textContent,
             tableHTML: tableBodyEl.innerHTML
         };
+        
         userSchedulesCollection.doc(currentScheduleId).update(payload)
-            .catch(err => console.error("Save failed:", err));
-    }, 1500);
+            .then(() => {
+                updateStatus('Synced', 'synced');
+                isSaving = false;
+            })
+            .catch(err => {
+                console.error("Save failed:", err);
+                updateStatus('Error', 'error');
+                isSaving = false;
+            });
+    }
 
     function initCreationFlow() {
         const dateList = document.getElementById('date-checklist');
@@ -639,6 +861,8 @@
                 cell.classList.remove('editable-cell');
             });
         }
+        // Update mobile view
+        createMobileView();
         debouncedSave();
     }
     
@@ -907,6 +1131,9 @@
         });
         menuOverlay.addEventListener('click', closeMenu);
 
+        // Sync button functionality
+        syncButton.addEventListener('click', manualSave);
+
         // App-specific UI
         document.getElementById('print-button').addEventListener('click', generatePdf);
         document.getElementById('cancel-creation').addEventListener('click', () => window.location.href = './sunday-dashboard.html');
@@ -924,6 +1151,8 @@
             const item = e.target.closest('.member-dropdown-item');
             if (item && activeCellForDropdown) {
                 activeCellForDropdown.textContent = item.dataset.name;
+                // Update mobile view
+                createMobileView();
                 debouncedSave();
             }
             memberDropdown.style.display = 'none';
@@ -934,6 +1163,8 @@
             const item = e.target.closest('.topic-dropdown-item');
             if (item && activeCellForDropdown) {
                 activeCellForDropdown.textContent = item.dataset.topic;
+                // Update mobile view
+                createMobileView();
                 debouncedSave();
             }
             topicDropdown.style.display = 'none';
