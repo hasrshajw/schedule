@@ -374,46 +374,46 @@
     async function generatePdf() {
         const printButton = document.getElementById('print-button');
         printButton.disabled = true;
-        printButton.querySelector('span:last-child').textContent = 'Generating...';
+        printButton.querySelector('span:last-child').textContent = 'Generating... Please wait 5 seconds.'; // Update text to inform user
 
-        // --- NEW LOGIC: Wait for fonts to be ready ---
-        await document.fonts.ready;
-
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('l', 'mm', 'a4'); // 'l' for landscape
-        const contentToPrint = document.getElementById('schedule-content-wrapper');
-        
-        const actionElements = contentToPrint.querySelectorAll('.actions-col, .event-btn');
-        actionElements.forEach(el => el.style.display = 'none');
-        
-        try {
-            const canvas = await html2canvas(contentToPrint, {
-                scale: 2,
-                useCORS: true,
-                backgroundColor: '#ffffff'
-            });
-
-            const imgData = canvas.toDataURL('image/jpeg', 0.9);
-            const A4_WIDTH_MM = 297;
-            const A4_HEIGHT_MM = 210;
+        // --- NEW: Force a 5-second delay ---
+        setTimeout(async () => {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('l', 'mm', 'a4'); // 'l' for landscape
+            const contentToPrint = document.getElementById('schedule-content-wrapper');
             
-            const imgProps = pdf.getImageProperties(imgData);
-            const pdfWidth = A4_WIDTH_MM;
-            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+            const actionElements = contentToPrint.querySelectorAll('.actions-col, .event-btn');
+            actionElements.forEach(el => el.style.display = 'none');
             
-            pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
-        } catch (error) {
-            console.error("PDF generation failed:", error);
-            alert("Sorry, there was an error creating the PDF.");
-        } finally {
-            // This block ensures elements are restored even if an error occurs
-            actionElements.forEach(el => el.style.display = '');
-            const fileName = `${document.title}.pdf`;
-            pdf.save(fileName);
-    
-            printButton.disabled = false;
-            printButton.querySelector('span:last-child').textContent = 'Download PDF';
-        }
+            try {
+                const canvas = await html2canvas(contentToPrint, {
+                    scale: 2,
+                    useCORS: true,
+                    backgroundColor: '#ffffff'
+                });
+
+                const imgData = canvas.toDataURL('image/jpeg', 0.9);
+                const A4_WIDTH_MM = 297;
+                const A4_HEIGHT_MM = 210;
+                
+                const imgProps = pdf.getImageProperties(imgData);
+                const pdfWidth = A4_WIDTH_MM;
+                const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+                
+                pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+
+            } catch (error) {
+                console.error("PDF generation failed:", error);
+                alert("Sorry, there was an error creating the PDF.");
+            } finally {
+                actionElements.forEach(el => el.style.display = '');
+                const fileName = `${document.title}.pdf`;
+                pdf.save(fileName);
+        
+                printButton.disabled = false;
+                printButton.querySelector('span:last-child').textContent = 'Download PDF';
+            }
+        }, 5000); // 5000 milliseconds = 5 seconds
     }
 
     document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
