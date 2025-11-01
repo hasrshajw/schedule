@@ -10,7 +10,8 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf-autotable.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf-autotable.umd.min.js"></script>
+
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -132,7 +133,7 @@
 (function() {
     'use strict';
     
-    // --- START: NEW HELPER FUNCTION ---
+    // --- START: HELPER FUNCTION ---
     /**
      * Fetches a local file and converts it to a Base64 string.
      * @param {string} url The path to the font file (e.g., 'NotoSansTelugu-Regular.ttf')
@@ -157,7 +158,7 @@
                 return window.btoa(binary);
             });
     }
-    // --- END: NEW HELPER FUNCTION ---
+    // --- END: HELPER FUNCTION ---
     
 
     const firebaseConfig = {
@@ -463,7 +464,7 @@
 
             // 5. Generate the table
             // *** THIS IS THE FIX for 'autoTable is not a function' ***
-            // We call `pdf.autoTable`, which was added by the plugin.
+            // We call `pdf.autoTable`, which was added by the compatible plugin.
             pdf.autoTable({
                 html: tableEl, 
                 startY: 35,
