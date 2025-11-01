@@ -85,85 +85,91 @@
     #cancel-creation { background-color: var(--surface-color); }
     #confirm-creation { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 
-    /* Print container for PDF generation */
-    #print-container { position: absolute; left: -9999px; top: auto; width: 1100px; background: white; }
-    
     /* PDF-specific styles */
-    .pdf-page-container {
-        background: white;
-        padding: 20px;
-        font-family: 'Noto Sans Telugu', sans-serif;
-        width: 1100px;
-        margin-bottom: 20px;
+    #print-container {
+        position: absolute !important;
+        left: -9999px !important;
+        top: 0 !important;
+        width: 1100px !important;
+        background: white !important;
+        padding: 20px !important;
+        font-family: 'Noto Sans Telugu', sans-serif !important;
     }
-    
-    .pdf-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-family: 'Noto Sans Telugu', sans-serif;
-        border: 2px solid #000;
+
+    #print-container .schedule-table {
+        border-collapse: collapse !important;
+        width: 100% !important;
+        table-layout: fixed !important;
     }
-    
-    .pdf-table th,
-    .pdf-table td {
-        border: 1px solid #000;
-        padding: 12px 8px;
-        font-family: 'Noto Sans Telugu', sans-serif;
-        font-weight: 700;
-        height: 45px;
-        vertical-align: middle;
-        box-sizing: border-box;
+
+    #print-container .schedule-table th,
+    #print-container .schedule-table td {
+        border: 1px solid #000 !important;
+        padding: 12px 8px !important;
+        font-family: 'Noto Sans Telugu', sans-serif !important;
+        font-weight: 700 !important;
+        height: 45px !important;
+        vertical-align: middle !important;
+        box-sizing: border-box !important;
     }
-    
-    .pdf-table .top-empty-row {
-        border: none;
-        border-bottom: 2px solid #000;
+
+    /* First row border fix */
+    #print-container .schedule-table .top-empty-row {
+        border: none !important;
+        border-bottom: 2px solid #000 !important;
     }
-    
-    .pdf-table .top-empty-row th {
-        border: none;
-        border-bottom: 2px solid #000;
-        background: white;
+
+    #print-container .schedule-table .top-empty-row th {
+        border: none !important;
+        border-bottom: 2px solid #000 !important;
+        background: white !important;
     }
-    
-    .pdf-header {
-        text-align: center;
-        margin-bottom: 20px;
+
+    /* SVG divider fix */
+    #print-container .svg-divider {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        width: 400px !important;
+        height: 5px !important;
     }
-    
-    .pdf-title {
-        font-family: 'Noto Sans Telugu', sans-serif;
-        font-weight: 700;
-        color: rgb(97, 40, 0);
-        margin: 0;
+
+    /* Hide action elements in PDF */
+    #print-container .actions-col,
+    #print-container .event-btn {
+        display: none !important;
     }
-    
-    .pdf-subtitle-container {
-        position: relative;
-        display: inline-block;
-        margin-top: 0;
+
+    /* Ensure proper header rendering */
+    #print-container .schedule-display-header {
+        text-align: center !important;
+        margin-bottom: 20px !important;
     }
-    
-    .pdf-subtitle {
-        font-family: 'Noto Sans Telugu', sans-serif;
-        font-weight: 500;
-        background: white;
-        padding: 2px 8px;
-        display: inline-block;
-        position: relative;
-        z-index: 2;
+
+    #print-container .title-block h1 {
+        font-family: 'Noto Sans Telugu', sans-serif !important;
+        font-weight: 700 !important;
+        color: rgb(97, 40, 0) !important;
+        margin: 0 !important;
     }
-    
-    .pdf-divider {
-        width: 400px;
-        height: 5px;
-        display: block;
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-        top: 50%;
-        margin-top: -2.5px;
-        z-index: 1;
+
+    #print-container .subtitle {
+        font-family: 'Noto Sans Telugu', sans-serif !important;
+        font-weight: 500 !important;
+        background: white !important;
+        padding: 2px 8px !important;
+        display: inline-block !important;
+        position: relative !important;
+        z-index: 2 !important;
+    }
+
+    /* Backup divider in case SVG doesn't render */
+    .svg-divider-backup {
+        background: linear-gradient(to right, #093261, #ffffff, #093261) !important;
+        height: 5px !important;
+        width: 400px !important;
+        margin: 0 auto !important;
+        display: none !important;
     }
 </style>
 </head>
@@ -462,175 +468,202 @@
         const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_MM * 2);
 
         try {
-            // Get the original schedule content
+            // Create print container
+            const printContainer = document.createElement('div');
+            printContainer.id = 'print-container';
+            printContainer.style.position = 'absolute';
+            printContainer.style.left = '-9999px';
+            printContainer.style.top = '0';
+            printContainer.style.width = '1100px';
+            printContainer.style.background = 'white';
+            printContainer.style.padding = '20px';
+            printContainer.style.fontFamily = "'Noto Sans Telugu', sans-serif";
+            
+            document.body.appendChild(printContainer);
+
+            // Clone the content
             const contentToPrint = document.getElementById('schedule-content-wrapper');
+            const clone = contentToPrint.cloneNode(true);
             
-            // Extract header information
-            const title = contentToPrint.querySelector('.title-block h1')?.textContent || 'బహిరంగ ప్రసంగాల పట్టిక';
-            const subtitle = contentToPrint.querySelector('.subtitle')?.textContent || '';
-            const tableElement = contentToPrint.querySelector('.schedule-table');
+            // Hide action elements
+            const actionElements = clone.querySelectorAll('.actions-col, .event-btn');
+            actionElements.forEach(el => el.style.display = 'none');
             
-            if (!tableElement) {
-                throw new Error('Table not found');
+            // Fix first cell borders
+            const topEmptyRow = clone.querySelector('.top-empty-row');
+            if (topEmptyRow) {
+                topEmptyRow.style.border = 'none';
+                topEmptyRow.style.borderBottom = '2px solid #000';
+                const firstCell = topEmptyRow.querySelector('th');
+                if (firstCell) {
+                    firstCell.style.border = 'none';
+                    firstCell.style.borderBottom = '2px solid #000';
+                }
             }
 
-            // Get all data rows (excluding header rows)
-            const tbody = tableElement.querySelector('tbody');
-            const dataRows = Array.from(tbody.querySelectorAll('tr')).filter(row => 
-                !row.classList.contains('header-row') && 
-                !row.querySelector('.actions-col')
-            );
+            // Ensure SVG visibility and add backup
+            const svgDivider = clone.querySelector('.svg-divider');
+            if (svgDivider) {
+                svgDivider.style.display = 'block';
+                svgDivider.style.visibility = 'visible';
+                svgDivider.style.opacity = '1';
+                
+                // Add backup divider
+                const svgParent = svgDivider.parentElement;
+                const backupDiv = document.createElement('div');
+                backupDiv.className = 'svg-divider-backup';
+                backupDiv.style.width = '400px';
+                backupDiv.style.height = '5px';
+                backupDiv.style.background = 'linear-gradient(to right, #093261, #ffffff, #093261)';
+                backupDiv.style.margin = '0 auto';
+                svgParent.appendChild(backupDiv);
+            }
 
-            // Calculate approximate row height
-            let rowHeight = 15; // Default row height in mm
+            // Apply Telugu font to all elements
+            const allElements = clone.querySelectorAll('*');
+            allElements.forEach(el => {
+                el.style.fontFamily = "'Noto Sans Telugu', sans-serif";
+                el.style.fontWeight = '700';
+            });
+
+            // Enhanced table styling for PDF
+            const table = clone.querySelector('.schedule-table');
+            if (table) {
+                table.style.fontFamily = "'Noto Sans Telugu', sans-serif";
+                table.style.borderCollapse = 'collapse';
+                table.style.width = '100%';
+                
+                const allCells = clone.querySelectorAll('th, td');
+                allCells.forEach(cell => {
+                    cell.style.fontFamily = "'Noto Sans Telugu', sans-serif";
+                    cell.style.fontWeight = '700';
+                    cell.style.height = '45px';
+                    cell.style.padding = '12px 8px';
+                    cell.style.border = '1px solid #000';
+                    cell.style.verticalAlign = 'middle';
+                    cell.style.boxSizing = 'border-box';
+                });
+            }
+
+            printContainer.appendChild(clone);
+
+            // Wait for fonts and rendering
+            await document.fonts.ready;
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            // NEW APPROACH: Row-based pagination
+            const tableElement = printContainer.querySelector('.schedule-table');
+            if (!tableElement) throw new Error('Table not found');
+
+            const tbody = tableElement.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
             
-            if (dataRows.length > 0) {
-                // Create a temporary container to measure row height
+            // Calculate approximate row height
+            let sampleRowHeight = 0;
+            if (rows.length > 0) {
                 const tempContainer = document.createElement('div');
                 tempContainer.style.position = 'absolute';
                 tempContainer.style.left = '-9999px';
-                tempContainer.style.top = '0';
-                tempContainer.style.width = '1100px';
                 tempContainer.style.background = 'white';
                 tempContainer.style.padding = '20px';
+                tempContainer.style.width = '1100px';
                 
+                const rowClone = rows[0].cloneNode(true);
                 const tempTable = document.createElement('table');
-                tempTable.className = 'pdf-table';
+                tempTable.className = 'schedule-table';
                 tempTable.style.width = '100%';
+                tempTable.style.borderCollapse = 'collapse';
                 
-                // Add header
-                const thead = tableElement.querySelector('thead').cloneNode(true);
-                tempTable.appendChild(thead);
+                // Add header for proper measurement
+                const theadClone = tableElement.querySelector('thead').cloneNode(true);
+                tempTable.appendChild(theadClone);
                 
-                // Add one sample row
-                const sampleRow = dataRows[0].cloneNode(true);
-                const sampleTbody = document.createElement('tbody');
-                sampleTbody.appendChild(sampleRow);
-                tempTable.appendChild(sampleTbody);
-                
+                const tempTbody = document.createElement('tbody');
+                tempTbody.appendChild(rowClone);
+                tempTable.appendChild(tempTbody);
                 tempContainer.appendChild(tempTable);
                 document.body.appendChild(tempContainer);
-                
-                // Measure the height
-                const canvas = await html2canvas(tempContainer, {
+
+                const tempCanvas = await html2canvas(tempContainer, {
                     scale: 1,
                     useCORS: true,
                     backgroundColor: '#ffffff',
                     logging: false
                 });
                 
-                const imgProps = { width: canvas.width, height: canvas.height };
-                const totalHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
-                rowHeight = totalHeight - 60; // Subtract header height
-                
                 document.body.removeChild(tempContainer);
+                
+                const imgProps = { width: tempCanvas.width, height: tempCanvas.height };
+                sampleRowHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
             }
 
-            // Calculate how many rows fit per page
-            const headerHeight = 60; // Approximate header height in mm
+            // Calculate rows per page
+            const headerHeight = 80; // Approximate header height in mm
             const availableRowHeight = USABLE_HEIGHT - headerHeight;
-            const rowsPerPage = Math.floor(availableRowHeight / rowHeight);
-            
-            // Ensure at least 5 rows per page
-            const finalRowsPerPage = Math.max(5, rowsPerPage);
+            const rowsPerPage = Math.max(1, Math.floor(availableRowHeight / sampleRowHeight));
 
-            console.log(`Row height: ${rowHeight}mm, Rows per page: ${finalRowsPerPage}`);
+            let currentPage = 0;
+            let processedRows = 0;
 
-            let currentRow = 0;
-            let pageNumber = 0;
-
-            while (currentRow < dataRows.length) {
-                if (pageNumber > 0) {
+            while (processedRows < rows.length) {
+                if (currentPage > 0) {
                     pdf.addPage();
                 }
 
-                // Create page container
+                // Create a container for current page
                 const pageContainer = document.createElement('div');
-                pageContainer.className = 'pdf-page-container';
+                pageContainer.style.background = 'white';
+                pageContainer.style.padding = '20px';
+                pageContainer.style.fontFamily = "'Noto Sans Telugu', sans-serif";
+                pageContainer.style.width = '1100px';
 
-                // Create header for this page
-                const headerDiv = document.createElement('div');
-                headerDiv.className = 'pdf-header';
+                // Clone header for each page
+                const headerClone = clone.querySelector('.schedule-display-header').cloneNode(true);
                 
-                const titleDiv = document.createElement('div');
-                titleDiv.className = 'pdf-title';
-                titleDiv.textContent = title;
-                headerDiv.appendChild(titleDiv);
+                // Ensure SVG is visible in cloned header
+                const clonedSvg = headerClone.querySelector('.svg-divider');
+                const clonedBackup = headerClone.querySelector('.svg-divider-backup');
+                if (clonedSvg) {
+                    clonedSvg.style.display = 'block';
+                    clonedSvg.style.visibility = 'visible';
+                    clonedSvg.style.opacity = '1';
+                }
                 
-                const subtitleContainer = document.createElement('div');
-                subtitleContainer.className = 'pdf-subtitle-container';
-                
-                const subtitleDiv = document.createElement('div');
-                subtitleDiv.className = 'pdf-subtitle';
-                subtitleDiv.textContent = subtitle;
-                subtitleContainer.appendChild(subtitleDiv);
-                
-                // Create SVG divider
-                const svgDivider = document.createElement('svg');
-                svgDivider.className = 'pdf-divider';
-                svgDivider.setAttribute('viewBox', '0 0 24039.797 260');
-                svgDivider.setAttribute('preserveAspectRatio', 'xMidYMid slice');
-                svgDivider.innerHTML = `
-                    <defs>
-                        <radialGradient id="pdfGradient" gradientUnits="userSpaceOnUse" r="12020.601" cx="12019.898" cy="130" fx="12019.898" fy="130">
-                            <stop stop-color="#093261" stop-opacity="1" offset="0"></stop>
-                            <stop stop-color="#ffffff" stop-opacity="1" offset="1"></stop>
-                        </radialGradient>
-                    </defs>
-                    <rect x="0" y="0" width="24039.797" height="260" fill="url(#pdfGradient)"></rect>
-                `;
-                subtitleContainer.appendChild(svgDivider);
-                
-                headerDiv.appendChild(subtitleContainer);
-                pageContainer.appendChild(headerDiv);
+                pageContainer.appendChild(headerClone);
 
-                // Create table for this page
+                // Create table for current page
                 const pageTable = document.createElement('table');
-                pageTable.className = 'pdf-table';
+                pageTable.className = 'schedule-table';
+                pageTable.style.width = '100%';
+                pageTable.style.borderCollapse = 'collapse';
+                pageTable.style.fontFamily = "'Noto Sans Telugu', sans-serif";
 
                 // Clone table header
                 const theadClone = tableElement.querySelector('thead').cloneNode(true);
                 
-                // Fix first cell borders
-                const topEmptyRow = theadClone.querySelector('.top-empty-row');
-                if (topEmptyRow) {
-                    topEmptyRow.className = 'top-empty-row';
-                    topEmptyRow.style.border = 'none';
-                    topEmptyRow.style.borderBottom = '2px solid #000';
-                    
-                    const firstCell = topEmptyRow.querySelector('th');
-                    if (firstCell) {
-                        firstCell.style.border = 'none';
-                        firstCell.style.borderBottom = '2px solid #000';
+                // Fix first cell borders in cloned header
+                const clonedTopEmptyRow = theadClone.querySelector('.top-empty-row');
+                if (clonedTopEmptyRow) {
+                    clonedTopEmptyRow.style.border = 'none';
+                    clonedTopEmptyRow.style.borderBottom = '2px solid #000';
+                    const clonedFirstCell = clonedTopEmptyRow.querySelector('th');
+                    if (clonedFirstCell) {
+                        clonedFirstCell.style.border = 'none';
+                        clonedFirstCell.style.borderBottom = '2px solid #000';
                     }
                 }
 
-                // Remove action column from header
-                const headerRows = theadClone.querySelectorAll('tr');
-                headerRows.forEach(row => {
-                    const actionCol = row.querySelector('.actions-col');
-                    if (actionCol) {
-                        actionCol.remove();
-                    }
-                });
-
                 pageTable.appendChild(theadClone);
 
-                // Create tbody for data rows
+                // Create tbody for current page rows
                 const tbodyClone = document.createElement('tbody');
                 
                 // Add rows for current page
-                const endRow = Math.min(currentRow + finalRowsPerPage, dataRows.length);
-                for (let i = currentRow; i < endRow; i++) {
-                    const rowClone = dataRows[i].cloneNode(true);
+                const endRow = Math.min(processedRows + rowsPerPage, rows.length);
+                for (let i = processedRows; i < endRow; i++) {
+                    const rowClone = rows[i].cloneNode(true);
                     
-                    // Remove action column from data rows
-                    const actionCol = rowClone.querySelector('.actions-col');
-                    if (actionCol) {
-                        actionCol.remove();
-                    }
-                    
-                    // Ensure proper styling
+                    // Ensure proper styling for cloned rows
                     const cells = rowClone.querySelectorAll('th, td');
                     cells.forEach(cell => {
                         cell.style.fontFamily = "'Noto Sans Telugu', sans-serif";
@@ -647,7 +680,7 @@
                 pageTable.appendChild(tbodyClone);
                 pageContainer.appendChild(pageTable);
 
-                // Create temporary container for capturing
+                // Add page container to temporary container for capture
                 const tempContainer = document.createElement('div');
                 tempContainer.style.position = 'absolute';
                 tempContainer.style.left = '-9999px';
@@ -655,24 +688,27 @@
                 tempContainer.appendChild(pageContainer);
                 document.body.appendChild(tempContainer);
 
-                // Wait for fonts and rendering
-                await document.fonts.ready;
-                await new Promise(resolve => setTimeout(resolve, 100));
-
                 // Capture the page
                 const canvas = await html2canvas(pageContainer, {
                     scale: 2,
                     useCORS: true,
                     backgroundColor: '#ffffff',
                     letterRendering: true,
-                    logging: false
+                    logging: false,
+                    onclone: function(clonedDoc) {
+                        // Ensure fonts are applied
+                        const clonedElements = clonedDoc.querySelectorAll('*');
+                        clonedElements.forEach(el => {
+                            el.style.fontFamily = "'Noto Sans Telugu', sans-serif";
+                        });
+                    }
                 });
 
                 const imgData = canvas.toDataURL('image/png', 1.0);
                 const imgProps = pdf.getImageProperties(imgData);
                 const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
 
-                // Center the content vertically
+                // Center the content vertically on the page
                 const verticalPosition = Math.max(0, (USABLE_HEIGHT - imgHeight) / 2);
                 
                 pdf.addImage(
@@ -687,13 +723,25 @@
                 // Clean up
                 document.body.removeChild(tempContainer);
                 
-                currentRow = endRow;
-                pageNumber++;
+                processedRows = endRow;
+                currentPage++;
             }
+
+            // Final cleanup
+            document.body.removeChild(printContainer);
+
+            const fileName = `${document.title || 'sunday-schedule'}.pdf`;
+            pdf.save(fileName);
 
         } catch (error) {
             console.error("PDF generation failed:", error);
             alert("Sorry, there was an error creating the PDF. Please try again.");
+            
+            // Clean up any remaining elements
+            const printContainer = document.getElementById('print-container');
+            if (printContainer && document.body.contains(printContainer)) {
+                document.body.removeChild(printContainer);
+            }
         } finally {
             printButton.disabled = false;
             printButton.querySelector('span:last-child').textContent = 'Download PDF';
