@@ -441,11 +441,10 @@
         opacity: 0.5; 
     }
 
-    /* Enhanced dropdown styling */
-    #event-context-menu, #member-dropdown, #topic-dropdown { 
-        position: fixed; 
-        display: none; 
-        background: var(--surface-color); 
+    /* ENHANCED DESKTOP DROPDOWN STYLING - Real dropdown look */
+    .desktop-dropdown { 
+        position: absolute; 
+        background: white; 
         border-radius: var(--radius-md); 
         box-shadow: var(--shadow-lg); 
         z-index: 1001; 
@@ -454,28 +453,29 @@
         border: 1px solid var(--border-color); 
         max-height: 300px;
         overflow-y: auto;
+        display: none;
     }
-    .context-menu-item, .member-dropdown-item, .topic-dropdown-item { 
-        font-family: 'Inter', sans-serif; 
-        display: block; 
-        width: 100%; 
-        padding: 10px 12px; 
-        cursor: pointer; 
-        font-size: 14px; 
-        border-radius: 6px; 
-        background: none; 
-        border: none; 
-        text-align: left; 
-        transition: background-color 0.15s ease;
-    }
-    .context-menu-item:hover, .member-dropdown-item:hover, .topic-dropdown-item:hover { 
-        background: #f7fafc; 
-    }
-    .member-dropdown-item { 
+    
+    .desktop-dropdown-item { 
         display: flex; 
-        justify-content: space-between; 
         align-items: center; 
+        width: 100%; 
+        padding: 12px 16px; 
+        border: none; 
+        background: none; 
+        cursor: pointer; 
+        transition: background-color 0.2s;
+        font-family: 'Noto Sans Telugu', sans-serif;
+        font-size: 0.9rem;
+        text-align: left;
+        color: var(--text-primary);
+        border-radius: 6px;
     }
+    
+    .desktop-dropdown-item:hover {
+        background-color: #f8fafc;
+    }
+    
     .servant-tag { 
         font-size: 0.75rem; 
         font-weight: 600; 
@@ -483,6 +483,8 @@
         background-color: var(--primary-light); 
         padding: 4px 8px; 
         border-radius: 12px; 
+        margin-left: auto;
+        margin-right: 8px;
     }
 
     /* Enhanced cell styling for better UX */
@@ -638,6 +640,110 @@
     #confirm-creation:hover {
         background-color: var(--primary-hover);
         border-color: var(--primary-hover);
+    }
+
+    /* MOBILE BOTTOM SHEET STYLES */
+    .dropdown-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 1100;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(4px);
+    }
+    
+    .dropdown-backdrop.active {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    .dropdown-container {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        border-radius: 24px 24px 0 0;
+        z-index: 1101;
+        transform: translateY(100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        max-height: 80vh;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 -10px 30px rgba(0,0,0,0.2);
+    }
+    
+    .dropdown-container.active {
+        transform: translateY(0);
+    }
+    
+    .dropdown-header {
+        padding: 20px 24px 12px;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-shrink: 0;
+    }
+    
+    .dropdown-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        font-family: 'Noto Sans Telugu', sans-serif;
+    }
+    
+    .dropdown-close {
+        background: none;
+        border: none;
+        padding: 8px;
+        cursor: pointer;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-secondary);
+        transition: background-color 0.2s;
+    }
+    
+    .dropdown-close:hover {
+        background-color: #f5f5f5;
+    }
+    
+    .dropdown-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 8px 0;
+    }
+    
+    .dropdown-item {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        padding: 16px 24px;
+        border: none;
+        background: none;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        font-family: 'Noto Sans Telugu', sans-serif;
+        font-size: 1rem;
+        text-align: left;
+        color: var(--text-primary);
+    }
+    
+    .dropdown-item:hover {
+        background-color: #f8fafc;
+    }
+    
+    .dropdown-item.active {
+        background-color: var(--primary-light);
+        color: var(--primary-color);
+        font-weight: 600;
     }
 
     /* Mobile View Styles */
@@ -919,6 +1025,10 @@
         .svg-divider {
             width: 300px;
         }
+        
+        .desktop-dropdown {
+            display: none !important;
+        }
     }
 
     /* PDF-specific styles */
@@ -1071,15 +1181,24 @@
     </div>
 </div>
 
-<div id="event-context-menu">
-    <button class="context-menu-item" data-event-type="normal">Normal</button>
-    <button class="context-menu-item" data-event-type="co-visit">CO Visit</button>
-    <button class="context-menu-item" data-event-type="assembly">Assembly</button>
-    <button class="context-menu-item" data-event-type="convention">Convention</button>
+<!-- Desktop Dropdown -->
+<div class="desktop-dropdown" id="desktop-dropdown">
+    <!-- Desktop dropdown items will be injected here -->
 </div>
 
-<div id="member-dropdown"></div>
-<div id="topic-dropdown"></div>
+<!-- Mobile Bottom Sheet Components -->
+<div class="dropdown-backdrop" id="dropdown-backdrop"></div>
+<div class="dropdown-container" id="dropdown-container">
+    <div class="dropdown-header">
+        <h3 class="dropdown-title" id="dropdown-title">Select Option</h3>
+        <button class="dropdown-close" id="dropdown-close">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+    </div>
+    <div class="dropdown-content" id="dropdown-content">
+        <!-- Dropdown items will be injected here -->
+    </div>
+</div>
 
 <div id="date-selection-modal" class="modal-overlay">
     <div class="modal-content">
@@ -1118,12 +1237,18 @@
     let activeRowForEvents = null;
     let members = { brothers: [], sisters: [] };
     let activeCellForDropdown = null;
+    let currentDropdownType = null;
 
     const scheduleWrapper = document.getElementById('schedule-content-wrapper');
     const dateSelectionModal = document.getElementById('date-selection-modal');
-    const eventContextMenu = document.getElementById('event-context-menu');
-    const memberDropdown = document.getElementById('member-dropdown');
-    const topicDropdown = document.getElementById('topic-dropdown');
+    const desktopDropdown = document.getElementById('desktop-dropdown');
+
+    // Mobile dropdown elements
+    const dropdownBackdrop = document.getElementById('dropdown-backdrop');
+    const dropdownContainer = document.getElementById('dropdown-container');
+    const dropdownTitle = document.getElementById('dropdown-title');
+    const dropdownContent = document.getElementById('dropdown-content');
+    const dropdownClose = document.getElementById('dropdown-close');
 
     // Topic definitions
     const topics = {
@@ -1227,7 +1352,7 @@
             </main>
         `;
         
-        // Add dropdown functionality to cells - FIXED: Special event cells are not editable
+        // Add dropdown functionality to desktop table cells
         scheduleWrapper.querySelectorAll('tbody td').forEach((cell, index) => {
             const row = cell.parentElement;
             const cellIndex = cell.cellIndex;
@@ -1243,9 +1368,9 @@
                 if (cell.classList.contains('special-event')) return;
                 
                 if (cellIndex === 1) { // Topic column
-                    openTopicDropdown(cell);
+                    openDesktopDropdown('topic', cell);
                 } else { // Brother columns (2, 3, 4)
-                    openMemberDropdown(cell);
+                    openDesktopDropdown('member', cell);
                 }
             });
         });
@@ -1353,8 +1478,7 @@
                 const cellIndex = field.dataset.cell;
                 const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
                 const cell = tableBody.rows[rowIndex].cells[cellIndex];
-                openTopicDropdown(cell);
-                field.classList.add('active');
+                openMobileDropdown('topic', cell, field);
             });
         });
 
@@ -1364,8 +1488,7 @@
                 const cellIndex = field.dataset.cell;
                 const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
                 const cell = tableBody.rows[rowIndex].cells[cellIndex];
-                openMemberDropdown(cell);
-                field.classList.add('active');
+                openMobileDropdown('member', cell, field);
             });
         });
 
@@ -1375,10 +1498,7 @@
                 const rowIndex = btn.dataset.row;
                 const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
                 activeRowForEvents = tableBody.rows[rowIndex];
-                const rect = btn.getBoundingClientRect();
-                eventContextMenu.style.display = 'block';
-                eventContextMenu.style.top = `${rect.bottom}px`;
-                eventContextMenu.style.left = `${rect.left - eventContextMenu.offsetWidth + rect.width}px`;
+                showEventTypeMenu();
             });
         });
 
@@ -1386,9 +1506,200 @@
         mobileContainer.querySelectorAll('.change-event-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const rowIndex = btn.dataset.row;
+                const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
+                activeRowForEvents = tableBody.rows[rowIndex];
                 applyEventType('normal');
             });
         });
+    }
+
+    // Desktop dropdown functions
+    function openDesktopDropdown(type, cell) {
+        currentDropdownType = type;
+        activeCellForDropdown = cell;
+        
+        if (type === 'member') {
+            showDesktopMemberDropdown(cell);
+        } else if (type === 'topic') {
+            showDesktopTopicDropdown(cell);
+        }
+    }
+
+    function showDesktopMemberDropdown(cell) {
+        desktopDropdown.innerHTML = '';
+        
+        // Sort brothers by name
+        const sortedBrothers = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
+        
+        if (sortedBrothers.length === 0) {
+            desktopDropdown.innerHTML = '<div style="padding: 12px 16px; color: var(--text-secondary);">No brothers available</div>';
+        } else {
+            sortedBrothers.forEach(member => {
+                const item = document.createElement('button');
+                item.className = 'desktop-dropdown-item';
+                item.innerHTML = `
+                    <span>${member.name}</span>
+                    ${member.isServant ? '<span class="servant-tag">Servant</span>' : ''}
+                `;
+                item.addEventListener('click', () => selectDesktopDropdownItem(member.name));
+                desktopDropdown.appendChild(item);
+            });
+        }
+        
+        showDesktopDropdown(cell);
+    }
+
+    function showDesktopTopicDropdown(cell) {
+        desktopDropdown.innerHTML = '';
+        
+        Object.entries(topics).forEach(([topicName, topicText]) => {
+            const item = document.createElement('button');
+            item.className = 'desktop-dropdown-item';
+            item.textContent = topicName;
+            item.addEventListener('click', () => selectDesktopDropdownItem(topicText));
+            desktopDropdown.appendChild(item);
+        });
+        
+        showDesktopDropdown(cell);
+    }
+
+    function showDesktopDropdown(cell) {
+        const rect = cell.getBoundingClientRect();
+        desktopDropdown.style.display = 'block';
+        desktopDropdown.style.top = `${rect.bottom}px`;
+        desktopDropdown.style.left = `${rect.left}px`;
+        desktopDropdown.style.width = `${rect.width}px`;
+    }
+
+    function hideDesktopDropdown() {
+        desktopDropdown.style.display = 'none';
+        currentDropdownType = null;
+        activeCellForDropdown = null;
+    }
+
+    function selectDesktopDropdownItem(value) {
+        if (activeCellForDropdown) {
+            activeCellForDropdown.textContent = value;
+            debouncedSave();
+        }
+        hideDesktopDropdown();
+    }
+
+    // Mobile dropdown functions
+    function openMobileDropdown(type, cell, fieldElement) {
+        currentDropdownType = type;
+        activeCellForDropdown = { cell: cell, fieldElement: fieldElement };
+        
+        // Add active class to field
+        fieldElement.classList.add('active');
+        
+        if (type === 'member') {
+            showMobileMemberDropdown();
+        } else if (type === 'topic') {
+            showMobileTopicDropdown();
+        }
+        
+        // Prevent body scrolling
+        document.body.classList.add('dropdown-open');
+    }
+
+    function showMobileMemberDropdown() {
+        dropdownTitle.textContent = 'Select Brother';
+        dropdownContent.innerHTML = '';
+        
+        // Sort brothers by name
+        const sortedBrothers = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
+        
+        if (sortedBrothers.length === 0) {
+            dropdownContent.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-secondary);">No brothers available</div>';
+        } else {
+            sortedBrothers.forEach(member => {
+                const item = document.createElement('button');
+                item.className = 'dropdown-item';
+                item.innerHTML = `
+                    <span>${member.name}</span>
+                    ${member.isServant ? '<span class="servant-tag">Servant</span>' : ''}
+                `;
+                item.addEventListener('click', () => selectMobileDropdownItem(member.name));
+                dropdownContent.appendChild(item);
+            });
+        }
+        
+        showMobileDropdown();
+    }
+
+    function showMobileTopicDropdown() {
+        dropdownTitle.textContent = 'Select Topic';
+        dropdownContent.innerHTML = '';
+        
+        Object.entries(topics).forEach(([topicName, topicText]) => {
+            const item = document.createElement('button');
+            item.className = 'dropdown-item';
+            item.textContent = topicName;
+            item.addEventListener('click', () => selectMobileDropdownItem(topicText));
+            dropdownContent.appendChild(item);
+        });
+        
+        showMobileDropdown();
+    }
+
+    function showEventTypeMenu() {
+        dropdownTitle.textContent = 'Select Event Type';
+        dropdownContent.innerHTML = '';
+        
+        const eventTypes = [
+            { type: 'normal', name: 'Normal' },
+            { type: 'co-visit', name: 'CO Visit' },
+            { type: 'assembly', name: 'Assembly' },
+            { type: 'convention', name: 'Convention' }
+        ];
+        
+        eventTypes.forEach(event => {
+            const item = document.createElement('button');
+            item.className = 'dropdown-item';
+            item.textContent = event.name;
+            item.addEventListener('click', () => {
+                applyEventType(event.type);
+                hideMobileDropdown();
+            });
+            dropdownContent.appendChild(item);
+        });
+        
+        showMobileDropdown();
+    }
+
+    function showMobileDropdown() {
+        dropdownBackdrop.classList.add('active');
+        dropdownContainer.classList.add('active');
+    }
+
+    function hideMobileDropdown() {
+        dropdownBackdrop.classList.remove('active');
+        dropdownContainer.classList.remove('active');
+        
+        // Remove active class from field
+        if (activeCellForDropdown && activeCellForDropdown.fieldElement) {
+            activeCellForDropdown.fieldElement.classList.remove('active');
+        }
+        
+        // Restore body scrolling
+        document.body.classList.remove('dropdown-open');
+        
+        currentDropdownType = null;
+        activeCellForDropdown = null;
+    }
+
+    function selectMobileDropdownItem(value) {
+        if (activeCellForDropdown) {
+            activeCellForDropdown.cell.textContent = value;
+            if (activeCellForDropdown.fieldElement) {
+                const valueSpan = activeCellForDropdown.fieldElement.querySelector('.mobile-field-value');
+                valueSpan.textContent = value;
+                valueSpan.classList.remove('mobile-field-placeholder');
+            }
+            debouncedSave();
+        }
+        hideMobileDropdown();
     }
 
     const debouncedSave = debounce(() => {
@@ -1478,9 +1789,18 @@
         const btn = e.currentTarget;
         activeRowForEvents = btn.closest('tr');
         const rect = btn.getBoundingClientRect();
-        eventContextMenu.style.display = 'block';
-        eventContextMenu.style.top = `${rect.bottom}px`;
-        eventContextMenu.style.left = `${rect.left - eventContextMenu.offsetWidth + rect.width}px`;
+        
+        // For desktop, show a simple dropdown
+        if (window.innerWidth > 768) {
+            showEventTypeMenu();
+            dropdownContainer.style.top = 'auto';
+            dropdownContainer.style.bottom = `${window.innerHeight - rect.top}px`;
+            dropdownContainer.style.left = `${rect.left}px`;
+            dropdownContainer.style.width = '200px';
+            dropdownContainer.style.borderRadius = '12px';
+        } else {
+            showEventTypeMenu();
+        }
     }
     
     function applyEventType(eventType) {
@@ -1524,47 +1844,6 @@
         // Update mobile view
         createMobileView();
         debouncedSave();
-    }
-    
-    function openMemberDropdown(cell) {
-        memberDropdown.innerHTML = '';
-        
-        // Sort brothers by name
-        const sortedBrothers = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
-
-        sortedBrothers.forEach(member => { 
-            const item = document.createElement('button');
-            item.className = 'member-dropdown-item';
-            item.dataset.name = member.name;
-            item.innerHTML = `<span>${member.name}</span>` + (member.isServant ? '<span class="servant-tag">Servant</span>' : '');
-            memberDropdown.appendChild(item);
-        });
-
-        const rect = cell.getBoundingClientRect();
-        memberDropdown.style.display = 'block';
-        memberDropdown.style.top = `${rect.bottom}px`;
-        memberDropdown.style.left = `${rect.left}px`;
-        memberDropdown.style.width = `${Math.max(rect.width, 200)}px`;
-        activeCellForDropdown = cell;
-    }
-
-    function openTopicDropdown(cell) {
-        topicDropdown.innerHTML = '';
-        
-        Object.entries(topics).forEach(([topicName, topicText]) => {
-            const item = document.createElement('button');
-            item.className = 'topic-dropdown-item';
-            item.dataset.topic = topicText;
-            item.textContent = topicName;
-            topicDropdown.appendChild(item);
-        });
-
-        const rect = cell.getBoundingClientRect();
-        topicDropdown.style.display = 'block';
-        topicDropdown.style.top = `${rect.bottom}px`;
-        topicDropdown.style.left = `${rect.left}px`;
-        topicDropdown.style.width = `${Math.max(rect.width, 200)}px`;
-        activeCellForDropdown = cell;
     }
     
     async function generatePdf() {
@@ -1802,61 +2081,20 @@
         });
         document.getElementById('confirm-creation').addEventListener('click', handleCreateSchedule);
 
-        // Enhanced dropdown handling with mousedown for better UX
-        eventContextMenu.addEventListener('mousedown', (e) => {
-            const target = e.target.closest('.context-menu-item');
-            if (target) {
-                applyEventType(target.dataset.eventType);
-                eventContextMenu.style.display = 'none';
-            }
-        });
+        // Enhanced dropdown event listeners
+        dropdownBackdrop.addEventListener('click', hideMobileDropdown);
+        dropdownClose.addEventListener('click', hideMobileDropdown);
 
-        memberDropdown.addEventListener('mousedown', (e) => {
-            const item = e.target.closest('.member-dropdown-item');
-            if (item && activeCellForDropdown) {
-                activeCellForDropdown.textContent = item.dataset.name;
-                debouncedSave();
-                memberDropdown.style.display = 'none';
-                activeCellForDropdown = null;
-                
-                // Remove active class from mobile field
-                document.querySelectorAll('.mobile-field').forEach(field => {
-                    field.classList.remove('active');
-                });
-            }
-        });
-
-        topicDropdown.addEventListener('mousedown', (e) => {
-            const item = e.target.closest('.topic-dropdown-item');
-            if (item && activeCellForDropdown) {
-                activeCellForDropdown.textContent = item.dataset.topic;
-                debouncedSave();
-                topicDropdown.style.display = 'none';
-                activeCellForDropdown = null;
-                
-                // Remove active class from mobile field
-                document.querySelectorAll('.mobile-field').forEach(field => {
-                    field.classList.remove('active');
-                });
-            }
-        });
-
+        // Desktop dropdown event listeners
         document.addEventListener('click', (e) => {
-            if (!eventContextMenu.contains(e.target) && !e.target.closest('.event-btn') && !e.target.closest('.event-menu-btn')) {
-                eventContextMenu.style.display = 'none';
+            if (!desktopDropdown.contains(e.target) && !e.target.closest('.editable-cell')) {
+                hideDesktopDropdown();
             }
-            if (!memberDropdown.contains(e.target) && !e.target.closest('.editable-cell') && !e.target.closest('.mobile-field.member-field')) {
-                memberDropdown.style.display = 'none';
-                document.querySelectorAll('.mobile-field.member-field').forEach(field => {
-                    field.classList.remove('active');
-                });
-            }
-            if (!topicDropdown.contains(e.target) && !e.target.closest('.editable-cell') && !e.target.closest('.mobile-field.topic-field')) {
-                topicDropdown.style.display = 'none';
-                document.querySelectorAll('.mobile-field.topic-field').forEach(field => {
-                    field.classList.remove('active');
-                });
-            }
+        });
+
+        // Prevent dropdown container click from closing dropdown
+        dropdownContainer.addEventListener('click', (e) => {
+            e.stopPropagation();
         });
 
         // Enhanced modal handling
@@ -1874,14 +2112,11 @@
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                if (eventContextMenu.style.display === 'block') {
-                    eventContextMenu.style.display = 'none';
+                if (dropdownContainer.classList.contains('active')) {
+                    hideMobileDropdown();
                 }
-                if (memberDropdown.style.display === 'block') {
-                    memberDropdown.style.display = 'none';
-                }
-                if (topicDropdown.style.display === 'block') {
-                    topicDropdown.style.display = 'none';
+                if (desktopDropdown.style.display === 'block') {
+                    hideDesktopDropdown();
                 }
                 if (dateSelectionModal.style.display === 'flex') {
                     dateSelectionModal.classList.remove('active');
