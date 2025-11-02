@@ -1877,20 +1877,46 @@
     }
 
     function showDesktopDropdown(cell) {
-        const rect = cell.getBoundingClientRect();
-        desktopDropdown.style.display = 'block';
-        desktopDropdown.style.top = `${rect.bottom}px`;
-        desktopDropdown.style.left = `${rect.left}px`;
-        desktopDropdown.style.width = `${rect.width}px`;
-        
-        // Reset search and focus
-        desktopDropdownSearch.value = '';
-        filterDesktopItems('');
-        setTimeout(() => {
-            desktopDropdown.classList.add('active');
-            desktopDropdownSearch.focus();
-        }, 10);
+    const rect = cell.getBoundingClientRect();
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
+    
+    // Calculate position relative to the viewport
+    let top = rect.bottom + window.scrollY;
+    let left = rect.left + window.scrollX;
+    
+    // Ensure dropdown stays within viewport
+    const dropdownHeight = 300; // Approximate max height
+    const dropdownWidth = 340; // Fixed width from CSS
+    
+    // If dropdown would go below viewport, show above the cell
+    if (top + dropdownHeight > window.scrollY + viewportHeight) {
+        top = rect.top + window.scrollY - dropdownHeight;
     }
+    
+    // If dropdown would go beyond right edge, adjust left position
+    if (left + dropdownWidth > window.scrollX + viewportWidth) {
+        left = window.scrollX + viewportWidth - dropdownWidth - 10; // 10px margin
+    }
+    
+    // Ensure dropdown doesn't go beyond left edge
+    if (left < window.scrollX) {
+        left = window.scrollX + 10; // 10px margin
+    }
+    
+    desktopDropdown.style.display = 'block';
+    desktopDropdown.style.top = `${top}px`;
+    desktopDropdown.style.left = `${left}px`;
+    desktopDropdown.style.width = `${rect.width}px`;
+    
+    // Reset search and focus
+    desktopDropdownSearch.value = '';
+    filterDesktopItems('');
+    setTimeout(() => {
+        desktopDropdown.classList.add('active');
+        desktopDropdownSearch.focus();
+    }, 10);
+}
 
     function hideDesktopDropdown() {
         desktopDropdown.classList.remove('active');
