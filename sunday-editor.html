@@ -2238,204 +2238,176 @@ function updateCorrespondingMobileField(cell, value) {
     }
     
     async function generatePdf() {
-        const printButton = document.getElementById('print-button');
-        printButton.disabled = true;
-        printButton.querySelector('span:last-child').textContent = 'Generating...';
+    const printButton = document.getElementById('print-button');
+    printButton.disabled = true;
+    printButton.querySelector('span:last-child').textContent = 'Generating...';
 
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('l', 'mm', 'a4');
-        const A4_WIDTH_MM = 297;
-        const A4_HEIGHT_MM = 210;
-        const MARGIN_MM = 10;
-        
-        const USABLE_WIDTH = A4_WIDTH_MM - (MARGIN_MM * 2);
-        const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_MM * 2);
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('l', 'mm', 'a4');
+    const A4_WIDTH_MM = 297;
+    const A4_HEIGHT_MM = 210;
+    const MARGIN_MM = 10;
+    
+    const USABLE_WIDTH = A4_WIDTH_MM - (MARGIN_MM * 2);
+    const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_MM * 2);
 
-        try {
-            // Create a temporary container for PDF generation
-            const tempContainer = document.createElement('div');
-            tempContainer.style.position = 'absolute';
-            tempContainer.style.left = '-9999px';
-            tempContainer.style.top = '0';
-            document.body.appendChild(tempContainer);
+    try {
+        // Create a temporary container for PDF generation
+        const tempContainer = document.createElement('div');
+        tempContainer.style.position = 'absolute';
+        tempContainer.style.left = '-9999px';
+        tempContainer.style.top = '0';
+        document.body.appendChild(tempContainer);
 
-            // Get the current schedule data
-            const scheduleData = document.getElementById('schedule-content-wrapper');
-            const title = scheduleData.querySelector('h1').textContent;
-            const subtitle = scheduleData.querySelector('.subtitle').textContent;
-            const tableRows = Array.from(scheduleData.querySelectorAll('tbody tr'));
+        // Get the current schedule data
+        const scheduleData = document.getElementById('schedule-content-wrapper');
+        const title = scheduleData.querySelector('h1').textContent;
+        const subtitle = scheduleData.querySelector('.subtitle').textContent;
+        const tableRows = Array.from(scheduleData.querySelectorAll('tbody tr'));
 
-            // Define rows per page: 15 for first page, 17 for subsequent pages
-            const rowsFirstPage = 15;
-            const rowsOtherPages = 17;
+        // Define rows per page: 15 for first page, 17 for subsequent pages
+        const rowsFirstPage = 15;
+        const rowsOtherPages = 17;
 
-            let currentRow = 0;
-            let pageCount = 0;
+        let currentRow = 0;
+        let pageCount = 0;
 
-            while (currentRow < tableRows.length) {
-                if (pageCount > 0) {
-                    pdf.addPage();
-                }
-
-                // Create page container
-                const pageContainer = document.createElement('div');
-                pageContainer.className = 'pdf-page-container';
-
-                // Add header only for first page
-                if (pageCount === 0) {
-                    const header = document.createElement('div');
-                    header.className = 'pdf-header';
-                    header.innerHTML = `
-                        <div class="title-block" style="text-align: center; margin-bottom: 20px;">
-                            <h1 style="font-family: 'Noto Sans Telugu', sans-serif; font-weight: 700; color: rgb(97, 40, 0); margin: 0; font-size: 1.8em;">${title}</h1>
-                            <div style="position: relative; display: inline-block; margin-top: 10px;">
-                                <p style="font-family: 'Noto Sans Telugu', sans-serif; font-weight: 500; color: #333; background-color: #ffffff; padding: 2px 8px; display: inline-block; position: relative; z-index: 2; white-space: nowrap; border-radius: 8px; margin: 0;">
-                                    ${subtitle}
-                                </p>
-                                <div style="width: 400px; height: 5px; background: linear-gradient(to right, #093261, #ffffff, #093261); position: absolute; left: 50%; transform: translateX(-50%); top: 50%; margin-top: -2.5px; z-index: 1;"></div>
-                            </div>
-                        </div>
-                    `;
-                    pageContainer.appendChild(header);
-                }
-
-                // Create table for this page
-                const table = document.createElement('table');
-                table.className = 'pdf-table';
-                table.style.tableLayout = 'fixed';
-
-                // Calculate column widths from the original table (only on first page)
-                let columnWidths = [];
-                if (pageCount === 0) {
-                    const originalTable = scheduleData.querySelector('.schedule-table');
-                    if (originalTable) {
-                        const headerCells = originalTable.querySelectorAll('thead th');
-                        columnWidths = Array.from(headerCells).map(cell => {
-                            const rect = cell.getBoundingClientRect();
-                            return rect.width;
-                        });
-                        // Remove the actions column width (last column)
-                        if (columnWidths.length > 5) {
-                            columnWidths = columnWidths.slice(0, 5);
-                        }
-                    }
-                }
-
-                // Add table header with consistent column widths
-                const thead = document.createElement('thead');
-                let headerHTML = '<tr>';
-                const columns = ['తేదీ', 'ప్రసంగ అంశం', 'ప్రసంగీకుడు', 'చైర్మన్', 'కావలికోట రీడర్'];
-                const defaultWidths = ['15%', '35%', '20%', '15%', '15%'];
-
-                columns.forEach((col, index) => {
-                    let width = defaultWidths[index];
-                    if (columnWidths.length > 0 && pageCount > 0) {
-                        const totalWidth = columnWidths.reduce((sum, w) => sum + w, 0);
-                        width = `${(columnWidths[index] / totalWidth * 100).toFixed(1)}%`;
-                    }
-                    headerHTML += `<th style="width: ${width}">${col}</th>`;
-                });
-                headerHTML += '</tr>';
-                thead.innerHTML = headerHTML;
-                table.appendChild(thead);
-                
-                // Add rows for this page
-                const tbody = document.createElement('tbody');
-                
-                // Calculate how many rows to show on this page
-                const rowsThisPage = pageCount === 0 ? rowsFirstPage : rowsOtherPages;
-                const endRow = Math.min(currentRow + rowsThisPage, tableRows.length);
-                
-                for (let i = currentRow; i < endRow; i++) {
-                    const originalRow = tableRows[i];
-                    const row = document.createElement('tr');
-                    
-                    // Copy cells, excluding the actions column
-                    for (let j = 0; j < originalRow.cells.length - 1; j++) {
-                        const cell = document.createElement(j === 0 ? 'th' : 'td');
-                        cell.innerHTML = originalRow.cells[j].innerHTML;
-                        
-                        // Apply consistent width styling
-                        if (columnWidths.length > 0 || defaultWidths.length > 0) {
-                            const widths = columnWidths.length > 0 ? columnWidths : defaultWidths;
-                            let width = defaultWidths[j];
-                            if (columnWidths.length > 0) {
-                                const totalWidth = columnWidths.reduce((sum, w) => sum + w, 0);
-                                width = `${(columnWidths[j] / totalWidth * 100).toFixed(1)}%`;
-                            }
-                            cell.style.width = width;
-                        }
-                        
-                        // Apply special event styling if needed
-                        if (originalRow.cells[1].classList.contains('special-event')) {
-                            if (j === 1) {
-                                cell.className = 'special-event';
-                                cell.colSpan = 4;
-                                cell.style.width = '85%';
-                                j += 3;
-                            }
-                        }
-                        
-                        row.appendChild(cell);
-                    }
-                    
-                    tbody.appendChild(row);
-                }
-
-                table.appendChild(tbody);
-                pageContainer.appendChild(table);
-                tempContainer.appendChild(pageContainer);
-
-                // Wait for fonts and rendering
-                await document.fonts.ready;
-                await new Promise(resolve => setTimeout(resolve, 100));
-
-                // Capture the page
-                const canvas = await html2canvas(pageContainer, {
-                    scale: 2,
-                    useCORS: true,
-                    backgroundColor: '#ffffff',
-                    letterRendering: true,
-                    logging: false
-                });
-
-                const imgData = canvas.toDataURL('image/png', 1.0);
-                const imgProps = pdf.getImageProperties(imgData);
-                const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
-
-                // Center the content vertically on the page
-                const verticalPosition = Math.max(0, (USABLE_HEIGHT - imgHeight) / 2);
-                
-                pdf.addImage(
-                    imgData, 
-                    'PNG', 
-                    MARGIN_MM, 
-                    MARGIN_MM + verticalPosition, 
-                    USABLE_WIDTH, 
-                    imgHeight
-                );
-
-                // Remove the page container
-                tempContainer.removeChild(pageContainer);
-                
-                currentRow = endRow;
-                pageCount++;
+        while (currentRow < tableRows.length) {
+            if (pageCount > 0) {
+                pdf.addPage();
             }
 
-            // Final cleanup
-            document.body.removeChild(tempContainer);
+            // Create page container
+            const pageContainer = document.createElement('div');
+            pageContainer.className = 'pdf-page-container';
 
-            const fileName = `${document.title || 'sunday-schedule'}.pdf`;
-            pdf.save(fileName);
+            // Add header only for first page
+            if (pageCount === 0) {
+                const header = document.createElement('div');
+                header.className = 'pdf-header';
+                header.innerHTML = `
+                    <div class="title-block" style="text-align: center; margin-bottom: 20px;">
+                        <h1 style="font-family: 'Noto Sans Telugu', sans-serif; font-weight: 700; color: rgb(97, 40, 0); margin: 0; font-size: 1.8em;">${title}</h1>
+                        <div style="position: relative; display: inline-block; margin-top: 10px;">
+                            <p style="font-family: 'Noto Sans Telugu', sans-serif; font-weight: 500; color: #333; background-color: #ffffff; padding: 2px 8px; display: inline-block; position: relative; z-index: 2; white-space: nowrap; border-radius: 8px; margin: 0;">
+                                ${subtitle}
+                            </p>
+                            <div style="width: 400px; height: 5px; background: linear-gradient(to right, #093261, #ffffff, #093261); position: absolute; left: 50%; transform: translateX(-50%); top: 50%; margin-top: -2.5px; z-index: 1;"></div>
+                        </div>
+                    </div>
+                `;
+                pageContainer.appendChild(header);
+            }
 
-        } catch (error) {
-            console.error("PDF generation failed:", error);
-            alert("Sorry, there was an error creating the PDF. Please try again.");
-        } finally {
-            printButton.disabled = false;
-            printButton.querySelector('span:last-child').textContent = 'Download PDF';
+            // Create table for this page
+            const table = document.createElement('table');
+            table.className = 'pdf-table';
+            table.style.tableLayout = 'fixed';
+
+            // Add table header
+            const thead = document.createElement('thead');
+            const headerHTML = `
+                <tr>
+                    <th style="width: 15%">తేదీ</th>
+                    <th style="width: 35%">ప్రసంగ అంశం</th>
+                    <th style="width: 20%">ప్రసంగీకుడు</th>
+                    <th style="width: 15%">చైర్మన్</th>
+                    <th style="width: 15%">కావలికోట రీడర్</th>
+                </tr>
+            `;
+            thead.innerHTML = headerHTML;
+            table.appendChild(thead);
+            
+            // Add rows for this page
+            const tbody = document.createElement('tbody');
+            
+            const rowsThisPage = pageCount === 0 ? rowsFirstPage : rowsOtherPages;
+            const endRow = Math.min(currentRow + rowsThisPage, tableRows.length);
+            
+            for (let i = currentRow; i < endRow; i++) {
+                const originalRow = tableRows[i];
+                const row = document.createElement('tr');
+                
+                // Copy cells, excluding the actions column
+                for (let j = 0; j < originalRow.cells.length - 1; j++) {
+                    const cell = document.createElement(j === 0 ? 'th' : 'td');
+                    cell.innerHTML = originalRow.cells[j].innerHTML;
+                    
+                    // Apply special event styling if needed
+                    if (originalRow.cells[1].classList.contains('special-event')) {
+                        if (j === 1) {
+                            cell.className = 'special-event';
+                            cell.colSpan = 4;
+                            cell.style.width = '85%';
+                            j += 3;
+                        }
+                    }
+                    
+                    row.appendChild(cell);
+                }
+                
+                tbody.appendChild(row);
+            }
+
+            table.appendChild(tbody);
+            pageContainer.appendChild(table);
+            tempContainer.appendChild(pageContainer);
+
+            // Wait for fonts and rendering
+            await document.fonts.ready;
+            await new Promise(resolve => setTimeout(resolve, 50)); // Reduced timeout
+
+            // Capture the page with optimized settings
+            const canvas = await html2canvas(pageContainer, {
+                scale: 1, // Reduced from 2 to 1
+                useCORS: true,
+                backgroundColor: '#ffffff',
+                letterRendering: false, // Disable for smaller files
+                logging: false,
+                imageTimeout: 15000,
+                removeContainer: true
+            });
+
+            // Use JPEG compression instead of PNG
+            const imgData = canvas.toDataURL('image/jpeg', 0.8);
+            const imgProps = pdf.getImageProperties(imgData);
+            const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
+
+            // Center the content vertically on the page
+            const verticalPosition = Math.max(0, (USABLE_HEIGHT - imgHeight) / 2);
+            
+            pdf.addImage(
+                imgData, 
+                'JPEG', // Changed to JPEG
+                MARGIN_MM, 
+                MARGIN_MM + verticalPosition, 
+                USABLE_WIDTH, 
+                imgHeight,
+                undefined,
+                'FAST' // Use fast compression
+            );
+
+            // Remove the page container
+            tempContainer.removeChild(pageContainer);
+            
+            currentRow = endRow;
+            pageCount++;
         }
+
+        // Final cleanup
+        document.body.removeChild(tempContainer);
+
+        const fileName = `${document.title || 'sunday-schedule'}.pdf`;
+        pdf.save(fileName);
+
+    } catch (error) {
+        console.error("PDF generation failed:", error);
+        alert("Sorry, there was an error creating the PDF. Please try again.");
+    } finally {
+        printButton.disabled = false;
+        printButton.querySelector('span:last-child').textContent = 'Download PDF';
     }
+}
 
     function setupGlobalUI() {
         // Initialize desktop dropdown elements
