@@ -111,27 +111,7 @@
         align-items: center; 
         gap: 16px; 
     }
-    .header-icons { 
-        display: flex; 
-        align-items: center; 
-        height: 64px; 
-        cursor: pointer; 
-        padding: 12px;
-        border-radius: var(--radius-md);
-        transition: background-color 0.2s;
-    }
-    .header-icons:hover {
-        background-color: rgba(255,255,255,0.1);
-    }
-    .header-icons svg { 
-        height: 24px; 
-        width: 24px; 
-        color: var(--text-light); 
-    }
-    .header-icons .close-icon { display: none; }
-    body.menu-open .header-icons .hamburger-icon { display: none; }
-    body.menu-open .header-icons .close-icon { display: block; }
-
+    
     /* Status Indicator */
     .status-indicator { 
         font-size: 12px; 
@@ -157,6 +137,27 @@
     .status-indicator[data-status="synced"] { color: var(--success-color); }
     .status-indicator[data-status="syncing"] { color: var(--warning-color); }
     .status-indicator[data-status="error"] { color: var(--danger-color); }
+    
+    .header-icons { 
+        display: flex; 
+        align-items: center; 
+        height: 64px; 
+        cursor: pointer; 
+        padding: 12px;
+        border-radius: var(--radius-md);
+        transition: background-color 0.2s;
+    }
+    .header-icons:hover {
+        background-color: rgba(255,255,255,0.1);
+    }
+    .header-icons svg { 
+        height: 24px; 
+        width: 24px; 
+        color: var(--text-light); 
+    }
+    .header-icons .close-icon { display: none; }
+    body.menu-open .header-icons .hamburger-icon { display: none; }
+    body.menu-open .header-icons .close-icon { display: block; }
 
     .menu-overlay { 
         position: fixed; 
@@ -277,7 +278,7 @@
     .hidden { display: none !important; }
     
     main { 
-        padding-top: 84px; /* 64px navbar + 20px spacing */
+        padding-top: 84px; /* Fixed navbar spacing */
         min-height: 100vh;
     }
     
@@ -1015,6 +1016,7 @@
             flex-direction: column;
             align-items: stretch;
             padding: 16px;
+            margin-bottom: 0;
             background: white;
             border-bottom: 1px solid var(--border-color);
             position: sticky;
@@ -1067,6 +1069,10 @@
         
         .desktop-dropdown {
             display: none !important;
+        }
+        
+        .status-indicator {
+            margin-right: auto;
         }
     }
 
@@ -1465,7 +1471,7 @@
                         <p class="special-event-text-mobile">${topicCell.textContent}</p>
                     </div>
                     <div class="mobile-actions">
-                        <button class="mobile-action-btn secondary event-menu-btn" data-row="${rowIndex}">
+                        <button class="mobile-action-btn secondary event-options-btn" data-row="${rowIndex}">
                             <span class="material-symbols-outlined">event</span>
                             Event Options
                         </button>
@@ -1509,8 +1515,8 @@
                         </div>
                     </div>
                     <div class="mobile-actions">
-                        <button class="mobile-action-btn secondary event-menu-btn" data-row="${rowIndex}">
-                            <span class="material-symbols-outlined">event</span>
+                        <button class="mobile-action-btn secondary event-options-btn" data-row="${rowIndex}">
+                            <span class="material-symbols-outlined">more_vert</span>
                             Event Options
                         </button>
                     </div>
@@ -1541,8 +1547,8 @@
             });
         });
 
-        // Add event listeners to event menu buttons
-        mobileContainer.querySelectorAll('.event-menu-btn').forEach(btn => {
+        // Add event listeners to event options buttons
+        mobileContainer.querySelectorAll('.event-options-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const rowIndex = btn.dataset.row;
                 const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
@@ -1841,11 +1847,13 @@
         // For desktop, show a simple dropdown
         if (window.innerWidth > 768) {
             showEventTypeMenu();
+            dropdownContainer.style.position = 'fixed';
             dropdownContainer.style.top = 'auto';
             dropdownContainer.style.bottom = `${window.innerHeight - rect.top}px`;
-            dropdownContainer.style.left = `${rect.left}px`;
+            dropdownContainer.style.left = `${rect.left - 150}px`;
             dropdownContainer.style.width = '200px';
             dropdownContainer.style.borderRadius = '12px';
+            dropdownContainer.style.transform = 'translateY(0)';
         } else {
             showEventTypeMenu();
         }
