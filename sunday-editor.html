@@ -598,6 +598,9 @@
         transition: opacity 0.2s;
         width: 16px;
         height: 16px;
+        background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 9L12 15L18 9' stroke='%23002726' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3C/path%3E%3C/svg%3E");
+        background-size: contain;
+        background-repeat: no-repeat;
     }
     .editable-cell:hover:after {
         opacity: 1;
@@ -1151,7 +1154,7 @@
         }
         
         main { 
-            padding-top: 35px; /* 60px navbar + 10px spacing */
+            padding-top: 70px; /* 60px navbar + 10px spacing */
         }
         
         .editor-main { 
@@ -1308,17 +1311,6 @@
         margin-top: -2.5px;
         z-index: 1;
     }
-    
-    @media print {
-    .schedule-table {
-        border: 2px solid #000 !important;
-    }
-    .schedule-table th,
-    .schedule-table td {
-        border: 1px solid #000 !important;
-        font-weight: bold !important;
-    }
-}
 </style>
 </head>
 <body>
@@ -1351,8 +1343,12 @@
     </div>
 </div>
 
-<div id="app-container" class="editor-main hidden" style="padding-top: 70px;">
+<div id="app-container" class="editor-main hidden">
     <div class="page-controls">
+        <button id="edit-weeks-button" class="btn">
+            <span class="material-symbols-outlined">edit_calendar</span>
+            <span>Edit Weeks</span>
+        </button>
         <button id="print-button" class="btn">
             <span class="material-symbols-outlined">picture_as_pdf</span>
             <span>Download PDF</span>
@@ -1532,36 +1528,33 @@
         }
     });
 
-
-
-
     function initEditor() {
-    if (currentListener) currentListener();
-    
-    let isFirstLoad = true;
-    
-    currentListener = userSchedulesCollection.doc(currentScheduleId).onSnapshot(doc => {
-        if (doc.exists) {
-            const scheduleData = doc.data();
-            
-            // Only render on first load, not on subsequent updates
-            if (isFirstLoad) {
+        if (currentListener) currentListener();
+        
+        // First, get the initial data and render it
+        userSchedulesCollection.doc(currentScheduleId).get().then(doc => {
+            if (doc.exists) {
+                const scheduleData = doc.data();
                 renderSchedule(scheduleData);
-                isFirstLoad = false;
+                updateStatus('Synced', 'synced');
+            } else {
+                alert("This schedule may have been deleted.");
+                window.location.href = './sunday-dashboard.html';
             }
-            
-            updateStatus('Synced', 'synced');
-        } else {
-            alert("This schedule may have been deleted.");
-            window.location.href = './sunday-dashboard.html';
-        }
-    }, error => {
-        updateStatus('Error', 'error');
-    });
-}
-
-
-
+        }).catch(error => {
+            updateStatus('Error', 'error');
+        });
+        
+        // Then set up the snapshot listener for real-time updates, but don't re-render on local changes
+        currentListener = userSchedulesCollection.doc(currentScheduleId).onSnapshot(doc => {
+            if (doc.exists) {
+                // Only update status, don't re-render to avoid conflicts with optimistic updates
+                updateStatus('Synced', 'synced');
+            }
+        }, error => {
+            updateStatus('Error', 'error');
+        });
+    }
 
     function renderSchedule(data) {
         document.title = data.name;
@@ -1888,46 +1881,46 @@
     }
 
     function showDesktopDropdown(cell) {
-    const rect = cell.getBoundingClientRect();
-    const viewportHeight = window.innerHeight;
-    const viewportWidth = window.innerWidth;
-    
-    // Calculate position relative to the viewport
-    let top = rect.bottom + window.scrollY;
-    let left = rect.left + window.scrollX;
-    
-    // Ensure dropdown stays within viewport
-    const dropdownHeight = 300; // Approximate max height
-    const dropdownWidth = 340; // Fixed width from CSS
-    
-    // If dropdown would go below viewport, show above the cell
-    if (top + dropdownHeight > window.scrollY + viewportHeight) {
-        top = rect.top + window.scrollY - dropdownHeight;
+        const rect = cell.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+        const viewportWidth = window.innerWidth;
+        
+        // Calculate position relative to the viewport
+        let top = rect.bottom + window.scrollY;
+        let left = rect.left + window.scrollX;
+        
+        // Ensure dropdown stays within viewport
+        const dropdownHeight = 300; // Approximate max height
+        const dropdownWidth = 340; // Fixed width from CSS
+        
+        // If dropdown would go below viewport, show above the cell
+        if (top + dropdownHeight > window.scrollY + viewportHeight) {
+            top = rect.top + window.scrollY - dropdownHeight;
+        }
+        
+        // If dropdown would go beyond right edge, adjust left position
+        if (left + dropdownWidth > window.scrollX + viewportWidth) {
+            left = window.scrollX + viewportWidth - dropdownWidth - 10; // 10px margin
+        }
+        
+        // Ensure dropdown doesn't go beyond left edge
+        if (left < window.scrollX) {
+            left = window.scrollX + 10; // 10px margin
+        }
+        
+        desktopDropdown.style.display = 'block';
+        desktopDropdown.style.top = `${top}px`;
+        desktopDropdown.style.left = `${left}px`;
+        desktopDropdown.style.width = `${rect.width}px`;
+        
+        // Reset search and focus
+        desktopDropdownSearch.value = '';
+        filterDesktopItems('');
+        setTimeout(() => {
+            desktopDropdown.classList.add('active');
+            desktopDropdownSearch.focus();
+        }, 10);
     }
-    
-    // If dropdown would go beyond right edge, adjust left position
-    if (left + dropdownWidth > window.scrollX + viewportWidth) {
-        left = window.scrollX + viewportWidth - dropdownWidth - 10; // 10px margin
-    }
-    
-    // Ensure dropdown doesn't go beyond left edge
-    if (left < window.scrollX) {
-        left = window.scrollX + 10; // 10px margin
-    }
-    
-    desktopDropdown.style.display = 'block';
-    desktopDropdown.style.top = `${top}px`;
-    desktopDropdown.style.left = `${left}px`;
-    desktopDropdown.style.width = `${rect.width}px`;
-    
-    // Reset search and focus
-    desktopDropdownSearch.value = '';
-    filterDesktopItems('');
-    setTimeout(() => {
-        desktopDropdown.classList.add('active');
-        desktopDropdownSearch.focus();
-    }, 10);
-}
 
     function hideDesktopDropdown() {
         desktopDropdown.classList.remove('active');
@@ -1939,36 +1932,38 @@
     }
 
     function selectDesktopDropdownItem(value) {
-    if (activeCellForDropdown) {
-        // Update UI immediately
-        activeCellForDropdown.textContent = value;
-        
-        // Also update the corresponding mobile field if it exists
-        updateCorrespondingMobileField(activeCellForDropdown, value);
-        
-        // Then save to Firebase in background
-        debouncedSave();
+        if (activeCellForDropdown) {
+            // Update UI immediately
+            activeCellForDropdown.textContent = value;
+            
+            // Also update the corresponding mobile field if it exists
+            updateCorrespondingMobileField(activeCellForDropdown, value);
+            
+            // Then save to Firebase in background
+            debouncedSave();
+        }
+        hideDesktopDropdown();
     }
-    hideDesktopDropdown();
-}
-function updateCorrespondingMobileField(cell, value) {
-    const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
-    const rowIndex = Array.from(cell.parentElement.parentElement.children).indexOf(cell.parentElement);
-    const cellIndex = Array.from(cell.parentElement.cells).indexOf(cell);
-    
-    const mobileContainer = scheduleWrapper.querySelector('.mobile-view-container');
-    if (mobileContainer) {
-        const mobileCard = mobileContainer.querySelectorAll('.mobile-week-card')[rowIndex];
-        if (mobileCard) {
-            const field = mobileCard.querySelector(`.mobile-field[data-row="${rowIndex}"][data-cell="${cellIndex}"]`);
-            if (field) {
-                const valueSpan = field.querySelector('.mobile-field-value');
-                valueSpan.textContent = value;
-                valueSpan.classList.remove('mobile-field-placeholder');
+
+    function updateCorrespondingMobileField(cell, value) {
+        const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
+        const rowIndex = Array.from(cell.parentElement.parentElement.children).indexOf(cell.parentElement);
+        const cellIndex = Array.from(cell.parentElement.cells).indexOf(cell);
+        
+        const mobileContainer = scheduleWrapper.querySelector('.mobile-view-container');
+        if (mobileContainer) {
+            const mobileCard = mobileContainer.querySelectorAll('.mobile-week-card')[rowIndex];
+            if (mobileCard) {
+                const field = mobileCard.querySelector(`.mobile-field[data-row="${rowIndex}"][data-cell="${cellIndex}"]`);
+                if (field) {
+                    const valueSpan = field.querySelector('.mobile-field-value');
+                    valueSpan.textContent = value;
+                    valueSpan.classList.remove('mobile-field-placeholder');
+                }
             }
         }
     }
-}
+
     // Desktop dropdown search functionality
     function filterDesktopItems(value) {
         const itemsEl = desktopDropdownList.querySelectorAll('.desktop-dropdown-item');
@@ -2127,19 +2122,19 @@ function updateCorrespondingMobileField(cell, value) {
     }
 
     function selectMobileDropdownItem(value) {
-    if (currentDropdownData) {
-        // Update both table cell and mobile field immediately
-        currentDropdownData.cell.textContent = value;
-        if (currentDropdownData.fieldElement) {
-            const valueSpan = currentDropdownData.fieldElement.querySelector('.mobile-field-value');
-            valueSpan.textContent = value;
-            valueSpan.classList.remove('mobile-field-placeholder');
+        if (currentDropdownData) {
+            // Update both table cell and mobile field immediately
+            currentDropdownData.cell.textContent = value;
+            if (currentDropdownData.fieldElement) {
+                const valueSpan = currentDropdownData.fieldElement.querySelector('.mobile-field-value');
+                valueSpan.textContent = value;
+                valueSpan.classList.remove('mobile-field-placeholder');
+            }
+            // Save to Firebase in background
+            debouncedSave();
         }
-        // Save to Firebase in background
-        debouncedSave();
+        hideMobileDropdown();
     }
-    hideMobileDropdown();
-}
 
     function selectMobileEventType(eventType) {
         if (currentDropdownData && currentDropdownData.rowIndex !== undefined) {
@@ -2154,6 +2149,147 @@ function updateCorrespondingMobileField(cell, value) {
         itemsEl.forEach(item => {
             item.style.display = item.textContent.toLowerCase().includes(value.toLowerCase()) ? 'flex' : 'none';
         });
+    }
+
+    // Week editing functions
+    function openWeekEditor() {
+        const dateList = document.getElementById('date-checklist');
+        const upcomingSundays = generateNextSundays(30);
+        
+        // Clear existing list
+        dateList.innerHTML = '';
+        
+        // Get current dates from the schedule
+        const currentDates = getCurrentScheduleDates();
+        
+        // Populate with all upcoming Sundays, pre-selecting current ones
+        upcomingSundays.forEach(dateStr => {
+            const li = document.createElement('li');
+            const isChecked = currentDates.includes(dateStr);
+            li.innerHTML = `<label><input type="checkbox" value="${dateStr}" ${isChecked ? 'checked' : ''}> ${dateStr}</label>`;
+            dateList.appendChild(li);
+        });
+        
+        // Update modal text for editing
+        document.querySelector('#date-selection-modal h2').textContent = 'Edit Sunday Schedule Weeks';
+        document.querySelector('#date-selection-modal p').textContent = 'Add or remove weeks from your schedule.';
+        document.getElementById('new-schedule-name').style.display = 'none';
+        document.getElementById('confirm-creation').textContent = 'Update Schedule';
+        
+        // Show modal
+        dateSelectionModal.style.display = 'flex';
+        setTimeout(() => {
+            dateSelectionModal.classList.add('active');
+        }, 10);
+    }
+
+    function getCurrentScheduleDates() {
+        const dates = [];
+        const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
+        
+        if (tableBody) {
+            const rows = tableBody.querySelectorAll('tr');
+            rows.forEach(row => {
+                const dateCell = row.cells[0];
+                if (dateCell) {
+                    dates.push(dateCell.textContent.trim());
+                }
+            });
+        }
+        
+        return dates;
+    }
+
+    function findExistingRowForDate(date) {
+        const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
+        if (!tableBody) return null;
+        
+        const rows = tableBody.querySelectorAll('tr');
+        for (let row of rows) {
+            if (row.cells[0].textContent.trim() === date) {
+                return row;
+            }
+        }
+        return null;
+    }
+
+    async function handleUpdateWeeks() {
+        const selectedCheckboxes = Array.from(document.querySelectorAll('#date-checklist input:checked'));
+        if (selectedCheckboxes.length === 0) {
+            alert("Please select at least one Sunday.");
+            return;
+        }
+        
+        const selectedDates = selectedCheckboxes.map(cb => cb.value);
+        const dateRange = `${selectedDates[0]} నుండి ${selectedDates[selectedDates.length - 1]}`;
+
+        // Generate new table HTML with the selected dates
+        const tableBodyHTML = selectedDates.map(date => {
+            // Check if this date already exists in current schedule to preserve content
+            const existingRow = findExistingRowForDate(date);
+            
+            if (existingRow) {
+                // Keep existing content
+                return `
+                    <tr>
+                        <td>${date}</td>
+                        <td class="${existingRow.cells[1].className}">${existingRow.cells[1].innerHTML}</td>
+                        <td class="${existingRow.cells[2].className}">${existingRow.cells[2].innerHTML}</td>
+                        <td class="${existingRow.cells[3].className}">${existingRow.cells[3].innerHTML}</td>
+                        <td class="${existingRow.cells[4].className}">${existingRow.cells[4].innerHTML}</td>
+                        <td class="actions-col">
+                            <button class="event-btn">
+                                <span class="material-symbols-outlined">more_vert</span>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            } else {
+                // Create new empty row
+                return `
+                    <tr>
+                        <td>${date}</td>
+                        <td class="editable-cell"></td>
+                        <td class="editable-cell"></td>
+                        <td class="editable-cell"></td>
+                        <td class="editable-cell"></td>
+                        <td class="actions-col">
+                            <button class="event-btn">
+                                <span class="material-symbols-outlined">more_vert</span>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }
+        }).join('');
+
+        try {
+            updateStatus('Updating...', 'syncing');
+            
+            await userSchedulesCollection.doc(currentScheduleId).update({
+                dateRange: dateRange,
+                tableHTML: tableBodyHTML,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            // Close modal
+            dateSelectionModal.classList.remove('active');
+            setTimeout(() => {
+                dateSelectionModal.style.display = 'none';
+                // Reset modal for next use
+                document.getElementById('new-schedule-name').style.display = 'block';
+                document.querySelector('#date-selection-modal h2').textContent = 'Create New Sunday Schedule';
+                document.querySelector('#date-selection-modal p').textContent = 'Give your new schedule a name and select the weeks to include.';
+                document.getElementById('confirm-creation').textContent = 'Create Schedule';
+            }, 300);
+            
+            updateStatus('Synced', 'synced');
+            
+        } catch (error) {
+            console.error("Error updating schedule weeks:", error);
+            alert("Could not update schedule. Please try again.");
+            updateStatus('Error', 'error');
+        }
     }
 
     const debouncedSave = debounce(() => {
@@ -2249,176 +2385,176 @@ function updateCorrespondingMobileField(cell, value) {
     }
     
     async function generatePdf() {
-    const printButton = document.getElementById('print-button');
-    printButton.disabled = true;
-    printButton.querySelector('span:last-child').textContent = 'Generating...';
+        const printButton = document.getElementById('print-button');
+        printButton.disabled = true;
+        printButton.querySelector('span:last-child').textContent = 'Generating...';
 
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF('l', 'mm', 'a4');
-    const A4_WIDTH_MM = 297;
-    const A4_HEIGHT_MM = 210;
-    const MARGIN_MM = 10;
-    
-    const USABLE_WIDTH = A4_WIDTH_MM - (MARGIN_MM * 2);
-    const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_MM * 2);
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('l', 'mm', 'a4');
+        const A4_WIDTH_MM = 297;
+        const A4_HEIGHT_MM = 210;
+        const MARGIN_MM = 10;
+        
+        const USABLE_WIDTH = A4_WIDTH_MM - (MARGIN_MM * 2);
+        const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_MM * 2);
 
-    try {
-        // Create a temporary container for PDF generation
-        const tempContainer = document.createElement('div');
-        tempContainer.style.position = 'absolute';
-        tempContainer.style.left = '-9999px';
-        tempContainer.style.top = '0';
-        document.body.appendChild(tempContainer);
+        try {
+            // Create a temporary container for PDF generation
+            const tempContainer = document.createElement('div');
+            tempContainer.style.position = 'absolute';
+            tempContainer.style.left = '-9999px';
+            tempContainer.style.top = '0';
+            document.body.appendChild(tempContainer);
 
-        // Get the current schedule data
-        const scheduleData = document.getElementById('schedule-content-wrapper');
-        const title = scheduleData.querySelector('h1').textContent;
-        const subtitle = scheduleData.querySelector('.subtitle').textContent;
-        const tableRows = Array.from(scheduleData.querySelectorAll('tbody tr'));
+            // Get the current schedule data
+            const scheduleData = document.getElementById('schedule-content-wrapper');
+            const title = scheduleData.querySelector('h1').textContent;
+            const subtitle = scheduleData.querySelector('.subtitle').textContent;
+            const tableRows = Array.from(scheduleData.querySelectorAll('tbody tr'));
 
-        // Define rows per page: 15 for first page, 17 for subsequent pages
-        const rowsFirstPage = 15;
-        const rowsOtherPages = 17;
+            // Define rows per page: 15 for first page, 17 for subsequent pages
+            const rowsFirstPage = 15;
+            const rowsOtherPages = 17;
 
-        let currentRow = 0;
-        let pageCount = 0;
+            let currentRow = 0;
+            let pageCount = 0;
 
-        while (currentRow < tableRows.length) {
-            if (pageCount > 0) {
-                pdf.addPage();
-            }
+            while (currentRow < tableRows.length) {
+                if (pageCount > 0) {
+                    pdf.addPage();
+                }
 
-            // Create page container
-            const pageContainer = document.createElement('div');
-            pageContainer.className = 'pdf-page-container';
+                // Create page container
+                const pageContainer = document.createElement('div');
+                pageContainer.className = 'pdf-page-container';
 
-            // Add header only for first page
-            if (pageCount === 0) {
-                const header = document.createElement('div');
-                header.className = 'pdf-header';
-                header.innerHTML = `
-                    <div class="title-block" style="text-align: center; margin-bottom: 20px;">
-                        <h1 style="font-family: 'Noto Sans Telugu', sans-serif; font-weight: 700; color: rgb(97, 40, 0); margin: 0; font-size: 1.8em;">${title}</h1>
-                        <div style="position: relative; display: inline-block; margin-top: 10px;">
-                            <p style="font-family: 'Noto Sans Telugu', sans-serif; font-weight: 500; color: #333; background-color: #ffffff; padding: 2px 8px; display: inline-block; position: relative; z-index: 2; white-space: nowrap; border-radius: 8px; margin: 0;">
-                                ${subtitle}
-                            </p>
-                            <div style="width: 400px; height: 5px; background: linear-gradient(to right, #093261, #ffffff, #093261); position: absolute; left: 50%; transform: translateX(-50%); top: 50%; margin-top: -2.5px; z-index: 1;"></div>
+                // Add header only for first page
+                if (pageCount === 0) {
+                    const header = document.createElement('div');
+                    header.className = 'pdf-header';
+                    header.innerHTML = `
+                        <div class="title-block" style="text-align: center; margin-bottom: 20px;">
+                            <h1 style="font-family: 'Noto Sans Telugu', sans-serif; font-weight: 700; color: rgb(97, 40, 0); margin: 0; font-size: 1.8em;">${title}</h1>
+                            <div style="position: relative; display: inline-block; margin-top: 10px;">
+                                <p style="font-family: 'Noto Sans Telugu', sans-serif; font-weight: 500; color: #333; background-color: #ffffff; padding: 2px 8px; display: inline-block; position: relative; z-index: 2; white-space: nowrap; border-radius: 8px; margin: 0;">
+                                    ${subtitle}
+                                </p>
+                                <div style="width: 400px; height: 5px; background: linear-gradient(to right, #093261, #ffffff, #093261); position: absolute; left: 50%; transform: translateX(-50%); top: 50%; margin-top: -2.5px; z-index: 1;"></div>
+                            </div>
                         </div>
-                    </div>
+                    `;
+                    pageContainer.appendChild(header);
+                }
+
+                // Create table for this page
+                const table = document.createElement('table');
+                table.className = 'pdf-table';
+                table.style.tableLayout = 'fixed';
+
+                // Add table header
+                const thead = document.createElement('thead');
+                const headerHTML = `
+                    <tr>
+                        <th style="width: 15%">తేదీ</th>
+                        <th style="width: 35%">ప్రసంగ అంశం</th>
+                        <th style="width: 20%">ప్రసంగీకుడు</th>
+                        <th style="width: 15%">చైర్మన్</th>
+                        <th style="width: 15%">కావలికోట రీడర్</th>
+                    </tr>
                 `;
-                pageContainer.appendChild(header);
-            }
-
-            // Create table for this page
-            const table = document.createElement('table');
-            table.className = 'pdf-table';
-            table.style.tableLayout = 'fixed';
-
-            // Add table header
-            const thead = document.createElement('thead');
-            const headerHTML = `
-                <tr>
-                    <th style="width: 15%">తేదీ</th>
-                    <th style="width: 35%">ప్రసంగ అంశం</th>
-                    <th style="width: 20%">ప్రసంగీకుడు</th>
-                    <th style="width: 15%">చైర్మన్</th>
-                    <th style="width: 15%">కావలికోట రీడర్</th>
-                </tr>
-            `;
-            thead.innerHTML = headerHTML;
-            table.appendChild(thead);
-            
-            // Add rows for this page
-            const tbody = document.createElement('tbody');
-            
-            const rowsThisPage = pageCount === 0 ? rowsFirstPage : rowsOtherPages;
-            const endRow = Math.min(currentRow + rowsThisPage, tableRows.length);
-            
-            for (let i = currentRow; i < endRow; i++) {
-                const originalRow = tableRows[i];
-                const row = document.createElement('tr');
+                thead.innerHTML = headerHTML;
+                table.appendChild(thead);
                 
-                // Copy cells, excluding the actions column
-                for (let j = 0; j < originalRow.cells.length - 1; j++) {
-                    const cell = document.createElement(j === 0 ? 'th' : 'td');
-                    cell.innerHTML = originalRow.cells[j].innerHTML;
+                // Add rows for this page
+                const tbody = document.createElement('tbody');
+                
+                const rowsThisPage = pageCount === 0 ? rowsFirstPage : rowsOtherPages;
+                const endRow = Math.min(currentRow + rowsThisPage, tableRows.length);
+                
+                for (let i = currentRow; i < endRow; i++) {
+                    const originalRow = tableRows[i];
+                    const row = document.createElement('tr');
                     
-                    // Apply special event styling if needed
-                    if (originalRow.cells[1].classList.contains('special-event')) {
-                        if (j === 1) {
-                            cell.className = 'special-event';
-                            cell.colSpan = 4;
-                            cell.style.width = '85%';
-                            j += 3;
+                    // Copy cells, excluding the actions column
+                    for (let j = 0; j < originalRow.cells.length - 1; j++) {
+                        const cell = document.createElement(j === 0 ? 'th' : 'td');
+                        cell.innerHTML = originalRow.cells[j].innerHTML;
+                        
+                        // Apply special event styling if needed
+                        if (originalRow.cells[1].classList.contains('special-event')) {
+                            if (j === 1) {
+                                cell.className = 'special-event';
+                                cell.colSpan = 4;
+                                cell.style.width = '85%';
+                                j += 3;
+                            }
                         }
+                        
+                        row.appendChild(cell);
                     }
                     
-                    row.appendChild(cell);
+                    tbody.appendChild(row);
                 }
+
+                table.appendChild(tbody);
+                pageContainer.appendChild(table);
+                tempContainer.appendChild(pageContainer);
+
+                // Wait for fonts and rendering
+                await document.fonts.ready;
+                await new Promise(resolve => setTimeout(resolve, 50)); // Reduced timeout
+
+                // Capture the page with optimized settings
+                const canvas = await html2canvas(pageContainer, {
+                    scale: 1, // Reduced from 2 to 1
+                    useCORS: true,
+                    backgroundColor: '#ffffff',
+                    letterRendering: false, // Disable for smaller files
+                    logging: false,
+                    imageTimeout: 15000,
+                    removeContainer: true
+                });
+
+                // Use JPEG compression instead of PNG
+                const imgData = canvas.toDataURL('image/jpeg', 0.8);
+                const imgProps = pdf.getImageProperties(imgData);
+                const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
+
+                // Center the content vertically on the page
+                const verticalPosition = Math.max(0, (USABLE_HEIGHT - imgHeight) / 2);
                 
-                tbody.appendChild(row);
+                pdf.addImage(
+                    imgData, 
+                    'JPEG', // Changed to JPEG
+                    MARGIN_MM, 
+                    MARGIN_MM + verticalPosition, 
+                    USABLE_WIDTH, 
+                    imgHeight,
+                    undefined,
+                    'FAST' // Use fast compression
+                );
+
+                // Remove the page container
+                tempContainer.removeChild(pageContainer);
+                
+                currentRow = endRow;
+                pageCount++;
             }
 
-            table.appendChild(tbody);
-            pageContainer.appendChild(table);
-            tempContainer.appendChild(pageContainer);
+            // Final cleanup
+            document.body.removeChild(tempContainer);
 
-            // Wait for fonts and rendering
-            await document.fonts.ready;
-            await new Promise(resolve => setTimeout(resolve, 50)); // Reduced timeout
+            const fileName = `${document.title || 'sunday-schedule'}.pdf`;
+            pdf.save(fileName);
 
-            // Capture the page with optimized settings
-            const canvas = await html2canvas(pageContainer, {
-                scale: 2, // Reduced from 2 to 1
-                useCORS: true,
-                backgroundColor: '#ffffff',
-                letterRendering: false, // Disable for smaller files
-                logging: false,
-                imageTimeout: 15000,
-                removeContainer: true
-            });
-
-            // Use JPEG compression instead of PNG
-            const imgData = canvas.toDataURL('image/jpeg', 1.0);
-            const imgProps = pdf.getImageProperties(imgData);
-            const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
-
-            // Center the content vertically on the page
-            const verticalPosition = Math.max(0, (USABLE_HEIGHT - imgHeight) / 2);
-            
-            pdf.addImage(
-                imgData, 
-                'JPEG', // Changed to JPEG
-                MARGIN_MM, 
-                MARGIN_MM + verticalPosition, 
-                USABLE_WIDTH, 
-                imgHeight,
-                undefined,
-                'FAST' // Use fast compression
-            );
-
-            // Remove the page container
-            tempContainer.removeChild(pageContainer);
-            
-            currentRow = endRow;
-            pageCount++;
+        } catch (error) {
+            console.error("PDF generation failed:", error);
+            alert("Sorry, there was an error creating the PDF. Please try again.");
+        } finally {
+            printButton.disabled = false;
+            printButton.querySelector('span:last-child').textContent = 'Download PDF';
         }
-
-        // Final cleanup
-        document.body.removeChild(tempContainer);
-
-        const fileName = `${document.title || 'sunday-schedule'}.pdf`;
-        pdf.save(fileName);
-
-    } catch (error) {
-        console.error("PDF generation failed:", error);
-        alert("Sorry, there was an error creating the PDF. Please try again.");
-    } finally {
-        printButton.disabled = false;
-        printButton.querySelector('span:last-child').textContent = 'Download PDF';
     }
-}
 
     function setupGlobalUI() {
         // Initialize desktop dropdown elements
@@ -2451,14 +2587,31 @@ function updateCorrespondingMobileField(cell, value) {
 
         // App-specific UI
         document.getElementById('print-button').addEventListener('click', generatePdf);
+        document.getElementById('edit-weeks-button').addEventListener('click', openWeekEditor);
+        
         document.getElementById('cancel-creation').addEventListener('click', () => {
             dateSelectionModal.classList.remove('active');
             setTimeout(() => {
                 dateSelectionModal.style.display = 'none';
-                window.location.href = './sunday-dashboard.html';
+                // Reset modal to creation state
+                document.querySelector('#date-selection-modal h2').textContent = 'Create New Sunday Schedule';
+                document.querySelector('#date-selection-modal p').textContent = 'Give your new schedule a name and select the weeks to include.';
+                document.getElementById('new-schedule-name').style.display = 'block';
+                document.getElementById('confirm-creation').textContent = 'Create Schedule';
+                
+                if (!currentScheduleId) {
+                    window.location.href = './sunday-dashboard.html';
+                }
             }, 300);
         });
-        document.getElementById('confirm-creation').addEventListener('click', handleCreateSchedule);
+        
+        document.getElementById('confirm-creation').addEventListener('click', function() {
+            if (this.textContent === 'Create Schedule') {
+                handleCreateSchedule();
+            } else {
+                handleUpdateWeeks();
+            }
+        });
 
         // Enhanced dropdown event listeners
         dropdownBackdrop.addEventListener('click', hideMobileDropdown);
