@@ -1521,23 +1521,36 @@
         }
     });
 
+
+
+
     function initEditor() {
-        if (currentListener) currentListener();
-        currentListener = userSchedulesCollection.doc(currentScheduleId).onSnapshot(doc => {
-    if (doc.exists) {
-        const scheduleData = doc.data();
-        
-        // Always update the status, but don't re-render on every change
-        // to avoid conflicts with optimistic updates
-        updateStatus('Synced', 'synced');
-    } else {
-        alert("This schedule may have been deleted.");
-        window.location.href = './sunday-dashboard.html';
-    }
-}, error => {
-    updateStatus('Error', 'error');
-});
-    }
+    if (currentListener) currentListener();
+    
+    let isFirstLoad = true;
+    
+    currentListener = userSchedulesCollection.doc(currentScheduleId).onSnapshot(doc => {
+        if (doc.exists) {
+            const scheduleData = doc.data();
+            
+            // Only render on first load, not on subsequent updates
+            if (isFirstLoad) {
+                renderSchedule(scheduleData);
+                isFirstLoad = false;
+            }
+            
+            updateStatus('Synced', 'synced');
+        } else {
+            alert("This schedule may have been deleted.");
+            window.location.href = './sunday-dashboard.html';
+        }
+    }, error => {
+        updateStatus('Error', 'error');
+    });
+}
+
+
+
 
     function renderSchedule(data) {
         document.title = data.name;
