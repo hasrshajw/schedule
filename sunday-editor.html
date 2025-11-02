@@ -795,37 +795,59 @@
         border-radius: 2px;
     }
     
-    /* Single Event Type Button in Mobile */
+    /* Event Type Selector at Top */
     .event-type-selector {
         display: flex;
+        gap: 8px;
         margin-bottom: 20px;
+        flex-wrap: wrap;
     }
     
     .event-type-btn {
         flex: 1;
+        min-width: 120px;
         padding: 12px 16px;
         border: 2px solid var(--border-color);
         background: white;
         border-radius: var(--radius-md);
         cursor: pointer;
+        transition: all 0.2s ease;
         font-family: 'Noto Sans Telugu', sans-serif;
         font-weight: 500;
         text-align: center;
-        transition: all 0.2s ease;
         display: flex;
+        flex-direction: column;
         align-items: center;
-        justify-content: center;
-        gap: 8px;
+        gap: 4px;
     }
     
-    .event-type-btn:hover {
-        border-color: var(--accent-color);
-        background-color: #f8fafc;
-    }
-    
-    .event-type-btn .current-event {
-        font-weight: 600;
+    .event-type-btn.active {
+        border-color: var(--primary-color);
+        background-color: var(--primary-light);
         color: var(--primary-color);
+        font-weight: 600;
+    }
+    
+    .event-type-btn.co-visit.active {
+        border-color: var(--danger-color);
+        background-color: #fef2f2;
+        color: var(--danger-color);
+    }
+    
+    .event-type-btn.assembly.active {
+        border-color: var(--success-color);
+        background-color: #f0fdf4;
+        color: var(--success-color);
+    }
+    
+    .event-type-btn.convention.active {
+        border-color: var(--accent-color);
+        background-color: #f0f9ff;
+        color: var(--accent-color);
+    }
+    
+    .event-type-icon {
+        font-size: 1.2rem;
     }
     
     .week-fields {
@@ -917,6 +939,47 @@
         margin: 0;
         font-family: 'Noto Sans Telugu', sans-serif;
     }
+    
+    .mobile-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 20px;
+        padding-top: 16px;
+        border-top: 1px solid var(--border-color);
+    }
+    
+    .mobile-action-btn {
+        flex: 1;
+        padding: 12px 16px;
+        border: 2px solid var(--border-color);
+        background: white;
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        font-family: 'Noto Sans Telugu', sans-serif;
+        font-weight: 500;
+        text-align: center;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    
+    .mobile-action-btn.primary {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+    
+    .mobile-action-btn.primary:hover {
+        background: var(--primary-hover);
+        border-color: var(--primary-hover);
+    }
+    
+    .mobile-action-btn.secondary:hover {
+        border-color: var(--accent-color);
+        color: var(--accent-color);
+    }
 
     /* Animation Classes */
     .fade-in {
@@ -969,7 +1032,7 @@
         }
         
         main { 
-            padding-top: 80px; /* 60px navbar + 20px spacing */
+            padding-top: 70px; /* 60px navbar + 10px spacing */
         }
         
         .editor-main { 
@@ -1019,6 +1082,16 @@
         
         .desktop-dropdown {
             display: none !important;
+        }
+        
+        .event-type-selector {
+            gap: 6px;
+        }
+        
+        .event-type-btn {
+            min-width: calc(50% - 6px);
+            padding: 10px 12px;
+            font-size: 0.9rem;
         }
     }
 
@@ -1255,10 +1328,10 @@
     };
 
     const eventTypes = [
-        { id: 'normal', name: 'Normal' },
-        { id: 'co-visit', name: 'CO Visit' },
-        { id: 'assembly', name: 'Assembly' },
-        { id: 'convention', name: 'Convention' }
+        { id: 'normal', name: 'Normal', icon: 'event', color: 'primary' },
+        { id: 'co-visit', name: 'CO Visit', icon: 'groups', color: 'co-visit' },
+        { id: 'assembly', name: 'Assembly', icon: 'celebration', color: 'assembly' },
+        { id: 'convention', name: 'Convention', icon: 'festival', color: 'convention' }
     ];
 
     const debounce = (func, delay) => {
@@ -1417,28 +1490,21 @@
             // Check if this is a special event
             const isSpecialEvent = topicCell.classList.contains('special-event') && topicCell.colSpan === 4;
             const currentEventType = getEventTypeForRow(row);
-            const currentEventName = eventTypes.find(e => e.id === currentEventType)?.name || 'Normal';
             
             if (isSpecialEvent) {
                 card.innerHTML = `
                     <h3 class="week-date">${dateCell.textContent}</h3>
                     <div class="event-type-selector">
-                        <button class="event-type-btn" data-row="${rowIndex}">
-                            <span class="material-symbols-outlined">event</span>
-                            <span class="current-event">${currentEventName}</span>
-                            <span class="material-symbols-outlined">expand_more</span>
-                        </button>
+                        ${eventTypes.map(event => `
+                            <button class="event-type-btn ${event.id} ${currentEventType === event.id ? 'active' : ''}" 
+                                    data-event-type="${event.id}" data-row="${rowIndex}">
+                                <span class="material-symbols-outlined event-type-icon">${event.icon}</span>
+                                <span>${event.name}</span>
+                            </button>
+                        `).join('')}
                     </div>
                     <div class="special-event-mobile">
                         <p class="special-event-text-mobile">${topicCell.textContent}</p>
-                    </div>
-                    <div class="week-fields">
-                        <div class="field-group">
-                            <label>ప్రసంగ అంశం</label>
-                            <div class="mobile-field topic-field" data-row="${rowIndex}" data-cell="1">
-                                <span class="mobile-field-value">${topicCell.textContent}</span>
-                            </div>
-                        </div>
                     </div>
                 `;
             } else {
@@ -1446,11 +1512,13 @@
                     <h3 class="week-date">${dateCell.textContent}</h3>
                     
                     <div class="event-type-selector">
-                        <button class="event-type-btn" data-row="${rowIndex}">
-                            <span class="material-symbols-outlined">event</span>
-                            <span class="current-event">${currentEventName}</span>
-                            <span class="material-symbols-outlined">expand_more</span>
-                        </button>
+                        ${eventTypes.map(event => `
+                            <button class="event-type-btn ${event.id} ${currentEventType === event.id ? 'active' : ''}" 
+                                    data-event-type="${event.id}" data-row="${rowIndex}">
+                                <span class="material-symbols-outlined event-type-icon">${event.icon}</span>
+                                <span>${event.name}</span>
+                            </button>
+                        `).join('')}
                     </div>
                     
                     <div class="week-fields">
@@ -1517,10 +1585,9 @@
         // Add event listeners to event type buttons
         mobileContainer.querySelectorAll('.event-type-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
+                const eventType = btn.dataset.eventType;
                 const rowIndex = btn.dataset.row;
-                const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
-                activeRowForEvents = tableBody.rows[rowIndex];
-                showMobileEventTypeDropdown();
+                changeEventType(rowIndex, eventType);
             });
         });
     }
@@ -1729,24 +1796,6 @@
         showMobileDropdown();
     }
 
-    function showMobileEventTypeDropdown() {
-        dropdownTitle.textContent = 'Select Event Type';
-        dropdownContent.innerHTML = '';
-        
-        eventTypes.forEach(event => {
-            const item = document.createElement('button');
-            item.className = 'dropdown-item';
-            item.textContent = event.name;
-            item.addEventListener('click', () => {
-                changeEventType(activeRowForEvents.rowIndex, event.id);
-                hideMobileDropdown();
-            });
-            dropdownContent.appendChild(item);
-        });
-        
-        showMobileDropdown();
-    }
-
     function showMobileDropdown() {
         dropdownBackdrop.classList.add('active');
         dropdownContainer.classList.add('active');
@@ -1880,15 +1929,78 @@
         
         // For desktop, show a simple dropdown
         if (window.innerWidth > 768) {
-            showMobileEventTypeDropdown();
+            showEventTypeMenu();
             dropdownContainer.style.top = 'auto';
             dropdownContainer.style.bottom = `${window.innerHeight - rect.top}px`;
             dropdownContainer.style.left = `${rect.left}px`;
             dropdownContainer.style.width = '200px';
             dropdownContainer.style.borderRadius = '12px';
         } else {
-            showMobileEventTypeDropdown();
+            showEventTypeMenu();
         }
+    }
+    
+    function showEventTypeMenu() {
+        dropdownTitle.textContent = 'Select Event Type';
+        dropdownContent.innerHTML = '';
+        
+        const eventTypes = [
+            { type: 'normal', name: 'Normal' },
+            { type: 'co-visit', name: 'CO Visit' },
+            { type: 'assembly', name: 'Assembly' },
+            { type: 'convention', name: 'Convention' }
+        ];
+        
+        eventTypes.forEach(event => {
+            const item = document.createElement('button');
+            item.className = 'dropdown-item';
+            item.textContent = event.name;
+            item.addEventListener('click', () => {
+                applyEventType(event.type);
+                hideMobileDropdown();
+            });
+            dropdownContent.appendChild(item);
+        });
+        
+        showMobileDropdown();
+    }
+    
+    function applyEventType(eventType) {
+        if (!activeRowForEvents) return;
+        const cells = Array.from(activeRowForEvents.cells);
+        const topicCell = cells[1];
+        const otherCells = cells.slice(2, 5);
+        topicCell.colSpan = 1;
+        topicCell.classList.remove('special-event');
+        topicCell.classList.add('editable-cell');
+        if(topicCell.dataset.originalContent) {
+           topicCell.innerHTML = topicCell.dataset.originalContent;
+        } else if (eventType !== 'normal') {
+           topicCell.innerHTML = '';
+        }
+        topicCell.removeAttribute('data-original-content');
+        otherCells.forEach((cell) => {
+            cell.style.display = '';
+            cell.classList.add('editable-cell');
+            if(cell.dataset.originalContent) cell.innerHTML = cell.dataset.originalContent;
+            cell.removeAttribute('data-original-content');
+        });
+        if (eventType !== 'normal') {
+            topicCell.dataset.originalContent = topicCell.innerHTML;
+            otherCells.forEach(cell => cell.dataset.originalContent = cell.innerHTML);
+            topicCell.colSpan = 4;
+            topicCell.classList.add('special-event');
+            topicCell.classList.remove('editable-cell');
+            topicCell.textContent = eventTexts[eventType];
+            otherCells.forEach(cell => {
+                cell.style.display = 'none';
+                cell.classList.remove('editable-cell');
+            });
+        }
+        
+        // Update mobile view
+        createMobileView();
+        debouncedSave();
     }
     
     async function generatePdf() {
