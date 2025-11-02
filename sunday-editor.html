@@ -2264,26 +2264,29 @@
         }).join('');
 
         try {
-            updateStatus('Updating...', 'syncing');
-            
-            await userSchedulesCollection.doc(currentScheduleId).update({
-                dateRange: dateRange,
-                tableHTML: tableBodyHTML,
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            
-            // Close modal
-            dateSelectionModal.classList.remove('active');
-            setTimeout(() => {
-                dateSelectionModal.style.display = 'none';
-                // Reset modal for next use
-                document.getElementById('new-schedule-name').style.display = 'block';
-                document.querySelector('#date-selection-modal h2').textContent = 'Create New Sunday Schedule';
-                document.querySelector('#date-selection-modal p').textContent = 'Give your new schedule a name and select the weeks to include.';
-                document.getElementById('confirm-creation').textContent = 'Create Schedule';
-            }, 300);
-            
-            updateStatus('Synced', 'synced');
+    updateStatus('Updating...', 'syncing');
+    
+    await userSchedulesCollection.doc(currentScheduleId).update({
+        dateRange: dateRange,
+        tableHTML: tableBodyHTML,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    
+    // Refresh the editor to show updated data
+    initEditor();
+    
+    // Close modal and reset
+    dateSelectionModal.classList.remove('active');
+    setTimeout(() => {
+        dateSelectionModal.style.display = 'none';
+        // Reset modal for next use
+        document.getElementById('new-schedule-name').style.display = 'block';
+        document.querySelector('#date-selection-modal h2').textContent = 'Create New Sunday Schedule';
+        document.querySelector('#date-selection-modal p').textContent = 'Give your new schedule a name and select the weeks to include.';
+        document.getElementById('confirm-creation').textContent = 'Create Schedule';
+    }, 300);
+    
+    updateStatus('Synced', 'synced');
             
         } catch (error) {
             console.error("Error updating schedule weeks:", error);
