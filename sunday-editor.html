@@ -1524,19 +1524,17 @@
     function initEditor() {
         if (currentListener) currentListener();
         currentListener = userSchedulesCollection.doc(currentScheduleId).onSnapshot(doc => {
-            if (doc.exists) {
-                const scheduleData = doc.data();
-                if (!document.activeElement || document.activeElement.tagName === 'BODY' || !scheduleWrapper.contains(document.activeElement)) {
-                    renderSchedule(scheduleData);
-                }
-                updateStatus('Synced', 'synced');
-            } else {
-                alert("This schedule may have been deleted.");
-                window.location.href = './sunday-dashboard.html';
-            }
-        }, error => {
-            updateStatus('Error', 'error');
-        });
+    if (doc.exists) {
+        const scheduleData = doc.data();
+        renderSchedule(scheduleData); // Always render when data changes
+        updateStatus('Synced', 'synced');
+    } else {
+        alert("This schedule may have been deleted.");
+        window.location.href = './sunday-dashboard.html';
+    }
+}, error => {
+    updateStatus('Error', 'error');
+});
     }
 
     function renderSchedule(data) {
