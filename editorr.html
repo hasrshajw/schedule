@@ -12,32 +12,35 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 <style>
     :root {
-        --header-bg: #292929;
-        --text-light: #fff;
+        --header-bg: #1a1a1a;
+        --text-light: #ffffff;
         --body-bg: #f8fafc;
-        --menu-new-text: #4a6da7;
+        --menu-new-text: #2c5282;
         --menu-new-bg: #ffffff;
-        --menu-new-border: #eeeeee;
-        --menu-new-hover: #f5f5f5;
-        --primary-color: #012726;
-        --primary-hover: #024443;
-        --primary-light: #e6f6f6;
-        --danger-color: #d32f2f;
-        --danger-hover: #b71c1c;
-        --border-color: #e5e7eb;
+        --menu-new-border: #e2e8f0;
+        --menu-new-hover: #f7fafc;
+        --primary-color: #2d3748;
+        --primary-hover: #4a5568;
+        --primary-light: #edf2f7;
+        --danger-color: #e53e3e;
+        --danger-hover: #c53030;
+        --border-color: #e2e8f0;
         --background-color: #f8fafc;
-        --text-primary: #1f2937;
-        --text-secondary: #6b7280;
+        --text-primary: #2d3748;
+        --text-secondary: #718096;
         --surface-color: #ffffff;
         --radius-md: 8px;
-        --radius-lg: 16px;
+        --radius-lg: 12px;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
         --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-        --warning-color: #f59e0b;
-        --success-color: #2e7d32;
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        --warning-color: #ed8936;
+        --success-color: #38a169;
+        --accent-color: #3182ce;
     }
 
     @font-face {
@@ -46,122 +49,826 @@
         font-weight: normal; font-style: normal;
     }
 
+    * {
+        box-sizing: border-box;
+    }
+
     body {
-        margin: 0; padding: 0;
-        font-family: 'Inter', sans-serif;
+        margin: 0; 
+        padding: 0;
+        font-family: 'Inter', 'Noto Sans Telugu', sans-serif;
         background-color: var(--body-bg);
         color: var(--text-primary);
-        visibility: hidden; opacity: 0;
+        line-height: 1.5;
+        visibility: hidden; 
+        opacity: 0;
         transition: opacity 0.3s ease-in;
     }
     body.auth-ready { visibility: visible; opacity: 1; }
     body.menu-open { overflow: hidden; }
+    body.dropdown-open { overflow: hidden; }
 
-    .site-header { background-color: var(--header-bg); padding: 0; color: var(--text-light); position: fixed; top: 0; left: 0; width: 100%; z-index: 900; }
-    .top-bar { display: flex; justify-content: space-between; align-items: center; height: 56px; padding: 0 15px 0 0; max-width: 1200px; margin: 0 auto; }
-    .top-bar .mobileLogo { display: block; width: 75px; height: 56px; background-image: url(https://www.jw.org/assets/ct/46605f23da/images/siteLogo-jworg-mobile.svg), none; background-repeat: no-repeat; background-size: contain; background-position: center left; flex-shrink: 0; margin-left: 0px; }
-    .header-right-controls { display: flex; align-items: center; gap: 15px; }
-    .header-icons { display: flex; align-items: center; height: 56px; cursor: pointer; }
-    .header-icons svg { height: 24px; width: 24px; color: var(--text-light); }
+    .site-header { 
+        background-color: var(--header-bg); 
+        padding: 0; 
+        color: var(--text-light); 
+        position: fixed; 
+        top: 0; 
+        left: 0; 
+        width: 100%; 
+        z-index: 1000;
+        box-shadow: var(--shadow-md);
+    }
+    .top-bar { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        height: 64px; 
+        padding: 0 20px; 
+        max-width: 1200px; 
+        margin: 0 auto; 
+    }
+    .top-bar .mobileLogo { 
+        display: block; 
+        width: 80px; 
+        height: 64px; 
+        background-image: url(https://www.jw.org/assets/ct/46605f23da/images/siteLogo-jworg-mobile.svg), none; 
+        background-repeat: no-repeat; 
+        background-size: contain; 
+        background-position: center left; 
+        flex-shrink: 0; 
+    }
+    .header-right-controls { 
+        display: flex; 
+        align-items: center; 
+        gap: 16px; 
+    }
+    
+    .status-indicator { 
+        font-size: 12px; 
+        font-weight: 600; 
+        padding: 6px 12px; 
+        border-radius: 999px; 
+        display: flex; 
+        align-items: center; 
+        gap: 6px; 
+        color: var(--text-light);
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+    }
+    
+    .status-indicator::before { 
+        content: ''; 
+        width: 8px; 
+        height: 8px; 
+        border-radius: 50%; 
+        background-color: currentColor; 
+    }
+    
+    .status-indicator[data-status="synced"] { color: var(--success-color); }
+    .status-indicator[data-status="syncing"] { color: var(--warning-color); }
+    .status-indicator[data-status="error"] { color: var(--danger-color); }
+    
+    .header-icons { 
+        display: flex; 
+        align-items: center; 
+        height: 64px; 
+        cursor: pointer; 
+        padding: 12px;
+        border-radius: var(--radius-md);
+        transition: background-color 0.2s;
+    }
+    .header-icons:hover {
+        background-color: rgba(255,255,255,0.1);
+    }
+    .header-icons svg { 
+        height: 24px; 
+        width: 24px; 
+        color: var(--text-light); 
+    }
     .header-icons .close-icon { display: none; }
     body.menu-open .header-icons .hamburger-icon { display: none; }
     body.menu-open .header-icons .close-icon { display: block; }
 
-    .menu-overlay { position: fixed; top: 56px; left: 0; width: 100%; height: calc(100% - 56px); background-color: rgba(0, 0, 0, 0.6); z-index: 998; opacity: 0; visibility: hidden; transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; }
+    .menu-overlay { 
+        position: fixed; 
+        top: 64px; 
+        left: 0; 
+        width: 100%; 
+        height: calc(100% - 64px); 
+        background-color: rgba(0, 0, 0, 0.6); 
+        z-index: 999; 
+        opacity: 0; 
+        visibility: hidden; 
+        transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; 
+        backdrop-filter: blur(2px);
+    }
     .menu-overlay.is-open { opacity: 1; visibility: visible; }
-    .slide-menu { position: fixed; top: 56px; right: 0; height: calc(100dvh - 56px); width: 320px; max-width: 90%; background-color: var(--menu-new-bg); z-index: 999; transform: translateX(100%); transition: transform 0.3s ease-in-out; display: flex; flex-direction: column; border-left: 1px solid var(--menu-new-border); }
+    .slide-menu { 
+        position: fixed; 
+        top: 64px; 
+        right: 0; 
+        height: calc(100dvh - 64px); 
+        width: 320px; 
+        max-width: 90%; 
+        background-color: var(--menu-new-bg); 
+        z-index: 1000; 
+        transform: translateX(100%); 
+        transition: transform 0.3s ease-in-out; 
+        display: flex; 
+        flex-direction: column; 
+        border-left: 1px solid var(--menu-new-border);
+        box-shadow: var(--shadow-lg);
+    }
     .slide-menu.is-open { transform: translateX(0); }
 
     .menu-links { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex-grow: 1; }
-    .menu-links li a { display: flex; align-items: center; color: var(--menu-new-text); background-color: var(--menu-new-bg); height: 50px; padding: 12px 5px 12px 12px; box-sizing: border-box; text-decoration: none; font-size: 1rem; transition: background-color 0.2s; border-top: 1px dotted #a7a7a7; }
+    .menu-links li a { 
+        display: flex; 
+        align-items: center; 
+        color: var(--menu-new-text); 
+        background-color: var(--menu-new-bg); 
+        height: 56px; 
+        padding: 12px 20px; 
+        box-sizing: border-box; 
+        text-decoration: none; 
+        font-size: 1rem; 
+        font-weight: 500;
+        transition: all 0.2s; 
+        border-bottom: 1px solid var(--border-color); 
+    }
     .menu-links li:first-child a { border-top: none; }
-    .menu-links li a:hover { background-color: var(--menu-new-hover); }
+    .menu-links li a:hover { 
+        background-color: var(--menu-new-hover); 
+        color: var(--accent-color);
+    }
 
-    .profile-section { padding: 16px; border-top: 1px solid var(--menu-new-border); flex-shrink: 0; background-color: #fafafa; margin-top: auto; }
+    .profile-section { 
+        padding: 20px; 
+        border-top: 1px solid var(--menu-new-border); 
+        flex-shrink: 0; 
+        background-color: #fafafa; 
+        margin-top: auto; 
+    }
     .profile-info { display: flex; align-items: center; }
-    .profile-name { font-weight: bold; font-size: 1rem; color: #333; word-break: break-all; }
+    .profile-name { 
+        font-weight: 600; 
+        font-size: 1rem; 
+        color: #333; 
+        word-break: break-all; 
+    }
 
-    .iconLink-icon { font-family: "jw-icons-external"; font-size: 24px; display: inline-block; color: #757575; width: 30px; margin-right: 10px; text-align: center; }
+    .iconLink-icon { 
+        font-family: "jw-icons-external"; 
+        font-size: 24px; 
+        display: inline-block; 
+        color: #718096; 
+        width: 32px; 
+        margin-right: 12px; 
+        text-align: center; 
+        transition: color 0.2s;
+    }
+    .menu-links li a:hover .iconLink-icon {
+        color: var(--accent-color);
+    }
     .home-icon::before { content: "\e661"; }
     .midweek-icon::before { content: "\e625"; }
     .sunday-icon::before { content: "\e610"; }
     .members-icon::before { content: "\e695"; }
 
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; border-radius: var(--radius-md); font-size: 1rem; font-weight: 600; cursor: pointer; border: none; text-decoration: none; background-color: var(--primary-color); color: white; transition: background-color 0.2s; }
-    .btn:hover:not(:disabled) { background-color: var(--primary-hover); }
+    .btn { 
+        display: inline-flex; 
+        align-items: center; 
+        justify-content: center; 
+        gap: 8px; 
+        padding: 12px 20px; 
+        border-radius: var(--radius-md); 
+        font-size: 1rem; 
+        font-weight: 600; 
+        cursor: pointer; 
+        border: none; 
+        text-decoration: none; 
+        background-color: var(--primary-color); 
+        color: white; 
+        transition: all 0.2s ease; 
+        box-shadow: var(--shadow-sm);
+    }
+    .btn:hover:not(:disabled) { 
+        background-color: var(--primary-hover); 
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+    }
+    .btn:active:not(:disabled) {
+        transform: translateY(0);
+    }
     .btn:disabled { cursor: not-allowed; opacity: 0.6; }
 
     .hidden { display: none !important; }
+    
+    main { 
+        padding-top: 84px;
+        min-height: 100vh;
+    }
+    
+    .editor-main { 
+        max-width: 1100px; 
+        margin: 0 auto; 
+        padding: 20px;
+    }
+    
+    .page-controls { 
+        margin-bottom: 24px; 
+        display: flex; 
+        justify-content: flex-end;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .master-container { 
+        background: var(--surface-color); 
+        padding: 24px; 
+        border-radius: var(--radius-lg); 
+        box-shadow: var(--shadow-md); 
+        border: 1px solid var(--border-color);
+    }
+    
+    .schedule-display-header { 
+        text-align: center; 
+        margin-bottom: 0; 
+    }
+    
+    .title-block { 
+        text-align: center; 
+        margin-bottom: 24px;
+    }
+    
+    .title-block h1 { 
+        margin: 0 0 12px 0; 
+        font-size: 1.8em; 
+        font-weight: 700; 
+        color: rgb(97, 40, 0); 
+        font-family: 'Noto Sans Telugu', sans-serif; 
+        line-height: 1.3;
+    }
+    
+    .subtitle-svg-container { 
+        position: relative; 
+        display: inline-block; 
+        margin-top: 0; 
+    }
+    
+    .subtitle { 
+        margin: 0; 
+        font-size: 1.1em; 
+        font-weight: 500; 
+        color: var(--text-primary); 
+        background-color: var(--surface-color); 
+        padding: 8px 16px; 
+        display: inline-block; 
+        position: relative; 
+        z-index: 2; 
+        white-space: nowrap; 
+        border-radius: var(--radius-md); 
+        font-family: 'Noto Sans Telugu', sans-serif; 
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-sm);
+        transition: all 0.2s;
+    }
+    
+    .subtitle:focus { 
+        outline: 2px solid var(--accent-color); 
+        background-color: #f0f8ff; 
+    }
+    
+    .svg-divider { 
+        width: 400px; 
+        height: 5px; 
+        display: block; 
+        position: absolute; 
+        left: 50%; 
+        transform: translateX(-50%); 
+        top: 50%; 
+        margin-top: -2.5px; 
+        z-index: 1; 
+    }
+    
+    .schedule-table { 
+        width: 100%; 
+        border-collapse: collapse; 
+        font-size: 0.9em; 
+        border: 2px solid var(--border-color);
+        font-family: 'Noto Sans Telugu', sans-serif; 
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .schedule-table th, .schedule-table td { 
+        border: 1px solid var(--border-color); 
+        padding: 12px 8px; 
+        text-align: center; 
+        vertical-align: middle; 
+        font-weight: 500; 
+        font-family: 'Noto Sans Telugu', sans-serif; 
+    }
+    
+    .schedule-table tbody td:not(:first-child):not(.special-event) { 
+        text-align: left; 
+        padding-left: 12px; 
+    }
+    
+    .schedule-table thead th { 
+        background-color: #f8f9fa; 
+        font-size: 1.0em; 
+        padding: 14px 8px; 
+        font-family: 'Noto Sans Telugu', sans-serif; 
+        font-weight: 600;
+        color: var(--text-primary);
+        border-bottom: 2px solid var(--border-color);
+    }
+    
+    .schedule-table tbody tr {
+        transition: background-color 0.2s;
+    }
+    
+    .schedule-table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .schedule-table [contenteditable="true"]:focus { 
+        background-color: #fffbe5; 
+        outline: 2px solid var(--warning-color); 
+        border-radius: 4px;
+    }
+    
+    .special-event { 
+        color: var(--danger-color); 
+        font-weight: 700; 
+        text-align: center; 
+        padding-left: 5px; 
+        font-family: 'Noto Sans Telugu', sans-serif; 
+        background-color: #fff5f5;
+    }
+    
+    .event-btn { 
+        background: none; 
+        border: none; 
+        cursor: pointer; 
+        padding: 6px; 
+        border-radius: 50%; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        margin: 0 auto; 
+        transition: background-color 0.2s;
+        color: var(--text-secondary);
+    }
+    
+    .event-btn:hover { 
+        background-color: #f0f0f0; 
+        color: var(--text-primary);
+    }
 
-    main { padding: calc(56px + 20px) 20px 20px; }
-    .editor-main { max-width: 1100px; margin: 0 auto; }
-    .page-controls { margin-bottom: 24px; display: flex; gap: 12px; justify-content: flex-end; }
+    .desktop-dropdown { 
+        position: absolute; 
+        background: rgba(255, 255, 255, 0.9); 
+        backdrop-filter: blur(8px);
+        border-radius: 14px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 10px 35px rgba(0, 0, 0, 0.12);
+        z-index: 1001; 
+        padding: 0; 
+        width: 340px;
+        transform: scale(0.98) translateY(-10px);
+        transform-origin: top;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+        overflow: hidden;
+        display: block;
+    }
+    
+    .desktop-dropdown.active {
+        opacity: 1;
+        visibility: visible;
+        transform: scale(1) translateY(0);
+    }
+    
+    .desktop-dropdown-search {
+        display: flex;
+        align-items: center;
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--border-color);
+        background: rgba(255,255,255,0.7);
+    }
+    
+    .desktop-dropdown-search svg {
+        margin-right: 8px;
+    }
+    
+    .desktop-dropdown-search input {
+        width: 100%;
+        border: none;
+        outline: none;
+        background: transparent;
+        font-size: 14px;
+        color: var(--text-primary);
+    }
+    
+    .desktop-dropdown-list {
+        max-height: 260px;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: var(--accent-color) transparent;
+    }
+    
+    .desktop-dropdown-list::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .desktop-dropdown-list::-webkit-scrollbar-thumb {
+        background: var(--accent-color);
+        border-radius: 3px;
+    }
+    
+    .desktop-dropdown-item { 
+        display: flex; 
+        align-items: center; 
+        width: 100%; 
+        padding: 12px 16px; 
+        border: none; 
+        background: none; 
+        cursor: pointer; 
+        transition: background-color 0.2s;
+        font-family: 'Noto Sans Telugu', sans-serif;
+        font-size: 14px;
+        text-align: left;
+        color: var(--text-primary);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .desktop-dropdown-item:hover {
+        background: rgba(0,123,255,0.08);
+        color: var(--accent-color);
+    }
+    
+    .desktop-dropdown-item.active {
+        background: rgba(0,123,255,0.15);
+        color: var(--accent-color);
+        font-weight: 500;
+    }
+    
+    .servant-tag { 
+        font-size: 0.75rem; 
+        font-weight: 600; 
+        color: var(--primary-color); 
+        background-color: var(--primary-light); 
+        padding: 4px 8px; 
+        border-radius: 12px; 
+        margin-left: auto;
+        margin-right: 8px;
+    }
 
-    .master-container { background: var(--surface-color); padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
-    .project-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color); }
-    .project-title { font-size: 1.75rem; font-weight: 700; margin: 0; flex-grow: 1; border: none; padding: 4px 8px; margin: -4px -8px; border-radius: var(--radius-md); font-family: 'Noto Sans Telugu', sans-serif; }
-    .project-title:focus { outline: 2px solid var(--primary-color); background-color: var(--primary-light); }
+    .desktop-event-menu { 
+        position: fixed; 
+        display: none; 
+        background: white; 
+        border-radius: var(--radius-md); 
+        box-shadow: var(--shadow-lg); 
+        z-index: 1001; 
+        padding: 8px; 
+        min-width: 180px; 
+        border: 1px solid var(--border-color); 
+    }
+    
+    .desktop-event-item { 
+        display: flex; 
+        align-items: center; 
+        width: 100%; 
+        padding: 10px 12px; 
+        border: none; 
+        background: none; 
+        cursor: pointer; 
+        transition: background-color 0.2s;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.9rem;
+        text-align: left;
+        color: var(--text-primary);
+        border-radius: 4px;
+    }
+    
+    .desktop-event-item:hover {
+        background-color: #f8fafc;
+    }
 
-    .schedule-block { margin-bottom: 32px; }
-    .schedule-block:last-child { margin-bottom: 0; }
-    .schedule-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    .schedule-title { font-size: 1.25rem; font-weight: 600; margin: 0; color: var(--text-secondary); font-family: 'Noto Sans Telugu', sans-serif; }
+    .editable-cell {
+        cursor: pointer;
+        transition: all 0.2s ease;
+        position: relative;
+        border-radius: 4px;
+    }
+    .editable-cell:hover {
+        background-color: #f0f8ff;
+        box-shadow: inset 0 0 0 1px var(--accent-color);
+    }
+    .editable-cell:after {
+        content: "";
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        opacity: 0.5;
+        transition: opacity 0.2s;
+        width: 16px;
+        height: 16px;
+        background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 9L12 15L18 9' stroke='%23002726' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3C/path%3E%3C/svg%3E");
+        background-size: contain;
+        background-repeat: no-repeat;
+    }
+    .editable-cell:hover:after {
+        opacity: 1;
+    }
+    
+    .special-event {
+        cursor: default !important;
+    }
+    .special-event:after {
+        display: none;
+    }
 
-    .status-indicator { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; display: flex; align-items: center; gap: 6px; }
-    .status-indicator::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background-color: currentColor; }
-    .status-indicator[data-status="synced"] { color: var(--success-color); background-color: #eaf5ea; }
-    .status-indicator[data-status="syncing"] { color: var(--warning-color); background-color: #fffbeb; }
-    .status-indicator[data-status="error"] { color: var(--danger-color); background-color: #fde8e8; }
+    .modal-overlay { 
+        position: fixed; 
+        top: 0; 
+        left: 0; 
+        width: 100%; 
+        height: 100%; 
+        background: rgba(0,0,0,0.6); 
+        display: none; 
+        justify-content: center; 
+        align-items: center; 
+        z-index: 1000; 
+        padding: 16px; 
+        backdrop-filter: blur(4px);
+    }
+    .modal-content { 
+        background: white; 
+        padding: 24px; 
+        border-radius: var(--radius-lg); 
+        width: 100%; 
+        max-width: 500px; 
+        max-height: 90vh; 
+        display: flex; 
+        flex-direction: column; 
+        gap: 16px; 
+        box-shadow: var(--shadow-lg); 
+        transform: scale(0.9);
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
+    
+    .modal-overlay.active {
+        display: flex;
+    }
+    
+    .modal-overlay.active .modal-content {
+        transform: scale(1);
+        opacity: 1;
+    }
+    
+    #new-schedule-name { 
+        width: 100%; 
+        padding: 12px 16px; 
+        font-size: 16px; 
+        border-radius: var(--radius-md); 
+        border: 2px solid var(--border-color); 
+        font-family: 'Inter', sans-serif;
+        transition: border-color 0.2s;
+    }
+    
+    #new-schedule-name:focus {
+        outline: none;
+        border-color: var(--accent-color);
+    }
+    
+    #date-checklist { 
+        list-style: none; 
+        padding: 0; 
+        margin: 0; 
+        overflow-y: auto; 
+        border: 1px solid var(--border-color); 
+        border-radius: var(--radius-md); 
+        max-height: 40vh; 
+    }
+    
+    #date-checklist label { 
+        display: flex; 
+        align-items: center; 
+        gap: 10px; 
+        font-size: 16px; 
+        cursor: pointer; 
+        font-weight: 500; 
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border-color);
+        transition: background-color 0.2s;
+    }
+    
+    #date-checklist label:last-child {
+        border-bottom: none;
+    }
+    
+    #date-checklist label:hover {
+        background-color: #f8fafc;
+    }
+    
+    .modal-actions { 
+        display: flex; 
+        justify-content: flex-end; 
+        gap: 12px; 
+        margin-top: 16px; 
+    }
+    
+    .modal-actions button { 
+        font-family: 'Inter', sans-serif; 
+        padding: 10px 20px; 
+        border-radius: var(--radius-md); 
+        font-size: 15px; 
+        font-weight: 600; 
+        cursor: pointer; 
+        border: 2px solid var(--border-color); 
+        transition: all 0.2s ease;
+    }
+    
+    #cancel-creation { 
+        background-color: var(--surface-color); 
+    }
+    
+    #cancel-creation:hover {
+        border-color: var(--text-secondary);
+    }
+    
+    #confirm-creation { 
+        background-color: var(--primary-color); 
+        color: white; 
+        border-color: var(--primary-color); 
+    }
+    
+    #confirm-creation:hover {
+        background-color: var(--primary-hover);
+        border-color: var(--primary-hover);
+    }
 
-    .toolbar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); transition: all 0.2s; text-decoration: none; color: var(--text-secondary); }
-    .toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; border-color: #d1d5db; color: var(--text-primary); }
-    .toolbar-btn:disabled { cursor: not-allowed; opacity: 0.5; }
+    .dropdown-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 1100;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(4px);
+    }
+    
+    .dropdown-backdrop.active {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    .dropdown-container {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        border-radius: 24px 24px 0 0;
+        z-index: 1101;
+        transform: translateY(100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        max-height: 80vh;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 -10px 30px rgba(0,0,0,0.2);
+    }
+    
+    .dropdown-container.active {
+        transform: translateY(0);
+    }
+    
+    .dropdown-header {
+        padding: 20px 24px 12px;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-shrink: 0;
+    }
+    
+    .dropdown-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        font-family: 'Noto Sans Telugu', sans-serif;
+    }
+    
+    .dropdown-close {
+        background: none;
+        border: none;
+        padding: 8px;
+        cursor: pointer;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-secondary);
+        transition: background-color 0.2s;
+    }
+    
+    .dropdown-close:hover {
+        background-color: #f5f5f5;
+    }
+    
+    .mobile-dropdown-search {
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border-color);
+        background: rgba(255,255,255,0.7);
+    }
+    
+    .mobile-dropdown-search svg {
+        margin-right: 8px;
+    }
+    
+    .mobile-dropdown-search input {
+        width: 100%;
+        border: none;
+        outline: none;
+        background: transparent;
+        font-size: 16px;
+        color: var(--text-primary);
+    }
+    
+    .dropdown-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 8px 0;
+        max-height: 300px;
+    }
+    
+    .dropdown-item {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        padding: 16px 24px;
+        border: none;
+        background: none;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        font-family: 'Noto Sans Telugu', sans-serif;
+        font-size: 1rem;
+        text-align: left;
+        color: var(--text-primary);
+    }
+    
+    .dropdown-item:hover {
+        background-color: #f8fafc;
+    }
+    
+    .dropdown-item.active {
+        background-color: var(--primary-light);
+        color: var(--primary-color);
+        font-weight: 600;
+    }
 
-    .schedule-block table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.25px; }
-    .schedule-block th, .schedule-block td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; }
-    .schedule-block .editable-cell:not([contenteditable="true"]) { cursor: pointer; }
-    .schedule-block .editable-cell:not([contenteditable="true"]):hover { background-color: #f9fafb; }
-    .schedule-block [contenteditable="true"]:focus { background-color: #fffbe5; }
-    .schedule-block .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; }
-    .schedule-block .cell-icon { height: 70%; max-height: 24px; object-fit: contain; flex-shrink: 0; }
-    .schedule-block .header-row .cell-icon { filter: brightness(0) invert(1); }
-    .schedule-block .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; }
-    .schedule-block .header-row td { font-size: 16px; color: #ffffff; height: 42px; }
-    .schedule-block .row-handle { display: none !important; }
-    .special-event-text { color: red; text-align: center !important; font-weight: 700; }
-
-    #event-context-menu, #member-dropdown { position: fixed; display: none; background: var(--surface-color); border-radius: var(--radius-md); box-shadow: var(--shadow-md); z-index: 1001; padding: 6px; min-width: 180px; border: 1px solid var(--border-color); }
-    .context-menu-item, .member-dropdown-item { font-family: 'Inter', sans-serif; display: block; width: 100%; padding: 8px 12px; cursor: pointer; font-size: 14px; border-radius: 6px; background: none; border: none; text-align: left; }
-    .context-menu-item:hover, .member-dropdown-item:hover { background: #f9fafb; }
-    .member-dropdown-item { display: flex; justify-content: space-between; align-items: center; }
-    #member-dropdown { max-height: 300px; overflow-y: auto; }
-    .servant-tag { font-size: 0.75rem; font-weight: 600; color: var(--primary-color); background-color: var(--primary-light); padding: 2px 6px; border-radius: 4px; }
-
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 16px; }
-    .modal-content { background: white; padding: 24px; border-radius: var(--radius-lg); width: 100%; max-width: 500px; max-height: 90vh; display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow-lg); }
-    #new-project-name { width: 100%; padding: 12px; font-size: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); }
-    #template-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md); }
-    #template-list li { padding: 12px; border-bottom: 1px solid var(--border-color); }
-    #template-list label { display: flex; align-items: center; gap: 10px; font-size: 16px; cursor: pointer; font-weight: 500; }
-    .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px; }
-    .modal-actions button { padding: 10px 20px; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); }
-    #cancel-template-selection { background-color: var(--surface-color); }
-    #confirm-template-selection { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
-    #print-container { position: absolute; left: -9999px; top: auto; width: 1100px; background: white; }
-
-    .mobile-view-container { display: none; flex-direction: column; gap: 1rem; }
-    .date-input { cursor: pointer; -webkit-appearance: none; -moz-appearance: none; appearance: none; background-color: transparent; border: none; width: 100%; height: 100%; font-family: inherit; font-size: inherit; font-weight: inherit; text-align: left; padding-left: 8px; }
-
+    .mobile-view-container { 
+        display: none; 
+    }
+    
     .mobile-week-card {
         background: var(--surface-color);
         border: 1px solid var(--border-color);
         border-radius: var(--radius-lg);
         padding: 20px;
         margin-bottom: 20px;
-        box-shadow: var(--shadow-md);
+        box-shadow: var(--shadow-sm);
         transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
     }
-
+    
+    .mobile-week-card:last-child {
+        margin-bottom: 0;
+    }
+    
+    .mobile-week-card:hover {
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+    }
+    
     .week-date {
         font-size: 1.3rem;
         font-weight: 700;
@@ -173,7 +880,7 @@
         font-family: 'Noto Sans Telugu', sans-serif;
         position: relative;
     }
-
+    
     .week-date::after {
         content: '';
         position: absolute;
@@ -185,11 +892,11 @@
         background: var(--primary-color);
         border-radius: 2px;
     }
-
+    
     .event-type-dropdown {
         margin-bottom: 20px;
     }
-
+    
     .event-type-field {
         padding: 16px;
         border: 2px solid var(--border-color);
@@ -205,12 +912,12 @@
         align-items: center;
         min-height: 56px;
     }
-
+    
     .event-type-field:hover {
-        border-color: var(--primary-color);
+        border-color: var(--accent-color);
         background-color: white;
     }
-
+    
     .event-type-field::after {
         content: "";
         width: 16px;
@@ -220,11 +927,11 @@
         background-repeat: no-repeat;
         transition: transform 0.2s ease;
     }
-
+    
     .event-type-field.active::after {
         transform: rotate(180deg);
     }
-
+    
     .event-type-value {
         flex: 1;
         color: var(--text-primary);
@@ -232,28 +939,28 @@
         align-items: center;
         gap: 8px;
     }
-
+    
     .event-type-placeholder {
         color: var(--text-secondary);
         font-style: italic;
     }
-
+    
     .event-type-icon {
         font-size: 1.2rem;
     }
-
+    
     .week-fields {
         display: flex;
         flex-direction: column;
         gap: 16px;
     }
-
+    
     .field-group {
         display: flex;
         flex-direction: column;
         gap: 8px;
     }
-
+    
     .field-group label {
         font-size: 0.95rem;
         font-weight: 600;
@@ -263,7 +970,7 @@
         align-items: center;
         gap: 6px;
     }
-
+    
     .field-group label::before {
         content: '';
         width: 4px;
@@ -271,7 +978,7 @@
         background: var(--primary-color);
         border-radius: 2px;
     }
-
+    
     .mobile-field {
         padding: 16px;
         border: 2px solid var(--border-color);
@@ -287,12 +994,12 @@
         align-items: center;
         min-height: 56px;
     }
-
+    
     .mobile-field:hover {
-        border-color: var(--primary-color);
+        border-color: var(--accent-color);
         background-color: white;
     }
-
+    
     .mobile-field::after {
         content: "";
         width: 16px;
@@ -302,21 +1009,21 @@
         background-repeat: no-repeat;
         transition: transform 0.2s ease;
     }
-
+    
     .mobile-field.active::after {
         transform: rotate(180deg);
     }
-
+    
     .mobile-field-value {
         flex: 1;
         color: var(--text-primary);
     }
-
+    
     .mobile-field-placeholder {
         color: var(--text-secondary);
         font-style: italic;
     }
-
+    
     .special-event-mobile {
         text-align: center;
         padding: 20px;
@@ -325,7 +1032,7 @@
         border: 2px dashed #fed7d7;
         margin: 16px 0;
     }
-
+    
     .special-event-text-mobile {
         color: var(--danger-color);
         font-weight: 700;
@@ -333,7 +1040,7 @@
         margin: 0;
         font-family: 'Noto Sans Telugu', sans-serif;
     }
-
+    
     .mobile-actions {
         display: flex;
         gap: 12px;
@@ -341,7 +1048,7 @@
         padding-top: 16px;
         border-top: 1px solid var(--border-color);
     }
-
+    
     .mobile-action-btn {
         flex: 1;
         padding: 12px 16px;
@@ -358,226 +1065,173 @@
         justify-content: center;
         gap: 6px;
     }
-
+    
     .mobile-action-btn.primary {
         background: var(--primary-color);
         color: white;
         border-color: var(--primary-color);
     }
-
+    
     .mobile-action-btn.primary:hover {
         background: var(--primary-hover);
         border-color: var(--primary-hover);
     }
-
+    
     .mobile-action-btn.secondary:hover {
-        border-color: var(--primary-color);
-        color: var(--primary-color);
+        border-color: var(--accent-color);
+        color: var(--accent-color);
     }
 
-    .dropdown-backdrop {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.5);
-        z-index: 1100;
-        opacity: 0;
-        visibility: hidden;
-        transition: all 0.3s ease;
+    .fade-in {
+        animation: fadeIn 0.3s ease-in-out;
     }
-
-    .dropdown-backdrop.active {
-        opacity: 1;
-        visibility: visible;
+    
+    .slide-up {
+        animation: slideUp 0.3s ease-out;
     }
-
-    .dropdown-container {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: white;
-        border-radius: 24px 24px 0 0;
-        z-index: 1101;
-        transform: translateY(100%);
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        max-height: 80vh;
-        display: flex;
-        flex-direction: column;
-        box-shadow: 0 -10px 30px rgba(0,0,0,0.2);
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
     }
-
-    .dropdown-container.active {
-        transform: translateY(0);
-    }
-
-    .dropdown-header {
-        padding: 20px 24px 12px;
-        border-bottom: 1px solid var(--border-color);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-shrink: 0;
-    }
-
-    .dropdown-title {
-        font-size: 1.2rem;
-        font-weight: 600;
-        color: var(--text-primary);
-        font-family: 'Noto Sans Telugu', sans-serif;
-    }
-
-    .dropdown-close {
-        background: none;
-        border: none;
-        padding: 8px;
-        cursor: pointer;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--text-secondary);
-        transition: background-color 0.2s;
-    }
-
-    .dropdown-close:hover {
-        background-color: #f5f5f5;
-    }
-
-    .mobile-dropdown-search {
-        display: flex;
-        align-items: center;
-        padding: 12px 16px;
-        border-bottom: 1px solid var(--border-color);
-        background: rgba(255,255,255,0.7);
-    }
-
-    .mobile-dropdown-search svg {
-        margin-right: 8px;
-    }
-
-    .mobile-dropdown-search input {
-        width: 100%;
-        border: none;
-        outline: none;
-        background: transparent;
-        font-size: 16px;
-        color: var(--text-primary);
-    }
-
-    .dropdown-content {
-        flex: 1;
-        overflow-y: auto;
-        padding: 8px 0;
-        max-height: 300px;
-    }
-
-    .dropdown-item {
-        display: flex;
-        align-items: center;
-        width: 100%;
-        padding: 16px 24px;
-        border: none;
-        background: none;
-        cursor: pointer;
-        transition: background-color 0.2s;
-        font-family: 'Noto Sans Telugu', sans-serif;
-        font-size: 1rem;
-        text-align: left;
-        color: var(--text-primary);
-    }
-
-    .dropdown-item:hover {
-        background-color: #f8fafc;
-    }
-
-    .dropdown-item.active {
-        background-color: var(--primary-light);
-        color: var(--primary-color);
-        font-weight: 600;
-    }
-
-    .edit-weeks-modal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.6);
-        display: none;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-        padding: 16px;
-    }
-
-    .edit-weeks-modal.active {
-        display: flex;
-    }
-
-    .edit-weeks-content {
-        background: white;
-        padding: 24px;
-        border-radius: var(--radius-lg);
-        width: 100%;
-        max-width: 500px;
-        max-height: 90vh;
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-        box-shadow: var(--shadow-lg);
-    }
-
-    #date-checklist {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        overflow-y: auto;
-        border: 1px solid var(--border-color);
-        border-radius: var(--radius-md);
-        max-height: 40vh;
-    }
-
-    #date-checklist label {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 16px;
-        cursor: pointer;
-        font-weight: 500;
-        padding: 12px 16px;
-        border-bottom: 1px solid var(--border-color);
-        transition: background-color 0.2s;
-    }
-
-    #date-checklist label:last-child {
-        border-bottom: none;
-    }
-
-    #date-checklist label:hover {
-        background-color: #f8fafc;
+    
+    @keyframes slideUp {
+        from { 
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to { 
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     @media (max-width: 768px) {
-        main { padding: 56px 0 0 0; }
-        .master-container { padding: 16px; border-radius: 0; box-shadow: none; }
-        .page-controls { padding: 0 16px; margin-bottom: 16px; justify-content: center; }
-        .project-header { flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px 0; margin-bottom: 16px; }
-        .project-title { font-size: 1.5rem; }
-        .schedule-block { margin-bottom: 24px; padding: 0 0 24px 0; border-bottom: 8px solid var(--background-color); }
-        .schedule-block:last-child { border-bottom: none; }
-        .schedule-block table { display: none; }
-        .mobile-view-container { display: flex; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 16px; }
+        .top-bar { 
+            padding: 0 16px; 
+            height: 60px;
+        }
+        
+        .top-bar .mobileLogo { 
+            height: 60px; 
+        }
+        
+        .header-icons { 
+            height: 60px; 
+        }
+        
+        .menu-overlay { 
+            top: 60px; 
+            height: calc(100% - 60px); 
+        }
+        
+        .slide-menu { 
+            top: 60px; 
+            height: calc(100dvh - 60px); 
+        }
+        
+        main { 
+            padding-top: 70px;
+        }
+        
+        .editor-main { 
+            padding: 16px; 
+        }
+        
+        .page-controls { 
+            justify-content: center;
+        }
+        
+        .master-container { 
+            padding: 0; 
+            border-radius: 0; 
+            box-shadow: none; 
+            background: transparent;
+            border: none;
+        }
+        
+        .schedule-table { 
+            display: none; 
+        }
+        
+        .mobile-view-container { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 1rem; 
+        }
+        
+        .title-block {
+            padding: 0 16px;
+            margin-bottom: 16px;
+        }
+        
+        .title-block h1 {
+            font-size: 1.5rem;
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            padding: 6px 12px;
+        }
+        
+        .svg-divider {
+            width: 300px;
+        }
+        
+        .desktop-dropdown {
+            display: none !important;
+        }
+        
+        .desktop-event-menu {
+            display: none !important;
+        }
     }
+
+    .project-header { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        gap: 16px; 
+        margin-bottom: 24px; 
+        padding-bottom: 24px; 
+        border-bottom: 1px solid var(--border-color); 
+    }
+    .project-title { 
+        font-size: 1.75rem; 
+        font-weight: 700; 
+        margin: 0; 
+        flex-grow: 1; 
+        border: none; 
+        padding: 4px 8px; 
+        margin: -4px -8px; 
+        border-radius: var(--radius-md); 
+        font-family: 'Noto Sans Telugu', sans-serif; 
+    }
+    .project-title:focus { 
+        outline: 2px solid var(--primary-color); 
+        background-color: var(--primary-light); 
+    }
+
+    .schedule-block { margin-bottom: 32px; }
+    .schedule-block:last-child { margin-bottom: 0; }
+    .schedule-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .schedule-title { font-size: 1.25rem; font-weight: 600; margin: 0; color: var(--text-secondary); font-family: 'Noto Sans Telugu', sans-serif; }
+
+    .toolbar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); transition: all 0.2s; text-decoration: none; color: var(--text-secondary); }
+    .toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; border-color: #d1d5db; color: var(--text-primary); }
+    .toolbar-btn:disabled { cursor: not-allowed; opacity: 0.5; }
+
+    #template-selection-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 16px; }
+    #template-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md); }
+    #template-list li { padding: 12px; border-bottom: 1px solid var(--border-color); }
+    #template-list label { display: flex; align-items: center; gap: 10px; font-size: 16px; cursor: pointer; font-weight: 500; }
 </style>
 </head>
 <body>
 
 <header class="site-header">
     <div class="top-bar">
-        <a href="./dashboard.html" class="mobileLogo" title="Dashboard"></a>
+        <a href="./sunday-dashboard.html" class="mobileLogo" title="Sunday Schedules"></a>
         <div class="header-right-controls">
             <div class="status-indicator" data-status="synced">Synced</div>
             <div class="header-icons" id="menu-toggle-button">
@@ -598,12 +1252,12 @@
     </ul>
     <div class="profile-section">
         <div class="profile-info">
-             <div class="profile-name">Loading...</div>
+            <div class="profile-name">Loading...</div>
         </div>
     </div>
 </div>
 
-<main id="app-container" class="editor-main hidden">
+<div id="app-container" class="editor-main hidden">
     <div class="page-controls">
         <button id="edit-weeks-button" class="btn">
             <span class="material-symbols-outlined">edit_calendar</span>
@@ -620,7 +1274,7 @@
         </div>
         <div id="schedules-wrapper"></div>
     </div>
-</main>
+</div>
 
 <template id="schedule-template">
     <div class="schedule-block">
@@ -631,22 +1285,57 @@
                 <span>Event</span>
             </button>
         </div>
-        <table>
-            <colgroup><col style="width: 60%;"><col style="width: 20%;"><col style="width: 20%;"></colgroup>
+        <div class="schedule-display-header">
+            <div class="title-block">
+                <h1>బహిరంగ ప్రసంగాల పట్టిక</h1>
+                <div class="subtitle-svg-container">
+                    <p class="subtitle" contenteditable="true">Schedule Date Range</p>
+                    <svg class="svg-divider" role="presentation" viewBox="0 0 24039.797 260" preserveAspectRatio="xMidYMid slice">
+                        <defs>
+                            <radialGradient id="__id9__id4" gradientUnits="userSpaceOnUse" r="12020.601" cx="12019.898" cy="130" fx="12019.898" fy="130">
+                                <stop stop-color="#093261" stop-opacity="1" offset="0"></stop>
+                                <stop stop-color="#ffffff" stop-opacity="1" offset="1"></stop>
+                            </radialGradient>
+                        </defs>
+                        <rect x="0" y="0" width="24039.797" height="260" fill="url(#__id9__id4)"></rect>
+                    </svg>
+                </div>
+            </div>
+        </div>
+        <table class="schedule-table">
+            <thead>
+                <tr>
+                    <th>తేదీ</th>
+                    <th>ప్రసంగ అంశం</th>
+                    <th>ప్రసంగీకుడు</th>
+                    <th>చైర్మన్</th>
+                    <th>కావలికోట రీడర్</th>
+                    <th class="actions-col">Actions</th>
+                </tr>
+            </thead>
             <tbody class="schedule-table-body"></tbody>
         </table>
         <div class="mobile-view-container"></div>
     </div>
 </template>
 
-<div id="event-context-menu">
-    <button class="context-menu-item" data-event-type="normal">Normal</button>
-    <button class="context-menu-item" data-event-type="co-visit">CO Visit</button>
-    <button class="context-menu-item" data-event-type="assembly">Assembly</button>
-    <button class="context-menu-item" data-event-type="convention">Convention</button>
+<div class="desktop-dropdown" id="desktop-dropdown">
+    <div class="desktop-dropdown-search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="desktop-dropdown-search" placeholder="Search...">
+    </div>
+    <div class="desktop-dropdown-list" id="desktop-dropdown-list"></div>
 </div>
 
-<div id="member-dropdown"></div>
+<div class="desktop-event-menu" id="desktop-event-menu">
+    <button class="desktop-event-item" data-event-type="normal">Normal</button>
+    <button class="desktop-event-item" data-event-type="co-visit">CO Visit</button>
+    <button class="desktop-event-item" data-event-type="assembly">Assembly</button>
+    <button class="desktop-event-item" data-event-type="convention">Convention</button>
+</div>
 
 <div class="dropdown-backdrop" id="dropdown-backdrop"></div>
 <div class="dropdown-container" id="dropdown-container">
@@ -679,14 +1368,14 @@
     </div>
 </div>
 
-<div id="edit-weeks-modal" class="edit-weeks-modal">
-    <div class="edit-weeks-content">
+<div id="date-selection-modal" class="modal-overlay">
+    <div class="modal-content">
         <h2>Edit Schedule Weeks</h2>
         <p>Add or remove weeks from your schedule.</p>
         <ul id="date-checklist"></ul>
         <div class="modal-actions">
-            <button id="cancel-edit-weeks">Cancel</button>
-            <button id="confirm-edit-weeks">Update Schedule</button>
+            <button id="cancel-creation">Cancel</button>
+            <button id="confirm-creation">Update Schedule</button>
         </div>
     </div>
 </div>
@@ -716,25 +1405,42 @@
     let activeProject = null;
     let activeEventScheduleTable = null;
     let activeCellForDropdown = null;
+    let currentDropdownType = null;
+    let currentDropdownData = null;
+    let desktopDropdownSearch = null;
+    let desktopDropdownList = null;
+    let mobileSearchInput = null;
 
     const appContainer = document.getElementById('app-container');
     const projectTitleEl = document.getElementById('project-title');
     const schedulesWrapper = document.getElementById('schedules-wrapper');
     const templateSelectionModal = document.getElementById('template-selection-modal');
     const templateList = document.getElementById('template-list');
-    const eventContextMenu = document.getElementById('event-context-menu');
-    const memberDropdown = document.getElementById('member-dropdown');
     const statusIndicator = document.querySelector('.status-indicator');
-    const editWeeksModal = document.getElementById('edit-weeks-modal');
+    const dateSelectionModal = document.getElementById('date-selection-modal');
     const dateChecklist = document.getElementById('date-checklist');
     
+    const desktopDropdown = document.getElementById('desktop-dropdown');
+    const desktopEventMenu = document.getElementById('desktop-event-menu');
     const dropdownBackdrop = document.getElementById('dropdown-backdrop');
     const dropdownContainer = document.getElementById('dropdown-container');
     const dropdownTitle = document.getElementById('dropdown-title');
     const dropdownContent = document.getElementById('dropdown-content');
     const dropdownClose = document.getElementById('dropdown-close');
     const mobileDropdownSearch = document.getElementById('mobile-dropdown-search');
-    const mobileSearchInput = document.getElementById('mobile-search-input');
+
+    const topics = {
+        'అంశం-1': 'this is talk-1',
+        'అంశం-2': 'this is talk-2', 
+        'అంశం-3': 'this is talk-3',
+        'అంశం-4': 'this is talk-4'
+    };
+
+    const eventTexts = {
+        'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం',
+        'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో',
+        'convention': 'ప్రాదేశిక సమావేశం'
+    };
 
     const eventTypes = [
         { id: 'normal', name: 'Normal', icon: 'event', color: 'primary' },
@@ -743,10 +1449,9 @@
         { id: 'convention', name: 'Convention', icon: 'festival', color: 'convention' }
     ];
 
-    const eventTexts = {
-        'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం',
-        'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో',
-        'convention': 'ప్రాదేశిక సమావేశం'
+    const debounce = (func, delay) => {
+        let timeout;
+        return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), delay); };
     };
 
     function updateStatus(text, status) {
@@ -787,17 +1492,21 @@
             this.tableBody = this.element.querySelector('.schedule-table-body');
             this.mobileViewContainer = this.element.querySelector('.mobile-view-container');
             this.eventBtn = this.element.querySelector('.event-btn');
+            this.subtitleEl = this.element.querySelector('.subtitle');
             schedulesWrapper.appendChild(this.element);
         }
 
         render() {
             this.titleEl.textContent = this.data.title;
             this.tableBody.innerHTML = this.data.content;
+            if (this.data.dateRange) {
+                this.subtitleEl.textContent = this.data.dateRange;
+            }
             
             this.tableBody.querySelectorAll('td, th').forEach(cell => {
                 if (cell.hasAttribute('data-user-editable')) {
                     const isFirstRow = cell.closest('tr') === this.tableBody.rows[0];
-                    if (isFirstRow) {
+                    if (isFirstRow && cell.cellIndex === 0) {
                         const originalText = cell.textContent.trim();
                         const dateValue = originalText.split('-').reverse().join('-');
                         cell.innerHTML = `<input type="date" class="date-input" value="${dateValue || ''}">`;
@@ -805,6 +1514,11 @@
                     } else {
                         cell.classList.add('editable-cell');
                         cell.removeAttribute('contenteditable');
+                        cell.style.backgroundImage = "url(\"data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 9L12 15L18 9' stroke='%23002726' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3C/path%3E%3C/svg%3E\")";
+                        cell.style.backgroundRepeat = "no-repeat";
+                        cell.style.backgroundPosition = "right 8px center";
+                        cell.style.backgroundSize = "16px";
+                        cell.style.paddingRight = "30px";
                     }
                 } else {
                     cell.setAttribute('contenteditable', 'false');
@@ -819,13 +1533,18 @@
             const tableRows = Array.from(this.tableBody.rows);
             
             tableRows.forEach((row, rowIndex) => {
-                const card = document.createElement('div');
-                card.className = 'mobile-week-card';
+                const cells = Array.from(row.cells);
+                const dateCell = cells[0];
+                const topicCell = cells[1];
+                const speakerCell = cells[2];
+                const chairmanCell = cells[3];
+                const readerCell = cells[4];
                 
-                const dateCell = row.cells[2];
+                const card = document.createElement('div');
+                card.className = 'mobile-week-card fade-in';
+                
                 const dateInput = dateCell ? dateCell.querySelector('.date-input') : null;
                 const dateValue = dateInput ? dateInput.value : '';
-                
                 const formattedDate = dateValue ? new Date(dateValue).toLocaleDateString('te-IN', { 
                     day: '2-digit', 
                     month: '2-digit', 
@@ -852,15 +1571,10 @@
                         </div>
                         <div class="field-group">
                             <label>తేదీ</label>
-                            <input type="date" class="mobile-field date-input" value="${dateValue}" data-table-index="${this.index}" data-row-index="${rowIndex}" data-cell-index="2">
+                            <input type="date" class="mobile-field date-input" value="${dateValue}" data-table-index="${this.index}" data-row-index="${rowIndex}" data-cell-index="0">
                         </div>
                     `;
                 } else {
-                    const topicCell = row.cells[0];
-                    const speakerCell = row.cells[1];
-                    const chairmanCell = row.cells[3];
-                    const readerCell = row.cells[4];
-                    
                     card.innerHTML = `
                         <h3 class="week-date">${formattedDate}</h3>
                         <div class="event-type-dropdown">
@@ -874,7 +1588,7 @@
                         <div class="week-fields">
                             <div class="field-group">
                                 <label>ప్రసంగ అంశం</label>
-                                <div class="mobile-field topic-field" data-table-index="${this.index}" data-row-index="${rowIndex}" data-cell-index="0">
+                                <div class="mobile-field topic-field" data-table-index="${this.index}" data-row-index="${rowIndex}" data-cell-index="1">
                                     <span class="mobile-field-value ${topicCell.textContent ? '' : 'mobile-field-placeholder'}">
                                         ${topicCell.textContent || 'Select Topic'}
                                     </span>
@@ -882,7 +1596,7 @@
                             </div>
                             <div class="field-group">
                                 <label>ప్రసంగీకుడు</label>
-                                <div class="mobile-field member-field" data-table-index="${this.index}" data-row-index="${rowIndex}" data-cell-index="1">
+                                <div class="mobile-field member-field" data-table-index="${this.index}" data-row-index="${rowIndex}" data-cell-index="2">
                                     <span class="mobile-field-value ${speakerCell.textContent ? '' : 'mobile-field-placeholder'}">
                                         ${speakerCell.textContent || 'Select Brother'}
                                     </span>
@@ -956,6 +1670,21 @@
                     this.parentProject.triggerSave();
                 });
             });
+
+            this.tableBody.querySelectorAll('td').forEach((cell, index) => {
+                const row = cell.parentElement;
+                const cellIndex = cell.cellIndex;
+                
+                if (cellIndex === 0 || cellIndex === 5) return;
+                
+                cell.addEventListener('click', (e) => {
+                    if (cellIndex === 1) {
+                        openDesktopDropdown('topic', cell);
+                    } else {
+                        openDesktopDropdown('member', cell);
+                    }
+                });
+            });
         }
         
         getContent() {
@@ -982,11 +1711,6 @@
                     delete firstRow.dataset.originalContent;
                 }
             } else {
-                const eventTexts = {
-                    'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం',
-                    'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో',
-                    'convention': 'ప్రాదేశిక సమావేశం'
-                };
                 allRows.forEach((row, index) => {
                     row.style.display = (index === 0) ? '' : 'none';
                 });
@@ -999,9 +1723,15 @@
                     if (originalDateCell) existingDateValue = originalDateCell.textContent.trim().split('-').reverse().join('-');
                 }
                 firstRow.innerHTML = `
-                    <th colspan="1" class="special-event-text">${eventTexts[eventType]}</th>
+                    <td colspan="1" class="special-event">${eventTexts[eventType]}</td>
                     <td style="text-align: right; font-weight: 700;">తేదీ:</td>
                     <td data-user-editable="true"><input type="date" class="date-input" value="${existingDateValue}"></td>
+                    <td colspan="2"></td>
+                    <td class="actions-col">
+                        <button class="event-btn">
+                            <span class="material-symbols-outlined">more_vert</span>
+                        </button>
+                    </td>
                 `;
             }
 
@@ -1010,29 +1740,15 @@
         }
 
         setupEventListeners() {
-            this.element.addEventListener('input', (e) => {
-                const input = e.target;
-                if(input.classList.contains('item-input')) {
-                    const rowIndex = input.dataset.rowIndex;
-                    const cellIndex = input.dataset.cellIndex;
-                    const targetCell = this.tableBody.rows[rowIndex].cells[cellIndex];
-                    if(input.type === 'date') {
-                        const tableInput = targetCell.querySelector('.date-input');
-                        if(tableInput) tableInput.value = input.value;
-                    } else {
-                         targetCell.textContent = input.textContent;
-                    }
-                }
-                this.parentProject.triggerSave();
-            });
-
             this.eventBtn.addEventListener('click', (e) => {
                 activeEventScheduleTable = this;
                 const rect = e.currentTarget.getBoundingClientRect();
-                eventContextMenu.style.display = 'block';
-                eventContextMenu.style.top = `${rect.bottom}px`;
-                eventContextMenu.style.left = `${rect.left}px`;
+                desktopEventMenu.style.display = 'block';
+                desktopEventMenu.style.top = `${rect.bottom}px`;
+                desktopEventMenu.style.left = `${rect.left}px`;
             });
+
+            this.subtitleEl.addEventListener('input', () => this.parentProject.triggerSave());
         }
     }
     
@@ -1068,19 +1784,18 @@
         save() {
             this.isSaving = true;
             updateStatus('Syncing...', 'syncing');
-            this.scheduleTables.forEach(table => {
-                const dateInput = table.tableBody.querySelector('.date-input');
-                if (dateInput && dateInput.value) {
-                    const cell = dateInput.parentElement;
-                    cell.textContent = dateInput.value.split('-').reverse().join('-');
-                }
-            });
+            
             const updatedTablesData = this.scheduleTables.map(table => ({
                 title: table.data.title,
                 content: table.getContent(),
-                eventType: table.data.eventType || 'normal'
+                eventType: table.data.eventType || 'normal',
+                dateRange: table.subtitleEl.textContent
             }));
-            const payload = { name: projectTitleEl.textContent, tables: updatedTablesData };
+            
+            const payload = { 
+                name: projectTitleEl.textContent, 
+                tables: updatedTablesData 
+            };
 
             this.collectionRef.doc(this.id).update(payload)
                 .then(() => {
@@ -1184,13 +1899,6 @@
         dropdownTitle.textContent = 'Select Topic';
         dropdownContent.innerHTML = '';
         
-        const topics = {
-            'అంశం-1': 'this is talk-1',
-            'అంశం-2': 'this is talk-2', 
-            'అంశం-3': 'this is talk-3',
-            'అంశం-4': 'this is talk-4'
-        };
-        
         Object.entries(topics).forEach(([topicName, topicText]) => {
             const item = document.createElement('button');
             item.className = 'dropdown-item';
@@ -1248,6 +1956,147 @@
         });
     }
 
+    function openDesktopDropdown(type, cell) {
+        currentDropdownType = type;
+        activeCellForDropdown = cell;
+        
+        if (type === 'member') {
+            showDesktopMemberDropdown(cell);
+        } else if (type === 'topic') {
+            showDesktopTopicDropdown(cell);
+        }
+    }
+
+    function showDesktopMemberDropdown(cell) {
+        desktopDropdownList.innerHTML = '';
+        
+        const sortedBrothers = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
+        
+        if (sortedBrothers.length === 0) {
+            desktopDropdownList.innerHTML = '<div style="padding: 12px 16px; color: var(--text-secondary);">No brothers available</div>';
+        } else {
+            sortedBrothers.forEach(member => {
+                const item = document.createElement('div');
+                item.className = 'desktop-dropdown-item';
+                item.innerHTML = `
+                    <span>${member.name}</span>
+                    ${member.isServant ? '<span class="servant-tag">Servant</span>' : ''}
+                `;
+                item.addEventListener('click', () => selectDesktopDropdownItem(member.name));
+                desktopDropdownList.appendChild(item);
+            });
+        }
+        
+        showDesktopDropdown(cell);
+    }
+
+    function showDesktopTopicDropdown(cell) {
+        desktopDropdownList.innerHTML = '';
+        
+        Object.entries(topics).forEach(([topicName, topicText]) => {
+            const item = document.createElement('div');
+            item.className = 'desktop-dropdown-item';
+            item.textContent = topicName;
+            item.addEventListener('click', () => selectDesktopDropdownItem(topicText));
+            desktopDropdownList.appendChild(item);
+        });
+        
+        showDesktopDropdown(cell);
+    }
+
+    function showDesktopDropdown(cell) {
+        const rect = cell.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+        const viewportWidth = window.innerWidth;
+        
+        let top = rect.bottom + window.scrollY;
+        let left = rect.left + window.scrollX;
+        
+        const dropdownHeight = 300;
+        const dropdownWidth = 340;
+        
+        if (top + dropdownHeight > window.scrollY + viewportHeight) {
+            top = rect.top + window.scrollY - dropdownHeight;
+        }
+        
+        if (left + dropdownWidth > window.scrollX + viewportWidth) {
+            left = window.scrollX + viewportWidth - dropdownWidth - 10;
+        }
+        
+        if (left < window.scrollX) {
+            left = window.scrollX + 10;
+        }
+        
+        desktopDropdown.style.display = 'block';
+        desktopDropdown.style.top = `${top}px`;
+        desktopDropdown.style.left = `${left}px`;
+        desktopDropdown.style.width = `${rect.width}px`;
+        
+        desktopDropdownSearch.value = '';
+        filterDesktopItems('');
+        setTimeout(() => {
+            desktopDropdown.classList.add('active');
+            desktopDropdownSearch.focus();
+        }, 10);
+    }
+
+    function hideDesktopDropdown() {
+        desktopDropdown.classList.remove('active');
+        setTimeout(() => {
+            desktopDropdown.style.display = 'none';
+        }, 250);
+        currentDropdownType = null;
+        activeCellForDropdown = null;
+    }
+
+    function selectDesktopDropdownItem(value) {
+        if (activeCellForDropdown) {
+            activeCellForDropdown.textContent = value;
+            updateCorrespondingMobileField(activeCellForDropdown, value);
+            if (activeProject) activeProject.triggerSave();
+        }
+        hideDesktopDropdown();
+    }
+
+    function updateCorrespondingMobileField(cell, value) {
+        const tableBody = cell.closest('.schedule-table-body');
+        if (!tableBody) return;
+        
+        const rowIndex = Array.from(cell.parentElement.parentElement.children).indexOf(cell.parentElement);
+        const cellIndex = Array.from(cell.parentElement.cells).indexOf(cell);
+        
+        const mobileContainer = tableBody.closest('.schedule-block').querySelector('.mobile-view-container');
+        if (mobileContainer) {
+            const mobileCard = mobileContainer.querySelectorAll('.mobile-week-card')[rowIndex];
+            if (mobileCard) {
+                const field = mobileCard.querySelector(`.mobile-field[data-row-index="${rowIndex}"][data-cell-index="${cellIndex}"]`);
+                if (field) {
+                    const valueSpan = field.querySelector('.mobile-field-value');
+                    valueSpan.textContent = value;
+                    valueSpan.classList.remove('mobile-field-placeholder');
+                }
+            }
+        }
+    }
+
+    function filterDesktopItems(value) {
+        const itemsEl = desktopDropdownList.querySelectorAll('.desktop-dropdown-item');
+        itemsEl.forEach(item => {
+            item.style.display = item.textContent.toLowerCase().includes(value.toLowerCase()) ? 'flex' : 'none';
+        });
+    }
+
+    function hideDesktopEventMenu() {
+        desktopEventMenu.style.display = 'none';
+        activeEventScheduleTable = null;
+    }
+
+    function applyEventType(eventType) {
+        if (!activeEventScheduleTable) return;
+        activeEventScheduleTable.applyEventType(eventType);
+        hideDesktopEventMenu();
+    }
+
     function openWeekEditor() {
         const upcomingSundays = generateNextSundays(30);
         dateChecklist.innerHTML = '';
@@ -1258,7 +2107,10 @@
             dateChecklist.appendChild(li);
         });
         
-        editWeeksModal.classList.add('active');
+        dateSelectionModal.style.display = 'flex';
+        setTimeout(() => {
+            dateSelectionModal.classList.add('active');
+        }, 10);
     }
 
     function generateNextSundays(count) {
@@ -1282,7 +2134,7 @@
         if (user) {
             if (user.email === ADMIN_EMAIL) { window.location.replace('./admin.html'); return; }
             currentUser = user;
-            await fetchMembers(); 
+            await fetchMembers();
             userSchedulesCollection = db.collection(`userSchedules/${currentUser.uid}/schedules`);
             appContainer.classList.remove('hidden');
             document.body.classList.add('auth-ready');
@@ -1339,6 +2191,10 @@
     }
 
     function setupGlobalUI() {
+        desktopDropdownSearch = document.getElementById('desktop-dropdown-search');
+        desktopDropdownList = document.getElementById('desktop-dropdown-list');
+        mobileSearchInput = document.getElementById('mobile-search-input');
+        
         const menuToggleButton = document.getElementById('menu-toggle-button');
         const slideMenu = document.getElementById('slide-menu');
         const menuOverlay = document.getElementById('menu-overlay');
@@ -1365,57 +2221,58 @@
         document.getElementById('edit-weeks-button').addEventListener('click', openWeekEditor);
         document.getElementById('cancel-template-selection').addEventListener('click', () => window.location.href = './dashboard.html');
         document.getElementById('confirm-template-selection').addEventListener('click', handleCreateSchedule);
-        document.getElementById('cancel-edit-weeks').addEventListener('click', () => editWeeksModal.classList.remove('active'));
-        document.getElementById('confirm-edit-weeks').addEventListener('click', handleEditWeeks);
         
-        eventContextMenu.addEventListener('click', (e) => {
-            const target = e.target.closest('.context-menu-item');
+        document.getElementById('cancel-creation').addEventListener('click', () => {
+            dateSelectionModal.classList.remove('active');
+            setTimeout(() => {
+                dateSelectionModal.style.display = 'none';
+            }, 300);
+        });
+        
+        document.getElementById('confirm-creation').addEventListener('click', handleEditWeeks);
+        
+        desktopEventMenu.addEventListener('click', (e) => {
+            const target = e.target.closest('.desktop-event-item');
             if (target && activeEventScheduleTable) {
-                activeEventScheduleTable.applyEventType(target.dataset.eventType);
+                applyEventType(target.dataset.eventType);
             }
-            eventContextMenu.style.display = 'none';
-            activeEventScheduleTable = null;
-        });
-
-        schedulesWrapper.addEventListener('click', e => {
-            const targetElement = e.target.closest('.editable-cell, [contenteditable="true"]');
-            if (!targetElement || targetElement.getAttribute('contenteditable') === 'true') return;
-
-            let realCell, mobileDiv = null;
-            if (targetElement.tagName === 'DIV') {
-                mobileDiv = targetElement;
-                const tableBody = mobileDiv.closest('.schedule-block').querySelector('.schedule-table-body');
-                realCell = tableBody.rows[mobileDiv.dataset.rowIndex].cells[mobileDiv.dataset.cellIndex];
-            } else {
-                realCell = targetElement;
-            }
-            openMemberDropdown(realCell, mobileDiv);
-        });
-
-        memberDropdown.addEventListener('click', e => {
-            const item = e.target.closest('.member-dropdown-item');
-            if (item && activeCellForDropdown.realCell) {
-                const newName = item.dataset.name;
-                activeCellForDropdown.realCell.textContent = newName;
-                if (activeCellForDropdown.mobileDiv) {
-                    activeCellForDropdown.mobileDiv.textContent = newName;
-                }
-                activeProject.triggerSave();
-            }
-            memberDropdown.style.display = 'none';
-            activeCellForDropdown = null;
         });
 
         dropdownBackdrop.addEventListener('click', hideMobileDropdown);
         dropdownClose.addEventListener('click', hideMobileDropdown);
         mobileSearchInput.addEventListener('input', (e) => filterMobileItems(e.target.value));
+        desktopDropdownSearch.addEventListener('input', (e) => filterDesktopItems(e.target.value));
 
         document.addEventListener('click', (e) => {
-            if (!eventContextMenu.contains(e.target) && !e.target.closest('.event-btn')) { eventContextMenu.style.display = 'none'; }
-            if (!memberDropdown.contains(e.target) && !e.target.closest('.editable-cell')) { memberDropdown.style.display = 'none'; }
+            if (!desktopDropdown.contains(e.target) && !e.target.closest('.editable-cell')) {
+                hideDesktopDropdown();
+            }
+            if (!desktopEventMenu.contains(e.target) && !e.target.closest('.event-btn')) {
+                hideDesktopEventMenu();
+            }
         });
 
         dropdownContainer.addEventListener('click', (e) => e.stopPropagation());
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (dropdownContainer.classList.contains('active')) {
+                    hideMobileDropdown();
+                }
+                if (desktopDropdown.classList.contains('active')) {
+                    hideDesktopDropdown();
+                }
+                if (desktopEventMenu.style.display === 'block') {
+                    hideDesktopEventMenu();
+                }
+                if (dateSelectionModal.style.display === 'flex') {
+                    dateSelectionModal.classList.remove('active');
+                    setTimeout(() => {
+                        dateSelectionModal.style.display = 'none';
+                    }, 300);
+                }
+            }
+        });
     }
 
     async function handleCreateSchedule() {
@@ -1432,7 +2289,12 @@
                 const isEssentiallyEmpty = cell.textContent.trim() === '' && !cell.querySelector('img');
                 if (isEssentiallyEmpty) cell.setAttribute('data-user-editable', 'true');
             });
-            return { title: input.dataset.name, content: tempDiv.querySelector('tbody').innerHTML, eventType: 'normal' };
+            return { 
+                title: input.dataset.name, 
+                content: tempDiv.querySelector('tbody').innerHTML, 
+                eventType: 'normal',
+                dateRange: 'తేదీ శ్రేణి'
+            };
         });
         const newDocRef = await userSchedulesCollection.add({
             name: newProjectName,
@@ -1444,27 +2306,10 @@
 
     function handleEditWeeks() {
         alert("Edit weeks functionality will be implemented here");
-        editWeeksModal.classList.remove('active');
-    }
-
-    function openMemberDropdown(cell, mobileDiv = null) {
-        memberDropdown.innerHTML = '';
-        const listToShow = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
-
-        listToShow.forEach(member => { 
-            const item = document.createElement('button');
-            item.className = 'member-dropdown-item';
-            item.dataset.name = member.name;
-            item.innerHTML = `<span>${member.name}</span>` + (member.isServant ? '<span class="servant-tag">Servant</span>' : '');
-            memberDropdown.appendChild(item);
-        });
-
-        const rect = (mobileDiv || cell).getBoundingClientRect();
-        memberDropdown.style.display = 'block';
-        memberDropdown.style.top = `${rect.bottom}px`;
-        memberDropdown.style.left = `${rect.left}px`;
-        memberDropdown.style.width = `${rect.width}px`;
-        activeCellForDropdown = { realCell: cell, mobileDiv: mobileDiv };
+        dateSelectionModal.classList.remove('active');
+        setTimeout(() => {
+            dateSelectionModal.style.display = 'none';
+        }, 300);
     }
 
     async function generatePdf() {
@@ -1473,83 +2318,76 @@
         printButton.querySelector('span:last-child').textContent = 'Generating...';
 
         const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const A4_WIDTH_MM = 210, A4_HEIGHT_MM = 297, MARGIN_MM = 10, PAGE_SPACING_MM = 5; 
+        const pdf = new jsPDF('l', 'mm', 'a4');
+        const A4_WIDTH_MM = 297;
+        const A4_HEIGHT_MM = 210;
+        const MARGIN_MM = 10;
+        
         const USABLE_WIDTH = A4_WIDTH_MM - (MARGIN_MM * 2);
         const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_MM * 2);
 
-        const printContainer = document.createElement('div');
-        printContainer.id = 'print-container';
-        document.body.appendChild(printContainer);
+        try {
+            const tempContainer = document.createElement('div');
+            tempContainer.style.position = 'absolute';
+            tempContainer.style.left = '-9999px';
+            tempContainer.style.top = '0';
+            document.body.appendChild(tempContainer);
 
-        const itemsToPrint = [];
+            for (const block of document.querySelectorAll('.schedule-block')) {
+                const clone = block.cloneNode(true);
+                
+                clone.querySelector('.event-btn').style.display = 'none';
+                clone.querySelector('.mobile-view-container').style.display = 'none';
+                clone.querySelector('table').style.display = 'table';
+                
+                const titleEl = clone.querySelector('.schedule-title');
+                if (titleEl) titleEl.style.display = 'none';
 
-        for (const block of document.querySelectorAll('.schedule-block')) {
-            const clone = block.cloneNode(true);
-            
-            clone.querySelector('.event-btn').style.display = 'none';
-            clone.querySelector('.mobile-view-container').style.display = 'none';
-            clone.querySelector('table').style.display = 'table';
-            
-            const titleEl = clone.querySelector('.schedule-title');
-            if (titleEl) titleEl.style.display = 'none';
-            
-            clone.style.marginBottom = '0';
-            clone.style.padding = '0';
-            clone.style.border = 'none';
+                tempContainer.appendChild(clone);
+                
+                const canvas = await html2canvas(clone, {
+                    scale: 1,
+                    useCORS: true,
+                    backgroundColor: '#ffffff',
+                    letterRendering: false,
+                    logging: false,
+                    imageTimeout: 15000,
+                    removeContainer: true
+                });
 
-            const allCells = clone.querySelectorAll('th, td');
-            allCells.forEach(cell => cell.style.height = '40px');
+                const imgData = canvas.toDataURL('image/jpeg', 0.8);
+                const imgProps = pdf.getImageProperties(imgData);
+                const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
 
-            printContainer.appendChild(clone);
-            
-            const canvas = await html2canvas(clone, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
-            const imgData = canvas.toDataURL('image/jpeg', 0.8);
-            const imgProps = pdf.getImageProperties(imgData);
-            const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
-            itemsToPrint.push({ imgData, width: USABLE_WIDTH, height: imgHeight });
+                const verticalPosition = Math.max(0, (USABLE_HEIGHT - imgHeight) / 2);
+                
+                pdf.addImage(
+                    imgData, 
+                    'JPEG',
+                    MARGIN_MM, 
+                    MARGIN_MM + verticalPosition, 
+                    USABLE_WIDTH, 
+                    imgHeight,
+                    undefined,
+                    'FAST'
+                );
+
+                tempContainer.removeChild(clone);
+                pdf.addPage();
+            }
+
+            document.body.removeChild(tempContainer);
+
+            const fileName = `${projectTitleEl.textContent.trim() || 'schedule'}.pdf`;
+            pdf.save(fileName);
+
+        } catch (error) {
+            console.error("PDF generation failed:", error);
+            alert("Sorry, there was an error creating the PDF. Please try again.");
+        } finally {
+            printButton.disabled = false;
+            printButton.querySelector('span:last-child').textContent = 'Download PDF';
         }
-        
-        document.body.removeChild(printContainer);
-        
-        const pages = [];
-        let currentPageItems = [];
-        let currentPageHeight = 0;
-
-        itemsToPrint.forEach(item => {
-            const itemHeightWithSpacing = currentPageItems.length > 0 ? item.height + PAGE_SPACING_MM : item.height;
-            if (currentPageHeight + itemHeightWithSpacing > USABLE_HEIGHT && currentPageItems.length > 0) {
-                pages.push(currentPageItems);
-                currentPageItems = [item];
-                currentPageHeight = item.height;
-            } else {
-                currentPageItems.push(item);
-                currentPageHeight += itemHeightWithSpacing;
-            }
-        });
-        if (currentPageItems.length > 0) pages.push(currentPageItems);
-
-        pages.forEach((pageItems, pageIndex) => {
-            if (pageIndex > 0) pdf.addPage();
-
-            const totalContentHeight = pageItems.reduce((sum, item) => sum + item.height, 0) + (PAGE_SPACING_MM * (pageItems.length - 1));
-            let startY = MARGIN_MM;
-            if (pageItems.length > 1) {
-                const remainingSpace = USABLE_HEIGHT - totalContentHeight;
-                if (remainingSpace > 0) startY = MARGIN_MM + (remainingSpace / 2);
-            }
-
-            let currentY = startY;
-            pageItems.forEach(item => {
-                pdf.addImage(item.imgData, 'JPEG', MARGIN_MM, currentY, item.width, item.height);
-                currentY += item.height + PAGE_SPACING_MM;
-            });
-        });
-
-        const fileName = `${projectTitleEl.textContent.trim() || 'schedule'}.pdf`;
-        pdf.save(fileName);
-        printButton.disabled = false;
-        printButton.querySelector('span:last-child').textContent = 'Download PDF';
     }
 
 })();
