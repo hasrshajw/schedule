@@ -2380,7 +2380,7 @@ function updateCorrespondingMobileField(cell, value) {
             });
 
             // Use JPEG compression instead of PNG
-            const imgData = canvas.toDataURL('image/jpeg', 0.8);
+            const imgData = canvas.toDataURL('image/jpeg', 1.0);
             const imgProps = pdf.getImageProperties(imgData);
             const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
 
