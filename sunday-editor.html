@@ -86,6 +86,7 @@
         width: 100%; 
         z-index: 1000;
         box-shadow: var(--shadow-md);
+        height: 70px;
     }
     .top-bar { 
         display: flex; 
@@ -795,30 +796,28 @@
         border-radius: 2px;
     }
     
-    /* Event Type Selector at Top */
+    /* Event Type Selector at Top - Single Button */
     .event-type-selector {
         display: flex;
         gap: 8px;
         margin-bottom: 20px;
-        flex-wrap: wrap;
     }
     
     .event-type-btn {
         flex: 1;
-        min-width: 120px;
         padding: 12px 16px;
         border: 2px solid var(--border-color);
         background: white;
         border-radius: var(--radius-md);
         cursor: pointer;
-        transition: all 0.2s ease;
         font-family: 'Noto Sans Telugu', sans-serif;
         font-weight: 500;
         text-align: center;
+        transition: all 0.2s ease;
         display: flex;
-        flex-direction: column;
         align-items: center;
-        gap: 4px;
+        justify-content: center;
+        gap: 6px;
     }
     
     .event-type-btn.active {
@@ -826,28 +825,6 @@
         background-color: var(--primary-light);
         color: var(--primary-color);
         font-weight: 600;
-    }
-    
-    .event-type-btn.co-visit.active {
-        border-color: var(--danger-color);
-        background-color: #fef2f2;
-        color: var(--danger-color);
-    }
-    
-    .event-type-btn.assembly.active {
-        border-color: var(--success-color);
-        background-color: #f0fdf4;
-        color: var(--success-color);
-    }
-    
-    .event-type-btn.convention.active {
-        border-color: var(--accent-color);
-        background-color: #f0f9ff;
-        color: var(--accent-color);
-    }
-    
-    .event-type-icon {
-        font-size: 1.2rem;
     }
     
     .week-fields {
@@ -938,47 +915,6 @@
         font-size: 1.1rem;
         margin: 0;
         font-family: 'Noto Sans Telugu', sans-serif;
-    }
-    
-    .mobile-actions {
-        display: flex;
-        gap: 12px;
-        margin-top: 20px;
-        padding-top: 16px;
-        border-top: 1px solid var(--border-color);
-    }
-    
-    .mobile-action-btn {
-        flex: 1;
-        padding: 12px 16px;
-        border: 2px solid var(--border-color);
-        background: white;
-        border-radius: var(--radius-md);
-        cursor: pointer;
-        font-family: 'Noto Sans Telugu', sans-serif;
-        font-weight: 500;
-        text-align: center;
-        transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-    }
-    
-    .mobile-action-btn.primary {
-        background: var(--primary-color);
-        color: white;
-        border-color: var(--primary-color);
-    }
-    
-    .mobile-action-btn.primary:hover {
-        background: var(--primary-hover);
-        border-color: var(--primary-hover);
-    }
-    
-    .mobile-action-btn.secondary:hover {
-        border-color: var(--accent-color);
-        color: var(--accent-color);
     }
 
     /* Animation Classes */
@@ -1082,16 +1018,6 @@
         
         .desktop-dropdown {
             display: none !important;
-        }
-        
-        .event-type-selector {
-            gap: 6px;
-        }
-        
-        .event-type-btn {
-            min-width: calc(50% - 6px);
-            padding: 10px 12px;
-            font-size: 0.9rem;
         }
     }
 
@@ -1328,10 +1254,10 @@
     };
 
     const eventTypes = [
-        { id: 'normal', name: 'Normal', icon: 'event', color: 'primary' },
-        { id: 'co-visit', name: 'CO Visit', icon: 'groups', color: 'co-visit' },
-        { id: 'assembly', name: 'Assembly', icon: 'celebration', color: 'assembly' },
-        { id: 'convention', name: 'Convention', icon: 'festival', color: 'convention' }
+        { id: 'normal', name: 'Normal', icon: 'event' },
+        { id: 'co-visit', name: 'CO Visit', icon: 'groups' },
+        { id: 'assembly', name: 'Assembly', icon: 'celebration' },
+        { id: 'convention', name: 'Convention', icon: 'festival' }
     ];
 
     const debounce = (func, delay) => {
@@ -1482,7 +1408,6 @@
             const speakerCell = cells[2];
             const chairmanCell = cells[3];
             const readerCell = cells[4];
-            const actionsCell = cells[5];
             
             const card = document.createElement('div');
             card.className = 'mobile-week-card fade-in';
@@ -1491,36 +1416,37 @@
             const isSpecialEvent = topicCell.classList.contains('special-event') && topicCell.colSpan === 4;
             const currentEventType = getEventTypeForRow(row);
             
+            card.innerHTML = `
+                <h3 class="week-date">${dateCell.textContent}</h3>
+                
+                <div class="event-type-selector">
+                    <button class="event-type-btn ${isSpecialEvent ? '' : 'active'}" data-row="${rowIndex}" data-event-type="normal">
+                        <span class="material-symbols-outlined">event</span>
+                        <span>Normal Event</span>
+                    </button>
+                    <button class="event-type-btn ${isSpecialEvent ? 'active' : ''}" data-row="${rowIndex}" data-event-type="special">
+                        <span class="material-symbols-outlined">celebration</span>
+                        <span>Special Event</span>
+                    </button>
+                </div>
+            `;
+            
             if (isSpecialEvent) {
-                card.innerHTML = `
-                    <h3 class="week-date">${dateCell.textContent}</h3>
-                    <div class="event-type-selector">
-                        ${eventTypes.map(event => `
-                            <button class="event-type-btn ${event.id} ${currentEventType === event.id ? 'active' : ''}" 
-                                    data-event-type="${event.id}" data-row="${rowIndex}">
-                                <span class="material-symbols-outlined event-type-icon">${event.icon}</span>
-                                <span>${event.name}</span>
-                            </button>
-                        `).join('')}
-                    </div>
+                card.innerHTML += `
                     <div class="special-event-mobile">
                         <p class="special-event-text-mobile">${topicCell.textContent}</p>
                     </div>
+                    <div class="week-fields">
+                        <div class="field-group">
+                            <label>Event Type</label>
+                            <div class="mobile-field event-type-field" data-row="${rowIndex}">
+                                <span class="mobile-field-value">${getCurrentEventTypeName(topicCell.textContent)}</span>
+                            </div>
+                        </div>
+                    </div>
                 `;
             } else {
-                card.innerHTML = `
-                    <h3 class="week-date">${dateCell.textContent}</h3>
-                    
-                    <div class="event-type-selector">
-                        ${eventTypes.map(event => `
-                            <button class="event-type-btn ${event.id} ${currentEventType === event.id ? 'active' : ''}" 
-                                    data-event-type="${event.id}" data-row="${rowIndex}">
-                                <span class="material-symbols-outlined event-type-icon">${event.icon}</span>
-                                <span>${event.name}</span>
-                            </button>
-                        `).join('')}
-                    </div>
-                    
+                card.innerHTML += `
                     <div class="week-fields">
                         <div class="field-group">
                             <label>ప్రసంగ అంశం</label>
@@ -1587,7 +1513,24 @@
             btn.addEventListener('click', (e) => {
                 const eventType = btn.dataset.eventType;
                 const rowIndex = btn.dataset.row;
-                changeEventType(rowIndex, eventType);
+                const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
+                const row = tableBody.rows[rowIndex];
+                
+                if (eventType === 'special') {
+                    showSpecialEventMenu(row, rowIndex);
+                } else {
+                    changeEventType(rowIndex, 'normal');
+                }
+            });
+        });
+
+        // Add event listeners to event type fields
+        mobileContainer.querySelectorAll('.event-type-field').forEach(field => {
+            field.addEventListener('click', (e) => {
+                const rowIndex = field.dataset.row;
+                const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
+                const row = tableBody.rows[rowIndex];
+                showSpecialEventMenu(row, rowIndex);
             });
         });
     }
@@ -1601,6 +1544,38 @@
             if (text.includes('సమావేశం')) return 'convention';
         }
         return 'normal';
+    }
+
+    function getCurrentEventTypeName(text) {
+        if (text.includes('పర్యవేక్షకుని')) return 'CO Visit';
+        if (text.includes('సమావేశ కార్యక్రమం')) return 'Assembly';
+        if (text.includes('సమావేశం')) return 'Convention';
+        return 'Select Event Type';
+    }
+
+    function showSpecialEventMenu(row, rowIndex) {
+        activeRowForEvents = row;
+        dropdownTitle.textContent = 'Select Special Event';
+        dropdownContent.innerHTML = '';
+        
+        const specialEvents = [
+            { type: 'co-visit', name: 'CO Visit' },
+            { type: 'assembly', name: 'Assembly' },
+            { type: 'convention', name: 'Convention' }
+        ];
+        
+        specialEvents.forEach(event => {
+            const item = document.createElement('button');
+            item.className = 'dropdown-item';
+            item.textContent = event.name;
+            item.addEventListener('click', () => {
+                changeEventType(rowIndex, event.type);
+                hideMobileDropdown();
+            });
+            dropdownContent.appendChild(item);
+        });
+        
+        showMobileDropdown();
     }
 
     function changeEventType(rowIndex, eventType) {
