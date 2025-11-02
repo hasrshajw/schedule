@@ -1,367 +1,170 @@
 <!DOCTYPE html>
 <html lang="te">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>User - Schedule Editor</title>
-
-  <!-- FIREBASE SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-
-  <!-- PDF Generation Libraries -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-  <!-- FONTS AND ICONS -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
-
-  <style>
-    /* ===== ROOT VARIABLES ===== */
-    :root {
-      --header-bg: #292929;
-      --text-light: #fff;
-      --body-bg: #f8fafc;
-      --menu-new-text: #4a6da7;
-      --menu-new-bg: #ffffff;
-      --menu-new-border: #eeeeee;
-      --menu-new-hover: #f5f5f5;
-      --primary-color: #012726;
-      --primary-hover: #024443;
-      --primary-light: #e6f6f6;
-      --danger-color: #d32f2f;
-      --danger-hover: #b71c1c;
-      --border-color: #e5e7eb;
-      --background-color: #f8fafc;
-      --text-primary: #1f2937;
-      --text-secondary: #6b7280;
-      --surface-color: #ffffff;
-      --radius-md: 8px;
-      --radius-lg: 16px;
-      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-      --warning-color: #f59e0b;
-      --success-color: #2e7d32;
-    }
-
-    @font-face {
-      font-family: "jw-icons-external";
-      src: url("./jw-icons-external-d876da3.woff") format("woff");
-      font-weight: normal; font-style: normal;
-    }
-
-    /* ===== BASE STYLES ===== */
-    *, *::before, *::after { box-sizing: border-box; }
-    html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-    body {
-      margin: 0; padding: 0;
-      font-family: 'Inter', sans-serif;
-      background-color: var(--body-bg);
-      color: var(--text-primary);
-      visibility: hidden; opacity: 0;
-      transition: opacity 0.3s ease-in;
-    }
-    body.auth-ready { visibility: visible; opacity: 1; }
-    body.menu-open { overflow: hidden; }
-    .hidden { display: none !important; }
-
-    /* ===== NAVBAR & MENU ===== */
-    .site-header {
-      background-color: var(--header-bg);
-      padding: 0; color: var(--text-light);
-      position: fixed; top: 0; left: 0; width: 100%; z-index: 900;
-    }
-    .top-bar {
-      display: flex; justify-content: space-between; align-items: center;
-      height: 56px; padding: 0 15px 0 0; max-width: 1200px; margin: 0 auto;
-    }
-    .top-bar .mobileLogo {
-      display: block; width: 75px; height: 56px;
-      background-image: ur[](https://www.jw.org/assets/ct/46605f23da/images/siteLogo-jworg-mobile.svg), none;
-      background-repeat: no-repeat; background-size: contain; background-position: center left;
-      flex-shrink: 0; margin-left: 0px;
-    }
-    .header-right-controls { display: flex; align-items: center; gap: 15px; }
-    .header-icons { display: flex; align-items: center; height: 56px; cursor: pointer; }
-    .header-icons svg { height: 24px; width: 24px; color: var(--text-light); }
-    .header-icons .close-icon { display: none; }
-    body.menu-open .header-icons .hamburger-icon { display: none; }
-    body.menu-open .header-icons .close-icon { display: block; }
-
-    .menu-overlay {
-      position: fixed; top: 56px; left: 0; width: 100%; height: calc(100% - 56px);
-      background-color: rgba(0, 0, 0, 0.6); z-index: 998;
-      opacity: 0; visibility: hidden; transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
-    }
-    .menu-overlay.is-open { opacity: 1; visibility: visible; }
-
-    .slide-menu {
-      position: fixed; top: 56px; right: 0; height: calc(100dvh - 56px);
-      width: 300px; max-width: 85%; background-color: var(--menu-new-bg); z-index: 999;
-      transform: translateX(100%); transition: transform 0.3s ease-in-out;
-      display: flex; flex-direction: column; border-left: 1px solid var(--menu-new-border);
-    }
-    .slide-menu.is-open { transform: translateX(0); }
-
-    .menu-links { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex-grow: 1; }
-    .menu-links li a {
-      display: flex; align-items: center; color: var(--menu-new-text);
-      background-color: var(--menu-new-bg); height: 56px; padding: 0 16px;
-      box-sizing: border-box; text-decoration: none; font-size: 1rem; font-weight: 500;
-      transition: background-color 0.2s; border-top: 1px solid var(--menu-new-border);
-    }
-    .menu-links li:first-child a { border-top: none; }
-    .menu-links li a:hover { background-color: var(--menu-new-hover); }
-
-    .profile-section {
-      padding: 16px; border-top: 1px solid var(--menu-new-border);
-      flex-shrink: 0; background-color: #f9f9f9; margin-top: auto;
-    }
-    .profile-info { display: flex; align-items: center; }
-    .profile-name { font-weight: 600; font-size: 1rem; color: #333; word-break: break-all; }
-
-    .iconLink-icon {
-      font-family: "jw-icons-external"; font-size: 24px; display: inline-block;
-      color: #757575; width: 30px; margin-right: 10px; text-align: center;
-    }
-    .home-icon::before { content: "\e661"; }
-    .midweek-icon::before { content: "\e625"; }
-    .sunday-icon::before { content: "\e610"; }
-    .members-icon::before { content: "\e695"; }
-
-    /* ===== BUTTONS ===== */
-    .btn {
-      display: inline-flex; align-items: center; justify-content: center;
-      gap: 8px; padding: 10px 20px; border-radius: var(--radius-md);
-      font-size: 1rem; font-weight: 600; cursor: pointer; border: none;
-      text-decoration: none; background-color: var(--primary-color); color: white;
-      transition: background-color 0.2s;
-    }
-    .btn:hover:not(:disabled) { background-color: var(--primary-hover); }
-    .btn:disabled { cursor: not-allowed; opacity: 0.6; }
-
-    .toolbar-btn {
-      display: inline-flex; align-items: center; justify-content: center;
-      gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500;
-      cursor: pointer; border: 1px solid var(--border-color);
-      background-color: var(--surface-color); border-radius: var(--radius-md);
-      transition: all 0.2s; text-decoration: none; color: var(--text-secondary);
-    }
-    .toolbar-btn:hover:not(:disabled) {
-      background-color: #f9fafb; border-color: #d1d5db; color: var(--text-primary);
-    }
-    .toolbar-btn:disabled { cursor: not-allowed; opacity: 0.5; }
-
-    /* Mobile: Smaller Event Button */
-    @media (max-width: 768px) {
-      .toolbar-btn {
-        padding: 6px 10px; font-size: 0.875rem; gap: 4px;
-      }
-      .toolbar-btn .material-symbols-outlined { font-size: 18px; }
-    }
-
-    /* ===== LAYOUT ===== */
-    main { padding: calc(56px + 20px) 20px 20px; }
-    .editor-main { max-width: 1100px; margin: 0 auto; }
-    .page-controls { margin-bottom: 24px; }
-    .master-container {
-      background: var(--surface-color); padding: 24px;
-      border-radius: var(--radius-lg); box-shadow: var(--shadow-md);
-    }
-    .project-header {
-      display: flex; justify-content: space-between; align-items: center;
-      gap: 16px; margin-bottom: 24px; padding-bottom: 24px;
-      border-bottom: 1px solid var(--border-color);
-    }
-    .project-title {
-      font-size: 1.75rem; font-weight: 700; margin: 0; flex-grow: 1;
-      border: none; padding: 4px 8px; margin: -4px -8px;
-      border-radius: var(--radius-md); font-family: 'Noto Sans Telugu', sans-serif;
-    }
-    .project-title:focus {
-      outline: 2px solid var(--primary-color); background-color: var(--primary-light);
-    }
-
-    /* ===== SCHEDULE BLOCK ===== */
-    .schedule-block { margin-bottom: 32px; }
-    .schedule-block:last-child { margin-bottom: 0; }
-    .schedule-header {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 16px;
-    }
-    .schedule-title {
-      font-size: 1.25rem; font-weight: 600; margin: 0;
-      color: var(--text-secondary); font-family: 'Noto Sans Telugu', sans-serif;
-    }
-
-    /* ===== TABLE STYLES ===== */
-    .schedule-block table {
-      width: 100%; border-collapse: collapse; border: 2px solid #4B0082;
-      font-family: 'Noto Sans Telugu', sans-serif; font-size: 14px;
-      font-weight: 700; letter-spacing: 0.25px;
-    }
-    .schedule-block th, .schedule-block td {
-      border: 1px solid #333; padding: 10px 12px; text-align: left;
-      vertical-align: middle; position: relative; height: 44px;
-    }
-    .schedule-block .editable-cell:not([contenteditable="true"]) {
-      cursor: pointer; transition: background 0.2s;
-    }
-    .schedule-block .editable-cell:not([contenteditable="true"]):hover {
-      background-color: #f0fdf4;
-    }
-    .schedule-block [contenteditable="true"]:focus {
-      background-color: #fffbe5; outline: 2px solid var(--primary-color);
-    }
-    .schedule-block .header-row td {
-      font-size: 16px; color: #ffffff; height: 48px;
-      background-color: #4B0082; text-align: center;
-    }
-    .special-event-text {
-      color: #d32f2f; text-align: center !important; font-weight: 700; font-size: 1.1rem;
-    }
-
-    /* ===== DROPDOWNS ===== */
-    #event-context-menu, #member-dropdown {
-      position: fixed; display: none; background: var(--surface-color);
-      border-radius: var(--radius-md); box-shadow: var(--shadow-md);
-      z-index: 1001; padding: 8px; min-width: 200px;
-      border: 1px solid var(--border-color);
-    }
-    .context-menu-item, .member-dropdown-item {
-      font-family: 'Inter', sans-serif; display: block; width: 100%;
-      padding: 10px 14px; cursor: pointer; font-size: 14px; font-weight: 500;
-      border-radius: 6px; background: none; border: none; text-align: left;
-      transition: background 0.2s;
-    }
-    .context-menu-item:hover, .member-dropdown-item:hover {
-      background: #f0fdf4;
-    }
-    .member-dropdown-item { display: flex; justify-content: space-between; align-items: center; }
-    #member-dropdown { max-height: 300px; overflow-y: auto; }
-
-    .servant-tag {
-      font-size: 0.7rem; font-weight: 600; color: var(--primary-color);
-      background-color: var(--primary-light); padding: 2px 6px; border-radius: 4px;
-    }
-
-    /* ===== MODAL ===== */
-    .modal-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.6); display: none; justify-content: center;
-      align-items: center; z-index: 1000; padding: 16px;
-    }
-    .modal-content {
-      background: white; padding: 24px; border-radius: var(--radius-lg);
-      width: 100%; max-width: 500px; max-height: 90vh;
-      display: flex; flex-direction: column; gap: 16px;
-      box-shadow: var(--shadow-md);
-    }
-    #new-project-name {
-      width: 100%; padding: 12px; font-size: 16px;
-      border-radius: var(--radius-md); border: 1px solid var(--border-color);
-    }
-    #template-list {
-      list-style: none; padding: 0; margin: 0; overflow-y: auto;
-      border: 1px solid var(--border-color); border-radius: var(--radius-md);
-      max-height: 300px;
-    }
-    #template-list li { padding: 12px; border-bottom: 1px solid var(--border-color); }
-    #template-list label {
-      display: flex; align-items: center; gap: 10px;
-      font-size: 16px; cursor: pointer; font-weight: 500;
-    }
-    .modal-actions {
-      display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px;
-    }
-    .modal-actions button {
-      padding: 10px 20px; border-radius: var(--radius-md);
-      font-size: 15px; font-weight: 600; cursor: pointer;
-      border: 1px solid var(--border-color);
-    }
-    #cancel-template-selection { background-color: var(--surface-color); }
-    #confirm-template-selection { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
-
-    #print-container { position: absolute; left: -9999px; top: auto; width: 1100px; background: white; }
-
-    /* ===== MOBILE VIEW ===== */
-    .mobile-view-container {
-      display: none; flex-direction: column; gap: 1.5rem;
-      border: 1px solid var(--border-color); border-radius: var(--radius-lg);
-      padding: 16px; background-color: #fafafa; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-    .mobile-item {
-      background: white; border-radius: var(--radius-md); padding: 12px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08); border: 1px solid #e5e7eb;
-    }
-    .mobile-item .item-label {
-      font-size: 1rem; font-weight: 700; color: var(--text-primary);
-      margin-bottom: 8px; font-family: 'Noto Sans Telugu', sans-serif;
-    }
-    .mobile-item .input-group { margin-bottom: 8px; }
-    .mobile-item .input-group:last-child { margin-bottom: 0; }
-    .mobile-item .item-input {
-      width: 100%; padding: 10px 12px; border: 1px solid var(--border-color);
-      border-radius: var(--radius-md); background-color: #f9fafb;
-      font-size: 1rem; font-weight: 500; color: var(--text-primary);
-      transition: all 0.2s;
-    }
-    .mobile-item .item-input:focus {
-      outline: none; border-color: var(--primary-color);
-      background-color: white; box-shadow: 0 0 0 3px rgba(1, 39, 38, 0.15);
-    }
-    .mobile-item .editable-cell {
-      display: block; padding: 10px 12px; background-color: #f0fdf4;
-      border: 1px dashed #86efac; border-radius: var(--radius-md);
-      font-size: 1rem; font-weight: 500; color: var(--text-primary);
-      cursor: pointer; transition: all 0.2s;
-    }
-    .mobile-item .editable-cell:hover { background-color: #dcfce7; }
-    .mobile-item .editable-cell:focus {
-      outline: 2px solid var(--primary-color); background-color: white;
-    }
-
-    /* Special Event Banner */
-    .mobile-item.special-event-banner {
-      background: linear-gradient(135deg, #fee2e2, #fecaca);
-      border: 2px solid #f87171; text-align: center; padding: 16px;
-    }
-    .mobile-item.special-event-banner .item-label {
-      color: #b91c1c; font-size: 1.1rem; margin-bottom: 12px;
-    }
-    .mobile-item.special-event-banner .item-input {
-      background: white; font-weight: 600;
-    }
-
-    .date-input {
-      cursor: pointer; -webkit-appearance: none; -moz-appearance: none; appearance: none;
-      background-color: transparent; border: none; width: 100%; height: 100%;
-      font-family: inherit; font-size: inherit; font-weight: inherit;
-      text-align: left; padding-left: 8px;
-    }
-
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 768px) {
-      main { padding: 56px 0 0 0; }
-      .master-container { padding: 16px; border-radius: 0; box-shadow: none; background: var(--body-bg); }
-      .page-controls { padding: 0 16px; margin-bottom: 16px; }
-      .project-header { flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px 0; margin-bottom: 16px; }
-      .project-title { font-size: 1.5rem; }
-      .schedule-block { margin-bottom: 24px; padding: 0 0 24px 0; border-bottom: 8px solid var(--background-color); }
-      .schedule-block:last-child { border-bottom: none; }
-      .schedule-block table { display: none; }
-      .mobile-view-container { display: flex; }
-      .schedule-header { padding: 0 16px; }
-      .schedule-title { font-size: 1.1rem; }
-      #member-dropdown {
-        width: calc(100% - 32px) !important; left: 16px !important;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>User - Schedule Editor</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+<style>
+:root {
+    --header-bg: #292929;
+    --text-light: #fff;
+    --body-bg: #f8fafc;
+    --menu-new-text: #4a6da7;
+    --menu-new-bg: #ffffff;
+    --menu-new-border: #eeeeee;
+    --menu-new-hover: #f5f5f5;
+    --primary-color: #012726;
+    --primary-hover: #024443;
+    --primary-light: #e6f6f6;
+    --danger-color: #d32f2f;
+    --danger-hover: #b71c1c;
+    --border-color: #e5e7eb;
+    --background-color: #f8fafc;
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --surface-color: #ffffff;
+    --radius-md: 8px;
+    --radius-lg: 16px;
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --warning-color: #f59e0b;
+    --success-color: #2e7d32;
+}
+@font-face {
+    font-family: "jw-icons-external";
+    src: url("./jw-icons-external-d876da3.woff") format("woff");
+    font-weight: normal; font-style: normal;
+}
+body {
+    margin: 0; padding: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: var(--body-bg);
+    color: var(--text-primary);
+    visibility: hidden; opacity: 0;
+    transition: opacity 0.3s ease-in;
+}
+body.auth-ready { visibility: visible; opacity: 1; }
+body.menu-open { overflow: hidden; }
+.site-header { background-color: var(--header-bg); padding: 0; color: var(--text-light); position: fixed; top: 0; left: 0; width: 100%; z-index: 900; }
+.top-bar { display: flex; justify-content: space-between; align-items: center; height: 56px; padding: 0 15px 0 0; max-width: 1200px; margin: 0 auto; }
+.top-bar .mobileLogo { display: block; width: 75px; height: 56px; background-image: ur[](https://www.jw.org/assets/ct/46605f23da/images/siteLogo-jworg-mobile.svg), none; background-repeat: no-repeat; background-size: contain; background-position: center left; flex-shrink: 0; margin-left: 0px; }
+.header-right-controls { display: flex; align-items: center; gap: 15px; }
+.header-icons { display: flex; align-items: center; height: 56px; cursor: pointer; }
+.header-icons svg { height: 24px; width: 24px; color: var(--text-light); }
+.header-icons .close-icon { display: none; }
+body.menu-open .header-icons .hamburger-icon { display: none; }
+body.menu-open .header-icons .close-icon { display: block; }
+.menu-overlay { position: fixed; top: 56px; left: 0; width: 100%; height: calc(100% - 56px); background-color: rgba(0, 0, 0, 0.6); z-index: 998; opacity: 0; visibility: hidden; transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; }
+.menu-overlay.is-open { opacity: 1; visibility: visible; }
+.slide-menu { position: fixed; top: 56px; right: 0; height: calc(100dvh - 56px); width: 320px; max-width: 90%; background-color: var(--menu-new-bg); z-index: 999; transform: translateX(100%); transition: transform 0.3s ease-in-out; display: flex; flex-direction: column; border-left: 1px solid var(--menu-new-border); box-shadow: -4px 0 12px rgba(0,0,0,0.15); }
+.slide-menu.is-open { transform: translateX(0); }
+.menu-links { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex-grow: 1; }
+.menu-links li a { display: flex; align-items: center; color: var(--menu-new-text); background-color: var(--menu-new-bg); height: 56px; padding: 0 16px; text-decoration: none; font-size: 1.05rem; font-weight: 500; transition: background-color 0.2s; border-bottom: 1px solid #eee; }
+.menu-links li a:hover { background-color: var(--menu-new-hover); }
+.profile-section { padding: 16px; border-top: 1px solid var(--menu-new-border); flex-shrink: 0; background-color: #f9f9f9; }
+.profile-info { display: flex; align-items: center; gap: 12px; }
+.profile-name { font-weight: 600; font-size: 1rem; color: #333; }
+.iconLink-icon { font-family: "jw-icons-external"; font-size: 24px; display: inline-block; color: #757575; width: 30px; text-align: center; }
+.home-icon::before { content: "\e661"; }
+.midweek-icon::before { content: "\e625"; }
+.sunday-icon::before { content: "\e610"; }
+.members-icon::before { content: "\e695"; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; border-radius: var(--radius-md); font-size: 1rem; font-weight: 600; cursor: pointer; border: none; background-color: var(--primary-color); color: white; transition: background-color 0.2s; }
+.btn:hover:not(:disabled) { background-color: var(--primary-hover); }
+.btn:disabled { cursor: not-allowed; opacity: 0.6; }
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+.hidden { display: none !important; }
+main { padding: calc(56px + 20px) 20px 20px; }
+.editor-main { max-width: 1100px; margin: 0 auto; }
+.page-controls { margin-bottom: 24px; }
+.master-container { background: var(--surface-color); padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
+.project-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color); }
+.project-title { font-size: 1.75rem; font-weight: 700; margin: 0; flex-grow: 1; border: none; padding: 4px 8px; margin: -4px -8px; border-radius: var(--radius-md); font-family: 'Noto Sans Telugu', sans-serif; }
+.project-title:focus { outline: 2px solid var(--primary-color); background-color: var(--primary-light); }
+.schedule-block { margin-bottom: 32px; }
+.schedule-block:last-child { margin-bottom: 0; }
+.schedule-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding: 0 16px; }
+.schedule-title { font-size: 1.25rem; font-weight: 600; margin: 0; color: var(--text-secondary); font-family: 'Noto Sans Telugu', sans-serif; }
+.status-indicator { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; display: flex; align-items: center; gap: 6px; }
+.status-indicator::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background-color: currentColor; }
+.status-indicator[data-status="synced"] { color: var(--success-color); background-color: #eaf5ea; }
+.status-indicator[data-status="syncing"] { color: var(--warning-color); background-color: #fffbeb; }
+.status-indicator[data-status="error"] { color: var(--danger-color); background-color: #fde8e8; }
+.toolbar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); transition: all 0.2s; text-decoration: none; color: var(--text-secondary); }
+.toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; border-color: #d1d5db; color: var(--text-primary); }
+.toolbar-btn:disabled { cursor: not-allowed; opacity: 0.5; }
+.mobile-event-btn { background: #fee2e2; color: #b91c1c; border: 1px solid #f87171; padding: 8px 12px; border-radius: var(--radius-md); font-weight: 600; font-size: 0.9rem; }
+.mobile-event-btn:hover { background: #fecaca; }
+.schedule-block table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.25px; }
+.schedule-block th, .schedule-block td { border: 1px solid #333; padding: 10px 12px; text-align: left; vertical-align: middle; position: relative; height: 44px; }
+.schedule-block .editable-cell:not([contenteditable="true"]) { cursor: pointer; transition: background 0.2s; }
+.schedule-block .editable-cell:not([contenteditable="true"]):hover { background-color: #f0fdf4; }
+.schedule-block [contenteditable="true"]:focus { background-color: #fffbe5; outline: 2px solid var(--primary-color); }
+.schedule-block .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; }
+.schedule-block .cell-icon { height: 70%; max-height: 24px; object-fit: contain; flex-shrink: 0; }
+.schedule-block .header-row .cell-icon { filter: brightness(0) invert(1); }
+.schedule-block .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; }
+.schedule-block .header-row td { font-size: 16px; color: #ffffff; height: 48px; background-color: #4B0082; text-align: center; }
+.schedule-block .row-handle { display: none !important; }
+.special-event-text { color: #d32f2f; text-align: center !important; font-weight: 700; font-size: 1.1rem; }
+#event-context-menu, #member-dropdown { position: fixed; display: none; background: var(--surface-color); border-radius: var(--radius-md); box-shadow: var(--shadow-md); z-index: 1001; padding: 8px 0; min-width: 200px; border: 1px solid var(--border-color); }
+.context-menu-item, .member-dropdown-item { display: block; width: 100%; padding: 12px 16px; cursor: pointer; font-size: 14.5px; font-weight: 500; border-radius: 0; background: none; border: none; text-align: left; transition: background 0.2s; }
+.context-menu-item:hover, .member-dropdown-item:hover { background: #f0fdf4; }
+.member-dropdown-item { display: flex; justify-content: space-between; align-items: center; }
+#member-dropdown { max-height: 300px; overflow-y: auto; }
+.servant-tag { font-size: 0.7rem; font-weight: 600; color: var(--primary-color); background-color: var(--primary-light); padding: 2px 6px; border-radius: 4px; }
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 16px; }
+.modal-content { background: white; padding: 24px; border-radius: var(--radius-lg); width: 100%; max-width: 500px; max-height: 90vh; display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow-md); }
+#new-project-name { width: 100%; padding: 12px; font-size: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); }
+#template-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md); max-height: 300px; }
+#template-list li { padding: 12px; border-bottom: 1px solid var(--border-color); }
+#template-list label { display: flex; align-items: center; gap: 10px; font-size: 16px; cursor: pointer; font-weight: 500; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px; }
+.modal-actions button { padding: 10px 20px; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); }
+#cancel-template-selection { background-color: var(--surface-color); }
+#confirm-template-selection { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
+#print-container { position: absolute; left: -9999px; top: auto; width: 1100px; background: white; }
+.mobile-view-container { display: none; flex-direction: column; gap: 1.5rem; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 16px; background-color: #fafafa; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.mobile-item { background: white; border-radius: var(--radius-md); padding: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border: 1px solid #e5e7eb; }
+.mobile-item .item-label { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; font-family: 'Noto Sans Telugu', sans-serif; }
+.mobile-item .input-group { margin-bottom: 8px; }
+.mobile-item .input-group:last-child { margin-bottom: 0; }
+.mobile-item .item-input { width: 100%; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-md); background-color: #f9fafb; font-size: 1rem; font-weight: 500; color: var(--text-primary); transition: all 0.2s; }
+.mobile-item .item-input:focus { outline: none; border-color: var(--primary-color); background-color: white; box-shadow: 0 0 0 3px rgba(1, 39, 38, 0.15); }
+.mobile-item .editable-cell { display: block; padding: 10px 12px; background-color: #f0fdf4; border: 1px dashed #86efac; border-radius: var(--radius-md); font-size: 1rem; font-weight: 500; color: var(--text-primary); cursor: pointer; transition: all 0.2s; }
+.mobile-item .editable-cell:hover { background-color: #dcfce7; }
+.mobile-item .editable-cell:focus { outline: 2px solid var(--primary-color); background-color: white; }
+.mobile-item.special-event-banner { background: linear-gradient(135deg, #fee2e2, #fecaca); border: 2px solid #f87171; text-align: center; padding: 16px; }
+.mobile-item.special-event-banner .item-label { color: #b91c1c; font-size: 1.1rem; margin-bottom: 12px; }
+.mobile-item.special-event-banner .item-input { background: white; font-weight: 600; }
+.date-input { cursor: pointer; -webkit-appearance: none; -moz-appearance: none; appearance: none; background-color: transparent; border: none; width: 100%; height: 100%; font-family: inherit; font-size: inherit; font-weight: inherit; text-align: left; padding-left: 8px; }
+.schedule-date-header { font-size: 1.1rem; font-weight: 600; color: var(--text-primary); margin: 12px 16px 8px; font-family: 'Noto Sans Telugu', sans-serif; }
+@media (max-width: 768px) {
+    main { padding: 56px 0 0 0; }
+    .master-container { padding: 16px; border-radius: 0; box-shadow: none; background: var(--body-bg); }
+    .page-controls { padding: 0 16px; margin-bottom: 16px; }
+    .project-header { flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px 0; margin-bottom: 16px; }
+    .project-title { font-size: 1.5rem; }
+    .schedule-block { margin-bottom: 24px; padding: 0 0 24px 0; border-bottom: 8px solid var(--background-color); }
+    .schedule-block:last-child { border-bottom: none; }
+    .schedule-block table { display: none; }
+    .mobile-view-container { display: flex; }
+    .schedule-header { padding: 0 16px; }
+    .schedule-title { font-size: 1.1rem; }
+    .event-btn { display: none; }
+    .mobile-event-btn { display: inline-flex; }
+}
+</style>
 </head>
 <body>
 <header class="site-header">
@@ -412,7 +215,12 @@
                 <span class="material-symbols-outlined">celebration</span>
                 <span>Event</span>
             </button>
+            <button class="toolbar-btn mobile-event-btn" style="display:none;">
+                <span class="material-symbols-outlined">celebration</span>
+                <span>Event</span>
+            </button>
         </div>
+        <div class="schedule-date-header"></div>
         <table>
             <colgroup><col style="width: 60%;"><col style="width: 20%;"><col style="width: 20%;"></colgroup>
             <tbody class="schedule-table-body"></tbody>
@@ -476,7 +284,6 @@
         statusIndicator.textContent = text;
         statusIndicator.dataset.status = status;
     }
-
     async function fetchMembers() {
         if (!currentUser) return;
         membersCollection = db.collection(`users/${currentUser.uid}/members`);
@@ -491,15 +298,6 @@
             }
         });
     }
-
-    // Format date to Telugu locale (e.g., 15-10-2025 → 15 అక్టోబర్ 2025)
-    function formatTeluguDate(dateStr) {
-        if (!dateStr) return '';
-        const [day, month, year] = dateStr.split('-');
-        const date = new Date(year, month - 1, day);
-        return date.toLocaleDateString('te-IN', { day: 'numeric', month: 'long', year: 'numeric' });
-    }
-
     class ScheduleTable {
         constructor(parentProject, tableData, index) {
             this.parentProject = parentProject;
@@ -510,28 +308,21 @@
             this.setupEventListeners();
             this.applyEventType(this.data.eventType || 'normal', false);
         }
-
         initDOM() {
             const templateClone = document.getElementById('schedule-template').content.cloneNode(true);
             this.element = templateClone.querySelector('.schedule-block');
             this.titleEl = this.element.querySelector('.schedule-title');
+            this.dateHeaderEl = this.element.querySelector('.schedule-date-header');
             this.tableBody = this.element.querySelector('.schedule-table-body');
             this.mobileViewContainer = this.element.querySelector('.mobile-view-container');
             this.eventBtn = this.element.querySelector('.event-btn');
+            this.mobileEventBtn = this.element.querySelector('.mobile-event-btn');
             schedulesWrapper.appendChild(this.element);
         }
-
         render() {
             this.titleEl.textContent = this.data.title;
             this.tableBody.innerHTML = this.data.content;
-
-            // Update title with date
-            const firstRow = this.tableBody.rows[0];
-            const dateCell = firstRow?.cells[firstRow.cells.length - 1];
-            const dateInput = dateCell?.querySelector('.date-input');
-            const dateStr = dateInput?.value ? formatTeluguDate(dateInput.value) : '';
-            this.titleEl.textContent = `${this.data.title}${dateStr ? ' – ' + dateStr : ''}`;
-
+           
             this.tableBody.querySelectorAll('td, th').forEach(cell => {
                 if (cell.hasAttribute('data-user-editable')) {
                     const isFirstRow = cell.closest('tr') === this.tableBody.rows[0];
@@ -548,34 +339,29 @@
                     cell.setAttribute('contenteditable', 'false');
                 }
             });
+            this.updateDateHeader();
             this._createMobileView();
         }
-
+        updateDateHeader() {
+            const firstRow = this.tableBody.rows[0];
+            const dateCell = firstRow ? firstRow.cells[2] : null;
+            const dateInput = dateCell ? dateCell.querySelector('.date-input') : null;
+            const dateValue = dateInput ? dateInput.value : '';
+            if (dateValue) {
+                const formatted = dateValue.split('-').reverse().join('-');
+                this.dateHeaderEl.textContent = `తేదీ: ${formatted}`;
+                this.dateHeaderEl.style.display = 'block';
+            } else {
+                this.dateHeaderEl.style.display = 'none';
+            }
+        }
         _createMobileView() {
             this.mobileViewContainer.innerHTML = '';
-            const firstRow = this.tableBody.rows[0];
-            const dateCell = firstRow?.cells[firstRow.cells.length - 1];
-            const dateInput = dateCell?.querySelector('.date-input');
-            const dateStr = dateInput?.value ? formatTeluguDate(dateInput.value) : '';
-
-            // Add header card with title + date
-            const headerDiv = document.createElement('div');
-            headerDiv.className = 'mobile-item';
-            headerDiv.style.background = 'linear-gradient(135deg, #e0f2fe, #bae6fd)';
-            headerDiv.style.borderLeft = '4px solid #0ea5e9';
-            headerDiv.innerHTML = `
-                <div class="item-label" style="font-size:1.1rem; color:#0369a1;">
-                    ${this.data.title}${dateStr ? '<span style="font-weight:500; color:#0c4a6e;"> – ' + dateStr + '</span>' : ''}
-                </div>
-            `;
-            this.mobileViewContainer.appendChild(headerDiv);
-
             if (this.data.eventType && this.data.eventType !== 'normal') {
-                const eventTexts = {
-                    'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం',
-                    'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో',
-                    'convention': 'ప్రాదేశిక సమావేశం'
-                };
+                const eventTexts = { 'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం', 'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో', 'convention': 'ప్రాదేశిక సమావేశం' };
+                const firstRow = this.tableBody.rows[0];
+                const dateCell = firstRow.cells[2];
+                const dateInput = dateCell ? dateCell.querySelector('.date-input') : null;
                 const dateValue = dateInput ? dateInput.value : '';
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'mobile-item special-event-banner';
@@ -583,13 +369,12 @@
                     <div class="item-label">${eventTexts[this.data.eventType]}</div>
                     <div class="input-group">
                         <div class="item-label">తేదీ:</div>
-                        <input type="date" class="item-input date-input" data-row-index="0" data-cell-index="${firstRow.cells.length - 1}" value="${dateValue}">
+                        <input type="date" class="item-input date-input" data-row-index="0" data-cell-index="2" value="${dateValue}">
                     </div>
                 `;
                 this.mobileViewContainer.appendChild(itemDiv);
                 return;
             }
-
             Array.from(this.tableBody.rows).forEach((row, rowIndex) => {
                 if (row.classList.contains('header-row')) return;
                 const editableCellsInRow = Array.from(row.cells).filter(c => c.hasAttribute('data-user-editable'));
@@ -666,7 +451,6 @@
             tempBody.querySelectorAll('.editable-cell').forEach(el => el.classList.remove('editable-cell'));
             return tempBody.innerHTML;
         }
-
         applyEventType(eventType, shouldSave = true) {
             this.data.eventType = eventType;
             const allRows = this.tableBody.querySelectorAll('tr');
@@ -701,9 +485,9 @@
                 `;
             }
             this._createMobileView();
+            this.updateDateHeader();
             if (shouldSave) this.parentProject.triggerSave();
         }
-
         setupEventListeners() {
             this.element.addEventListener('input', (e) => {
                 const input = e.target;
@@ -714,9 +498,7 @@
                     if(input.type === 'date') {
                         const tableInput = targetCell.querySelector('.date-input');
                         if(tableInput) tableInput.value = input.value;
-                        // Update title with new date
-                        const dateStr = input.value ? formatTeluguDate(input.value) : '';
-                        this.titleEl.textContent = `${this.data.title}${dateStr ? ' – ' + dateStr : ''}`;
+                        this.updateDateHeader();
                     } else {
                          targetCell.textContent = input.textContent;
                     }
@@ -724,6 +506,13 @@
                 this.parentProject.triggerSave();
             });
             this.eventBtn.addEventListener('click', (e) => {
+                activeEventScheduleTable = this;
+                const rect = e.currentTarget.getBoundingClientRect();
+                eventContextMenu.style.display = 'block';
+                eventContextMenu.style.top = `${rect.bottom}px`;
+                eventContextMenu.style.left = `${rect.left}px`;
+            });
+            this.mobileEventBtn.addEventListener('click', (e) => {
                 activeEventScheduleTable = this;
                 const rect = e.currentTarget.getBoundingClientRect();
                 eventContextMenu.style.display = 'block';
@@ -744,7 +533,6 @@
             this.render();
             this.setupEventListeners();
         }
-
         render(newData) {
             if (newData) this.data = newData;
             if (document.activeElement !== projectTitleEl) projectTitleEl.textContent = this.data.name;
@@ -754,7 +542,6 @@
                 this.scheduleTables.push(new ScheduleTable(this, tableData, index));
             });
         }
-
         triggerSave() {
             clearTimeout(this.saveTimeout);
             if (!this.isSaving) {
@@ -789,12 +576,10 @@
                     this.isSaving = false;
                 });
         }
-
         setupEventListeners() {
             projectTitleEl.addEventListener('input', () => this.triggerSave());
         }
     }
-
     auth.onAuthStateChanged(async user => {
         if (user) {
             if (user.email === ADMIN_EMAIL) { window.location.replace('./admin.html'); return; }
@@ -814,7 +599,6 @@
             window.location.replace('./login.html');
         }
     });
-
     function initEditor() {
         if (!currentUser || !currentProjectId) return;
         if (currentListener) currentListener();
@@ -835,7 +619,6 @@
              updateStatus('Error', 'error');
         });
     }
-
     async function initCreationFlow() {
         document.getElementById('project-header').style.display = 'none';
         document.getElementById('print-button').style.display = 'none';
@@ -853,7 +636,6 @@
         }
         templateSelectionModal.style.display = 'flex';
     }
-
     function setupGlobalUI() {
         const menuToggleButton = document.getElementById('menu-toggle-button');
         const slideMenu = document.getElementById('slide-menu');
@@ -875,7 +657,6 @@
             }
         });
         menuOverlay.addEventListener('click', closeMenu);
-
         document.getElementById('print-button').addEventListener('click', generatePdf);
         document.getElementById('cancel-template-selection').addEventListener('click', () => window.location.href = './dashboard.html');
         document.getElementById('confirm-template-selection').addEventListener('click', async () => {
@@ -909,7 +690,6 @@
             eventContextMenu.style.display = 'none';
             activeEventScheduleTable = null;
         });
-
         schedulesWrapper.addEventListener('click', e => {
             const targetElement = e.target.closest('.editable-cell, [contenteditable="true"]');
             if (!targetElement || targetElement.getAttribute('contenteditable') === 'true') return;
@@ -923,7 +703,6 @@
             }
             openMemberDropdown(realCell, mobileDiv);
         });
-
         memberDropdown.addEventListener('click', e => {
             const item = e.target.closest('.member-dropdown-item');
             if (item && activeCellForDropdown.realCell) {
@@ -937,14 +716,9 @@
             memberDropdown.style.display = 'none';
             activeCellForDropdown = null;
         });
-
         document.addEventListener('click', (e) => {
-            if (!eventContextMenu.contains(e.target) && !e.target.closest('.event-btn')) {
-                eventContextMenu.style.display = 'none';
-            }
-            if (!memberDropdown.contains(e.target) && !e.target.closest('.editable-cell')) {
-                memberDropdown.style.display = 'none';
-            }
+            if (!eventContextMenu.contains(e.target) && !e.target.closest('.event-btn') && !e.target.closest('.mobile-event-btn')) { eventContextMenu.style.display = 'none'; }
+            if (!memberDropdown.contains(e.target) && !e.target.closest('.editable-cell')) { memberDropdown.style.display = 'none'; }
         });
     }
    
@@ -968,7 +742,6 @@
         if (ministryHeaderIndex === -1) return false;
         return cellIndex > ministryHeaderIndex && cellIndex < nextHeaderIndex;
     }
-
     function openMemberDropdown(cell, mobileDiv = null) {
         const isInMinistry = isCellInMinistrySection(cell);
         memberDropdown.innerHTML = '';
@@ -994,7 +767,6 @@
         memberDropdown.style.width = `${rect.width}px`;
         activeCellForDropdown = { realCell: cell, mobileDiv: mobileDiv };
     }
-
     async function generatePdf() {
         const printButton = document.getElementById('print-button');
         printButton.disabled = true;
@@ -1008,42 +780,34 @@
         printContainer.id = 'print-container';
         document.body.appendChild(printContainer);
         const itemsToPrint = [];
-
         for (const block of document.querySelectorAll('.schedule-block')) {
             const clone = block.cloneNode(true);
-           
-            clone.querySelector('.event-btn').style.display = 'none';
+            clone.querySelector('.event-btn, .mobile-event-btn').style.display = 'none';
             clone.querySelector('.mobile-view-container').style.display = 'none';
             clone.querySelector('table').style.display = 'table';
-           
             const titleEl = clone.querySelector('.schedule-title');
-            if (titleEl) {
-                titleEl.style.display = 'block';
-                titleEl.style.margin = '0 0 12px 0';
-                titleEl.style.fontSize = '18px';
-                titleEl.style.fontWeight = '700';
-                titleEl.style.color = '#1f2937';
-                titleEl.style.textAlign = 'center';
-                titleEl.style.fontFamily = "'Noto Sans Telugu', sans-serif";
-            }
-
+            if (titleEl) titleEl.style.display = 'block';
+            clone.style.marginBottom = '0';
+            clone.style.padding = '0';
+            clone.style.border = 'none';
             const allCells = clone.querySelectorAll('th, td');
             allCells.forEach(cell => {
                 cell.style.height = '40px';
             });
-
+            const dateHeader = clone.querySelector('.schedule-date-header');
+            if (dateHeader && dateHeader.textContent) {
+                dateHeader.style.display = 'block';
+                dateHeader.style.margin = '8px 0';
+                dateHeader.style.fontWeight = '600';
+            }
             printContainer.appendChild(clone);
-           
             const canvas = await html2canvas(clone, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
-           
             const imgData = canvas.toDataURL('image/jpeg', 0.8);
             const imgProps = pdf.getImageProperties(imgData);
             const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
             itemsToPrint.push({ imgData, width: USABLE_WIDTH, height: imgHeight });
         }
-       
         document.body.removeChild(printContainer);
-        let currentY = MARGIN_MM;
         const pages = [];
         let currentPageItems = [];
         let currentPageHeight = 0;
@@ -1058,21 +822,14 @@
                 currentPageHeight += itemHeightWithSpacing;
             }
         });
-        if (currentPageItems.length > 0) {
-            pages.push(currentPageItems);
-        }
-
+        if (currentPageItems.length > 0) pages.push(currentPageItems);
         pages.forEach((pageItems, pageIndex) => {
-            if (pageIndex > 0) {
-                pdf.addPage();
-            }
+            if (pageIndex > 0) pdf.addPage();
             const totalContentHeight = pageItems.reduce((sum, item) => sum + item.height, 0) + (PAGE_SPACING_MM * (pageItems.length - 1));
             let startY = MARGIN_MM;
             if (pageItems.length > 1) {
                 const remainingSpace = USABLE_HEIGHT - totalContentHeight;
-                if (remainingSpace > 0) {
-                    startY = MARGIN_MM + (remainingSpace / 2);
-                }
+                if (remainingSpace > 0) startY = MARGIN_MM + (remainingSpace / 2);
             }
             let currentY = startY;
             pageItems.forEach(item => {
@@ -1080,7 +837,6 @@
                 currentY += item.height + PAGE_SPACING_MM;
             });
         });
-
         const fileName = `${projectTitleEl.textContent.trim() || 'schedule'}.pdf`;
         pdf.save(fileName);
         printButton.disabled = false;
