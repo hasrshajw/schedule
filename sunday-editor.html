@@ -86,7 +86,6 @@
         width: 100%; 
         z-index: 1000;
         box-shadow: var(--shadow-md);
-        height: 70px;
     }
     .top-bar { 
         display: flex; 
@@ -796,14 +795,13 @@
         border-radius: 2px;
     }
     
-    /* Event Type Selector at Top - Single Button */
+    /* Single Event Type Selector Button for Mobile */
     .event-type-selector {
         display: flex;
-        gap: 8px;
         margin-bottom: 20px;
     }
     
-    .event-type-btn {
+    .event-type-dropdown-btn {
         flex: 1;
         padding: 12px 16px;
         border: 2px solid var(--border-color);
@@ -813,18 +811,21 @@
         font-family: 'Noto Sans Telugu', sans-serif;
         font-weight: 500;
         text-align: center;
-        transition: all 0.2s ease;
         display: flex;
         align-items: center;
-        justify-content: center;
-        gap: 6px;
+        justify-content: space-between;
+        gap: 8px;
+        transition: all 0.2s ease;
     }
     
-    .event-type-btn.active {
+    .event-type-dropdown-btn:hover {
+        border-color: var(--accent-color);
+    }
+    
+    .event-type-dropdown-btn.active {
         border-color: var(--primary-color);
         background-color: var(--primary-light);
         color: var(--primary-color);
-        font-weight: 600;
     }
     
     .week-fields {
@@ -916,6 +917,47 @@
         margin: 0;
         font-family: 'Noto Sans Telugu', sans-serif;
     }
+    
+    .mobile-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 20px;
+        padding-top: 16px;
+        border-top: 1px solid var(--border-color);
+    }
+    
+    .mobile-action-btn {
+        flex: 1;
+        padding: 12px 16px;
+        border: 2px solid var(--border-color);
+        background: white;
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        font-family: 'Noto Sans Telugu', sans-serif;
+        font-weight: 500;
+        text-align: center;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    
+    .mobile-action-btn.primary {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+    
+    .mobile-action-btn.primary:hover {
+        background: var(--primary-hover);
+        border-color: var(--primary-hover);
+    }
+    
+    .mobile-action-btn.secondary:hover {
+        border-color: var(--accent-color);
+        color: var(--accent-color);
+    }
 
     /* Animation Classes */
     .fade-in {
@@ -968,7 +1010,7 @@
         }
         
         main { 
-            padding-top: 70px; /* 60px navbar + 10px spacing */
+            padding-top: 80px; /* Increased to prevent navbar overlap */
         }
         
         .editor-main { 
@@ -978,6 +1020,7 @@
         .page-controls { 
             flex-direction: column;
             align-items: stretch;
+            margin-bottom: 16px;
         }
         
         .master-container { 
@@ -1254,10 +1297,10 @@
     };
 
     const eventTypes = [
-        { id: 'normal', name: 'Normal', icon: 'event' },
-        { id: 'co-visit', name: 'CO Visit', icon: 'groups' },
-        { id: 'assembly', name: 'Assembly', icon: 'celebration' },
-        { id: 'convention', name: 'Convention', icon: 'festival' }
+        { id: 'normal', name: 'Normal', icon: 'event', color: 'primary' },
+        { id: 'co-visit', name: 'CO Visit', icon: 'groups', color: 'co-visit' },
+        { id: 'assembly', name: 'Assembly', icon: 'celebration', color: 'assembly' },
+        { id: 'convention', name: 'Convention', icon: 'festival', color: 'convention' }
     ];
 
     const debounce = (func, delay) => {
@@ -1408,6 +1451,7 @@
             const speakerCell = cells[2];
             const chairmanCell = cells[3];
             const readerCell = cells[4];
+            const actionsCell = cells[5];
             
             const card = document.createElement('div');
             card.className = 'mobile-week-card fade-in';
@@ -1415,38 +1459,32 @@
             // Check if this is a special event
             const isSpecialEvent = topicCell.classList.contains('special-event') && topicCell.colSpan === 4;
             const currentEventType = getEventTypeForRow(row);
-            
-            card.innerHTML = `
-                <h3 class="week-date">${dateCell.textContent}</h3>
-                
-                <div class="event-type-selector">
-                    <button class="event-type-btn ${isSpecialEvent ? '' : 'active'}" data-row="${rowIndex}" data-event-type="normal">
-                        <span class="material-symbols-outlined">event</span>
-                        <span>Normal Event</span>
-                    </button>
-                    <button class="event-type-btn ${isSpecialEvent ? 'active' : ''}" data-row="${rowIndex}" data-event-type="special">
-                        <span class="material-symbols-outlined">celebration</span>
-                        <span>Special Event</span>
-                    </button>
-                </div>
-            `;
+            const eventTypeLabel = getEventTypeLabel(currentEventType);
             
             if (isSpecialEvent) {
-                card.innerHTML += `
+                card.innerHTML = `
+                    <h3 class="week-date">${dateCell.textContent}</h3>
+                    <div class="event-type-selector">
+                        <button class="event-type-dropdown-btn" data-row="${rowIndex}">
+                            <span>${eventTypeLabel}</span>
+                            <span class="material-symbols-outlined">arrow_drop_down</span>
+                        </button>
+                    </div>
                     <div class="special-event-mobile">
                         <p class="special-event-text-mobile">${topicCell.textContent}</p>
                     </div>
-                    <div class="week-fields">
-                        <div class="field-group">
-                            <label>Event Type</label>
-                            <div class="mobile-field event-type-field" data-row="${rowIndex}">
-                                <span class="mobile-field-value">${getCurrentEventTypeName(topicCell.textContent)}</span>
-                            </div>
-                        </div>
-                    </div>
                 `;
             } else {
-                card.innerHTML += `
+                card.innerHTML = `
+                    <h3 class="week-date">${dateCell.textContent}</h3>
+                    
+                    <div class="event-type-selector">
+                        <button class="event-type-dropdown-btn" data-row="${rowIndex}">
+                            <span>${eventTypeLabel}</span>
+                            <span class="material-symbols-outlined">arrow_drop_down</span>
+                        </button>
+                    </div>
+                    
                     <div class="week-fields">
                         <div class="field-group">
                             <label>ప్రసంగ అంశం</label>
@@ -1508,31 +1546,18 @@
             });
         });
 
-        // Add event listeners to event type buttons
-        mobileContainer.querySelectorAll('.event-type-btn').forEach(btn => {
+        // Add event listeners to event type dropdown buttons
+        mobileContainer.querySelectorAll('.event-type-dropdown-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const eventType = btn.dataset.eventType;
                 const rowIndex = btn.dataset.row;
-                const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
-                const row = tableBody.rows[rowIndex];
-                
-                if (eventType === 'special') {
-                    showSpecialEventMenu(row, rowIndex);
-                } else {
-                    changeEventType(rowIndex, 'normal');
-                }
+                openEventTypeDropdown(rowIndex);
             });
         });
+    }
 
-        // Add event listeners to event type fields
-        mobileContainer.querySelectorAll('.event-type-field').forEach(field => {
-            field.addEventListener('click', (e) => {
-                const rowIndex = field.dataset.row;
-                const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
-                const row = tableBody.rows[rowIndex];
-                showSpecialEventMenu(row, rowIndex);
-            });
-        });
+    function getEventTypeLabel(eventType) {
+        const event = eventTypes.find(e => e.id === eventType);
+        return event ? event.name : 'Normal';
     }
 
     function getEventTypeForRow(row) {
@@ -1544,38 +1569,6 @@
             if (text.includes('సమావేశం')) return 'convention';
         }
         return 'normal';
-    }
-
-    function getCurrentEventTypeName(text) {
-        if (text.includes('పర్యవేక్షకుని')) return 'CO Visit';
-        if (text.includes('సమావేశ కార్యక్రమం')) return 'Assembly';
-        if (text.includes('సమావేశం')) return 'Convention';
-        return 'Select Event Type';
-    }
-
-    function showSpecialEventMenu(row, rowIndex) {
-        activeRowForEvents = row;
-        dropdownTitle.textContent = 'Select Special Event';
-        dropdownContent.innerHTML = '';
-        
-        const specialEvents = [
-            { type: 'co-visit', name: 'CO Visit' },
-            { type: 'assembly', name: 'Assembly' },
-            { type: 'convention', name: 'Convention' }
-        ];
-        
-        specialEvents.forEach(event => {
-            const item = document.createElement('button');
-            item.className = 'dropdown-item';
-            item.textContent = event.name;
-            item.addEventListener('click', () => {
-                changeEventType(rowIndex, event.type);
-                hideMobileDropdown();
-            });
-            dropdownContent.appendChild(item);
-        });
-        
-        showMobileDropdown();
     }
 
     function changeEventType(rowIndex, eventType) {
@@ -1803,6 +1796,27 @@
             debouncedSave();
         }
         hideMobileDropdown();
+    }
+
+    function openEventTypeDropdown(rowIndex) {
+        dropdownTitle.textContent = 'Select Event Type';
+        dropdownContent.innerHTML = '';
+        
+        eventTypes.forEach(event => {
+            const item = document.createElement('button');
+            item.className = 'dropdown-item';
+            item.innerHTML = `
+                <span class="material-symbols-outlined">${event.icon}</span>
+                <span>${event.name}</span>
+            `;
+            item.addEventListener('click', () => {
+                changeEventType(rowIndex, event.id);
+                hideMobileDropdown();
+            });
+            dropdownContent.appendChild(item);
+        });
+        
+        showMobileDropdown();
     }
 
     const debouncedSave = debounce(() => {
