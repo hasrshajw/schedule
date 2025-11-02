@@ -1384,62 +1384,54 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
-    
+    const ADMIN_EMAIL = 'harshavardhanjw@gmail.com';
     let currentUser = null;
-    let currentScheduleId = null;
+    let currentProjectId = null;
     let userSchedulesCollection = null;
     let membersCollection = null;
-    let currentListener = null;
-    let activeRowForEvents = null;
     let members = { brothers: [], sisters: [] };
+    let currentListener = null;
+    let activeProject = null;
+    let activeEventScheduleTable = null;
     let activeCellForDropdown = null;
-    let currentDropdownType = null;
-    let currentDropdownData = null;
-    let desktopDropdownSearch = null;
-    let desktopDropdownList = null;
-    let mobileSearchInput = null;
 
-    const scheduleWrapper = document.getElementById('schedule-content-wrapper');
-    const dateSelectionModal = document.getElementById('date-selection-modal');
-    const statusIndicator = document.querySelector('.status-indicator');
-    const desktopDropdown = document.getElementById('desktop-dropdown');
-    const desktopEventMenu = document.getElementById('desktop-event-menu');
+    // DOM Elements - declare them at the top
+    let appContainer, projectTitleEl, schedulesWrapper, templateSelectionModal;
+    let templateList, eventContextMenu, memberDropdown, statusIndicator;
+    let desktopDropdown, desktopDropdownSearch, desktopDropdownList;
+    let dropdownBackdrop, dropdownContainer, dropdownTitle, dropdownContent;
+    let dropdownClose, mobileDropdownSearch, mobileSearchInput;
 
-    const dropdownBackdrop = document.getElementById('dropdown-backdrop');
-    const dropdownContainer = document.getElementById('dropdown-container');
-    const dropdownTitle = document.getElementById('dropdown-title');
-    const dropdownContent = document.getElementById('dropdown-content');
-    const dropdownClose = document.getElementById('dropdown-close');
-    const mobileDropdownSearch = document.getElementById('mobile-dropdown-search');
-
-    const topics = {
-        'అంశం-1': 'this is talk-1',
-        'అంశం-2': 'this is talk-2', 
-        'అంశం-3': 'this is talk-3',
-        'అంశం-4': 'this is talk-4'
-    };
-
-    const eventTexts = {
-        'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం',
-        'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో',
-        'convention': 'ప్రాదేశిక సమావేశం'
-    };
-
-    const eventTypes = [
-        { id: 'normal', name: 'Normal', icon: 'event', color: 'primary' },
-        { id: 'co-visit', name: 'CO Visit', icon: 'groups', color: 'co-visit' },
-        { id: 'assembly', name: 'Assembly', icon: 'celebration', color: 'assembly' },
-        { id: 'convention', name: 'Convention', icon: 'festival', color: 'convention' }
-    ];
-
-    const debounce = (func, delay) => {
-        let timeout;
-        return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), delay); };
-    };
+    function initializeDOMElements() {
+        appContainer = document.getElementById('app-container');
+        projectTitleEl = document.getElementById('project-title');
+        schedulesWrapper = document.getElementById('schedules-wrapper');
+        templateSelectionModal = document.getElementById('template-selection-modal');
+        templateList = document.getElementById('template-list');
+        eventContextMenu = document.getElementById('event-context-menu');
+        memberDropdown = document.getElementById('member-dropdown');
+        statusIndicator = document.querySelector('.status-indicator');
+        
+        // Desktop dropdown elements
+        desktopDropdown = document.getElementById('desktop-dropdown');
+        desktopDropdownSearch = document.getElementById('desktop-dropdown-search');
+        desktopDropdownList = document.getElementById('desktop-dropdown-list');
+        
+        // Mobile dropdown elements
+        dropdownBackdrop = document.getElementById('dropdown-backdrop');
+        dropdownContainer = document.getElementById('dropdown-container');
+        dropdownTitle = document.getElementById('dropdown-title');
+        dropdownContent = document.getElementById('dropdown-content');
+        dropdownClose = document.getElementById('dropdown-close');
+        mobileDropdownSearch = document.getElementById('mobile-dropdown-search');
+        mobileSearchInput = document.getElementById('mobile-search-input');
+    }
 
     function updateStatus(text, status) {
-        statusIndicator.textContent = text;
-        statusIndicator.dataset.status = status;
+        if (statusIndicator) {
+            statusIndicator.textContent = text;
+            statusIndicator.dataset.status = status;
+        }
     }
 
     async function fetchMembers() {
@@ -1457,1063 +1449,800 @@
         });
     }
 
-    auth.onAuthStateChanged(async user => {
-        if (user) {
-            currentUser = user;
-            await fetchMembers();
-            userSchedulesCollection = db.collection(`userSundaySchedules/${currentUser.uid}/schedules`);
-            document.body.classList.add('auth-ready');
-            const profileNameEl = document.querySelector('.profile-name');
-            if (profileNameEl) profileNameEl.textContent = user.email;
-            
-            setupGlobalUI();
-
-            const params = new URLSearchParams(window.location.search);
-            currentScheduleId = params.get('id');
-            if (currentScheduleId) initEditor(); else initCreationFlow();
-        } else {
-            window.location.replace('./login.html');
+    class ScheduleTable {
+        constructor(parentProject, tableData, index) {
+            this.parentProject = parentProject;
+            this.data = tableData;
+            this.index = index;
+            this.initDOM();
+            this.render();
+            this.setupEventListeners();
+            this.applyEventType(this.data.eventType || 'normal', false);
         }
-    });
 
-    function initEditor() {
-        if (currentListener) currentListener();
-        
-        userSchedulesCollection.doc(currentScheduleId).get().then(doc => {
-            if (doc.exists) {
-                const scheduleData = doc.data();
-                renderSchedule(scheduleData);
-                updateStatus('Synced', 'synced');
-            } else {
-                alert("This schedule may have been deleted.");
-                window.location.href = './sunday-dashboard.html';
-            }
-        }).catch(error => {
-            updateStatus('Error', 'error');
-        });
-        
-        currentListener = userSchedulesCollection.doc(currentScheduleId).onSnapshot(doc => {
-            if (doc.exists) {
-                updateStatus('Synced', 'synced');
-            }
-        }, error => {
-            updateStatus('Error', 'error');
-        });
-    }
+        initDOM() {
+            const templateClone = document.getElementById('schedule-template').content.cloneNode(true);
+            this.element = templateClone.querySelector('.schedule-block');
+            this.titleEl = this.element.querySelector('.schedule-title');
+            this.tableBody = this.element.querySelector('.schedule-table-body');
+            this.mobileViewContainer = this.element.querySelector('.mobile-view-container');
+            this.eventBtn = this.element.querySelector('.event-btn');
+            schedulesWrapper.appendChild(this.element);
+        }
 
-    function renderSchedule(data) {
-        document.title = data.name;
-        scheduleWrapper.innerHTML = `
-            <header class="schedule-display-header">
-                <div class="title-block">
-                    <h1>బహిరంగ ప్రసంగాల పట్టిక</h1>
-                    <div class="subtitle-svg-container">
-                        <p class="subtitle" contenteditable="true">${data.dateRange || ''}</p>
-                        <svg class="svg-divider" role="presentation" viewBox="0 0 24039.797 260" preserveAspectRatio="xMidYMid slice">
-                            <defs>
-                                <radialGradient id="__id9__id4" gradientUnits="userSpaceOnUse" r="12020.601" cx="12019.898" cy="130" fx="12019.898" fy="130">
-                                    <stop stop-color="#093261" stop-opacity="1" offset="0"></stop>
-                                    <stop stop-color="#ffffff" stop-opacity="1" offset="1"></stop>
-                                </radialGradient>
-                            </defs>
-                            <rect x="0" y="0" width="24039.797" height="260" fill="url(#__id9__id4)"></rect>
-                        </svg>
-                    </div>
-                </div>
-            </header>
-            <main>
-                <table class="schedule-table">
-                    <thead>
-                        <tr>
-                            <th>తేదీ</th>
-                            <th>ప్రసంగ అంశం</th>
-                            <th>ప్రసంగీకుడు</th>
-                            <th>చైర్మన్</th>
-                            <th>కావలికోట రీడర్</th>
-                            <th class="actions-col">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${data.tableHTML}
-                    </tbody>
-                </table>
-                <div class="mobile-view-container"></div>
-            </main>
-        `;
-        
-        scheduleWrapper.querySelectorAll('tbody td').forEach((cell, index) => {
-            const row = cell.parentElement;
-            const cellIndex = cell.cellIndex;
+        render() {
+            this.titleEl.textContent = this.data.title;
+            this.tableBody.innerHTML = this.data.content;
             
-            if (cellIndex === 0 || cellIndex === 5) return;
-            
-            cell.classList.add('editable-cell');
-            cell.removeAttribute('contenteditable');
-            
-            cell.style.backgroundImage = "url(\"data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 9L12 15L18 9' stroke='%23002726' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3C/path%3E%3C/svg%3E\")";
-            cell.style.backgroundRepeat = "no-repeat";
-            cell.style.backgroundPosition = "right 8px center";
-            cell.style.backgroundSize = "16px";
-            cell.style.paddingRight = "30px";
-            
-            cell.addEventListener('click', (e) => {
-                if (cellIndex === 1) {
-                    openDesktopDropdown('topic', cell);
+            this.tableBody.querySelectorAll('td, th').forEach(cell => {
+                if (cell.hasAttribute('data-user-editable')) {
+                    const isFirstRow = cell.closest('tr') === this.tableBody.rows[0];
+                    if (isFirstRow) {
+                        const originalText = cell.textContent.trim();
+                        const dateValue = originalText.split('-').reverse().join('-');
+                        cell.innerHTML = `<input type="date" class="date-input" value="${dateValue || ''}">`;
+                        cell.removeAttribute('contenteditable');
+                    } else {
+                        cell.classList.add('editable-cell');
+                        cell.removeAttribute('contenteditable');
+                    }
                 } else {
-                    openDesktopDropdown('member', cell);
+                    cell.setAttribute('contenteditable', 'false');
                 }
             });
-        });
 
-        createMobileView();
+            this._createMobileView();
+        }
 
-        scheduleWrapper.addEventListener('input', debouncedSave);
-        scheduleWrapper.querySelectorAll('.event-btn').forEach(btn => {
-            btn.addEventListener('click', openEventMenu);
-        });
-        
-        document.getElementById('app-container').classList.remove('hidden');
-    }
+        _createMobileView() {
+            this.mobileViewContainer.innerHTML = '';
+            if (this.data.eventType && this.data.eventType !== 'normal') {
+                const eventTexts = { 'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం', 'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో', 'convention': 'ప్రాదేశిక సమావేశం' };
+                const firstRow = this.tableBody.rows[0];
+                const dateCell = firstRow.cells[2];
+                const dateInput = dateCell ? dateCell.querySelector('.date-input') : null;
+                const dateValue = dateInput ? dateInput.value : '';
 
-    function createMobileView() {
-        const mobileContainer = scheduleWrapper.querySelector('.mobile-view-container');
-        const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
-        
-        if (!tableBody) return;
-        
-        mobileContainer.innerHTML = '';
-        
-        Array.from(tableBody.rows).forEach((row, rowIndex) => {
-            const cells = Array.from(row.cells);
-            const dateCell = cells[0];
-            const topicCell = cells[1];
-            const speakerCell = cells[2];
-            const chairmanCell = cells[3];
-            const readerCell = cells[4];
-            
-            const card = document.createElement('div');
-            card.className = 'mobile-week-card fade-in';
-            
-            const isSpecialEvent = topicCell.classList.contains('special-event') && topicCell.colSpan === 4;
-            const currentEventType = getEventTypeForRow(row);
-            const currentEventTypeName = eventTypes.find(event => event.id === currentEventType)?.name || 'Normal';
-            const currentEventTypeIcon = eventTypes.find(event => event.id === currentEventType)?.icon || 'event';
-            
-            if (isSpecialEvent) {
-                card.innerHTML = `
-                    <h3 class="week-date">${dateCell.textContent}</h3>
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'mobile-schedule-card fade-in';
+                itemDiv.innerHTML = `
+                    <h3 class="schedule-title-mobile">${this.data.title}</h3>
                     <div class="event-type-dropdown">
-                        <div class="event-type-field" data-row="${rowIndex}">
+                        <div class="event-type-field" data-row="${this.index}">
                             <span class="event-type-value">
-                                <span class="material-symbols-outlined event-type-icon">${currentEventTypeIcon}</span>
-                                <span>${currentEventTypeName}</span>
+                                <span class="material-symbols-outlined event-type-icon">celebration</span>
+                                <span>${this.data.eventType.charAt(0).toUpperCase() + this.data.eventType.slice(1)}</span>
                             </span>
                         </div>
                     </div>
                     <div class="special-event-mobile">
-                        <p class="special-event-text-mobile">${topicCell.textContent}</p>
+                        <p class="special-event-text-mobile">${eventTexts[this.data.eventType]}</p>
+                    </div>
+                    <div class="field-group">
+                        <label>తేదీ:</label>
+                        <input type="date" class="mobile-field date-input" value="${dateValue}" data-schedule-index="${this.index}" data-cell-index="2">
                     </div>
                 `;
+                this.mobileViewContainer.appendChild(itemDiv);
+                return;
+            }
+
+            const mobileCard = document.createElement('div');
+            mobileCard.className = 'mobile-schedule-card fade-in';
+            mobileCard.innerHTML = `
+                <h3 class="schedule-title-mobile">${this.data.title}</h3>
+                <div class="event-type-dropdown">
+                    <div class="event-type-field" data-row="${this.index}">
+                        <span class="event-type-value">
+                            <span class="material-symbols-outlined event-type-icon">event</span>
+                            <span>Normal</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="mobile-fields" id="mobile-fields-${this.index}"></div>
+            `;
+
+            Array.from(this.tableBody.rows).forEach((row, rowIndex) => {
+                if (row.classList.contains('header-row')) return;
+                const editableCellsInRow = Array.from(row.cells).filter(c => c.hasAttribute('data-user-editable'));
+                if (editableCellsInRow.length === 0) return;
+
+                editableCellsInRow.forEach(cell => {
+                    const cellIndex = cell.cellIndex;
+                    let labelText = '';
+                    
+                    // Find label for this cell
+                    for (let i = cellIndex - 1; i >= 0; i--) {
+                        const potentialLabelCell = row.cells[i];
+                        if (potentialLabelCell && !potentialLabelCell.hasAttribute('data-user-editable') && potentialLabelCell.textContent.trim() !== '') {
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = potentialLabelCell.innerHTML;
+                            labelText = tempDiv.textContent.trim().replace('⠿', '').replace(':', '').trim();
+                            break;
+                        }
+                    }
+                    
+                    if (!labelText && row.cells[0] && !row.cells[0].hasAttribute('data-user-editable')) {
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = row.cells[0].innerHTML;
+                        labelText = tempDiv.textContent.trim().replace('⠿', '').replace(':', '').trim();
+                    }
+
+                    const fieldsContainer = mobileCard.querySelector(`#mobile-fields-${this.index}`);
+                    const fieldGroup = document.createElement('div');
+                    fieldGroup.className = 'field-group';
+                    
+                    if (rowIndex === 0) {
+                        // Date field
+                        const dateInput = cell.querySelector('.date-input');
+                        const dateValue = dateInput ? dateInput.value : '';
+                        fieldGroup.innerHTML = `
+                            <label>${labelText || 'తేదీ'}</label>
+                            <input type="date" class="mobile-field date-input" value="${dateValue}" data-schedule-index="${this.index}" data-row-index="${rowIndex}" data-cell-index="${cellIndex}">
+                        `;
+                    } else {
+                        // Member field
+                        fieldGroup.innerHTML = `
+                            <label>${labelText}</label>
+                            <div class="mobile-field member-field" data-schedule-index="${this.index}" data-row-index="${rowIndex}" data-cell-index="${cellIndex}">
+                                <span class="mobile-field-value ${cell.textContent.trim() ? '' : 'mobile-field-placeholder'}">
+                                    ${cell.textContent.trim() || 'Select Name'}
+                                </span>
+                            </div>
+                        `;
+                    }
+                    
+                    fieldsContainer.appendChild(fieldGroup);
+                });
+            });
+
+            this.mobileViewContainer.appendChild(mobileCard);
+        }
+        
+        getContent() {
+            const tempBody = this.tableBody.cloneNode(true);
+            const dateInput = tempBody.querySelector('.date-input');
+            if (dateInput && dateInput.value) {
+                const cell = dateInput.parentElement;
+                cell.textContent = dateInput.value.split('-').reverse().join('-');
+            }
+            tempBody.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+            tempBody.querySelectorAll('.editable-cell').forEach(el => el.classList.remove('editable-cell'));
+            return tempBody.innerHTML;
+        }
+
+        applyEventType(eventType, shouldSave = true) {
+            this.data.eventType = eventType;
+            const allRows = this.tableBody.querySelectorAll('tr');
+            const firstRow = this.tableBody.rows[0];
+
+            if (eventType === 'normal') {
+                allRows.forEach(row => row.style.display = '');
+                if (firstRow && firstRow.dataset.originalContent) {
+                    firstRow.innerHTML = firstRow.dataset.originalContent;
+                    delete firstRow.dataset.originalContent;
+                }
             } else {
-                card.innerHTML = `
-                    <h3 class="week-date">${dateCell.textContent}</h3>
-                    <div class="event-type-dropdown">
-                        <div class="event-type-field" data-row="${rowIndex}">
-                            <span class="event-type-value">
-                                <span class="material-symbols-outlined event-type-icon">${currentEventTypeIcon}</span>
-                                <span>${currentEventTypeName}</span>
-                            </span>
-                        </div>
-                    </div>
-                    <div class="week-fields">
-                        <div class="field-group">
-                            <label>ప్రసంగ అంశం</label>
-                            <div class="mobile-field topic-field" data-row="${rowIndex}" data-cell="1">
-                                <span class="mobile-field-value ${topicCell.textContent ? '' : 'mobile-field-placeholder'}">
-                                    ${topicCell.textContent || 'Select Topic'}
-                                </span>
-                            </div>
-                        </div>
-                        <div class="field-group">
-                            <label>ప్రసంగీకుడు</label>
-                            <div class="mobile-field member-field" data-row="${rowIndex}" data-cell="2">
-                                <span class="mobile-field-value ${speakerCell.textContent ? '' : 'mobile-field-placeholder'}">
-                                    ${speakerCell.textContent || 'Select Brother'}
-                                </span>
-                            </div>
-                        </div>
-                        <div class="field-group">
-                            <label>చైర్మన్</label>
-                            <div class="mobile-field member-field" data-row="${rowIndex}" data-cell="3">
-                                <span class="mobile-field-value ${chairmanCell.textContent ? '' : 'mobile-field-placeholder'}">
-                                    ${chairmanCell.textContent || 'Select Brother'}
-                                </span>
-                            </div>
-                        </div>
-                        <div class="field-group">
-                            <label>కావలికోట రీడర్</label>
-                            <div class="mobile-field member-field" data-row="${rowIndex}" data-cell="4">
-                                <span class="mobile-field-value ${readerCell.textContent ? '' : 'mobile-field-placeholder'}">
-                                    ${readerCell.textContent || 'Select Brother'}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
+                const eventTexts = {
+                    'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం',
+                    'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో',
+                    'convention': 'ప్రాదేశిక సమావేశం'
+                };
+                allRows.forEach((row, index) => {
+                    row.style.display = (index === 0) ? '' : 'none';
+                });
+                let existingDateValue = '';
+                if (firstRow) {
+                    if (!firstRow.dataset.originalContent) firstRow.dataset.originalContent = firstRow.innerHTML;
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = firstRow.dataset.originalContent;
+                    const originalDateCell = tempDiv.querySelector('[data-user-editable]');
+                    if (originalDateCell) existingDateValue = originalDateCell.textContent.trim().split('-').reverse().join('-');
+                }
+                firstRow.innerHTML = `
+                    <th colspan="1" class="special-event-text">${eventTexts[eventType]}</th>
+                    <td style="text-align: right; font-weight: 700;">తేదీ:</td>
+                    <td data-user-editable="true"><input type="date" class="date-input" value="${existingDateValue}"></td>
                 `;
             }
-            
-            mobileContainer.appendChild(card);
-        });
 
-        mobileContainer.querySelectorAll('.topic-field').forEach(field => {
-            field.addEventListener('click', (e) => {
-                const rowIndex = field.dataset.row;
-                const cellIndex = field.dataset.cell;
-                const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
-                const cell = tableBody.rows[rowIndex].cells[cellIndex];
-                openMobileDropdown('topic', cell, field);
-            });
-        });
-
-        mobileContainer.querySelectorAll('.member-field').forEach(field => {
-            field.addEventListener('click', (e) => {
-                const rowIndex = field.dataset.row;
-                const cellIndex = field.dataset.cell;
-                const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
-                const cell = tableBody.rows[rowIndex].cells[cellIndex];
-                openMobileDropdown('member', cell, field);
-            });
-        });
-
-        mobileContainer.querySelectorAll('.event-type-field').forEach(field => {
-            field.addEventListener('click', (e) => {
-                const rowIndex = field.dataset.row;
-                openMobileEventTypeDropdown(rowIndex, field);
-            });
-        });
-    }
-
-    function getEventTypeForRow(row) {
-        const topicCell = row.cells[1];
-        if (topicCell.classList.contains('special-event')) {
-            const text = topicCell.textContent;
-            if (text.includes('పర్యవేక్షకుని')) return 'co-visit';
-            if (text.includes('సమావేశ కార్యక్రమం')) return 'assembly';
-            if (text.includes('సమావేశం')) return 'convention';
+            this._createMobileView();
+            if (shouldSave) this.parentProject.triggerSave();
         }
-        return 'normal';
-    }
 
-    function changeEventType(rowIndex, eventType) {
-        const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
-        const row = tableBody.rows[rowIndex];
-        const topicCell = row.cells[1];
-        const speakerCell = row.cells[2];
-        const chairmanCell = row.cells[3];
-        const readerCell = row.cells[4];
-        
-        topicCell.colSpan = 1;
-        topicCell.classList.remove('special-event');
-        topicCell.classList.add('editable-cell');
-        [speakerCell, chairmanCell, readerCell].forEach(cell => {
-            cell.style.display = '';
-            cell.classList.add('editable-cell');
-        });
-        
-        if (eventType !== 'normal') {
-            if (topicCell.textContent && !topicCell.classList.contains('special-event')) {
-                topicCell.dataset.originalContent = topicCell.textContent;
-            }
-            [speakerCell, chairmanCell, readerCell].forEach(cell => {
-                if (cell.textContent) {
-                    cell.dataset.originalContent = cell.textContent;
+        setupEventListeners() {
+            // Mobile field event listeners
+            this.mobileViewContainer.addEventListener('click', (e) => {
+                const mobileField = e.target.closest('.mobile-field');
+                if (!mobileField) return;
+
+                if (mobileField.classList.contains('member-field')) {
+                    const scheduleIndex = mobileField.dataset.scheduleIndex;
+                    const rowIndex = mobileField.dataset.rowIndex;
+                    const cellIndex = mobileField.dataset.cellIndex;
+                    const targetCell = this.tableBody.rows[rowIndex].cells[cellIndex];
+                    this.openMobileMemberDropdown(targetCell, mobileField);
                 }
             });
-            
-            topicCell.colSpan = 4;
-            topicCell.classList.add('special-event');
-            topicCell.classList.remove('editable-cell');
-            topicCell.textContent = eventTexts[eventType];
-            [speakerCell, chairmanCell, readerCell].forEach(cell => {
-                cell.style.display = 'none';
-                cell.classList.remove('editable-cell');
-                cell.textContent = '';
+
+            this.mobileViewContainer.addEventListener('input', (e) => {
+                if (e.target.classList.contains('date-input')) {
+                    const scheduleIndex = e.target.dataset.scheduleIndex;
+                    const rowIndex = e.target.dataset.rowIndex;
+                    const cellIndex = e.target.dataset.cellIndex;
+                    const targetCell = this.tableBody.rows[rowIndex].cells[cellIndex];
+                    const tableInput = targetCell.querySelector('.date-input');
+                    if (tableInput) tableInput.value = e.target.value;
+                    this.parentProject.triggerSave();
+                }
             });
-        } else {
-            if (topicCell.dataset.originalContent) {
-                topicCell.innerHTML = topicCell.dataset.originalContent;
+
+            // Event type dropdown
+            this.mobileViewContainer.addEventListener('click', (e) => {
+                const eventTypeField = e.target.closest('.event-type-field');
+                if (eventTypeField) {
+                    this.openMobileEventTypeDropdown(eventTypeField);
+                }
+            });
+
+            // Desktop event button
+            this.eventBtn.addEventListener('click', (e) => {
+                activeEventScheduleTable = this;
+                const rect = e.currentTarget.getBoundingClientRect();
+                if (eventContextMenu) {
+                    eventContextMenu.style.display = 'block';
+                    eventContextMenu.style.top = `${rect.bottom}px`;
+                    eventContextMenu.style.left = `${rect.left}px`;
+                }
+            });
+
+            // Desktop cell clicks
+            this.tableBody.addEventListener('click', (e) => {
+                const cell = e.target.closest('.editable-cell');
+                if (cell) {
+                    this.openDesktopMemberDropdown(cell);
+                }
+            });
+        }
+
+        openDesktopMemberDropdown(cell) {
+            if (!desktopDropdown) return;
+            
+            const isInMinistry = this.isCellInMinistrySection(cell);
+            desktopDropdownList.innerHTML = '';
+            
+            let listToShow;
+            if (isInMinistry) {
+                const sortedSisters = [...members.sisters].sort((a, b) => a.name.localeCompare(b.name));
+                const sortedBrothers = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
+                listToShow = [...sortedSisters, ...sortedBrothers];
             } else {
-                topicCell.innerHTML = '';
+                listToShow = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
             }
-            [speakerCell, chairmanCell, readerCell].forEach(cell => {
-                if (cell.dataset.originalContent) {
-                    cell.innerHTML = cell.dataset.originalContent;
-                } else {
-                    cell.innerHTML = '';
-                }
-            });
-            topicCell.removeAttribute('data-original-content');
-            [speakerCell, chairmanCell, readerCell].forEach(cell => {
-                cell.removeAttribute('data-original-content');
-            });
-        }
-        
-        createMobileView();
-        debouncedSave();
-    }
 
-    function openDesktopDropdown(type, cell) {
-        currentDropdownType = type;
-        activeCellForDropdown = cell;
-        
-        if (type === 'member') {
-            showDesktopMemberDropdown(cell);
-        } else if (type === 'topic') {
-            showDesktopTopicDropdown(cell);
-        }
-    }
-
-    function showDesktopMemberDropdown(cell) {
-        desktopDropdownList.innerHTML = '';
-        
-        const sortedBrothers = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
-        
-        if (sortedBrothers.length === 0) {
-            desktopDropdownList.innerHTML = '<div style="padding: 12px 16px; color: var(--text-secondary);">No brothers available</div>';
-        } else {
-            sortedBrothers.forEach(member => {
+            listToShow.forEach(member => {
                 const item = document.createElement('div');
                 item.className = 'desktop-dropdown-item';
                 item.innerHTML = `
                     <span>${member.name}</span>
                     ${member.isServant ? '<span class="servant-tag">Servant</span>' : ''}
                 `;
-                item.addEventListener('click', () => selectDesktopDropdownItem(member.name));
+                item.addEventListener('click', () => {
+                    cell.textContent = member.name;
+                    // Update corresponding mobile field
+                    const mobileField = this.mobileViewContainer.querySelector(`[data-schedule-index="${this.index}"][data-cell-index="${cell.cellIndex}"]`);
+                    if (mobileField) {
+                        const valueSpan = mobileField.querySelector('.mobile-field-value');
+                        valueSpan.textContent = member.name;
+                        valueSpan.classList.remove('mobile-field-placeholder');
+                    }
+                    this.parentProject.triggerSave();
+                });
                 desktopDropdownList.appendChild(item);
             });
-        }
-        
-        showDesktopDropdown(cell);
-    }
 
-    function showDesktopTopicDropdown(cell) {
-        desktopDropdownList.innerHTML = '';
-        
-        Object.entries(topics).forEach(([topicName, topicText]) => {
-            const item = document.createElement('div');
-            item.className = 'desktop-dropdown-item';
-            item.textContent = topicName;
-            item.addEventListener('click', () => selectDesktopDropdownItem(topicText));
-            desktopDropdownList.appendChild(item);
-        });
-        
-        showDesktopDropdown(cell);
-    }
-
-    function showDesktopDropdown(cell) {
-        const rect = cell.getBoundingClientRect();
-        const viewportHeight = window.innerHeight;
-        const viewportWidth = window.innerWidth;
-        
-        let top = rect.bottom + window.scrollY;
-        let left = rect.left + window.scrollX;
-        
-        const dropdownHeight = 300;
-        const dropdownWidth = 340;
-        
-        if (top + dropdownHeight > window.scrollY + viewportHeight) {
-            top = rect.top + window.scrollY - dropdownHeight;
+            this.showDesktopDropdown(cell);
         }
-        
-        if (left + dropdownWidth > window.scrollX + viewportWidth) {
-            left = window.scrollX + viewportWidth - dropdownWidth - 10;
-        }
-        
-        if (left < window.scrollX) {
-            left = window.scrollX + 10;
-        }
-        
-        desktopDropdown.style.display = 'block';
-        desktopDropdown.style.top = `${top}px`;
-        desktopDropdown.style.left = `${left}px`;
-        desktopDropdown.style.width = `${rect.width}px`;
-        
-        desktopDropdownSearch.value = '';
-        filterDesktopItems('');
-        setTimeout(() => {
-            desktopDropdown.classList.add('active');
-            desktopDropdownSearch.focus();
-        }, 10);
-    }
 
-    function hideDesktopDropdown() {
-        desktopDropdown.classList.remove('active');
-        setTimeout(() => {
-            desktopDropdown.style.display = 'none';
-        }, 250);
-        currentDropdownType = null;
-        activeCellForDropdown = null;
-    }
-
-    function selectDesktopDropdownItem(value) {
-        if (activeCellForDropdown) {
-            activeCellForDropdown.textContent = value;
-            updateCorrespondingMobileField(activeCellForDropdown, value);
-            debouncedSave();
+        openMobileMemberDropdown(cell, mobileField) {
+            currentDropdownType = 'member';
+            currentDropdownData = { cell: cell, mobileField: mobileField, schedule: this };
+            
+            mobileField.classList.add('active');
+            this.showMobileMemberDropdown();
+            
+            if (mobileDropdownSearch) {
+                mobileDropdownSearch.style.display = 'flex';
+            }
+            document.body.classList.add('dropdown-open');
         }
-        hideDesktopDropdown();
-    }
 
-    function updateCorrespondingMobileField(cell, value) {
-        const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
-        const rowIndex = Array.from(cell.parentElement.parentElement.children).indexOf(cell.parentElement);
-        const cellIndex = Array.from(cell.parentElement.cells).indexOf(cell);
-        
-        const mobileContainer = scheduleWrapper.querySelector('.mobile-view-container');
-        if (mobileContainer) {
-            const mobileCard = mobileContainer.querySelectorAll('.mobile-week-card')[rowIndex];
-            if (mobileCard) {
-                const field = mobileCard.querySelector(`.mobile-field[data-row="${rowIndex}"][data-cell="${cellIndex}"]`);
-                if (field) {
-                    const valueSpan = field.querySelector('.mobile-field-value');
-                    valueSpan.textContent = value;
-                    valueSpan.classList.remove('mobile-field-placeholder');
-                }
+        openMobileEventTypeDropdown(fieldElement) {
+            currentDropdownType = 'event-type';
+            currentDropdownData = { schedule: this, fieldElement: fieldElement };
+            
+            fieldElement.classList.add('active');
+            this.showMobileEventTypeDropdown();
+            
+            if (mobileDropdownSearch) {
+                mobileDropdownSearch.style.display = 'none';
+            }
+            document.body.classList.add('dropdown-open');
+        }
+
+        showDesktopDropdown(cell) {
+            const rect = cell.getBoundingClientRect();
+            const viewportHeight = window.innerHeight;
+            const viewportWidth = window.innerWidth;
+            
+            let top = rect.bottom + window.scrollY;
+            let left = rect.left + window.scrollX;
+            
+            const dropdownHeight = 300;
+            const dropdownWidth = 340;
+            
+            if (top + dropdownHeight > window.scrollY + viewportHeight) {
+                top = rect.top + window.scrollY - dropdownHeight;
+            }
+            
+            if (left + dropdownWidth > window.scrollX + viewportWidth) {
+                left = window.scrollX + viewportWidth - dropdownWidth - 10;
+            }
+            
+            if (left < window.scrollX) {
+                left = window.scrollX + 10;
+            }
+            
+            desktopDropdown.style.display = 'block';
+            desktopDropdown.style.top = `${top}px`;
+            desktopDropdown.style.left = `${left}px`;
+            desktopDropdown.style.width = `${rect.width}px`;
+            
+            if (desktopDropdownSearch) {
+                desktopDropdownSearch.value = '';
+                this.filterDesktopItems('');
+                setTimeout(() => {
+                    desktopDropdown.classList.add('active');
+                    desktopDropdownSearch.focus();
+                }, 10);
             }
         }
-    }
 
-    function filterDesktopItems(value) {
-        const itemsEl = desktopDropdownList.querySelectorAll('.desktop-dropdown-item');
-        itemsEl.forEach(item => {
-            item.style.display = item.textContent.toLowerCase().includes(value.toLowerCase()) ? 'flex' : 'none';
-        });
-    }
+        showMobileMemberDropdown() {
+            if (!dropdownTitle || !dropdownContent) return;
+            
+            dropdownTitle.textContent = 'Select Person';
+            dropdownContent.innerHTML = '';
+            
+            const isInMinistry = this.isCellInMinistrySection(currentDropdownData.cell);
+            let listToShow;
+            
+            if (isInMinistry) {
+                const sortedSisters = [...members.sisters].sort((a, b) => a.name.localeCompare(b.name));
+                const sortedBrothers = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
+                listToShow = [...sortedSisters, ...sortedBrothers];
+            } else {
+                listToShow = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
+            }
 
-    function openEventMenu(e) {
-        const btn = e.currentTarget;
-        activeRowForEvents = btn.closest('tr');
-        const rect = btn.getBoundingClientRect();
-        
-        desktopEventMenu.style.display = 'block';
-        desktopEventMenu.style.top = `${rect.bottom}px`;
-        desktopEventMenu.style.left = `${rect.left - desktopEventMenu.offsetWidth + rect.width}px`;
-    }
-
-    function hideDesktopEventMenu() {
-        desktopEventMenu.style.display = 'none';
-        activeRowForEvents = null;
-    }
-
-    function applyEventType(eventType) {
-        if (!activeRowForEvents) return;
-        const rowIndex = Array.from(activeRowForEvents.parentElement.children).indexOf(activeRowForEvents);
-        changeEventType(rowIndex, eventType);
-        hideDesktopEventMenu();
-    }
-
-    function openMobileDropdown(type, cell, fieldElement) {
-        currentDropdownType = type;
-        currentDropdownData = { cell: cell, fieldElement: fieldElement };
-        
-        fieldElement.classList.add('active');
-        
-        if (type === 'member') {
-            showMobileMemberDropdown();
-        } else if (type === 'topic') {
-            showMobileTopicDropdown();
+            if (listToShow.length === 0) {
+                dropdownContent.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-secondary);">No members available</div>';
+            } else {
+                listToShow.forEach(member => {
+                    const item = document.createElement('button');
+                    item.className = 'dropdown-item';
+                    item.innerHTML = `
+                        <span>${member.name}</span>
+                        ${member.isServant ? '<span class="servant-tag">Servant</span>' : ''}
+                    `;
+                    item.addEventListener('click', () => {
+                        currentDropdownData.cell.textContent = member.name;
+                        const valueSpan = currentDropdownData.mobileField.querySelector('.mobile-field-value');
+                        valueSpan.textContent = member.name;
+                        valueSpan.classList.remove('mobile-field-placeholder');
+                        this.parentProject.triggerSave();
+                        this.hideMobileDropdown();
+                    });
+                    dropdownContent.appendChild(item);
+                });
+            }
+            
+            this.showMobileDropdown();
         }
-        
-        mobileDropdownSearch.style.display = 'flex';
-        document.body.classList.add('dropdown-open');
-    }
 
-    function openMobileEventTypeDropdown(rowIndex, fieldElement) {
-        currentDropdownType = 'event-type';
-        currentDropdownData = { rowIndex: rowIndex, fieldElement: fieldElement };
-        
-        fieldElement.classList.add('active');
-        showMobileEventTypeDropdown();
-        
-        mobileDropdownSearch.style.display = 'none';
-        document.body.classList.add('dropdown-open');
-    }
-
-    function showMobileMemberDropdown() {
-        dropdownTitle.textContent = 'Select Brother';
-        dropdownContent.innerHTML = '';
-        
-        const sortedBrothers = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
-        
-        if (sortedBrothers.length === 0) {
-            dropdownContent.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-secondary);">No brothers available</div>';
-        } else {
-            sortedBrothers.forEach(member => {
+        showMobileEventTypeDropdown() {
+            if (!dropdownTitle || !dropdownContent) return;
+            
+            dropdownTitle.textContent = 'Select Event Type';
+            dropdownContent.innerHTML = '';
+            
+            const eventTypes = [
+                { id: 'normal', name: 'Normal', icon: 'event' },
+                { id: 'co-visit', name: 'CO Visit', icon: 'groups' },
+                { id: 'assembly', name: 'Assembly', icon: 'celebration' },
+                { id: 'convention', name: 'Convention', icon: 'festival' }
+            ];
+            
+            eventTypes.forEach(event => {
                 const item = document.createElement('button');
                 item.className = 'dropdown-item';
                 item.innerHTML = `
-                    <span>${member.name}</span>
-                    ${member.isServant ? '<span class="servant-tag">Servant</span>' : ''}
+                    <span style="display: flex; align-items: center; gap: 12px;">
+                        <span class="material-symbols-outlined">${event.icon}</span>
+                        <span>${event.name}</span>
+                    </span>
                 `;
-                item.addEventListener('click', () => selectMobileDropdownItem(member.name));
+                item.addEventListener('click', () => {
+                    this.applyEventType(event.id);
+                    this.hideMobileDropdown();
+                });
                 dropdownContent.appendChild(item);
             });
-        }
-        
-        showMobileDropdown();
-    }
-
-    function showMobileTopicDropdown() {
-        dropdownTitle.textContent = 'Select Topic';
-        dropdownContent.innerHTML = '';
-        
-        Object.entries(topics).forEach(([topicName, topicText]) => {
-            const item = document.createElement('button');
-            item.className = 'dropdown-item';
-            item.textContent = topicName;
-            item.addEventListener('click', () => selectMobileDropdownItem(topicText));
-            dropdownContent.appendChild(item);
-        });
-        
-        showMobileDropdown();
-    }
-
-    function showMobileEventTypeDropdown() {
-        dropdownTitle.textContent = 'Select Event Type';
-        dropdownContent.innerHTML = '';
-        
-        eventTypes.forEach(event => {
-            const item = document.createElement('button');
-            item.className = 'dropdown-item';
-            item.innerHTML = `
-                <span style="display: flex; align-items: center; gap: 12px;">
-                    <span class="material-symbols-outlined">${event.icon}</span>
-                    <span>${event.name}</span>
-                </span>
-            `;
-            item.addEventListener('click', () => selectMobileEventType(event.id));
-            dropdownContent.appendChild(item);
-        });
-        
-        showMobileDropdown();
-    }
-
-    function showMobileDropdown() {
-        dropdownBackdrop.classList.add('active');
-        dropdownContainer.classList.add('active');
-        
-        mobileSearchInput.value = '';
-        filterMobileItems('');
-        setTimeout(() => {
-            if (mobileDropdownSearch.style.display !== 'none') {
-                mobileSearchInput.focus();
-            }
-        }, 100);
-    }
-
-    function hideMobileDropdown() {
-        dropdownBackdrop.classList.remove('active');
-        dropdownContainer.classList.remove('active');
-        
-        if (currentDropdownData && currentDropdownData.fieldElement) {
-            currentDropdownData.fieldElement.classList.remove('active');
-        }
-        
-        document.body.classList.remove('dropdown-open');
-        currentDropdownType = null;
-        currentDropdownData = null;
-    }
-
-    function selectMobileDropdownItem(value) {
-        if (currentDropdownData) {
-            currentDropdownData.cell.textContent = value;
-            if (currentDropdownData.fieldElement) {
-                const valueSpan = currentDropdownData.fieldElement.querySelector('.mobile-field-value');
-                valueSpan.textContent = value;
-                valueSpan.classList.remove('mobile-field-placeholder');
-            }
-            debouncedSave();
-        }
-        hideMobileDropdown();
-    }
-
-    function selectMobileEventType(eventType) {
-        if (currentDropdownData && currentDropdownData.rowIndex !== undefined) {
-            changeEventType(currentDropdownData.rowIndex, eventType);
-        }
-        hideMobileDropdown();
-    }
-
-    function filterMobileItems(value) {
-        const itemsEl = dropdownContent.querySelectorAll('.dropdown-item');
-        itemsEl.forEach(item => {
-            item.style.display = item.textContent.toLowerCase().includes(value.toLowerCase()) ? 'flex' : 'none';
-        });
-    }
-
-    function openWeekEditor() {
-        const dateList = document.getElementById('date-checklist');
-        const upcomingSundays = generateNextSundays(30);
-        
-        dateList.innerHTML = '';
-        
-        const currentDates = getCurrentScheduleDates();
-        
-        upcomingSundays.forEach(dateStr => {
-            const li = document.createElement('li');
-            const isChecked = currentDates.includes(dateStr);
-            li.innerHTML = `<label><input type="checkbox" value="${dateStr}" ${isChecked ? 'checked' : ''}> ${dateStr}</label>`;
-            dateList.appendChild(li);
-        });
-        
-        document.querySelector('#date-selection-modal h2').textContent = 'Edit Sunday Schedule Weeks';
-        document.querySelector('#date-selection-modal p').textContent = 'Add or remove weeks from your schedule.';
-        document.getElementById('new-schedule-name').style.display = 'none';
-        document.getElementById('confirm-creation').textContent = 'Update Schedule';
-        
-        dateSelectionModal.style.display = 'flex';
-        setTimeout(() => {
-            dateSelectionModal.classList.add('active');
-        }, 10);
-    }
-
-    function getCurrentScheduleDates() {
-        const dates = [];
-        const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
-        
-        if (tableBody) {
-            const rows = tableBody.querySelectorAll('tr');
-            rows.forEach(row => {
-                const dateCell = row.cells[0];
-                if (dateCell) {
-                    dates.push(dateCell.textContent.trim());
-                }
-            });
-        }
-        
-        return dates;
-    }
-
-    function findExistingRowForDate(date) {
-        const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
-        if (!tableBody) return null;
-        
-        const rows = tableBody.querySelectorAll('tr');
-        for (let row of rows) {
-            if (row.cells[0].textContent.trim() === date) {
-                return row;
-            }
-        }
-        return null;
-    }
-
-    async function handleUpdateWeeks() {
-        const selectedCheckboxes = Array.from(document.querySelectorAll('#date-checklist input:checked'));
-        if (selectedCheckboxes.length === 0) {
-            alert("Please select at least one Sunday.");
-            return;
-        }
-        
-        const selectedDates = selectedCheckboxes.map(cb => cb.value);
-        const dateRange = `${selectedDates[0]} నుండి ${selectedDates[selectedDates.length - 1]}`;
-
-        const tableBodyHTML = selectedDates.map(date => {
-            const existingRow = findExistingRowForDate(date);
             
-            if (existingRow) {
-                return `
-                    <tr>
-                        <td>${date}</td>
-                        <td class="${existingRow.cells[1].className}">${existingRow.cells[1].innerHTML}</td>
-                        <td class="${existingRow.cells[2].className}">${existingRow.cells[2].innerHTML}</td>
-                        <td class="${existingRow.cells[3].className}">${existingRow.cells[3].innerHTML}</td>
-                        <td class="${existingRow.cells[4].className}">${existingRow.cells[4].innerHTML}</td>
-                        <td class="actions-col">
-                            <button class="event-btn">
-                                <span class="material-symbols-outlined">more_vert</span>
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            } else {
-                return `
-                    <tr>
-                        <td>${date}</td>
-                        <td class="editable-cell"></td>
-                        <td class="editable-cell"></td>
-                        <td class="editable-cell"></td>
-                        <td class="editable-cell"></td>
-                        <td class="actions-col">
-                            <button class="event-btn">
-                                <span class="material-symbols-outlined">more_vert</span>
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            }
-        }).join('');
-
-        try {
-            updateStatus('Updating...', 'syncing');
-            
-            await userSchedulesCollection.doc(currentScheduleId).update({
-                dateRange: dateRange,
-                tableHTML: tableBodyHTML,
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            
-            initEditor();
-            
-            dateSelectionModal.classList.remove('active');
-            setTimeout(() => {
-                dateSelectionModal.style.display = 'none';
-                document.getElementById('new-schedule-name').style.display = 'block';
-                document.querySelector('#date-selection-modal h2').textContent = 'Create New Sunday Schedule';
-                document.querySelector('#date-selection-modal p').textContent = 'Give your new schedule a name and select the weeks to include.';
-                document.getElementById('confirm-creation').textContent = 'Create Schedule';
-            }, 300);
-            
-            updateStatus('Synced', 'synced');
-                    
-        } catch (error) {
-            console.error("Error updating schedule weeks:", error);
-            alert("Could not update schedule. Please try again.");
-            updateStatus('Error', 'error');
+            this.showMobileDropdown();
         }
-    }
 
-    const debouncedSave = debounce(() => {
-        const subtitleEl = scheduleWrapper.querySelector('.subtitle');
-        const tableBodyEl = scheduleWrapper.querySelector('.schedule-table tbody');
-        if (!subtitleEl || !tableBodyEl) return;
-
-        updateStatus('Syncing...', 'syncing');
-        
-        const payload = {
-            dateRange: subtitleEl.textContent,
-            tableHTML: tableBodyEl.innerHTML
-        };
-        
-        userSchedulesCollection.doc(currentScheduleId).update(payload)
-            .then(() => {
-                updateStatus('Synced', 'synced');
-            })
-            .catch(err => {
-                console.error("Save failed:", err);
-                updateStatus('Error', 'error');
-            });
-    }, 1500);
-
-    function initCreationFlow() {
-        const dateList = document.getElementById('date-checklist');
-        const upcomingSundays = generateNextSundays(30);
-        dateList.innerHTML = '';
-        upcomingSundays.forEach(dateStr => {
-            const li = document.createElement('li');
-            li.innerHTML = `<label><input type="checkbox" value="${dateStr}"> ${dateStr}</label>`;
-            dateList.appendChild(li);
-        });
-        dateSelectionModal.style.display = 'flex';
-        setTimeout(() => {
-            dateSelectionModal.classList.add('active');
-        }, 10);
-    }
-    
-    function generateNextSundays(count) {
-        const sundays = [];
-        let currentDate = new Date();
-        let dayOfWeek = currentDate.getDay();
-        if (dayOfWeek !== 0) { 
-            currentDate.setDate(currentDate.getDate() + (7 - dayOfWeek));
-        }
-        for (let i = 0; i < count; i++) {
-            const day = String(currentDate.getDate()).padStart(2, '0');
-            const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-            const year = currentDate.getFullYear();
-            sundays.push(`${day}-${month}-${year}`);
-            currentDate.setDate(currentDate.getDate() + 7);
-        }
-        return sundays;
-    }
-
-    async function handleCreateSchedule() {
-        const scheduleName = document.getElementById('new-schedule-name').value.trim();
-        if (!scheduleName) return alert("Please enter a name for the schedule.");
-        const selectedCheckboxes = Array.from(document.querySelectorAll('#date-checklist input:checked'));
-        if (selectedCheckboxes.length === 0) return alert("Please select at least one Sunday.");
-        
-        const selectedDates = selectedCheckboxes.map(cb => cb.value);
-        const dateRange = `${selectedDates[0]} నుండి ${selectedDates[selectedDates.length - 1]}`;
-
-        const tableBodyHTML = selectedDates.map(date => `
-            <tr>
-                <td>${date}</td>
-                <td class="editable-cell"></td>
-                <td class="editable-cell"></td>
-                <td class="editable-cell"></td>
-                <td class="editable-cell"></td>
-                <td class="actions-col">
-                    <button class="event-btn">
-                        <span class="material-symbols-outlined">more_vert</span>
-                    </button>
-                </td>
-            </tr>
-        `).join('');
-
-        try {
-            const newDocRef = await userSchedulesCollection.add({
-                name: scheduleName,
-                dateRange: dateRange,
-                tableHTML: tableBodyHTML,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            window.location.href = `./sunday-editor.html?id=${newDocRef.id}`;
-        } catch (error) {
-            console.error("Error creating new schedule:", error);
-            alert("Could not create schedule. Please try again.");
-        }
-    }
-    
-    async function generatePdf() {
-        const printButton = document.getElementById('print-button');
-        printButton.disabled = true;
-        printButton.querySelector('span:last-child').textContent = 'Generating...';
-
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('l', 'mm', 'a4');
-        const A4_WIDTH_MM = 297;
-        const A4_HEIGHT_MM = 210;
-        const MARGIN_MM = 10;
-        
-        const USABLE_WIDTH = A4_WIDTH_MM - (MARGIN_MM * 2);
-        const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_MM * 2);
-
-        try {
-            const tempContainer = document.createElement('div');
-            tempContainer.style.position = 'absolute';
-            tempContainer.style.left = '-9999px';
-            tempContainer.style.top = '0';
-            document.body.appendChild(tempContainer);
-
-            const scheduleData = document.getElementById('schedule-content-wrapper');
-            const title = scheduleData.querySelector('h1').textContent;
-            const subtitle = scheduleData.querySelector('.subtitle').textContent;
-            const tableRows = Array.from(scheduleData.querySelectorAll('tbody tr'));
-
-            const rowsFirstPage = 15;
-            const rowsOtherPages = 17;
-
-            let currentRow = 0;
-            let pageCount = 0;
-
-            while (currentRow < tableRows.length) {
-                if (pageCount > 0) {
-                    pdf.addPage();
-                }
-
-                const pageContainer = document.createElement('div');
-                pageContainer.className = 'pdf-page-container';
-
-                if (pageCount === 0) {
-                    const header = document.createElement('div');
-                    header.className = 'pdf-header';
-                    header.innerHTML = `
-                        <div class="title-block" style="text-align: center; margin-bottom: 20px;">
-                            <h1 style="font-family: 'Noto Sans Telugu', sans-serif; font-weight: 700; color: rgb(97, 40, 0); margin: 0; font-size: 1.8em;">${title}</h1>
-                            <div style="position: relative; display: inline-block; margin-top: 10px;">
-                                <p style="font-family: 'Noto Sans Telugu', sans-serif; font-weight: 500; color: #333; background-color: #ffffff; padding: 2px 8px; display: inline-block; position: relative; z-index: 2; white-space: nowrap; border-radius: 8px; margin: 0;">
-                                    ${subtitle}
-                                </p>
-                                <div style="width: 400px; height: 5px; background: linear-gradient(to right, #093261, #ffffff, #093261); position: absolute; left: 50%; transform: translateX(-50%); top: 50%; margin-top: -2.5px; z-index: 1;"></div>
-                            </div>
-                        </div>
-                    `;
-                    pageContainer.appendChild(header);
-                }
-
-                const table = document.createElement('table');
-                table.className = 'pdf-table';
-                table.style.tableLayout = 'fixed';
-
-                const thead = document.createElement('thead');
-                const headerHTML = `
-                    <tr>
-                        <th style="width: 15%">తేదీ</th>
-                        <th style="width: 35%">ప్రసంగ అంశం</th>
-                        <th style="width: 20%">ప్రసంగీకుడు</th>
-                        <th style="width: 15%">చైర్మన్</th>
-                        <th style="width: 15%">కావలికోట రీడర్</th>
-                    </tr>
-                `;
-                thead.innerHTML = headerHTML;
-                table.appendChild(thead);
-                
-                const tbody = document.createElement('tbody');
-                
-                const rowsThisPage = pageCount === 0 ? rowsFirstPage : rowsOtherPages;
-                const endRow = Math.min(currentRow + rowsThisPage, tableRows.length);
-                
-                for (let i = currentRow; i < endRow; i++) {
-                    const originalRow = tableRows[i];
-                    const row = document.createElement('tr');
-                    
-                    for (let j = 0; j < originalRow.cells.length - 1; j++) {
-                        const cell = document.createElement(j === 0 ? 'th' : 'td');
-                        cell.innerHTML = originalRow.cells[j].innerHTML;
-                        
-                        if (originalRow.cells[1].classList.contains('special-event')) {
-                            if (j === 1) {
-                                cell.className = 'special-event';
-                                cell.colSpan = 4;
-                                cell.style.width = '85%';
-                                j += 3;
-                            }
-                        }
-                        
-                        row.appendChild(cell);
+        showMobileDropdown() {
+            if (!dropdownBackdrop || !dropdownContainer) return;
+            
+            dropdownBackdrop.classList.add('active');
+            dropdownContainer.classList.add('active');
+            
+            if (mobileSearchInput) {
+                mobileSearchInput.value = '';
+                this.filterMobileItems('');
+                setTimeout(() => {
+                    if (mobileDropdownSearch && mobileDropdownSearch.style.display !== 'none') {
+                        mobileSearchInput.focus();
                     }
-                    
-                    tbody.appendChild(row);
-                }
-
-                table.appendChild(tbody);
-                pageContainer.appendChild(table);
-                tempContainer.appendChild(pageContainer);
-
-                await document.fonts.ready;
-                await new Promise(resolve => setTimeout(resolve, 50));
-
-                const canvas = await html2canvas(pageContainer, {
-                    scale: 1,
-                    useCORS: true,
-                    backgroundColor: '#ffffff',
-                    letterRendering: false,
-                    logging: false,
-                    imageTimeout: 15000,
-                    removeContainer: true
-                });
-
-                const imgData = canvas.toDataURL('image/jpeg', 0.8);
-                const imgProps = pdf.getImageProperties(imgData);
-                const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
-
-                const verticalPosition = Math.max(0, (USABLE_HEIGHT - imgHeight) / 2);
-                
-                pdf.addImage(
-                    imgData, 
-                    'JPEG',
-                    MARGIN_MM, 
-                    MARGIN_MM + verticalPosition, 
-                    USABLE_WIDTH, 
-                    imgHeight,
-                    undefined,
-                    'FAST'
-                );
-
-                tempContainer.removeChild(pageContainer);
-                
-                currentRow = endRow;
-                pageCount++;
+                }, 100);
             }
+        }
 
-            document.body.removeChild(tempContainer);
+        hideMobileDropdown() {
+            if (!dropdownBackdrop || !dropdownContainer) return;
+            
+            dropdownBackdrop.classList.remove('active');
+            dropdownContainer.classList.remove('active');
+            
+            if (currentDropdownData && currentDropdownData.fieldElement) {
+                currentDropdownData.fieldElement.classList.remove('active');
+            }
+            if (currentDropdownData && currentDropdownData.mobileField) {
+                currentDropdownData.mobileField.classList.remove('active');
+            }
+            
+            document.body.classList.remove('dropdown-open');
+            currentDropdownType = null;
+            currentDropdownData = null;
+        }
 
-            const fileName = `${document.title || 'sunday-schedule'}.pdf`;
-            pdf.save(fileName);
+        filterDesktopItems(value) {
+            const itemsEl = desktopDropdownList.querySelectorAll('.desktop-dropdown-item');
+            itemsEl.forEach(item => {
+                item.style.display = item.textContent.toLowerCase().includes(value.toLowerCase()) ? 'flex' : 'none';
+            });
+        }
 
-        } catch (error) {
-            console.error("PDF generation failed:", error);
-            alert("Sorry, there was an error creating the PDF. Please try again.");
-        } finally {
-            printButton.disabled = false;
-            printButton.querySelector('span:last-child').textContent = 'Download PDF';
+        filterMobileItems(value) {
+            const itemsEl = dropdownContent.querySelectorAll('.dropdown-item');
+            itemsEl.forEach(item => {
+                item.style.display = item.textContent.toLowerCase().includes(value.toLowerCase()) ? 'flex' : 'none';
+            });
+        }
+
+        isCellInMinistrySection(cell) {
+            // Your existing implementation
+            const table = cell.closest('table');
+            if (!table) return false;
+            const allRows = Array.from(table.querySelectorAll('tbody > tr'));
+            const cellRow = cell.closest('tr');
+            const cellIndex = allRows.indexOf(cellRow);
+            let ministryHeaderIndex = -1;
+            let nextHeaderIndex = allRows.length;
+            allRows.forEach((row, index) => {
+                if(row.classList.contains('header-row')) {
+                    if (row.dataset.section === 'ministry') {
+                        ministryHeaderIndex = index;
+                    } else if (ministryHeaderIndex !== -1 && index > ministryHeaderIndex) {
+                        if (index < nextHeaderIndex) nextHeaderIndex = index;
+                    }
+                }
+            });
+            if (ministryHeaderIndex === -1) return false;
+            return cellIndex > ministryHeaderIndex && cellIndex < nextHeaderIndex;
+        }
+    }
+    
+    class Project {
+        constructor(id, initialData, collectionRef) {
+            this.id = id;
+            this.data = initialData;
+            this.collectionRef = collectionRef;
+            this.scheduleTables = [];
+            this.isSaving = false;
+            this.saveTimeout = null;
+            this.render();
+            this.setupEventListeners();
+        }
+
+        render(newData) {
+            if (newData) this.data = newData;
+            if (document.activeElement !== projectTitleEl) projectTitleEl.textContent = this.data.name;
+            if (schedulesWrapper) schedulesWrapper.innerHTML = '';
+            this.scheduleTables = [];
+            this.data.tables.forEach((tableData, index) => {
+                this.scheduleTables.push(new ScheduleTable(this, tableData, index));
+            });
+        }
+
+        triggerSave() {
+            clearTimeout(this.saveTimeout);
+            if (!this.isSaving) {
+                this.saveTimeout = setTimeout(() => this.save(), 500);
+            }
+        }
+        
+        save() {
+            this.isSaving = true;
+            updateStatus('Syncing...', 'syncing');
+            this.scheduleTables.forEach(table => {
+                const dateInput = table.tableBody.querySelector('.date-input');
+                if (dateInput && dateInput.value) {
+                    const cell = dateInput.parentElement;
+                    cell.textContent = dateInput.value.split('-').reverse().join('-');
+                }
+            });
+            const updatedTablesData = this.scheduleTables.map(table => ({
+                title: table.data.title,
+                content: table.getContent(),
+                eventType: table.data.eventType || 'normal'
+            }));
+            const payload = { 
+                name: projectTitleEl ? projectTitleEl.textContent : 'Untitled Project', 
+                tables: updatedTablesData 
+            };
+
+            this.collectionRef.doc(this.id).update(payload)
+                .then(() => {
+                    updateStatus('Synced', 'synced');
+                    this.isSaving = false;
+                })
+                .catch(err => {
+                    console.error("Save failed:", err);
+                    updateStatus('Error', 'error');
+                    this.isSaving = false;
+                });
+        }
+
+        setupEventListeners() {
+            if (projectTitleEl) {
+                projectTitleEl.addEventListener('input', () => this.triggerSave());
+            }
+        }
+    }
+
+    auth.onAuthStateChanged(async user => {
+        if (user) {
+            if (user.email === ADMIN_EMAIL) { 
+                window.location.replace('./admin.html'); 
+                return; 
+            }
+            currentUser = user;
+            
+            // Initialize DOM elements first
+            initializeDOMElements();
+            
+            await fetchMembers(); 
+            userSchedulesCollection = db.collection(`userSchedules/${currentUser.uid}/schedules`);
+            
+            if (appContainer) appContainer.classList.remove('hidden');
+            document.body.classList.add('auth-ready');
+            
+            const profileNameEl = document.querySelector('.profile-name');
+            if (profileNameEl) profileNameEl.textContent = user.email;
+            
+            setupGlobalUI();
+
+            const params = new URLSearchParams(window.location.search);
+            currentProjectId = params.get('id');
+            if (currentProjectId) { 
+                initEditor(); 
+            } else { 
+                initCreationFlow(); 
+            }
+        } else {
+            window.location.replace('./login.html');
+        }
+    });
+
+    function initEditor() {
+        if (!currentUser || !currentProjectId) return;
+        if (currentListener) currentListener();
+        currentListener = userSchedulesCollection.doc(currentProjectId).onSnapshot(doc => {
+            if (doc.exists) {
+                const remoteData = doc.data();
+                if (!activeProject) {
+                    activeProject = new Project(doc.id, remoteData, userSchedulesCollection);
+                } else if (!activeProject.isSaving) {
+                    activeProject.render(remoteData);
+                }
+                 updateStatus('Synced', 'synced');
+            } else {
+                alert("This schedule may have been deleted.");
+                window.location.href = './dashboard.html';
+            }
+        }, error => {
+             updateStatus('Error', 'error');
+        });
+    }
+
+    async function initCreationFlow() {
+        if (document.getElementById('project-header')) {
+            document.getElementById('project-header').style.display = 'none';
+        }
+        const printButton = document.getElementById('print-button');
+        if (printButton) printButton.style.display = 'none';
+        
+        const templatesCollection = db.collection("templates");
+        const snapshot = await templatesCollection.orderBy("createdAt").get();
+        if (templateList) {
+            templateList.innerHTML = '';
+            if (snapshot.empty) {
+                templateList.innerHTML = '<li>No templates available.</li>';
+            } else {
+                snapshot.docs.forEach(doc => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<label><input type="checkbox" data-id="${doc.id}" data-name="${doc.data().name}" data-content="${encodeURIComponent(doc.data().content)}"> ${doc.data().name}</label>`;
+                    templateList.appendChild(li);
+                });
+            }
+        }
+        if (templateSelectionModal) {
+            templateSelectionModal.style.display = 'flex';
         }
     }
 
     function setupGlobalUI() {
-        desktopDropdownSearch = document.getElementById('desktop-dropdown-search');
-        desktopDropdownList = document.getElementById('desktop-dropdown-list');
-        mobileSearchInput = document.getElementById('mobile-search-input');
-        
+        // Menu Toggle Logic
         const menuToggleButton = document.getElementById('menu-toggle-button');
         const slideMenu = document.getElementById('slide-menu');
         const menuOverlay = document.getElementById('menu-overlay');
-        const body = document.body;
         
-        function closeMenu() {
-            slideMenu.classList.remove('is-open');
-            menuOverlay.classList.remove('is-open');
-            body.classList.remove('menu-open');
+        if (menuToggleButton && slideMenu && menuOverlay) {
+            const body = document.body;
+            
+            function closeMenu() {
+                slideMenu.classList.remove('is-open');
+                menuOverlay.classList.remove('is-open');
+                body.classList.remove('menu-open');
+            }
+
+            menuToggleButton.addEventListener('click', () => {
+                if (body.classList.contains('menu-open')) {
+                    closeMenu();
+                } else {
+                    slideMenu.classList.add('is-open');
+                    menuOverlay.classList.add('is-open');
+                    body.classList.add('menu-open');
+                }
+            });
+            menuOverlay.addEventListener('click', closeMenu);
         }
 
-        menuToggleButton.addEventListener('click', () => {
-            if (body.classList.contains('menu-open')) {
-                closeMenu();
-            } else {
-                slideMenu.classList.add('is-open');
-                menuOverlay.classList.add('is-open');
-                body.classList.add('menu-open');
-            }
-        });
-        menuOverlay.addEventListener('click', closeMenu);
+        // App-specific UI - only add event listeners if elements exist
+        const printButton = document.getElementById('print-button');
+        if (printButton) {
+            printButton.addEventListener('click', generatePdf);
+        }
 
-        document.getElementById('print-button').addEventListener('click', generatePdf);
-        document.getElementById('edit-weeks-button').addEventListener('click', openWeekEditor);
-        
-        document.getElementById('cancel-creation').addEventListener('click', () => {
-            dateSelectionModal.classList.remove('active');
-            setTimeout(() => {
-                dateSelectionModal.style.display = 'none';
-                document.querySelector('#date-selection-modal h2').textContent = 'Create New Sunday Schedule';
-                document.querySelector('#date-selection-modal p').textContent = 'Give your new schedule a name and select the weeks to include.';
-                document.getElementById('new-schedule-name').style.display = 'block';
-                document.getElementById('confirm-creation').textContent = 'Create Schedule';
-                
-                if (!currentScheduleId) {
-                    window.location.href = './sunday-dashboard.html';
+        const cancelTemplateSelection = document.getElementById('cancel-template-selection');
+        if (cancelTemplateSelection) {
+            cancelTemplateSelection.addEventListener('click', () => window.location.href = './dashboard.html');
+        }
+
+        const confirmTemplateSelection = document.getElementById('confirm-template-selection');
+        if (confirmTemplateSelection) {
+            confirmTemplateSelection.addEventListener('click', async () => {
+                const newProjectName = document.getElementById('new-project-name');
+                if (!newProjectName || !newProjectName.value.trim()) {
+                    alert("Please enter a name for your new project.");
+                    return;
                 }
-            }, 300);
-        });
+                
+                const selectedCheckboxes = templateList ? 
+                    Array.from(templateList.querySelectorAll('input:checked')) : [];
+                if (selectedCheckboxes.length === 0) {
+                    alert("Please select at least one template.");
+                    return;
+                }
+
+                const tablesArray = selectedCheckboxes.map(input => {
+                    const rawContent = decodeURIComponent(input.dataset.content);
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = `<table><tbody>${rawContent}</tbody></table>`;
+                    tempDiv.querySelectorAll('td, th').forEach(cell => {
+                        const isEssentiallyEmpty = cell.textContent.trim() === '' && !cell.querySelector('img');
+                        if (isEssentiallyEmpty) cell.setAttribute('data-user-editable', 'true');
+                    });
+                    return { title: input.dataset.name, content: tempDiv.querySelector('tbody').innerHTML, eventType: 'normal' };
+                });
+                const newDocRef = await userSchedulesCollection.add({
+                    name: newProjectName.value.trim(),
+                    tables: tablesArray,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                window.location.href = `./editor.html?id=${newDocRef.id}`;
+            });
+        }
         
-        document.getElementById('confirm-creation').addEventListener('click', function() {
-            if (this.textContent === 'Create Schedule') {
-                handleCreateSchedule();
-            } else {
-                handleUpdateWeeks();
-            }
-        });
+        if (eventContextMenu) {
+            eventContextMenu.addEventListener('click', (e) => {
+                const target = e.target.closest('.context-menu-item');
+                if (target && activeEventScheduleTable) {
+                    activeEventScheduleTable.applyEventType(target.dataset.eventType);
+                }
+                eventContextMenu.style.display = 'none';
+                activeEventScheduleTable = null;
+            });
+        }
 
-        dropdownBackdrop.addEventListener('click', hideMobileDropdown);
-        dropdownClose.addEventListener('click', hideMobileDropdown);
-
-        desktopDropdownSearch.addEventListener('input', (e) => {
-            filterDesktopItems(e.target.value);
-        });
+        // Desktop dropdown search functionality
+        if (desktopDropdownSearch) {
+            desktopDropdownSearch.addEventListener('input', (e) => {
+                if (activeEventScheduleTable) {
+                    activeEventScheduleTable.filterDesktopItems(e.target.value);
+                }
+            });
+        }
         
-        mobileSearchInput.addEventListener('input', (e) => {
-            filterMobileItems(e.target.value);
-        });
+        // Mobile dropdown search functionality
+        if (mobileSearchInput) {
+            mobileSearchInput.addEventListener('input', (e) => {
+                if (activeEventScheduleTable) {
+                    activeEventScheduleTable.filterMobileItems(e.target.value);
+                }
+            });
+        }
 
+        // Desktop dropdown event listeners
         document.addEventListener('click', (e) => {
-            if (!desktopDropdown.contains(e.target) && !e.target.closest('.editable-cell')) {
-                hideDesktopDropdown();
+            if (desktopDropdown && !desktopDropdown.contains(e.target) && !e.target.closest('.editable-cell')) {
+                desktopDropdown.classList.remove('active');
+                setTimeout(() => {
+                    desktopDropdown.style.display = 'none';
+                }, 250);
             }
-            if (!desktopEventMenu.contains(e.target) && !e.target.closest('.event-btn')) {
-                hideDesktopEventMenu();
-            }
-        });
-
-        desktopEventMenu.addEventListener('click', (e) => {
-            const target = e.target.closest('.desktop-event-item');
-            if (target) {
-                applyEventType(target.dataset.eventType);
+            if (eventContextMenu && !eventContextMenu.contains(e.target) && !e.target.closest('.event-btn')) {
+                eventContextMenu.style.display = 'none';
             }
         });
 
-        dropdownContainer.addEventListener('click', (e) => {
-            e.stopPropagation();
-        });
+        // Mobile dropdown close handlers
+        if (dropdownBackdrop) {
+            dropdownBackdrop.addEventListener('click', () => {
+                if (activeEventScheduleTable) {
+                    activeEventScheduleTable.hideMobileDropdown();
+                }
+            });
+        }
 
+        if (dropdownClose) {
+            dropdownClose.addEventListener('click', () => {
+                if (activeEventScheduleTable) {
+                    activeEventScheduleTable.hideMobileDropdown();
+                }
+            });
+        }
+
+        // Prevent dropdown container click from closing dropdown
+        if (dropdownContainer) {
+            dropdownContainer.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+        }
+
+        // Enhanced modal handling
         const modalOverlays = document.querySelectorAll('.modal-overlay');
         modalOverlays.forEach(modal => {
             modal.addEventListener('click', (e) => {
@@ -2528,23 +2257,134 @@
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                if (dropdownContainer.classList.contains('active')) {
-                    hideMobileDropdown();
+                if (dropdownContainer && dropdownContainer.classList.contains('active')) {
+                    if (activeEventScheduleTable) {
+                        activeEventScheduleTable.hideMobileDropdown();
+                    }
                 }
-                if (desktopDropdown.classList.contains('active')) {
-                    hideDesktopDropdown();
-                }
-                if (desktopEventMenu.style.display === 'block') {
-                    hideDesktopEventMenu();
-                }
-                if (dateSelectionModal.style.display === 'flex') {
-                    dateSelectionModal.classList.remove('active');
+                if (desktopDropdown && desktopDropdown.classList.contains('active')) {
+                    desktopDropdown.classList.remove('active');
                     setTimeout(() => {
-                        dateSelectionModal.style.display = 'none';
+                        desktopDropdown.style.display = 'none';
+                    }, 250);
+                }
+                if (eventContextMenu && eventContextMenu.style.display === 'block') {
+                    eventContextMenu.style.display = 'none';
+                }
+                if (templateSelectionModal && templateSelectionModal.style.display === 'flex') {
+                    templateSelectionModal.classList.remove('active');
+                    setTimeout(() => {
+                        templateSelectionModal.style.display = 'none';
                     }, 300);
                 }
             }
         });
+    }
+
+    async function generatePdf() {
+        const printButton = document.getElementById('print-button');
+        if (printButton) {
+            printButton.disabled = true;
+            printButton.querySelector('span:last-child').textContent = 'Generating...';
+        }
+
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const A4_WIDTH_MM = 210, A4_HEIGHT_MM = 297, MARGIN_MM = 10, PAGE_SPACING_MM = 5; 
+        const USABLE_WIDTH = A4_WIDTH_MM - (MARGIN_MM * 2);
+        const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_MM * 2);
+
+        const printContainer = document.createElement('div');
+        printContainer.id = 'print-container';
+        document.body.appendChild(printContainer);
+
+        const itemsToPrint = [];
+
+        for (const block of document.querySelectorAll('.schedule-block')) {
+            const clone = block.cloneNode(true);
+            
+            clone.querySelector('.event-btn').style.display = 'none';
+            clone.querySelector('.mobile-view-container').style.display = 'none';
+            clone.querySelector('table').style.display = 'table';
+            
+            const titleEl = clone.querySelector('.schedule-title');
+            if (titleEl) {
+                titleEl.style.display = 'none';
+            }
+            clone.style.marginBottom = '0';
+            
+            
+            clone.style.padding = '0';
+            clone.style.border = 'none';
+
+            // Increase the height of all table cells for better spacing in the PDF
+            const allCells = clone.querySelectorAll('th, td');
+            allCells.forEach(cell => {
+                cell.style.height = '40px';
+            });
+
+            printContainer.appendChild(clone);
+            
+            const canvas = await html2canvas(clone, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+            
+            const imgData = canvas.toDataURL('image/jpeg', 0.8);
+            const imgProps = pdf.getImageProperties(imgData);
+            const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
+            itemsToPrint.push({ imgData, width: USABLE_WIDTH, height: imgHeight });
+        }
+        
+        document.body.removeChild(printContainer);
+        
+        // Group all printable items into pages
+        const pages = [];
+        let currentPageItems = [];
+        let currentPageHeight = 0;
+
+        itemsToPrint.forEach(item => {
+            const itemHeightWithSpacing = currentPageItems.length > 0 ? item.height + PAGE_SPACING_MM : item.height;
+            if (currentPageHeight + itemHeightWithSpacing > USABLE_HEIGHT && currentPageItems.length > 0) {
+                pages.push(currentPageItems);
+                currentPageItems = [item];
+                currentPageHeight = item.height;
+            } else {
+                currentPageItems.push(item);
+                currentPageHeight += itemHeightWithSpacing;
+            }
+        });
+        if (currentPageItems.length > 0) {
+            pages.push(currentPageItems);
+        }
+
+        // Render each page
+        pages.forEach((pageItems, pageIndex) => {
+            if (pageIndex > 0) {
+                pdf.addPage();
+            }
+
+            const totalContentHeight = pageItems.reduce((sum, item) => sum + item.height, 0) + (PAGE_SPACING_MM * (pageItems.length - 1));
+
+            let startY = MARGIN_MM;
+            if (pageItems.length > 1) {
+                const remainingSpace = USABLE_HEIGHT - totalContentHeight;
+                if (remainingSpace > 0) {
+                    startY = MARGIN_MM + (remainingSpace / 2);
+                }
+            }
+
+            let currentY = startY;
+            pageItems.forEach(item => {
+                pdf.addImage(item.imgData, 'JPEG', MARGIN_MM, currentY, item.width, item.height);
+                currentY += item.height + PAGE_SPACING_MM;
+            });
+        });
+
+        const fileName = `${projectTitleEl ? projectTitleEl.textContent.trim() : 'schedule'}.pdf`;
+        pdf.save(fileName);
+        
+        if (printButton) {
+            printButton.disabled = false;
+            printButton.querySelector('span:last-child').textContent = 'Download PDF';
+        }
     }
 
 })();
