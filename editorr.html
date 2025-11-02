@@ -4,1870 +4,1172 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>User - Schedule Editor</title>
-<!-- FIREBASE SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-<!-- PDF Generation Libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<!-- FONTS AND ICONS -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 <style>
-    :root {
-        --header-bg: #1a1a1a;
-        --text-light: #ffffff;
-        --body-bg: #f8fafc;
-        --menu-new-text: #2c5282;
-        --menu-new-bg: #ffffff;
-        --menu-new-border: #e2e8f0;
-        --menu-new-hover: #f7fafc;
-        --primary-color: #2d3748;
-        --primary-hover: #4a5568;
-        --primary-light: #edf2f7;
-        --danger-color: #e53e3e;
-        --danger-hover: #c53030;
-        --border-color: #e2e8f0;
-        --background-color: #f8fafc;
-        --text-primary: #2d3748;
-        --text-secondary: #718096;
-        --surface-color: #ffffff;
-        --radius-md: 8px;
-        --radius-lg: 12px;
-        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-        --warning-color: #ed8936;
-        --success-color: #38a169;
-        --accent-color: #3182ce;
-    }
-   
-    @font-face {
-        font-family: "jw-icons-external";
-        src: url("./jw-icons-external-d876da3.woff") format("woff");
-        font-weight: normal; font-style: normal;
-    }
-    * {
-        box-sizing: border-box;
-    }
-    body {
-        margin: 0;
-        padding: 0;
-        font-family: 'Inter', 'Noto Sans Telugu', sans-serif;
-        background-color: var(--body-bg);
-        color: var(--text-primary);
-        line-height: 1.5;
-        visibility: hidden;
-        opacity: 0;
-        transition: opacity 0.3s ease-in;
-    }
-    body.auth-ready { visibility: visible; opacity: 1; }
-    body.menu-open { overflow: hidden; }
-    body.dropdown-open { overflow: hidden; }
-    /* START: ENHANCED NAVBAR STYLES */
-    .site-header {
-        background-color: var(--header-bg);
-        padding: 0;
-        color: var(--text-light);
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        z-index: 1000;
-        box-shadow: var(--shadow-md);
-    }
-    .top-bar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        height: 64px;
-        padding: 0 20px;
-        max-width: 1200px;
-        margin: 0 auto;
-    }
-    .top-bar .mobileLogo {
-        display: block;
-        width: 80px;
-        height: 64px;
-        background-image: url(https://www.jw.org/assets/ct/46605f23da/images/siteLogo-jworg-mobile.svg), none;
-        background-repeat: no-repeat;
-        background-size: contain;
-        background-position: center left;
-        flex-shrink: 0;
-    }
-    .header-right-controls {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-    }
-   
-    /* Status Indicator */
-    .status-indicator {
-        font-size: 12px;
-        font-weight: 600;
-        padding: 6px 12px;
-        border-radius: 999px;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        color: var(--text-light);
-        background: rgba(255,255,255,0.1);
-        backdrop-filter: blur(10px);
-    }
-   
-    .status-indicator::before {
-        content: '';
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background-color: currentColor;
-    }
-   
-    .status-indicator[data-status="synced"] { color: var(--success-color); }
-    .status-indicator[data-status="syncing"] { color: var(--warning-color); }
-    .status-indicator[data-status="error"] { color: var(--danger-color); }
-   
-    .header-icons {
-        display: flex;
-        align-items: center;
-        height: 64px;
-        cursor: pointer;
-        padding: 12px;
-        border-radius: var(--radius-md);
-        transition: background-color 0.2s;
-    }
-    .header-icons:hover {
-        background-color: rgba(255,255,255,0.1);
-    }
-    .header-icons svg {
-        height: 24px;
-        width: 24px;
-        color: var(--text-light);
-    }
-    .header-icons .close-icon { display: none; }
-    body.menu-open .header-icons .hamburger-icon { display: none; }
-    body.menu-open .header-icons .close-icon { display: block; }
-    .menu-overlay {
-        position: fixed;
-        top: 64px;
-        left: 0;
-        width: 100%;
-        height: calc(100% - 64px);
-        background-color: rgba(0, 0, 0, 0.6);
-        z-index: 999;
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
-        backdrop-filter: blur(2px);
-    }
-    .menu-overlay.is-open { opacity: 1; visibility: visible; }
-    .slide-menu {
-        position: fixed;
-        top: 64px;
-        right: 0;
-        height: calc(100dvh - 64px);
-        width: 320px;
-        max-width: 90%;
-        background-color: var(--menu-new-bg);
-        z-index: 1000;
-        transform: translateX(100%);
-        transition: transform 0.3s ease-in-out;
-        display: flex;
-        flex-direction: column;
-        border-left: 1px solid var(--menu-new-border);
-        box-shadow: var(--shadow-lg);
-    }
-    .slide-menu.is-open { transform: translateX(0); }
-    .menu-links { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex-grow: 1; }
-    .menu-links li a {
-        display: flex;
-        align-items: center;
-        color: var(--menu-new-text);
-        background-color: var(--menu-new-bg);
-        height: 56px;
-        padding: 12px 20px;
-        box-sizing: border-box;
-        text-decoration: none;
-        font-size: 1rem;
-        font-weight: 500;
-        transition: all 0.2s;
-        border-bottom: 1px solid var(--border-color);
-    }
-    .menu-links li:first-child a { border-top: none; }
-    .menu-links li a:hover {
-        background-color: var(--menu-new-hover);
-        color: var(--accent-color);
-    }
-    .profile-section {
-        padding: 20px;
-        border-top: 1px solid var(--menu-new-border);
-        flex-shrink: 0;
-        background-color: #fafafa;
-        margin-top: auto;
-    }
-    .profile-info { display: flex; align-items: center; }
-    .profile-name {
-        font-weight: 600;
-        font-size: 1rem;
-        color: #333;
-        word-break: break-all;
-    }
-    .iconLink-icon {
-        font-family: "jw-icons-external";
-        font-size: 24px;
-        display: inline-block;
-        color: #718096;
-        width: 32px;
-        margin-right: 12px;
-        text-align: center;
-        transition: color 0.2s;
-    }
-    .menu-links li a:hover .iconLink-icon {
-        color: var(--accent-color);
-    }
-    .home-icon::before { content: "\e661"; }
-    .midweek-icon::before { content: "\e625"; }
-    .sunday-icon::before { content: "\e610"; }
-    .members-icon::before { content: "\e695"; }
-    .btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        padding: 12px 20px;
-        border-radius: var(--radius-md);
-        font-size: 1rem;
-        font-weight: 600;
-        cursor: pointer;
-        border: none;
-        text-decoration: none;
-        background-color: var(--primary-color);
-        color: white;
-        transition: all 0.2s ease;
-        box-shadow: var(--shadow-sm);
-    }
-    .btn:hover:not(:disabled) {
-        background-color: var(--primary-hover);
-        transform: translateY(-1px);
-        box-shadow: var(--shadow-md);
-    }
-    .btn:active:not(:disabled) {
-        transform: translateY(0);
-    }
-    .btn:disabled { cursor: not-allowed; opacity: 0.6; }
-    /* END: ENHANCED NAVBAR STYLES */
-
-    /* START: ENHANCED EDITOR STYLES */
-    .hidden { display: none !important; }
-   
-    main {
-        padding-top: 84px; /* 64px navbar + 20px spacing */
-        min-height: 100vh;
-    }
-   
-    .editor-main {
-        max-width: 1100px;
-        margin: 0 auto;
-        padding: 20px;
-    }
-   
-    .page-controls {
-        margin-bottom: 24px;
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        gap: 12px;
-    }
-   
-    .master-container {
-        background: var(--surface-color);
-        padding: 24px;
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-md);
-        border: 1px solid var(--border-color);
-    }
-
-    .project-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 16px;
-        margin-bottom: 24px;
-        padding-bottom: 24px;
-        border-bottom: 1px solid var(--border-color);
-    }
-
-    .project-title {
-        font-size: 1.75rem;
-        font-weight: 700;
-        margin: 0;
-        flex-grow: 1;
-        border: none;
-        padding: 12px 16px;
-        border-radius: var(--radius-md);
-        font-family: 'Noto Sans Telugu', sans-serif;
-        background: var(--primary-light);
-        transition: all 0.2s;
-    }
-
-    .project-title:focus {
-        outline: 2px solid var(--accent-color);
-        background-color: white;
-        box-shadow: var(--shadow-sm);
-    }
-
-    .schedule-block {
-        margin-bottom: 32px;
-        background: white;
-        padding: 24px;
-        border-radius: var(--radius-lg);
-        border: 1px solid var(--border-color);
-        box-shadow: var(--shadow-sm);
-        transition: all 0.3s ease;
-    }
-
-    .schedule-block:hover {
-        box-shadow: var(--shadow-md);
-    }
-
-    .schedule-block:last-child {
-        margin-bottom: 0;
-    }
-
-    .schedule-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-        padding-bottom: 16px;
-        border-bottom: 2px solid var(--border-color);
-    }
-
-    .schedule-title {
-        font-size: 1.5rem;
-        font-weight: 600;
-        margin: 0;
-        color: var(--text-primary);
-        font-family: 'Noto Sans Telugu', sans-serif;
-    }
-
-    .toolbar-btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        padding: 10px 16px;
-        font-size: 14px;
-        font-weight: 500;
-        cursor: pointer;
-        border: 1px solid var(--border-color);
-        background-color: var(--surface-color);
-        border-radius: var(--radius-md);
-        transition: all 0.2s;
-        text-decoration: none;
-        color: var(--text-secondary);
-    }
-
-    .toolbar-btn:hover:not(:disabled) {
-        background-color: #f9fafb;
-        border-color: #d1d5db;
-        color: var(--text-primary);
-        transform: translateY(-1px);
-        box-shadow: var(--shadow-sm);
-    }
-
-    .schedule-block table {
-        width: 100%;
-        border-collapse: collapse;
-        border: 2px solid var(--border-color);
-        font-family: 'Noto Sans Telugu', sans-serif;
-        font-size: 14px;
-        font-weight: 500;
-        border-radius: var(--radius-md);
-        overflow: hidden;
-        box-shadow: var(--shadow-sm);
-    }
-
-    .schedule-block th, .schedule-block td {
-        border: 1px solid var(--border-color);
-        padding: 12px 8px;
-        text-align: left;
-        vertical-align: middle;
-        position: relative;
-        height: 40px;
-    }
-
-    .schedule-block .editable-cell:not([contenteditable="true"]) {
-        cursor: pointer;
-        transition: all 0.2s ease;
-        position: relative;
-    }
-
-    .schedule-block .editable-cell:not([contenteditable="true"]):hover {
-        background-color: #f0f8ff;
-        box-shadow: inset 0 0 0 1px var(--accent-color);
-    }
-
-    .schedule-block .editable-cell:not([contenteditable="true"]):after {
-        content: "";
-        position: absolute;
-        right: 8px;
-        top: 50%;
-        transform: translateY(-50%);
-        opacity: 0.5;
-        transition: opacity 0.2s;
-        width: 16px;
-        height: 16px;
-        background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 9L12 15L18 9' stroke='%23002726' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3C/path%3E%3C/svg%3E");
-        background-size: contain;
-        background-repeat: no-repeat;
-    }
-
-    .schedule-block .editable-cell:not([contenteditable="true"]):hover:after {
-        opacity: 1;
-    }
-
-    .schedule-block [contenteditable="true"]:focus {
-        background-color: #fffbe5;
-        outline: 2px solid var(--warning-color);
-        border-radius: 4px;
-    }
-
-    .schedule-block .header-row td {
-        font-size: 16px;
-        color: #ffffff;
-        height: 42px;
-        background-color: var(--primary-color);
-        font-weight: 600;
-    }
-
-    .special-event-text {
-        color: var(--danger-color);
-        text-align: center !important;
-        font-weight: 700;
-        background-color: #fff5f5;
-    }
-
-    /* Enhanced Desktop Dropdown Styling */
-    .desktop-dropdown {
-        position: absolute;
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(8px);
-        border-radius: 14px;
-        border: 1px solid var(--border-color);
-        box-shadow: 0 10px 35px rgba(0, 0, 0, 0.12);
-        z-index: 1001;
-        padding: 0;
-        width: 300px;
-        transform: scale(0.98) translateY(-10px);
-        transform-origin: top;
-        opacity: 0;
-        visibility: hidden;
-        transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
-        overflow: hidden;
-        display: block;
-    }
-   
-    .desktop-dropdown.active {
-        opacity: 1;
-        visibility: visible;
-        transform: scale(1) translateY(0);
-    }
-   
-    .desktop-dropdown-search {
-        display: flex;
-        align-items: center;
-        padding: 12px 16px;
-        border-bottom: 1px solid var(--border-color);
-        background: rgba(255,255,255,0.7);
-    }
-   
-    .desktop-dropdown-search svg {
-        margin-right: 8px;
-        color: var(--text-secondary);
-    }
-   
-    .desktop-dropdown-search input {
-        width: 100%;
-        border: none;
-        outline: none;
-        background: transparent;
-        font-size: 14px;
-        color: var(--text-primary);
-    }
-   
-    .desktop-dropdown-list {
-        max-height: 260px;
-        overflow-y: auto;
-        scrollbar-width: thin;
-        scrollbar-color: var(--accent-color) transparent;
-    }
-   
-    .desktop-dropdown-list::-webkit-scrollbar {
-        width: 6px;
-    }
-   
-    .desktop-dropdown-list::-webkit-scrollbar-thumb {
-        background: var(--accent-color);
-        border-radius: 3px;
-    }
-   
-    .desktop-dropdown-item {
-        display: flex;
-        align-items: center;
-        width: 100%;
-        padding: 12px 16px;
-        border: none;
-        background: none;
-        cursor: pointer;
-        transition: background-color 0.2s;
-        font-family: 'Noto Sans Telugu', sans-serif;
-        font-size: 14px;
-        text-align: left;
-        color: var(--text-primary);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-   
-    .desktop-dropdown-item:hover {
-        background: rgba(0,123,255,0.08);
-        color: var(--accent-color);
-    }
-   
-    .servant-tag {
-        font-size: 0.75rem;
-        font-weight: 600;
-        color: var(--primary-color);
-        background-color: var(--primary-light);
-        padding: 4px 8px;
-        border-radius: 12px;
-        margin-left: auto;
-        margin-right: 8px;
-    }
-
-    /* Desktop Event Context Menu */
-    .desktop-event-menu {
-        position: fixed;
-        display: none;
-        background: white;
-        border-radius: var(--radius-md);
-        box-shadow: var(--shadow-lg);
-        z-index: 1001;
-        padding: 8px;
-        min-width: 180px;
-        border: 1px solid var(--border-color);
-    }
-   
-    .desktop-event-item {
-        display: flex;
-        align-items: center;
-        width: 100%;
-        padding: 10px 12px;
-        border: none;
-        background: none;
-        cursor: pointer;
-        transition: background-color 0.2s;
-        font-family: 'Inter', sans-serif;
-        font-size: 0.9rem;
-        text-align: left;
-        color: var(--text-primary);
-        border-radius: 4px;
-    }
-   
-    .desktop-event-item:hover {
-        background-color: #f8fafc;
-    }
-
-    /* MOBILE BOTTOM SHEET STYLES */
-    .dropdown-backdrop {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.5);
-        z-index: 1100;
-        opacity: 0;
-        visibility: hidden;
-        transition: all 0.3s ease;
-        backdrop-filter: blur(4px);
-    }
-   
-    .dropdown-backdrop.active {
-        opacity: 1;
-        visibility: visible;
-    }
-   
-    .dropdown-container {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: white;
-        border-radius: 24px 24px 0 0;
-        z-index: 1101;
-        transform: translateY(100%);
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        max-height: 80vh;
-        display: flex;
-        flex-direction: column;
-        box-shadow: 0 -10px 30px rgba(0,0,0,0.2);
-    }
-   
-    .dropdown-container.active {
-        transform: translateY(0);
-    }
-   
-    .dropdown-header {
-        padding: 20px 24px 12px;
-        border-bottom: 1px solid var(--border-color);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-shrink: 0;
-    }
-   
-    .dropdown-title {
-        font-size: 1.2rem;
-        font-weight: 600;
-        color: var(--text-primary);
-        font-family: 'Noto Sans Telugu', sans-serif;
-    }
-   
-    .dropdown-close {
-        background: none;
-        border: none;
-        padding: 8px;
-        cursor: pointer;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--text-secondary);
-        transition: background-color 0.2s;
-    }
-   
-    .dropdown-close:hover {
-        background-color: #f5f5f5;
-    }
-   
-    /* Mobile Search Bar */
-    .mobile-dropdown-search {
-        display: flex;
-        align-items: center;
-        padding: 12px 16px;
-        border-bottom: 1px solid var(--border-color);
-        background: rgba(255,255,255,0.7);
-    }
-   
-    .mobile-dropdown-search svg {
-        margin-right: 8px;
-        color: var(--text-secondary);
-    }
-   
-    .mobile-dropdown-search input {
-        width: 100%;
-        border: none;
-        outline: none;
-        background: transparent;
-        font-size: 16px;
-        color: var(--text-primary);
-    }
-   
-    .dropdown-content {
-        flex: 1;
-        overflow-y: auto;
-        padding: 8px 0;
-        max-height: 300px;
-    }
-   
-    .dropdown-item {
-        display: flex;
-        align-items: center;
-        width: 100%;
-        padding: 16px 24px;
-        border: none;
-        background: none;
-        cursor: pointer;
-        transition: background-color 0.2s;
-        font-family: 'Noto Sans Telugu', sans-serif;
-        font-size: 1rem;
-        text-align: left;
-        color: var(--text-primary);
-    }
-   
-    .dropdown-item:hover {
-        background-color: #f8fafc;
-    }
-   
-    .dropdown-item.active {
-        background-color: var(--primary-light);
-        color: var(--primary-color);
-        font-weight: 600;
-    }
-
-    /* Enhanced Mobile View Styles */
-    .mobile-view-container {
-        display: none;
-        flex-direction: column;
-        gap: 1.5rem;
-        margin-top: 20px;
-    }
-
-    .mobile-schedule-card {
-        background: var(--surface-color);
-        border: 1px solid var(--border-color);
-        border-radius: var(--radius-lg);
-        padding: 20px;
-        margin-bottom: 20px;
-        box-shadow: var(--shadow-sm);
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .mobile-schedule-card:last-child {
-        margin-bottom: 0;
-    }
-
-    .mobile-schedule-card:hover {
-        box-shadow: var(--shadow-md);
-        transform: translateY(-2px);
-    }
-
-    .schedule-card-title {
-        font-size: 1.3rem;
-        font-weight: 700;
-        color: var(--text-primary);
-        margin: 0 0 20px 0;
-        padding-bottom: 12px;
-        border-bottom: 2px solid var(--border-color);
-        text-align: center;
-        font-family: 'Noto Sans Telugu', sans-serif;
-        position: relative;
-    }
-
-    .schedule-card-title::after {
-        content: '';
-        position: absolute;
-        bottom: -2px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 60px;
-        height: 3px;
-        background: var(--primary-color);
-        border-radius: 2px;
-    }
-
-    .mobile-field-group {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-        margin-bottom: 20px;
-    }
-
-    .mobile-field {
-        padding: 16px;
-        border: 2px solid var(--border-color);
-        border-radius: var(--radius-md);
-        background-color: #fafafa;
-        cursor: pointer;
-        font-family: 'Noto Sans Telugu', sans-serif;
-        font-weight: 500;
-        position: relative;
-        transition: all 0.2s ease;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        min-height: 56px;
-    }
-
-    .mobile-field:hover {
-        border-color: var(--accent-color);
-        background-color: white;
-    }
-
-    .mobile-field::after {
-        content: "";
-        width: 16px;
-        height: 16px;
-        background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 9L12 15L18 9' stroke='%23002726' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3C/path%3E%3C/svg%3E");
-        background-size: contain;
-        background-repeat: no-repeat;
-        transition: transform 0.2s ease;
-    }
-
-    .mobile-field.active::after {
-        transform: rotate(180deg);
-    }
-
-    .mobile-field-value {
-        flex: 1;
-        color: var(--text-primary);
-    }
-
-    .mobile-field-placeholder {
-        color: var(--text-secondary);
-        font-style: italic;
-    }
-
-    .mobile-field-label {
-        font-size: 0.95rem;
-        font-weight: 600;
-        color: var(--text-secondary);
-        font-family: 'Noto Sans Telugu', sans-serif;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        margin-bottom: 8px;
-    }
-
-    .mobile-field-label::before {
-        content: '';
-        width: 4px;
-        height: 16px;
-        background: var(--primary-color);
-        border-radius: 2px;
-    }
-
-    .special-event-mobile {
-        text-align: center;
-        padding: 20px;
-        background: linear-gradient(135deg, #fff5f5, #fed7d7);
-        border-radius: var(--radius-lg);
-        border: 2px dashed #fed7d7;
-        margin: 16px 0;
-    }
-
-    .special-event-text-mobile {
-        color: var(--danger-color);
-        font-weight: 700;
-        font-size: 1.1rem;
-        margin: 0;
-        font-family: 'Noto Sans Telugu', sans-serif;
-    }
-
-    .mobile-actions {
-        display: flex;
-        gap: 12px;
-        margin-top: 20px;
-        padding-top: 16px;
-        border-top: 1px solid var(--border-color);
-    }
-
-    .mobile-action-btn {
-        flex: 1;
-        padding: 12px 16px;
-        border: 2px solid var(--border-color);
-        background: white;
-        border-radius: var(--radius-md);
-        cursor: pointer;
-        font-family: 'Noto Sans Telugu', sans-serif;
-        font-weight: 500;
-        text-align: center;
-        transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-    }
-
-    .mobile-action-btn.primary {
-        background: var(--primary-color);
-        color: white;
-        border-color: var(--primary-color);
-    }
-
-    .mobile-action-btn.primary:hover {
-        background: var(--primary-hover);
-        border-color: var(--primary-hover);
-    }
-
-    .mobile-action-btn.secondary:hover {
-        border-color: var(--accent-color);
-        color: var(--accent-color);
-    }
-
-    /* Enhanced Modal Styles */
-    .modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.6);
-        display: none;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-        padding: 16px;
-        backdrop-filter: blur(4px);
-    }
-    
-    .modal-overlay.active {
-        display: flex;
-    }
-
-    .modal-content {
-        background: white;
-        padding: 24px;
-        border-radius: var(--radius-lg);
-        width: 100%;
-        max-width: 500px;
-        max-height: 90vh;
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-        box-shadow: var(--shadow-lg);
-        transform: scale(0.9);
-        opacity: 0;
-        transition: all 0.3s ease;
-    }
-
-    .modal-overlay.active .modal-content {
-        transform: scale(1);
-        opacity: 1;
-    }
-
-    #new-project-name {
-        width: 100%;
-        padding: 12px 16px;
-        font-size: 16px;
-        border-radius: var(--radius-md);
-        border: 2px solid var(--border-color);
-        font-family: 'Inter', sans-serif;
-        transition: border-color 0.2s;
-    }
-
-    #new-project-name:focus {
-        outline: none;
-        border-color: var(--accent-color);
-    }
-
-    #template-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        overflow-y: auto;
-        border: 1px solid var(--border-color);
-        border-radius: var(--radius-md);
-        max-height: 40vh;
-    }
-
-    #template-list label {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 16px;
-        cursor: pointer;
-        font-weight: 500;
-        padding: 12px 16px;
-        border-bottom: 1px solid var(--border-color);
-        transition: background-color 0.2s;
-    }
-
-    #template-list label:last-child {
-        border-bottom: none;
-    }
-
-    #template-list label:hover {
-        background-color: #f8fafc;
-    }
-
-    .modal-actions {
-        display: flex;
-        justify-content: flex-end;
-        gap: 12px;
-        margin-top: 16px;
-    }
-
-    .modal-actions button {
-        font-family: 'Inter', sans-serif;
-        padding: 10px 20px;
-        border-radius: var(--radius-md);
-        font-size: 15px;
-        font-weight: 600;
-        cursor: pointer;
-        border: 2px solid var(--border-color);
-        transition: all 0.2s ease;
-    }
-
-    #cancel-template-selection {
-        background-color: var(--surface-color);
-    }
-
-    #cancel-template-selection:hover {
-        border-color: var(--text-secondary);
-    }
-
-    #confirm-template-selection {
-        background-color: var(--primary-color);
-        color: white;
-        border-color: var(--primary-color);
-    }
-
-    #confirm-template-selection:hover {
-        background-color: var(--primary-hover);
-        border-color: var(--primary-hover);
-    }
-
-    /* Animation Classes */
-    .fade-in {
-        animation: fadeIn 0.3s ease-in-out;
-    }
-
-    .slide-up {
-        animation: slideUp 0.3s ease-out;
-    }
-
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
-
-    @keyframes slideUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    /* Responsive Design */
-    @media (max-width: 768px) {
-        .top-bar {
-            padding: 0 16px;
-            height: 60px;
-        }
-       
-        .top-bar .mobileLogo {
-            height: 60px;
-        }
-       
-        .header-icons {
-            height: 60px;
-        }
-       
-        .menu-overlay {
-            top: 60px;
-            height: calc(100% - 60px);
-        }
-       
-        .slide-menu {
-            top: 60px;
-            height: calc(100dvh - 60px);
-        }
-       
-        main {
-            padding-top: 70px; /* 60px navbar + 10px spacing */
-        }
-       
-        .editor-main {
-            padding: 16px;
-        }
-       
-        .page-controls {
-            justify-content: center;
-        }
-       
-        .master-container {
-            padding: 0;
-            border-radius: 0;
-            box-shadow: none;
-            background: transparent;
-            border: none;
-        }
-
-        .project-header {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
-        }
-
-        .project-title {
-            font-size: 1.5rem;
-            width: 100%;
-        }
-
-        .schedule-block {
-            padding: 16px;
-            margin-bottom: 24px;
-            border-radius: 0;
-            border-left: none;
-            border-right: none;
-            box-shadow: none;
-        }
-
-        .schedule-block table {
-            display: none;
-        }
-       
-        .mobile-view-container {
-            display: flex;
-        }
-       
-        .desktop-dropdown {
-            display: none !important;
-        }
-       
-        .desktop-event-menu {
-            display: none !important;
-        }
-    }
-
-    /* PDF-specific styles */
-    .pdf-page-container {
-        background: white;
-        padding: 20px;
-        font-family: 'Noto Sans Telugu', sans-serif;
-        width: 1100px;
-        margin-bottom: 20px;
-    }
-
-    .pdf-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-family: 'Noto Sans Telugu', sans-serif;
-        border: 2px solid #000;
-        table-layout: fixed !important;
-    }
-
-    .pdf-table th,
-    .pdf-table td {
-        border: 1px solid #000;
-        padding: 8px 6px;
-        font-family: 'Noto Sans Telugu', sans-serif;
-        font-weight: 700;
-        height: 35px;
-        vertical-align: middle;
-        box-sizing: border-box;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
-        white-space: nowrap !important;
-    }
-
-    .pdf-table thead th {
-        background-color: #F3E5D7;
-        font-size: 1.0em;
-        padding: 8px 6px;
-    }
+    :root {
+        --header-bg: #292929;
+        --text-light: #fff;
+        --body-bg: #f8fafc;
+        --menu-new-text: #4a6da7;
+        --menu-new-bg: #ffffff;
+        --menu-new-border: #eeeeee;
+        --menu-new-hover: #f5f5f5;
+        --primary-color: #012726;
+        --primary-hover: #024443;
+        --primary-light: #e6f6f6;
+        --danger-color: #d32f2f;
+        --danger-hover: #b71c1c;
+        --border-color: #e5e7eb;
+        --background-color: #f8fafc;
+        --text-primary: #1f2937;
+        --text-secondary: #6b7280;
+        --surface-color: #ffffff;
+        --radius-md: 8px;
+        --radius-lg: 16px;
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --warning-color: #f59e0b;
+        --success-color: #2e7d32;
+        --accent-color: #3182ce;
+    }
+
+@font-face {
+        font-family: "jw-icons-external";
+        src: url("./jw-icons-external-d876da3.woff") format("woff");
+        font-weight: normal; font-style: normal;
+    }
+
+body {
+    margin: 0; padding: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: var(--body-bg);
+    color: var(--text-primary);
+    visibility: hidden; opacity: 0;
+    transition: opacity 0.3s ease-in;
+}
+body.auth-ready { visibility: visible; opacity: 1; }
+body.menu-open, body.dropdown-open { overflow: hidden; }
+
+/* START: NAVBAR STYLES */
+.site-header { background-color: var(--header-bg); padding: 0; color: var(--text-light); position: fixed; top: 0; left: 0; width: 100%; z-index: 900; }
+.top-bar { display: flex; justify-content: space-between; align-items: center; height: 56px; padding: 0 15px 0 0; max-width: 1200px; margin: 0 auto; }
+.top-bar .mobileLogo { display: block; width: 75px; height: 56px; background-image: url(https://www.jw.org/assets/ct/46605f23da/images/siteLogo-jworg-mobile.svg), none; background-repeat: no-repeat; background-size: contain; background-position: center left; flex-shrink: 0; margin-left: 0px; }
+.header-right-controls { display: flex; align-items: center; gap: 15px; }
+.header-icons { display: flex; align-items: center; height: 56px; cursor: pointer; }
+.header-icons svg { height: 24px; width: 24px; color: var(--text-light); }
+.header-icons .close-icon { display: none; }
+body.menu-open .header-icons .hamburger-icon { display: none; }
+body.menu-open .header-icons .close-icon { display: block; }
+.menu-overlay { position: fixed; top: 56px; left: 0; width: 100%; height: calc(100% - 56px); background-color: rgba(0, 0, 0, 0.6); z-index: 998; opacity: 0; visibility: hidden; transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; }
+.menu-overlay.is-open { opacity: 1; visibility: visible; }
+.slide-menu { position: fixed; top: 56px; right: 0; height: calc(100dvh - 56px); width: 320px; max-width: 90%; background-color: var(--menu-new-bg); z-index: 999; transform: translateX(100%); transition: transform 0.3s ease-in-out; display: flex; flex-direction: column; border-left: 1px solid var(--menu-new-border); }
+.slide-menu.is-open { transform: translateX(0); }
+.menu-links { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex-grow: 1; }
+.menu-links li a { display: flex; align-items: center; color: var(--menu-new-text); background-color: var(--menu-new-bg); height: 50px; padding: 12px 5px 12px 12px; box-sizing: border-box; text-decoration: none; font-size: 1rem; transition: background-color 0.2s; border-top: 1px dotted #a7a7a7; }
+.menu-links li:first-child a { border-top: none; }
+.menu-links li a:hover { background-color: var(--menu-new-hover); }
+.profile-section { padding: 16px; border-top: 1px solid var(--menu-new-border); flex-shrink: 0; background-color: #fafafa; margin-top: auto; }
+.profile-info { display: flex; align-items: center; }
+.profile-name { font-weight: bold; font-size: 1rem; color: #333; word-break: break-all; }
+.iconLink-icon { font-family: "jw-icons-external"; font-size: 24px; display: inline-block; color: #757575; width: 30px; margin-right: 10px; text-align: center; }
+.home-icon::before { content: "\e661"; }
+.midweek-icon::before { content: "\e625"; }
+.sunday-icon::before { content: "\e610"; }
+.members-icon::before { content: "\e695"; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; border-radius: var(--radius-md); font-size: 1rem; font-weight: 600; cursor: pointer; border: none; text-decoration: none; background-color: var(--primary-color); color: white; transition: background-color 0.2s; }
+.btn:hover:not(:disabled) { background-color: var(--primary-hover); }
+.btn:disabled { cursor: not-allowed; opacity: 0.6; }
+/* END: NAVBAR STYLES */
+
+/* START: EDITOR STYLES */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+.hidden { display: none !important; }
+
+main { padding: calc(56px + 20px) 20px 20px; }
+.editor-main { max-width: 1100px; margin: 0 auto; }
+.page-controls { margin-bottom: 24px; display: flex; justify-content: flex-end;}
+
+.master-container { background: var(--surface-color); padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
+.project-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color); }
+.project-title { font-size: 1.75rem; font-weight: 700; margin: 0; flex-grow: 1; border: none; padding: 4px 8px; margin: -4px -8px; border-radius: var(--radius-md); font-family: 'Noto Sans Telugu', sans-serif; }
+.project-title:focus { outline: 2px solid var(--primary-color); background-color: var(--primary-light); }
+
+.schedule-block { margin-bottom: 32px; }
+.schedule-block:last-child { margin-bottom: 0; }
+.schedule-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.schedule-title { font-size: 1.25rem; font-weight: 600; margin: 0; color: var(--text-secondary); font-family: 'Noto Sans Telugu', sans-serif; }
+
+.status-indicator { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; display: flex; align-items: center; gap: 6px; }
+.status-indicator::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background-color: currentColor; }
+.status-indicator[data-status="synced"] { color: var(--success-color); background-color: #eaf5ea; }
+.status-indicator[data-status="syncing"] { color: var(--warning-color); background-color: #fffbeb; }
+.status-indicator[data-status="error"] { color: var(--danger-color); background-color: #fde8e8; }
+
+.toolbar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); transition: all 0.2s; text-decoration: none; color: var(--text-secondary); }
+.toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; border-color: #d1d5db; color: var(--text-primary); }
+.toolbar-btn:disabled { cursor: not-allowed; opacity: 0.5; }
+
+/* Desktop Table Styles */
+.schedule-block table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.25px; }
+.schedule-block th, .schedule-block td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; }
+.schedule-block .editable-cell:not([contenteditable="true"]) { cursor: pointer; }
+.schedule-block .editable-cell:not([contenteditable="true"]):hover { background-color: #f9fafb; }
+.schedule-block [contenteditable="true"]:focus { background-color: #fffbe5; }
+.schedule-block .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; }
+.schedule-block .cell-icon { height: 70%; max-height: 24px; object-fit: contain; flex-shrink: 0; }
+.schedule-block .header-row .cell-icon { filter: brightness(0) invert(1); }
+.schedule-block .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; }
+.schedule-block .header-row td { font-size: 16px; color: #ffffff; height: 42px; }
+.schedule-block .row-handle { display: none !important; }
+.special-event-text { color: var(--danger-color); text-align: center !important; font-weight: 700; }
+.date-input { cursor: pointer; -webkit-appearance: none; -moz-appearance: none; appearance: none; background-color: transparent; border: none; width: 100%; height: 100%; font-family: inherit; font-size: inherit; font-weight: inherit; text-align: left; padding-left: 8px; }
+
+/* Desktop Dropdowns */
+#event-context-menu, #member-dropdown { position: fixed; display: none; background: var(--surface-color); border-radius: var(--radius-md); box-shadow: var(--shadow-md); z-index: 1001; padding: 6px; min-width: 180px; border: 1px solid var(--border-color); }
+.context-menu-item, .member-dropdown-item { font-family: 'Inter', sans-serif; display: block; width: 100%; padding: 8px 12px; cursor: pointer; font-size: 14px; border-radius: 6px; background: none; border: none; text-align: left; }
+.context-menu-item:hover, .member-dropdown-item:hover { background: #f9fafb; }
+.member-dropdown-item { display: flex; justify-content: space-between; align-items: center; }
+#member-dropdown { max-height: 300px; overflow-y: auto; }
+.servant-tag { font-size: 0.75rem; font-weight: 600; color: var(--primary-color); background-color: var(--primary-light); padding: 2px 6px; border-radius: 4px; }
+
+/* Modals */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 16px; backdrop-filter: blur(4px); }
+.modal-content { background: white; padding: 24px; border-radius: var(--radius-lg); width: 100%; max-width: 500px; max-height: 90vh; display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow-lg); }
+#new-project-name { width: 100%; padding: 12px; font-size: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); }
+#template-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md); }
+#template-list li { padding: 12px; border-bottom: 1px solid var(--border-color); }
+#template-list label { display: flex; align-items: center; gap: 10px; font-size: 16px; cursor: pointer; font-weight: 500; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px; }
+.modal-actions button { padding: 10px 20px; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); }
+#cancel-template-selection { background-color: var(--surface-color); }
+#confirm-template-selection { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
+#print-container { position: absolute; left: -9999px; top: auto; width: 1100px; background: white; }
+/* END: EDITOR STYLES */
+
+
+/* START: NEW MOBILE BOTTOM SHEET STYLES */
+.dropdown-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1100;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(4px);
+}
+.dropdown-backdrop.active {
+    opacity: 1;
+    visibility: visible;
+}
+.dropdown-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 24px 24px 0 0;
+    z-index: 1101;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 -10px 30px rgba(0,0,0,0.2);
+}
+.dropdown-container.active {
+    transform: translateY(0);
+}
+.dropdown-header {
+    padding: 20px 24px 12px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+.dropdown-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-family: 'Noto Sans Telugu', sans-serif;
+}
+.dropdown-close {
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    transition: background-color 0.2s;
+}
+.dropdown-close:hover {
+    background-color: #f5f5f5;
+}
+.mobile-dropdown-search {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-color);
+    background: rgba(248, 248, 248, 0.7);
+    flex-shrink: 0;
+}
+.mobile-dropdown-search .material-symbols-outlined {
+    margin-right: 8px;
+    color: var(--text-secondary);
+}
+.mobile-dropdown-search input {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 16px;
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+}
+.dropdown-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 0;
+}
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 16px 24px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-family: 'Noto Sans Telugu', sans-serif;
+    font-size: 1rem;
+    text-align: left;
+    color: var(--text-primary);
+}
+.dropdown-item:hover {
+    background-color: #f8fafc;
+}
+.dropdown-item.active {
+    background-color: var(--primary-light);
+    color: var(--primary-color);
+    font-weight: 600;
+}
+.dropdown-item .servant-tag {
+    margin-left: 12px;
+}
+/* END: NEW MOBILE BOTTOM SHEET STYLES */
+
+
+/* START: RESPONSIVE & MOBILE VIEW STYLES */
+.mobile-view-container {
+    display: none; /* Hidden by default, shown on mobile */
+}
+
+@media (max-width: 768px) {
+    main { padding: 56px 0 0 0; }
+    .master-container { padding: 0; border-radius: 0; box-shadow: none; background: transparent; }
+    .page-controls { padding: 16px 16px 0; justify-content: center; }
+    .project-header { flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px; margin-bottom: 0; border-bottom: none; }
+    .project-title { font-size: 1.5rem; }
+    .schedule-block { margin-bottom: 0; padding: 0; border-bottom: 8px solid var(--background-color); }
+    .schedule-block:last-child { border-bottom: none; }
+    
+    /* Hide desktop elements on mobile */
+    .schedule-block table { display: none; }
+    .schedule-header .event-btn { display: none; }
+
+    /* Show mobile container */
+    .mobile-view-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 20px;
+        margin: 16px;
+        box-shadow: var(--shadow-md);
+    }
+    
+    .schedule-header {
+        padding: 0 20px;
+        margin-top: 16px;
+        margin-bottom: 8px;
+    }
+
+    .mobile-item {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .mobile-item .item-label {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        font-family: 'Noto Sans Telugu', sans-serif;
+    }
+    
+    /* This is the main tappable field */
+    .mobile-item .item-input {
+        width: 100%;
+        padding: 16px;
+        border: 2px solid var(--border-color);
+        border-radius: var(--radius-md);
+        background-color: #fafafa;
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--text-primary);
+        font-family: 'Noto Sans Telugu', sans-serif;
+        min-height: 56px;
+        display: flex;
+        align-items: center;
+        transition: all 0.2s ease;
+    }
+    
+    .mobile-item .item-input.mobile-editable-field {
+        cursor: pointer;
+        position: relative;
+    }
+
+    .mobile-item .item-input.mobile-editable-field:hover {
+        border-color: var(--accent-color);
+        background-color: var(--surface-color);
+    }
+    
+    /* Dropdown arrow for tappable fields */
+    .mobile-item .item-input.mobile-editable-field::after {
+        content: "";
+        width: 16px;
+        height: 16px;
+        margin-left: auto;
+        background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 9L12 15L18 9' stroke='%23002726' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3C/path%3E%3C/svg%3E");
+        background-size: contain;
+        background-repeat: no-repeat;
+        transition: transform 0.2s ease;
+        opacity: 0.6;
+    }
+    
+    .mobile-item .placeholder {
+        color: var(--text-secondary);
+        font-style: italic;
+    }
+    
+    .mobile-special-event-display {
+        text-align: center;
+        padding: 20px;
+        background: #fff5f5;
+        border-radius: var(--radius-md);
+        border: 2px dashed var(--danger-color);
+    }
+    .mobile-special-event-display .special-event-text {
+        font-size: 1.1rem;
+    }
+}
+/* END: RESPONSIVE & MOBILE VIEW STYLES */
 </style>
 </head>
 <body>
+
 <header class="site-header">
-    <div class="top-bar">
-        <a href="./dashboard.html" class="mobileLogo" title="Dashboard"></a>
-        <div class="header-right-controls">
-            <div class="status-indicator" data-status="synced">Synced</div>
-            <div class="header-icons" id="menu-toggle-button">
-                <svg class="hamburger-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M22.5 7h-21a.5.5 0 010-1h21a.5.5 0 010 1zM22.5 13h-21a.5.5 0 010-1h21a.5.5 0 010 1zM22.5 19h-21a.5.5 0 010-1h21a.5.5 0 010 1z"></path></svg>
-                <svg class="close-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12.707 12l6.146-6.146a.5.5 0 00-.707-.707L12 11.293 5.854 5.146a.5.5 0 00-.707.707L11.293 12l-6.147 6.146a.5.5 0 10.707.707L12 12.707l6.146 6.146a.5.5 0 00.707-.707z"></path></svg>
-            </div>
-        </div>
-    </div>
+    <div class="top-bar">
+        <a href="./dashboard.html" class="mobileLogo" title="Dashboard"></a>
+        <div class="header-right-controls">
+            <div class="status-indicator" data-status="synced">Synced</div>
+            <div class="header-icons" id="menu-toggle-button">
+                <svg class="hamburger-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M22.5 7h-21a.5.5 0 010-1h21a.5.5 0 010 1zM22.5 13h-21a.5.5 0 010-1h21a.5.5 0 010 1zM22.5 19h-21a.5.5 0 010-1h21a.5.5 0 010 1z"></path></svg>
+                <svg class="close-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12.707 12l6.146-6.146a.5.5 0 00-.707-.707L12 11.293 5.854 5.146a.5.5 0 00-.707.707L11.293 12l-6.147 6.146a.5.5 0 10.707.707L12 12.707l6.146 6.146a.5.5 0 00.707-.707z"></path></svg>
+            </div>
+        </div>
+    </div>
 </header>
 <div class="menu-overlay" id="menu-overlay"></div>
 <div class="slide-menu" id="slide-menu">
-    <ul class="menu-links">
-        <li><a href="./home.html"><span class="iconLink-icon home-icon"></span><span>Home</span></a></li>
-        <li><a href="./mid-week.html"><span class="iconLink-icon midweek-icon"></span><span>Mid-Week Schedules</span></a></li>
-        <li><a href="./sunday-dashboard.html"><span class="iconLink-icon sunday-icon"></span><span>Sunday Schedules</span></a></li>
-        <li><a href="./members.html"><span class="iconLink-icon members-icon"></span><span>Members</span></a></li>
-    </ul>
-    <div class="profile-section">
-        <div class="profile-info">
-            <div class="profile-name">Loading...</div>
-        </div>
-    </div>
+    <ul class="menu-links">
+        <li><a href="./home.html"><span class="iconLink-icon home-icon"></span><span>Home</span></a></li>
+        <li><a href="./mid-week.html"><span class="iconLink-icon midweek-icon"></span><span>Mid-Week Schedules</span></a></li>
+        <li><a href="./sunday-dashboard.html"><span class="iconLink-icon sunday-icon"></span><span>Sunday Schedules</span></a></li>
+        <li><a href="./members.html"><span class="iconLink-icon members-icon"></span><span>Members</span></a></li>
+    </ul>
+    <div class="profile-section">
+        <div class="profile-info">
+             <div class="profile-name">Loading...</div>
+        </div>
+    </div>
 </div>
+
 <main id="app-container" class="editor-main hidden">
-    <div class="page-controls">
-        <button id="print-button" class="btn">
-            <span class="material-symbols-outlined">picture_as_pdf</span>
-            <span>Download PDF</span>
-        </button>
-    </div>
-    <div class="master-container">
-        <div id="project-header" class="project-header">
-            <h1 id="project-title" contenteditable="true">Loading Project...</h1>
-        </div>
-        <div id="schedules-wrapper"></div>
-    </div>
+    <div class="page-controls">
+        <button id="print-button" class="btn">
+            <span class="material-symbols-outlined">picture_as_pdf</span>
+            <span>Download PDF</span>
+        </button>
+    </div>
+    <div class="master-container">
+        <div id="project-header" class="project-header">
+            <h1 id="project-title" contenteditable="true">Loading Project...</h1>
+        </div>
+        <div id="schedules-wrapper"></div>
+    </div>
 </main>
-<!-- Desktop Dropdown -->
-<div class="desktop-dropdown" id="desktop-dropdown">
-    <div class="desktop-dropdown-search">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-        </svg>
-        <input type="text" id="desktop-dropdown-search" placeholder="Search...">
-    </div>
-    <div class="desktop-dropdown-list" id="desktop-dropdown-list">
-        <!-- Desktop dropdown items will be injected here -->
-    </div>
+
+<div id="event-context-menu">
+    <button class="context-menu-item" data-event-type="normal">Normal</button>
+    <button class="context-menu-item" data-event-type="co-visit">CO Visit</button>
+    <button class="context-menu-item" data-event-type="assembly">Assembly</button>
+    <button class="context-menu-item" data-event-type="convention">Convention</button>
 </div>
-<!-- Desktop Event Menu -->
-<div class="desktop-event-menu" id="desktop-event-menu">
-    <button class="desktop-event-item" data-event-type="normal">Normal</button>
-    <button class="desktop-event-item" data-event-type="co-visit">CO Visit</button>
-    <button class="desktop-event-item" data-event-type="assembly">Assembly</button>
-    <button class="desktop-event-item" data-event-type="convention">Convention</button>
-</div>
-<!-- Mobile Bottom Sheet Components -->
-<div class="dropdown-backdrop" id="dropdown-backdrop"></div>
-<div class="dropdown-container" id="dropdown-container">
-    <div class="dropdown-header">
-        <h3 class="dropdown-title" id="dropdown-title">Select Option</h3>
-        <button class="dropdown-close" id="dropdown-close">
-            <span class="material-symbols-outlined">close</span>
-        </button>
-    </div>
-    <div class="mobile-dropdown-search" id="mobile-dropdown-search" style="display: none;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-        </svg>
-        <input type="text" id="mobile-search-input" placeholder="Search...">
-    </div>
-    <div class="dropdown-content" id="dropdown-content">
-        <!-- Dropdown items will be injected here -->
-    </div>
-</div>
+
+<div id="member-dropdown"></div>
+
 <template id="schedule-template">
-    <div class="schedule-block">
-        <div class="schedule-header">
-            <h2 class="schedule-title"></h2>
-            <button class="toolbar-btn event-btn">
-                <span class="material-symbols-outlined">celebration</span>
-                <span>Event</span>
-            </button>
-        </div>
-        <table>
-            <colgroup><col style="width: 60%;"><col style="width: 20%;"><col style="width: 20%;"></colgroup>
-            <tbody class="schedule-table-body"></tbody>
-        </table>
-        <div class="mobile-view-container"></div>
-    </div>
+    <div class="schedule-block">
+        <div class="schedule-header">
+            <h2 class="schedule-title"></h2>
+            <button class="toolbar-btn event-btn">
+                <span class="material-symbols-outlined">celebration</span>
+                <span>Event</span>
+            </button>
+        </div>
+        <table>
+            <colgroup><col style="width: 60%;"><col style="width: 20%;"><col style="width: 20%;"></colgroup>
+            <tbody class="schedule-table-body"></tbody>
+        </table>
+        <div class="mobile-view-container"></div>
+    </div>
 </template>
-<div id="template-selection-modal" class="modal-overlay">
-    <div class="modal-content">
-        <h2>Create a New Schedule</h2>
-        <p>Give your new project a name and select the templates to include.</p>
-        <input type="text" id="new-project-name" placeholder="Enter Project Name">
-        <ul id="template-list"></ul>
-        <div class="modal-actions">
-            <button id="cancel-template-selection">Cancel</button>
-            <button id="confirm-template-selection">Create Schedule</button>
-        </div>
-    </div>
+
+
+<div class="dropdown-backdrop" id="mobile-dropdown-backdrop"></div>
+
+<div class="dropdown-container" id="mobile-member-dropdown">
+    <div class="dropdown-header">
+        <h3 class="dropdown-title" id="member-dropdown-title">Select Name</h3>
+        <button class="dropdown-close" id="mobile-member-close">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+    </div>
+    <div class="mobile-dropdown-search">
+        <span class="material-symbols-outlined">search</span>
+        <input type="text" id="member-search-input" placeholder="Search names...">
+    </div>
+    <div class="dropdown-content" id="member-dropdown-list">
+            </div>
 </div>
+
+<div class="dropdown-container" id="mobile-event-type-dropdown">
+    <div class="dropdown-header">
+        <h3 class="dropdown-title">Select Event Type</h3>
+        <button class="dropdown-close" id="mobile-event-close">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+    </div>
+    <div class="dropdown-content" id="event-type-list">
+        <button class="dropdown-item" data-event-type="normal">Normal</button>
+        <button class="dropdown-item" data-event-type="co-visit">CO Visit</button>
+        <button class="dropdown-item" data-event-type="assembly">Assembly</button>
+        <button class="dropdown-item" data-event-type="convention">Convention</button>
+    </div>
+</div>
+
+<div id="template-selection-modal" class="modal-overlay">
+    <div class="modal-content">
+        <h2>Create a New Schedule</h2>
+        <p>Give your new project a name and select the templates to include.</p>
+        <input type="text" id="new-project-name" placeholder="Enter Project Name">
+        <ul id="template-list"></ul>
+        <div class="modal-actions">
+            <button id="cancel-template-selection">Cancel</button>
+            <button id="confirm-template-selection">Create Schedule</button>
+        </div>
+    </div>
+</div>
+
 <script>
 (function() {
-    'use strict';
-    const firebaseConfig = {
-      apiKey: "AIzaSyDLK5f4C-nfG6fz0ajqqay1q9TTN6rxgmQ",
-      authDomain: "schedule-harsha.firebaseapp.com",
-      projectId: "schedule-harsha",
-      storageBucket: "schedule-harsha.firebasestorage.app",
-      messagingSenderId: "965478014820",
-      appId: "1:965478014820:web:1c36c5d890a27e599aa471"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    const ADMIN_EMAIL = 'harshavardhanjw@gmail.com';
-    let currentUser = null;
-    let currentProjectId = null;
-    let userSchedulesCollection = null;
-    let membersCollection = null;
-    let members = { brothers: [], sisters: [] };
-    let currentListener = null;
-    let activeProject = null;
-    let activeEventScheduleTable = null;
-    let activeCellForDropdown = null;
-    const appContainer = document.getElementById('app-container');
-    const projectTitleEl = document.getElementById('project-title');
-    const schedulesWrapper = document.getElementById('schedules-wrapper');
-    const templateSelectionModal = document.getElementById('template-selection-modal');
-    const templateList = document.getElementById('template-list');
-    const eventContextMenu = document.getElementById('event-context-menu');
-    const memberDropdown = document.getElementById('member-dropdown');
-    const statusIndicator = document.querySelector('.status-indicator');
-   
-    function updateStatus(text, status) {
-        statusIndicator.textContent = text;
-        statusIndicator.dataset.status = status;
-    }
-    async function fetchMembers() {
-        if (!currentUser) return;
-        membersCollection = db.collection(`users/${currentUser.uid}/members`);
-        const snapshot = await membersCollection.orderBy("name").get();
-        members = { brothers: [], sisters: [] };
-        snapshot.forEach(doc => {
-            const member = { id: doc.id, ...doc.data() };
-            if (member.type === 'brother') {
-                members.brothers.push(member);
-            } else {
-                members.sisters.push(member);
-            }
-        });
-    }
-    class ScheduleTable {
-        constructor(parentProject, tableData, index) {
-            this.parentProject = parentProject;
-            this.data = tableData;
-            this.index = index;
-            this.initDOM();
-            this.render();
-            this.setupEventListeners();
-            this.applyEventType(this.data.eventType || 'normal', false);
-        }
-        initDOM() {
-            const templateClone = document.getElementById('schedule-template').content.cloneNode(true);
-            this.element = templateClone.querySelector('.schedule-block');
-            this.titleEl = this.element.querySelector('.schedule-title');
-            this.tableBody = this.element.querySelector('.schedule-table-body');
-            this.mobileViewContainer = this.element.querySelector('.mobile-view-container');
-            this.eventBtn = this.element.querySelector('.event-btn');
-            schedulesWrapper.appendChild(this.element);
-        }
-        render() {
-            this.titleEl.textContent = this.data.title;
-            this.tableBody.innerHTML = this.data.content;
-           
-            this.tableBody.querySelectorAll('td, th').forEach(cell => {
-                if (cell.hasAttribute('data-user-editable')) {
-                    const isFirstRow = cell.closest('tr') === this.tableBody.rows[0];
-                    if (isFirstRow) {
-                        const originalText = cell.textContent.trim();
-                        const dateValue = originalText.split('-').reverse().join('-');
-                        cell.innerHTML = `<input type="date" class="date-input" value="${dateValue || ''}">`;
-                        cell.removeAttribute('contenteditable');
-                    } else {
-                        cell.classList.add('editable-cell');
-                        cell.removeAttribute('contenteditable');
-                    }
-                } else {
-                    cell.setAttribute('contenteditable', 'false');
-                }
-            });
-            this._createMobileView();
-        }
-        _createMobileView() {
-            this.mobileViewContainer.innerHTML = '';
-            if (this.data.eventType && this.data.eventType !== 'normal') {
-                const eventTexts = { 'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం', 'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో', 'convention': 'ప్రాదేశిక సమావేశం' };
-                const firstRow = this.tableBody.rows[0];
-                const dateCell = firstRow.cells[2];
-                const dateInput = dateCell ? dateCell.querySelector('.date-input') : null;
-                const dateValue = dateInput ? dateInput.value : '';
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'mobile-item';
-                itemDiv.innerHTML = `
-                    <div class="item-label special-event-text">${eventTexts[this.data.eventType]}</div>
-                    <div class="input-group">
-                        <div class="item-label">తేదీ:</div>
-                        <input type="date" class="item-input date-input" data-row-index="0" data-cell-index="2" value="${dateValue}">
-                    </div>
-                `;
-                this.mobileViewContainer.appendChild(itemDiv);
-                return;
-            }
-            Array.from(this.tableBody.rows).forEach((row, rowIndex) => {
-                if (row.classList.contains('header-row')) return;
-                const editableCellsInRow = Array.from(row.cells).filter(c => c.hasAttribute('data-user-editable'));
-                if (editableCellsInRow.length === 0) return;
-                const groupedInputs = {};
-                editableCellsInRow.forEach(cell => {
-                    const cellIndex = cell.cellIndex;
-                    let labelText = '';
-                    for (let i = cellIndex - 1; i >= 0; i--) {
-                        const potentialLabelCell = row.cells[i];
-                        if (potentialLabelCell && !potentialLabelCell.hasAttribute('data-user-editable') && potentialLabelCell.textContent.trim() !== '') {
-                            const tempDiv = document.createElement('div');
-                            tempDiv.innerHTML = potentialLabelCell.innerHTML;
-                            labelText = tempDiv.textContent.trim().replace('⠿', '').replace(':', '');
-                            break;
-                        }
-                    }
-                    if (!labelText && row.cells[0] && !row.cells[0].hasAttribute('data-user-editable')) {
-                        const tempDiv = document.createElement('div');
-                        tempDiv.innerHTML = row.cells[0].innerHTML;
-                        labelText = tempDiv.textContent.trim().replace('⠿', '').replace(':', '');
-                    }
-                    if (!groupedInputs[labelText]) groupedInputs[labelText] = [];
-                    groupedInputs[labelText].push(cell);
-                });
-                for (const label in groupedInputs) {
-                    const itemDiv = document.createElement('div');
-                    itemDiv.className = 'mobile-item';
-                    if (label) {
-                        const labelDiv = document.createElement('div');
-                        labelDiv.className = 'item-label';
-                        labelDiv.textContent = label;
-                        itemDiv.appendChild(labelDiv);
-                    }
-                    const inputsContainer = document.createElement('div');
-                    groupedInputs[label].forEach(cell => {
-                        const cellIndex = cell.cellIndex;
-                        const inputWrapper = document.createElement('div');
-                        inputWrapper.className = 'input-group';
-                        if (rowIndex === 0) {
-                            const dateInput = cell.querySelector('.date-input');
-                            const dateValue = dateInput ? dateInput.value : '';
-                            const inputEl = document.createElement('input');
-                            inputEl.type = 'date';
-                            inputEl.className = 'item-input';
-                            inputEl.value = dateValue;
-                            inputEl.dataset.rowIndex = rowIndex;
-                            inputEl.dataset.cellIndex = cellIndex;
-                            inputWrapper.appendChild(inputEl);
-                        } else {
-                            const inputDiv = document.createElement('div');
-                            inputDiv.className = 'item-input editable-cell';
-                            inputDiv.textContent = cell.textContent.trim() || 'Select Name';
-                            inputDiv.dataset.rowIndex = rowIndex;
-                            inputDiv.dataset.cellIndex = cellIndex;
-                            inputWrapper.appendChild(inputDiv);
-                        }
-                        inputsContainer.appendChild(inputWrapper);
-                    });
-                    itemDiv.appendChild(inputsContainer);
-                    this.mobileViewContainer.appendChild(itemDiv);
-                }
-            });
-        }
-       
-        getContent() {
-            const tempBody = this.tableBody.cloneNode(true);
-            const dateInput = tempBody.querySelector('.date-input');
-            if (dateInput && dateInput.value) {
-                const cell = dateInput.parentElement;
-                cell.textContent = dateInput.value.split('-').reverse().join('-');
-            }
-            tempBody.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
-            tempBody.querySelectorAll('.editable-cell').forEach(el => el.classList.remove('editable-cell'));
-            return tempBody.innerHTML;
-        }
-        applyEventType(eventType, shouldSave = true) {
-            this.data.eventType = eventType;
-            const allRows = this.tableBody.querySelectorAll('tr');
-            const firstRow = this.tableBody.rows[0];
-            if (eventType === 'normal') {
-                allRows.forEach(row => row.style.display = '');
-                if (firstRow && firstRow.dataset.originalContent) {
-                    firstRow.innerHTML = firstRow.dataset.originalContent;
-                    delete firstRow.dataset.originalContent;
-                }
-            } else {
-                const eventTexts = {
-                    'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం',
-                    'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో',
-                    'convention': 'ప్రాదేశిక సమావేశం'
-                };
-                allRows.forEach((row, index) => {
-                    row.style.display = (index === 0) ? '' : 'none';
-                });
-                let existingDateValue = '';
-                if (firstRow) {
-                    if (!firstRow.dataset.originalContent) firstRow.dataset.originalContent = firstRow.innerHTML;
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = firstRow.dataset.originalContent;
-                    const originalDateCell = tempDiv.querySelector('[data-user-editable]');
-                    if (originalDateCell) existingDateValue = originalDateCell.textContent.trim().split('-').reverse().join('-');
-                }
-                firstRow.innerHTML = `
-                    <th colspan="1" class="special-event-text">${eventTexts[eventType]}</th>
-                    <td style="text-align: right; font-weight: 700;">తేదీ:</td>
-                    <td data-user-editable="true"><input type="date" class="date-input" value="${existingDateValue}"></td>
-                `;
-            }
-            this._createMobileView();
-            if (shouldSave) this.parentProject.triggerSave();
-        }
-        setupEventListeners() {
-            this.element.addEventListener('input', (e) => {
-                const input = e.target;
-                if(input.classList.contains('item-input')) {
-                    const rowIndex = input.dataset.rowIndex;
-                    const cellIndex = input.dataset.cellIndex;
-                    const targetCell = this.tableBody.rows[rowIndex].cells[cellIndex];
-                    if(input.type === 'date') {
-                        const tableInput = targetCell.querySelector('.date-input');
-                        if(tableInput) tableInput.value = input.value;
-                    } else {
-                         targetCell.textContent = input.textContent;
-                    }
-                }
-                this.parentProject.triggerSave();
-            });
-            this.eventBtn.addEventListener('click', (e) => {
-                activeEventScheduleTable = this;
-                const rect = e.currentTarget.getBoundingClientRect();
-                eventContextMenu.style.display = 'block';
-                eventContextMenu.style.top = `${rect.bottom}px`;
-                eventContextMenu.style.left = `${rect.left}px`;
-            });
-        }
-    }
-   
-    class Project {
-        constructor(id, initialData, collectionRef) {
-            this.id = id;
-            this.data = initialData;
-            this.collectionRef = collectionRef;
-            this.scheduleTables = [];
-            this.isSaving = false;
-            this.saveTimeout = null;
-            this.render();
-            this.setupEventListeners();
-        }
-        render(newData) {
-            if (newData) this.data = newData;
-            if (document.activeElement !== projectTitleEl) projectTitleEl.textContent = this.data.name;
-            schedulesWrapper.innerHTML = '';
-            this.scheduleTables = [];
-            this.data.tables.forEach((tableData, index) => {
-                this.scheduleTables.push(new ScheduleTable(this, tableData, index));
-            });
-        }
-        triggerSave() {
-            clearTimeout(this.saveTimeout);
-            if (!this.isSaving) {
-                this.saveTimeout = setTimeout(() => this.save(), 500);
-            }
-        }
-       
-        save() {
-            this.isSaving = true;
-            updateStatus('Syncing...', 'syncing');
-            this.scheduleTables.forEach(table => {
-                const dateInput = table.tableBody.querySelector('.date-input');
-                if (dateInput && dateInput.value) {
-                    const cell = dateInput.parentElement;
-                    cell.textContent = dateInput.value.split('-').reverse().join('-');
-                }
-            });
-            const updatedTablesData = this.scheduleTables.map(table => ({
-                title: table.data.title,
-                content: table.getContent(),
-                eventType: table.data.eventType || 'normal'
-            }));
-            const payload = { name: projectTitleEl.textContent, tables: updatedTablesData };
-            this.collectionRef.doc(this.id).update(payload)
-                .then(() => {
-                    updateStatus('Synced', 'synced');
-                    this.isSaving = false;
-                })
-                .catch(err => {
-                    console.error("Save failed:", err);
-                    updateStatus('Error', 'error');
-                    this.isSaving = false;
-                });
-        }
-        setupEventListeners() {
-            projectTitleEl.addEventListener('input', () => this.triggerSave());
-        }
-    }
-    auth.onAuthStateChanged(async user => {
-        if (user) {
-            if (user.email === ADMIN_EMAIL) { window.location.replace('./admin.html'); return; }
-            currentUser = user;
-            await fetchMembers();
-            userSchedulesCollection = db.collection(`userSchedules/${currentUser.uid}/schedules`);
-            appContainer.classList.remove('hidden');
-            document.body.classList.add('auth-ready');
-            const profileNameEl = document.querySelector('.profile-name');
-            if (profileNameEl) profileNameEl.textContent = user.email;
-           
-            setupGlobalUI();
-            const params = new URLSearchParams(window.location.search);
-            currentProjectId = params.get('id');
-            if (currentProjectId) { initEditor(); } else { initCreationFlow(); }
-        } else {
-            window.location.replace('./login.html');
-        }
-    });
-    function initEditor() {
-        if (!currentUser || !currentProjectId) return;
-        if (currentListener) currentListener();
-        currentListener = userSchedulesCollection.doc(currentProjectId).onSnapshot(doc => {
-            if (doc.exists) {
-                const remoteData = doc.data();
-                if (!activeProject) {
-                    activeProject = new Project(doc.id, remoteData, userSchedulesCollection);
-                } else if (!activeProject.isSaving) {
-                    activeProject.render(remoteData);
-                }
-                 updateStatus('Synced', 'synced');
-            } else {
-                alert("This schedule may have been deleted.");
-                window.location.href = './dashboard.html';
-            }
-        }, error => {
-             updateStatus('Error', 'error');
-        });
-    }
-    async function initCreationFlow() {
-        document.getElementById('project-header').style.display = 'none';
-        document.getElementById('print-button').style.display = 'none';
-        const templatesCollection = db.collection("templates");
-        const snapshot = await templatesCollection.orderBy("createdAt").get();
-        templateList.innerHTML = '';
-        if (snapshot.empty) {
-            templateList.innerHTML = '<li>No templates available.</li>';
-        } else {
-            snapshot.docs.forEach(doc => {
-                const li = document.createElement('li');
-                li.innerHTML = `<label><input type="checkbox" data-id="${doc.id}" data-name="${doc.data().name}" data-content="${encodeURIComponent(doc.data().content)}"> ${doc.data().name}</label>`;
-                templateList.appendChild(li);
-            });
-        }
-        templateSelectionModal.style.display = 'flex';
-    }
-    function setupGlobalUI() {
-        // Menu Toggle Logic
-        const menuToggleButton = document.getElementById('menu-toggle-button');
-        const slideMenu = document.getElementById('slide-menu');
-        const menuOverlay = document.getElementById('menu-overlay');
-        const body = document.body;
-       
-        function closeMenu() {
-            slideMenu.classList.remove('is-open');
-            menuOverlay.classList.remove('is-open');
-            body.classList.remove('menu-open');
-        }
-        menuToggleButton.addEventListener('click', () => {
-            if (body.classList.contains('menu-open')) {
-                closeMenu();
-            } else {
-                slideMenu.classList.add('is-open');
-                menuOverlay.classList.add('is-open');
-                body.classList.add('menu-open');
-            }
-        });
-        menuOverlay.addEventListener('click', closeMenu);
-        // App-specific UI
-        document.getElementById('print-button').addEventListener('click', generatePdf);
-        document.getElementById('cancel-template-selection').addEventListener('click', () => window.location.href = './dashboard.html');
-        document.getElementById('confirm-template-selection').addEventListener('click', async () => {
-            const newProjectName = document.getElementById('new-project-name').value.trim();
-            if (!newProjectName) return alert("Please enter a name for your new project.");
-            const selectedCheckboxes = Array.from(templateList.querySelectorAll('input:checked'));
-            if (selectedCheckboxes.length === 0) return alert("Please select at least one template.");
-            const tablesArray = selectedCheckboxes.map(input => {
-                const rawContent = decodeURIComponent(input.dataset.content);
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = `<table><tbody>${rawContent}</tbody></table>`;
-                tempDiv.querySelectorAll('td, th').forEach(cell => {
-                    const isEssentiallyEmpty = cell.textContent.trim() === '' && !cell.querySelector('img');
-                    if (isEssentiallyEmpty) cell.setAttribute('data-user-editable', 'true');
-                });
-                return { title: input.dataset.name, content: tempDiv.querySelector('tbody').innerHTML, eventType: 'normal' };
-            });
-            const newDocRef = await userSchedulesCollection.add({
-                name: newProjectName,
-                tables: tablesArray,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            window.location.href = `./editor.html?id=${newDocRef.id}`;
-        });
-       
-        eventContextMenu.addEventListener('click', (e) => {
-            const target = e.target.closest('.context-menu-item');
-            if (target && activeEventScheduleTable) {
-                activeEventScheduleTable.applyEventType(target.dataset.eventType);
-            }
-            eventContextMenu.style.display = 'none';
-            activeEventScheduleTable = null;
-        });
-        schedulesWrapper.addEventListener('click', e => {
-            const targetElement = e.target.closest('.editable-cell, [contenteditable="true"]');
-            if (!targetElement || targetElement.getAttribute('contenteditable') === 'true') return;
-            let realCell, mobileDiv = null;
-            if (targetElement.tagName === 'DIV') { // Mobile input
-                mobileDiv = targetElement;
-                const tableBody = mobileDiv.closest('.schedule-block').querySelector('.schedule-table-body');
-                realCell = tableBody.rows[mobileDiv.dataset.rowIndex].cells[mobileDiv.dataset.cellIndex];
-            } else { // Desktop cell
-                realCell = targetElement;
-            }
-            openMemberDropdown(realCell, mobileDiv);
-        });
-        memberDropdown.addEventListener('click', e => {
-            const item = e.target.closest('.member-dropdown-item');
-            if (item && activeCellForDropdown.realCell) {
-                const newName = item.dataset.name;
-                activeCellForDropdown.realCell.textContent = newName;
-                if (activeCellForDropdown.mobileDiv) {
-                    activeCellForDropdown.mobileDiv.textContent = newName;
-                }
-                activeProject.triggerSave();
-            }
-            memberDropdown.style.display = 'none';
-            activeCellForDropdown = null;
-        });
-        document.addEventListener('click', (e) => {
-            if (!eventContextMenu.contains(e.target) && !e.target.closest('.event-btn')) { eventContextMenu.style.display = 'none'; }
-            if (!memberDropdown.contains(e.target) && !e.target.closest('.editable-cell')) { memberDropdown.style.display = 'none'; }
-        });
-    }
-   
-    function isCellInMinistrySection(cell) {
-        const table = cell.closest('table');
-        if (!table) return false;
-        const allRows = Array.from(table.querySelectorAll('tbody > tr'));
-        const cellRow = cell.closest('tr');
-        const cellIndex = allRows.indexOf(cellRow);
-        let ministryHeaderIndex = -1;
-        let nextHeaderIndex = allRows.length;
-        allRows.forEach((row, index) => {
-            if(row.classList.contains('header-row')) {
-                if (row.dataset.section === 'ministry') {
-                    ministryHeaderIndex = index;
-                } else if (ministryHeaderIndex !== -1 && index > ministryHeaderIndex) {
-                    if (index < nextHeaderIndex) nextHeaderIndex = index;
-                }
-            }
-        });
-        if (ministryHeaderIndex === -1) return false;
-        return cellIndex > ministryHeaderIndex && cellIndex < nextHeaderIndex;
-    }
-    function openMemberDropdown(cell, mobileDiv = null) {
-        const isInMinistry = isCellInMinistrySection(cell);
-        memberDropdown.innerHTML = '';
-        let listToShow;
-        if (isInMinistry) {
-            const sortedSisters = [...members.sisters].sort((a, b) => a.name.localeCompare(b.name));
-            const sortedBrothers = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
-            listToShow = [...sortedSisters, ...sortedBrothers];
-        } else {
-            listToShow = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
-        }
-        listToShow.forEach(member => {
-            const item = document.createElement('button');
-            item.className = 'member-dropdown-item';
-            item.dataset.name = member.name;
-            item.innerHTML = `<span>${member.name}</span>` + (member.isServant ? '<span class="servant-tag">Servant</span>' : '');
-            memberDropdown.appendChild(item);
-        });
-        const rect = (mobileDiv || cell).getBoundingClientRect();
-        memberDropdown.style.display = 'block';
-        memberDropdown.style.top = `${rect.bottom}px`;
-        memberDropdown.style.left = `${rect.left}px`;
-        memberDropdown.style.width = `${rect.width}px`;
-        activeCellForDropdown = { realCell: cell, mobileDiv: mobileDiv };
-    }
-    async function generatePdf() {
-        const printButton = document.getElementById('print-button');
-        printButton.disabled = true;
-        printButton.querySelector('span:last-child').textContent = 'Generating...';
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const A4_WIDTH_MM = 210, A4_HEIGHT_MM = 297, MARGIN_MM = 10, PAGE_SPACING_MM = 5;
-        const USABLE_WIDTH = A4_WIDTH_MM - (MARGIN_MM * 2);
-        const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_MM * 2);
-        const printContainer = document.createElement('div');
-        printContainer.id = 'print-container';
-        document.body.appendChild(printContainer);
-        const itemsToPrint = [];
-        // INSIDE THE generatePdf function...
-        for (const block of document.querySelectorAll('.schedule-block')) {
-            const clone = block.cloneNode(true);
-           
-            clone.querySelector('.event-btn').style.display = 'none';
-            clone.querySelector('.mobile-view-container').style.display = 'none';
-            clone.querySelector('table').style.display = 'table';
-           
-            const titleEl = clone.querySelector('.schedule-title');
-            if (titleEl) {
-                titleEl.style.display = 'none';
-            }
-            clone.style.marginBottom = '0';
-           
-           
-            clone.style.padding = '0';
-            clone.style.border = 'none';
-            // --- START: ADD THIS NEW CODE BLOCK ---
-            // Increase the height of all table cells for better spacing in the PDF
-            const allCells = clone.querySelectorAll('th, td');
-            allCells.forEach(cell => {
-                cell.style.height = '40px'; // Adjust this value as needed
-            });
-            // --- END: ADD THIS NEW CODE BLOCK ---
-            printContainer.appendChild(clone);
-           
-            const canvas = await html2canvas(clone, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
-           
-            // --- And continue with the rest of the logic ---
-            const imgData = canvas.toDataURL('image/jpeg', 0.8);
-            const imgProps = pdf.getImageProperties(imgData);
-            const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
-            itemsToPrint.push({ imgData, width: USABLE_WIDTH, height: imgHeight });
-        }
-       
-        document.body.removeChild(printContainer);
-        let currentY = MARGIN_MM;
-        // --- START: NEW, ADVANCED PDF LAYOUT LOGIC ---
-        // Stage 1: Group all printable items into pages first.
-        const pages = [];
-        let currentPageItems = [];
-        let currentPageHeight = 0;
-        itemsToPrint.forEach(item => {
-            const itemHeightWithSpacing = currentPageItems.length > 0 ? item.height + PAGE_SPACING_MM : item.height;
-            if (currentPageHeight + itemHeightWithSpacing > USABLE_HEIGHT && currentPageItems.length > 0) {
-                pages.push(currentPageItems); // Finalize the current page
-                currentPageItems = [item]; // Start a new page with the current item
-                currentPageHeight = item.height;
-            } else {
-                currentPageItems.push(item);
-                currentPageHeight += itemHeightWithSpacing;
-            }
-        });
-        if (currentPageItems.length > 0) {
-            pages.push(currentPageItems); // Add the last page
-        }
-        // Stage 2: Render each page with calculated vertical alignment.
-        pages.forEach((pageItems, pageIndex) => {
-            if (pageIndex > 0) {
-                pdf.addPage();
-            }
-            // Calculate the total height of all content on this specific page
-            const totalContentHeight = pageItems.reduce((sum, item) => sum + item.height, 0) + (PAGE_SPACING_MM * (pageItems.length - 1));
-            let startY = MARGIN_MM; // Default: top-aligned
-            // *** This is the key logic for your request ***
-            // If there's more than one item on the page, center the entire content block vertically.
-            if (pageItems.length > 1) {
-                const remainingSpace = USABLE_HEIGHT - totalContentHeight;
-                if (remainingSpace > 0) {
-                    startY = MARGIN_MM + (remainingSpace / 2);
-                }
-            }
-            // Now, draw the items for this page starting at the calculated Y position
-            let currentY = startY;
-            pageItems.forEach(item => {
-                pdf.addImage(item.imgData, 'JPEG', MARGIN_MM, currentY, item.width, item.height);
-                currentY += item.height + PAGE_SPACING_MM;
-            });
-        });
-        // --- END: NEW LOGIC ---
-        const fileName = `${projectTitleEl.textContent.trim() || 'schedule'}.pdf`;
-        pdf.save(fileName);
-        printButton.disabled = false;
-        printButton.querySelector('span:last-child').textContent = 'Download PDF';
-    }
+    'use strict';
+    const firebaseConfig = {
+      apiKey: "AIzaSyDLK5f4C-nfG6fz0ajqqay1q9TTN6rxgmQ",
+      authDomain: "schedule-harsha.firebaseapp.com",
+      projectId: "schedule-harsha",
+      storageBucket: "schedule-harsha.firebasestorage.app",
+      messagingSenderId: "965478014820",
+      appId: "1:965478014820:web:1c36c5d890a27e599aa471"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const ADMIN_EMAIL = 'harshavardhanjw@gmail.com';
+    let currentUser = null;
+    let currentProjectId = null;
+    let userSchedulesCollection = null;
+    let membersCollection = null;
+    let members = { brothers: [], sisters: [] };
+    let currentListener = null;
+    let activeProject = null;
+    let activeEventScheduleTable = null;
+    let activeCellForDropdown = null;
+    let activeMobileInput = null; // NEW: Reference to the tapped mobile div
+
+    // Main App Elements
+    const appContainer = document.getElementById('app-container');
+    const projectTitleEl = document.getElementById('project-title');
+    const schedulesWrapper = document.getElementById('schedules-wrapper');
+    const templateSelectionModal = document.getElementById('template-selection-modal');
+    const templateList = document.getElementById('template-list');
+    const statusIndicator = document.querySelector('.status-indicator');
+    
+    // Desktop Dropdowns
+    const eventContextMenu = document.getElementById('event-context-menu');
+    const memberDropdown = document.getElementById('member-dropdown');
+
+    // NEW: Mobile Bottom Sheet Elements
+    const mobileDropdownBackdrop = document.getElementById('mobile-dropdown-backdrop');
+    const mobileMemberDropdown = document.getElementById('mobile-member-dropdown');
+    const mobileMemberClose = document.getElementById('mobile-member-close');
+    const memberDropdownList = document.getElementById('member-dropdown-list');
+    const memberSearchInput = document.getElementById('member-search-input');
+    const memberDropdownTitle = document.getElementById('member-dropdown-title');
+
+    const mobileEventDropdown = document.getElementById('mobile-event-type-dropdown');
+    const mobileEventClose = document.getElementById('mobile-event-close');
+    const eventTypeList = document.getElementById('event-type-list');
+
+    // Event display names (for consistency)
+    const eventDisplayNames = {
+        'normal': 'Normal',
+        'co-visit': 'CO Visit',
+        'assembly': 'Assembly',
+        'convention': 'Convention'
+    };
+
+    function updateStatus(text, status) {
+        statusIndicator.textContent = text;
+        statusIndicator.dataset.status = status;
+    }
+
+    async function fetchMembers() {
+        if (!currentUser) return;
+        membersCollection = db.collection(`users/${currentUser.uid}/members`);
+        const snapshot = await membersCollection.orderBy("name").get();
+        members = { brothers: [], sisters: [] };
+        snapshot.forEach(doc => {
+            const member = { id: doc.id, ...doc.data() };
+            if (member.type === 'brother') {
+                members.brothers.push(member);
+            } else {
+                members.sisters.push(member);
+            }
+        });
+    }
+
+    class ScheduleTable {
+        constructor(parentProject, tableData, index) {
+            this.parentProject = parentProject;
+            this.data = tableData;
+            this.index = index;
+            this.initDOM();
+            this.render();
+            this.setupEventListeners();
+            this.applyEventType(this.data.eventType || 'normal', false);
+        }
+
+        initDOM() {
+            const templateClone = document.getElementById('schedule-template').content.cloneNode(true);
+            this.element = templateClone.querySelector('.schedule-block');
+            this.titleEl = this.element.querySelector('.schedule-title');
+            this.tableBody = this.element.querySelector('.schedule-table-body');
+            this.mobileViewContainer = this.element.querySelector('.mobile-view-container');
+            this.eventBtn = this.element.querySelector('.event-btn');
+            schedulesWrapper.appendChild(this.element);
+        }
+
+        render() {
+            this.titleEl.textContent = this.data.title;
+            this.tableBody.innerHTML = this.data.content;
+            
+            this.tableBody.querySelectorAll('td, th').forEach(cell => {
+                if (cell.hasAttribute('data-user-editable')) {
+                    const isFirstRow = cell.closest('tr') === this.tableBody.rows[0];
+                    if (isFirstRow) {
+                        const originalText = cell.textContent.trim();
+                        const dateValue = originalText.split('-').reverse().join('-');
+                        cell.innerHTML = `<input type="date" class="date-input" value="${dateValue || ''}">`;
+                        cell.removeAttribute('contenteditable');
+                    } else {
+                        cell.classList.add('editable-cell');
+                        cell.removeAttribute('contenteditable');
+                        // ADDED: Add member-type to desktop cell for later reference
+                        const labelCell = cell.previousElementSibling;
+                        let memberType = 'brother';
+                        if (labelCell && labelCell.textContent.includes('సహోదరి')) {
+                            memberType = 'sister';
+                        }
+                        cell.dataset.memberType = memberType;
+                    }
+                } else {
+                    cell.setAttribute('contenteditable', 'false');
+                }
+            });
+            // Initial mobile view creation
+            this._createMobileView();
+        }
+
+        // NEW: Rewritten _createMobileView for the new UI
+        _createMobileView() {
+            this.mobileViewContainer.innerHTML = '';
+            const eventType = this.data.eventType || 'normal';
+
+            // 1. Add Event Type Selector
+            const eventItemDiv = document.createElement('div');
+            eventItemDiv.className = 'mobile-item';
+            eventItemDiv.innerHTML = `
+                <div class="item-label">Event Type</div>
+                <div class="item-input mobile-editable-field event-type-selector" data-event-type="${eventType}">
+                    ${eventDisplayNames[eventType]}
+                </div>
+            `;
+            this.mobileViewContainer.appendChild(eventItemDiv);
+
+            // 2. Add Date Field (always visible)
+            const firstRow = this.tableBody.rows[0];
+            const dateCell = firstRow.cells[2];
+            const dateInput = dateCell ? dateCell.querySelector('.date-input') : null;
+            const dateValue = dateInput ? dateInput.value : '';
+
+            const dateItemDiv = document.createElement('div');
+            dateItemDiv.className = 'mobile-item';
+            dateItemDiv.innerHTML = `
+                <div class="item-label">తేదీ (Date)</div>
+                <input type="date" class="item-input mobile-date-input" data-row-index="0" data-cell-index="2" value="${dateValue}">
+            `;
+            this.mobileViewContainer.appendChild(dateItemDiv);
+
+            // 3. Handle Special Event Display
+            if (eventType !== 'normal') {
+                const eventWrapper = document.createElement('div');
+                eventWrapper.className = 'mobile-special-event-display';
+                eventWrapper.innerHTML = `<div class="special-event-text">${eventDisplayNames[eventType]}</div>`;
+                this.mobileViewContainer.appendChild(eventWrapper);
+                return; // Stop here for special events
+            }
+
+            // 4. Add Member/Assignment Fields (for 'normal' events only)
+            Array.from(this.tableBody.rows).forEach((row, rowIndex) => {
+                if (row.classList.contains('header-row') || rowIndex === 0) return; // Skip headers and date row
+
+                const editableCellsInRow = Array.from(row.cells).filter(c => c.hasAttribute('data-user-editable'));
+                if (editableCellsInRow.length === 0) return;
+
+                const groupedInputs = {};
+
+                editableCellsInRow.forEach(cell => {
+                    let labelText = '';
+                    for (let i = cell.cellIndex - 1; i >= 0; i--) {
+                        const potentialLabelCell = row.cells[i];
+                        if (potentialLabelCell && !potentialLabelCell.hasAttribute('data-user-editable') && potentialLabelCell.textContent.trim() !== '') {
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = potentialLabelCell.innerHTML;
+                            labelText = tempDiv.textContent.trim().replace('⠿', '').replace(':', '');
+                            break;
+                        }
+                    }
+                    if (!labelText && row.cells[0] && !row.cells[0].hasAttribute('data-user-editable')) {
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = row.cells[0].innerHTML;
+                        labelText = tempDiv.textContent.trim().replace('⠿', '').replace(':', '');
+                    }
+                    if (!groupedInputs[labelText]) groupedInputs[labelText] = [];
+                    groupedInputs[labelText].push(cell);
+                });
+
+                for (const label in groupedInputs) {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'mobile-item';
+                    if (label) {
+                        const labelDiv = document.createElement('div');
+                        labelDiv.className = 'item-label';
+                        labelDiv.textContent = label;
+                        itemDiv.appendChild(labelDiv);
+                    }
+
+                    groupedInputs[label].forEach(cell => {
+                        const cellIndex = cell.cellIndex;
+                        const memberType = cell.dataset.memberType || 'brother'; // Get type from desktop cell
+                        const cellText = cell.textContent.trim();
+                        
+                        const inputDiv = document.createElement('div');
+                        inputDiv.className = 'item-input mobile-editable-field';
+                        inputDiv.dataset.rowIndex = rowIndex;
+                        inputDiv.dataset.cellIndex = cellIndex;
+                        inputDiv.dataset.memberType = memberType;
+                        inputDiv.dataset.label = label; // Store label for the dropdown title
+
+                        if (cellText) {
+                            inputDiv.textContent = cellText;
+                        } else {
+                            inputDiv.textContent = 'Select Name';
+                            inputDiv.classList.add('placeholder');
+                        }
+                        itemDiv.appendChild(inputDiv);
+                    });
+                    this.mobileViewContainer.appendChild(itemDiv);
+                }
+            });
+        }
+
+        getContent() {
+            const tempBody = this.tableBody.cloneNode(true);
+            const dateInput = tempBody.querySelector('.date-input');
+            if (dateInput && dateInput.value) {
+                const cell = dateInput.parentElement;
+                cell.textContent = dateInput.value.split('-').reverse().join('-');
+            }
+            tempBody.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+            tempBody.querySelectorAll('.editable-cell').forEach(el => el.classList.remove('editable-cell'));
+            return tempBody.innerHTML;
+        }
+
+        applyEventType(eventType, shouldSave = true) {
+            this.data.eventType = eventType;
+            const allRows = this.tableBody.querySelectorAll('tr');
+            const firstRow = this.tableBody.rows[0];
+
+            if (eventType === 'normal') {
+                allRows.forEach(row => row.style.display = '');
+                if (firstRow && firstRow.dataset.originalContent) {
+                    firstRow.innerHTML = firstRow.dataset.originalContent;
+                    delete firstRow.dataset.originalContent;
+                }
+            } else {
+                allRows.forEach((row, index) => {
+                    row.style.display = (index === 0) ? '' : 'none';
+                });
+                let existingDateValue = '';
+                if (firstRow) {
+                    if (!firstRow.dataset.originalContent) firstRow.dataset.originalContent = firstRow.innerHTML;
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = firstRow.dataset.originalContent;
+                    const originalDateCell = tempDiv.querySelector('[data-user-editable]');
+                    if (originalDateCell) existingDateValue = originalDateCell.textContent.trim().split('-').reverse().join('-');
+                }
+                firstRow.innerHTML = `
+                    <th colspan="1" class="special-event-text">${eventDisplayNames[eventType]}</th>
+                    <td style="text-align: right; font-weight: 700;">తేదీ:</td>
+                    <td data-user-editable="true"><input type="date" class="date-input" value="${existingDateValue}"></td>
+                `;
+            }
+
+            // Re-render the mobile view to reflect the change
+            this._createMobileView();
+            if (shouldSave) this.parentProject.triggerSave();
+        }
+
+        setupEventListeners() {
+            // Listener for desktop table AND mobile date inputs
+            this.element.addEventListener('input', (e) => {
+                const input = e.target;
+                let targetCell;
+                
+                // Handle mobile date input
+                if(input.classList.contains('mobile-date-input')) {
+                    const rowIndex = input.dataset.rowIndex;
+                    const cellIndex = input.dataset.cellIndex;
+                    targetCell = this.tableBody.rows[rowIndex].cells[cellIndex];
+                    const tableInput = targetCell.querySelector('.date-input');
+                    if(tableInput) tableInput.value = input.value;
+                }
+                // Handle desktop date input
+                else if (input.classList.contains('date-input')) {
+                    const mobileInput = this.mobileViewContainer.querySelector('.mobile-date-input');
+                    if(mobileInput) mobileInput.value = input.value;
+                }
+                
+                this.parentProject.triggerSave();
+            });
+
+            // Listener for desktop event button
+            this.eventBtn.addEventListener('click', (e) => {
+                // This logic is for DESKTOP only
+                if (window.innerWidth > 768) {
+                    activeEventScheduleTable = this;
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    eventContextMenu.style.display = 'block';
+                    eventContextMenu.style.top = `${rect.bottom}px`;
+                    eventContextMenu.style.left = `${rect.left}px`;
+                }
+                // Mobile logic is handled by the '.mobile-view-container' listener
+            });
+
+            // NEW: Click listener for MOBILE view
+            this.mobileViewContainer.addEventListener('click', (e) => {
+                const target = e.target.closest('.mobile-editable-field');
+                if (!target) return;
+
+                if (target.classList.contains('event-type-selector')) {
+                    // --- Handle Event Type selection ---
+                    activeEventScheduleTable = this; // Set context
+                    showEventDropdown(this.data.eventType || 'normal');
+                }
+                else {
+                    // --- Handle Member selection ---
+                    const rowIndex = target.dataset.rowIndex;
+          S          const cellIndex = target.dataset.cellIndex;
+                    const memberType = target.dataset.memberType;
+                    const label = target.dataset.label;
+
+                    // Set global context for the dropdown to use
+                    activeCellForDropdown = this.tableBody.rows[rowIndex].cells[cellIndex];
+                    activeMobileInput = target; // The mobile div we tapped
+                    
+                    memberDropdownTitle.textContent = label || "Select Name";
+                    showMemberDropdown(memberType, target.textContent);
+                }
+            });
+        }
+    }
+    
+    class Project {
+        constructor(id, initialData, collectionRef) {
+            this.id = id;
+            this.data = initialData;
+          :     this.collectionRef = collectionRef;
+            this.scheduleTables = [];
+            this.isSaving = false;
+            this.saveTimeout = null;
+            this.render();
+            this.setupEventListeners();
+        }
+
+        render(newData) {
+            if (newData) this.data = newData;
+            if (document.activeElement !== projectTitleEl) projectTitleEl.textContent = this.data.name;
+            schedulesWrapper.innerHTML = '';
+            this.scheduleTables = [];
+            this.data.tables.forEach((tableData, index) => {
+                this.scheduleTables.push(new ScheduleTable(this, tableData, index));
+            });
+        }
+
+        triggerSave() {
+            clearTimeout(this.saveTimeout);
+            updateStatus('Saving...', 'syncing');
+            if (!this.isSaving) {
+                this.saveTimeout = setTimeout(() => this.save(), 1000); // Increased delay
+            }
+        }
+        
+        async save() {
+            this.isSaving = true;
+            
+            const updatedTables = this.scheduleTables.map(table => ({
+                title: table.data.title,
+                content: table.getContent(),
+                eventType: table.data.eventType || 'normal'
+            }));
+            
+            const updatedData = {
+                name: projectTitleEl.textContent,
+                tables: updatedTables,
+                lastModified: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            try {
+                await this.collectionRef.doc(this.id).set(updatedData, { merge: true });
+                updateStatus('Synced', 'synced');
+            } catch (error) {
+                console.error("Error saving project:", error);
+                updateStatus('Error', 'error');
+            } finally {
+                this.isSaving = false;
+            }
+        }
+
+        setupEventListeners() {
+            projectTitleEl.addEventListener('input', () => this.triggerSave());
+        }
+    }
+    
+    // --- NEW: MOBILE DROPDOWN HELPER FUNCTIONS ---
+
+    function showEventDropdown(currentType) {
+        document.body.classList.add('dropdown-open');
+        mobileDropdownBackdrop.classList.add('active');
+        mobileEventDropdown.classList.add('active');
+        // Highlight the active event type
+        eventTypeList.querySelectorAll('.dropdown-item').forEach(item => {
+            item.classList.toggle('active', item.dataset.eventType === currentType);
+        });
+    }
+    
+    function hideEventDropdown() {
+        document.body.classList.remove('dropdown-open');
+        mobileDropdownBackdrop.classList.remove('active');
+        mobileEventDropdown.classList.remove('active');
+        activeEventScheduleTable = null;
+    }
+
+    function showMemberDropdown(memberType, currentName) {
+        const list = (memberType === 'sister') ? members.sisters : members.brothers;
+        memberDropdownList.innerHTML = ''; // Clear previous list
+        memberSearchInput.value = ''; // Clear search
+
+        // Add a "Clear" option
+        const clearButton = document.createElement('button');
+        clearButton.className = 'dropdown-item';
+        clearButton.textContent = 'Clear Assignment';
+        clearButton.dataset.name = '';
+        memberDropdownList.appendChild(clearButton);
+
+        list.forEach(member => {
+            const item = document.createElement('button');
+            item.className = 'dropdown-item';
+            item.textContent = member.name;
+            item.dataset.name = member.name;
+            if (member.name === currentName) {
+                item.classList.add('active');
+            }
+            if (member.isServant) {
+                const tag = document.createElement('span');
+                tag.className = 'servant-tag';
+                tag.textContent = 'Servant';
+                item.appendChild(tag);
+            }
+            memberDropdownList.appendChild(item);
+        });
+        
+        document.body.classList.add('dropdown-open');
+        mobileDropdownBackdrop.classList.add('active');
+        mobileMemberDropdown.classList.add('active');
+        setTimeout(() => memberSearchInput.focus(), 300); // Focus search on open
+    }
+
+    function hideMemberDropdown() {
+        document.body.classList.remove('dropdown-open');
+        mobileDropdownBackdrop.classList.remove('active');
+        mobileMemberDropdown.classList.remove('active');
+        activeCellForDropdown = null;
+        activeMobileInput = null;
+    }
+
+    function filterMembers() {
+        const filter = memberSearchInput.value.toLowerCase();
+        memberDropdownList.querySelectorAll('.dropdown-item').forEach(item => {
+            const name = item.dataset.name.toLowerCase();
+            item.style.display = (name.includes(filter)) ? '' : 'none';
+        });
+    }
+
+    // --- END: MOBILE DROPDOWN HELPER FUNCTIONS ---
+
+
+    function initGlobalListeners() {
+        // Close desktop menus
+        window.addEventListener('click', (e) => {
+            if (!eventContextMenu.contains(e.target) && !e.target.closest('.event-btn')) {
+                eventContextMenu.style.display = 'none';
+            }
+            if (!memberDropdown.contains(e.target) && !e.target.closest('.editable-cell')) {
+                memberDropdown.style.display = 'none';
+            }
+        });
+
+        // Desktop Event context menu listener
+        eventContextMenu.addEventListener('click', (e) => {
+            const eventType = e.target.dataset.eventType;
+            if (eventType && activeEventScheduleTable) {
+                activeEventScheduleTable.applyEventType(eventType);
+            }
+            eventContextMenu.style.display = 'none';
+        });
+        
+        // --- NEW: Mobile Dropdown Listeners ---
+
+        // Close buttons
+        mobileMemberClose.addEventListener('click', hideMemberDropdown);
+        mobileEventClose.addEventListener('click', hideEventDropdown);
+        mobileDropdownBackdrop.addEventListener('click', () => {
+            hideMemberDropdown();
+            hideEventDropdown();
+        });
+
+        // Event type selection
+        eventTypeList.addEventListener('click', (e) => {
+            const item = e.target.closest('.dropdown-item');
+            if (item && activeEventScheduleTable) {
+                const eventType = item.dataset.eventType;
+                activeEventScheduleTable.applyEventType(eventType, true);
+                hideEventDropdown();
+            }
+        });
+
+        // Member selection
+        memberDropdownList.addEventListener('click', (e) => {
+            const item = e.target.closest('.dropdown-item');
+            if (item && activeCellForDropdown && activeMobileInput) {
+                const name = item.dataset.name;
+                // 1. Update the desktop table cell (the "source of truth")
+                activeCellForDropdown.textContent = name;
+                // 2. Update the mobile UI div
+                activeMobileInput.textContent = name || 'Select Name';
+                activeMobileInput.classList.toggle('placeholder', !name);
+                // 3. Trigger save
+                activeProject.triggerSave();
+                // 4. Close dropdown
+                hideMemberDropdown();
+            }
+        });
+
+        // Member search
+        memberSearchInput.addEventListener('input', filterMembers);
+    }
+    
+    // (Other functions: initAuth, loadProjectData, etc.)
+    
+    function initAuth() {
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                currentUser = user;
+                document.querySelector('.profile-name').textContent = user.email;
+                await fetchMembers();
+                userSchedulesCollection = db.collection(`users/${currentUser.uid}/sundaySchedules`);
+                
+                const urlParams = new URLSearchParams(window.location.search);
+                currentProjectId = urlParams.get('id');
+                
+                if (currentProjectId) {
+                    loadProjectData(currentProjectId);
+                    appContainer.classList.remove('hidden');
+                } else {
+                    // (Modal logic for new schedule)
+                    loadTemplatesIntoModal();
+                    templateSelectionModal.style.display = 'flex';
+                }
+                document.body.classList.add('auth-ready');
+            } else {
+                window.location.href = './index.html';
+            }
+        });
+    }
+
+    async function loadTemplatesIntoModal() {
+        const templatesRef = (currentUser.email === ADMIN_EMAIL)
+            ? db.collection('templates_sunday')
+            : db.collection(`users/${currentUser.uid}/templates_sunday`);
+        
+        const snapshot = await templatesRef.get();
+        templateList.innerHTML = '';
+        snapshot.forEach(doc => {
+            const template = doc.data();
+            const li = document.createElement('li');
+            li.innerHTML = `<label><input type="checkbox" value="${doc.id}" checked> ${template.title}</label>`;
+            templateList.appendChild(li);
+        });
+    }
+
+    function loadProjectData(id) {
+        if (currentListener) currentListener();
+        currentListener = userSchedulesCollection.doc(id).onSnapshot((doc) => {
+            if (doc.exists) {
+                if (!activeProject) {
+                    activeProject = new Project(id, doc.data(), userSchedulesCollection);
+                } else {
+                    if (!activeProject.isSaving) {
+                        activeProject.render(doc.data());
+                        updateStatus('Synced', 'synced');
+                    }
+                }
+            } else {
+                console.error("Project not found");
+                window.location.href = './sunday-dashboard.html';
+            }
+  _       }, (error) => {
+            console.error("Error listening to project:", error);
+            updateStatus('Error', 'error');
+        });
+    }
+    
+    document.getElementById('confirm-template-selection').addEventListener('click', async () => {
+        const projectName = document.getElementById('new-project-name').value.trim();
+        if (!projectName) {
+            alert('Please enter a project name.');
+            return;
+        }
+        
+        const selectedTemplateIds = Array.from(templateList.querySelectorAll('input:checked')).map(input => input.value);
+        if (selectedTemplateIds.length === 0) {
+            alert('Please select at least one template.');
+            return;
+        }
+
+        const templatesRef = (currentUser.email === ADMIN_EMAIL)
+            ? db.collection('templates_sunday')
+            : db.collection(`users/${currentUser.uid}/templates_sunday`);
+
+        const newTables = [];
+        for (const id of selectedTemplateIds) {
+            const doc = await templatesRef.doc(id).get();
+            if (doc.exists) newTables.push(doc.data());
+        }
+
+        const newProject = {
+            name: projectName,
+            tables: newTables,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            lastModified: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        try {
+            const docRef = await userSchedulesCollection.add(newProject);
+            window.location.search = `?id=${docRef.id}`;
+        } catch (error) {
+            console.error("Error creating new project:", error);
+            alert('Could not create project.');
+        }
+    });
+    
+    document.getElementById('cancel-template-selection').addEventListener('click', () => {
+        window.location.href = './sunday-dashboard.html';
+    });
+
+    // Init Menu
+    const menuToggle = document.getElementById('menu-toggle-button');
+    const menuOverlay = document.getElementById('menu-overlay');
+    const slideMenu = document.getElementById('slide-menu');
+    menuToggle.addEventListener('click', () => {
+        document.body.classList.toggle('menu-open');
+        menuOverlay.classList.toggle('is-open');
+        slideMenu.classList.toggle('is-open');
+    });
+    menuOverlay.addEventListener('click', () => {
+        document.body.classList.remove('menu-open');
+        menuOverlay.classList.remove('is-open');
+        slideMenu.classList.remove('is-open');
+    });
+    
+    // Start the app
+    initAuth();
+    initGlobalListeners();
+
 })();
 </script>
+
 </body>
 </html>
