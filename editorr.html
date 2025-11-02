@@ -1693,19 +1693,46 @@
         templateSelectionModal.style.display = 'flex';
     }
 
-    function setupGlobalUI() {
-        // Menu Toggle Logic
-        const menuToggleButton = document.getElementById('menu-toggle-button');
-        const slideMenu = document.getElementById('slide-menu');
-        const menuOverlay = document.getElementById('menu-overlay');
-        const body = document.body;
-        
-        function closeMenu() {
-            slideMenu.classList.remove('is-open');
-            menuOverlay.classList.remove('is-open');
-            body.classList.remove('menu-open');
-        }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // ... (all the Firebase and other JavaScript code remains the same until the setupGlobalUI function)
+
+function setupGlobalUI() {
+    // Menu Toggle Logic
+    const menuToggleButton = document.getElementById('menu-toggle-button');
+    const slideMenu = document.getElementById('slide-menu');
+    const menuOverlay = document.getElementById('menu-overlay');
+    const body = document.body;
+    
+    function closeMenu() {
+        slideMenu.classList.remove('is-open');
+        menuOverlay.classList.remove('is-open');
+        body.classList.remove('menu-open');
+    }
+
+    if (menuToggleButton) {
         menuToggleButton.addEventListener('click', () => {
             if (body.classList.contains('menu-open')) {
                 closeMenu();
@@ -1715,13 +1742,26 @@
                 body.classList.add('menu-open');
             }
         });
+    }
+    
+    if (menuOverlay) {
         menuOverlay.addEventListener('click', closeMenu);
+    }
 
-        // App-specific UI
+    // App-specific UI - Check if elements exist before adding listeners
+    const printButton = document.getElementById('print-button');
+    if (printButton) {
+        printButton.addEventListener('click', generatePdf);
+    }
 
-        document.getElementById('print-button').addEventListener('click', generatePdf);
-        document.getElementById('cancel-template-selection').addEventListener('click', () => window.location.href = './dashboard.html');
-        document.getElementById('confirm-template-selection').addEventListener('click', async () => {
+    const cancelTemplateSelection = document.getElementById('cancel-template-selection');
+    if (cancelTemplateSelection) {
+        cancelTemplateSelection.addEventListener('click', () => window.location.href = './dashboard.html');
+    }
+
+    const confirmTemplateSelection = document.getElementById('confirm-template-selection');
+    if (confirmTemplateSelection) {
+        confirmTemplateSelection.addEventListener('click', async () => {
             const newProjectName = document.getElementById('new-project-name').value.trim();
             if (!newProjectName) return alert("Please enter a name for your new project.");
             const selectedCheckboxes = Array.from(templateList.querySelectorAll('input:checked'));
@@ -1744,7 +1784,29 @@
             });
             window.location.href = `./editor.html?id=${newDocRef.id}`;
         });
-        
+    }
+    
+    // Initialize desktop dropdown elements safely
+    const desktopDropdownSearch = document.getElementById('desktop-dropdown-search');
+    const desktopDropdownList = document.getElementById('desktop-dropdown-list');
+    const mobileSearchInput = document.getElementById('mobile-search-input');
+    
+    // Desktop dropdown search functionality
+    if (desktopDropdownSearch) {
+        desktopDropdownSearch.addEventListener('input', (e) => {
+            filterDesktopItems(e.target.value);
+        });
+    }
+    
+    // Mobile dropdown search functionality
+    if (mobileSearchInput) {
+        mobileSearchInput.addEventListener('input', (e) => {
+            filterMobileItems(e.target.value);
+        });
+    }
+
+    // Event context menu
+    if (eventContextMenu) {
         eventContextMenu.addEventListener('click', (e) => {
             const target = e.target.closest('.context-menu-item');
             if (target && activeEventScheduleTable) {
@@ -1753,41 +1815,166 @@
             eventContextMenu.style.display = 'none';
             activeEventScheduleTable = null;
         });
+    }
 
-        schedulesWrapper.addEventListener('click', e => {
-            const targetElement = e.target.closest('.editable-cell, [contenteditable="true"]');
-            if (!targetElement || targetElement.getAttribute('contenteditable') === 'true') return;
-
-            let realCell, mobileDiv = null;
-            if (targetElement.tagName === 'DIV') { // Mobile input
-                mobileDiv = targetElement;
-                const tableBody = mobileDiv.closest('.schedule-block').querySelector('.schedule-table-body');
-                realCell = tableBody.rows[mobileDiv.dataset.rowIndex].cells[mobileDiv.dataset.cellIndex];
-            } else { // Desktop cell
-                realCell = targetElement;
-            }
-            openMemberDropdown(realCell, mobileDiv);
-        });
-
+    // Member dropdown
+    if (memberDropdown) {
         memberDropdown.addEventListener('click', e => {
             const item = e.target.closest('.member-dropdown-item');
-            if (item && activeCellForDropdown.realCell) {
+            if (item && activeCellForDropdown && activeCellForDropdown.realCell) {
                 const newName = item.dataset.name;
                 activeCellForDropdown.realCell.textContent = newName;
                 if (activeCellForDropdown.mobileDiv) {
                     activeCellForDropdown.mobileDiv.textContent = newName;
                 }
-                activeProject.triggerSave();
+                if (activeProject) {
+                    activeProject.triggerSave();
+                }
             }
             memberDropdown.style.display = 'none';
             activeCellForDropdown = null;
         });
+    }
 
-        document.addEventListener('click', (e) => {
-            if (!eventContextMenu.contains(e.target) && !e.target.closest('.event-btn')) { eventContextMenu.style.display = 'none'; }
-            if (!memberDropdown.contains(e.target) && !e.target.closest('.editable-cell')) { memberDropdown.style.display = 'none'; }
+    // Enhanced dropdown event listeners
+    const dropdownBackdrop = document.getElementById('dropdown-backdrop');
+    const dropdownContainer = document.getElementById('dropdown-container');
+    const dropdownClose = document.getElementById('dropdown-close');
+
+    if (dropdownBackdrop) {
+        dropdownBackdrop.addEventListener('click', hideMobileDropdown);
+    }
+    
+    if (dropdownClose) {
+        dropdownClose.addEventListener('click', hideMobileDropdown);
+    }
+
+    // Desktop dropdown event listeners
+    document.addEventListener('click', (e) => {
+        const desktopDropdown = document.getElementById('desktop-dropdown');
+        const desktopEventMenu = document.getElementById('desktop-event-menu');
+        
+        if (desktopDropdown && !desktopDropdown.contains(e.target) && !e.target.closest('.editable-cell')) {
+            hideDesktopDropdown();
+        }
+        if (desktopEventMenu && !desktopEventMenu.contains(e.target) && !e.target.closest('.event-btn')) {
+            hideDesktopEventMenu();
+        }
+        if (eventContextMenu && !eventContextMenu.contains(e.target) && !e.target.closest('.event-btn')) { 
+            eventContextMenu.style.display = 'none'; 
+        }
+        if (memberDropdown && !memberDropdown.contains(e.target) && !e.target.closest('.editable-cell')) { 
+            memberDropdown.style.display = 'none'; 
+        }
+    });
+
+    // Enhanced modal handling
+    const modalOverlays = document.querySelectorAll('.modal-overlay');
+    modalOverlays.forEach(modal => {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 300);
+            }
+        });
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            const dropdownContainer = document.getElementById('dropdown-container');
+            const desktopDropdown = document.getElementById('desktop-dropdown');
+            const desktopEventMenu = document.getElementById('desktop-event-menu');
+            const templateSelectionModal = document.getElementById('template-selection-modal');
+            
+            if (dropdownContainer && dropdownContainer.classList.contains('active')) {
+                hideMobileDropdown();
+            }
+            if (desktopDropdown && desktopDropdown.classList.contains('active')) {
+                hideDesktopDropdown();
+            }
+            if (desktopEventMenu && desktopEventMenu.style.display === 'block') {
+                hideDesktopEventMenu();
+            }
+            if (templateSelectionModal && templateSelectionModal.style.display === 'flex') {
+                templateSelectionModal.classList.remove('active');
+                setTimeout(() => {
+                    templateSelectionModal.style.display = 'none';
+                }, 300);
+            }
+        }
+    });
+
+    // Prevent dropdown container click from closing dropdown
+    if (dropdownContainer) {
+        dropdownContainer.addEventListener('click', (e) => {
+            e.stopPropagation();
         });
     }
+}
+
+// Add the missing dropdown functions that are referenced
+function hideDesktopDropdown() {
+    const desktopDropdown = document.getElementById('desktop-dropdown');
+    if (desktopDropdown) {
+        desktopDropdown.classList.remove('active');
+        setTimeout(() => {
+            desktopDropdown.style.display = 'none';
+        }, 250);
+        currentDropdownType = null;
+        activeCellForDropdown = null;
+    }
+}
+
+function hideDesktopEventMenu() {
+    const desktopEventMenu = document.getElementById('desktop-event-menu');
+    if (desktopEventMenu) {
+        desktopEventMenu.style.display = 'none';
+        activeRowForEvents = null;
+    }
+}
+
+function hideMobileDropdown() {
+    const dropdownBackdrop = document.getElementById('dropdown-backdrop');
+    const dropdownContainer = document.getElementById('dropdown-container');
+    
+    if (dropdownBackdrop) dropdownBackdrop.classList.remove('active');
+    if (dropdownContainer) dropdownContainer.classList.remove('active');
+    
+    // Remove active class from field
+    if (currentDropdownData && currentDropdownData.fieldElement) {
+        currentDropdownData.fieldElement.classList.remove('active');
+    }
+    
+    // Restore body scrolling
+    document.body.classList.remove('dropdown-open');
+    
+    currentDropdownType = null;
+    currentDropdownData = null;
+}
+
+function filterDesktopItems(value) {
+    const desktopDropdownList = document.getElementById('desktop-dropdown-list');
+    if (desktopDropdownList) {
+        const itemsEl = desktopDropdownList.querySelectorAll('.desktop-dropdown-item');
+        itemsEl.forEach(item => {
+            item.style.display = item.textContent.toLowerCase().includes(value.toLowerCase()) ? 'flex' : 'none';
+        });
+    }
+}
+
+function filterMobileItems(value) {
+    const dropdownContent = document.getElementById('dropdown-content');
+    if (dropdownContent) {
+        const itemsEl = dropdownContent.querySelectorAll('.dropdown-item');
+        itemsEl.forEach(item => {
+            item.style.display = item.textContent.toLowerCase().includes(value.toLowerCase()) ? 'flex' : 'none';
+        });
+    }
+}
+
+// ... (rest of the JavaScript code remains the same)
     
     function isCellInMinistrySection(cell) {
         const table = cell.closest('table');
