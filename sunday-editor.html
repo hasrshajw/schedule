@@ -1896,13 +1896,36 @@ if (!document.activeElement ||
     }
 
     function selectDesktopDropdownItem(value) {
-        if (activeCellForDropdown) {
-            activeCellForDropdown.textContent = value;
-            debouncedSave();
-        }
-        hideDesktopDropdown();
+    if (activeCellForDropdown) {
+        // Update UI immediately
+        activeCellForDropdown.textContent = value;
+        
+        // Also update the corresponding mobile field if it exists
+        updateCorrespondingMobileField(activeCellForDropdown, value);
+        
+        // Then save to Firebase in background
+        debouncedSave();
     }
-
+    hideDesktopDropdown();
+}
+function updateCorrespondingMobileField(cell, value) {
+    const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
+    const rowIndex = Array.from(cell.parentElement.parentElement.children).indexOf(cell.parentElement);
+    const cellIndex = Array.from(cell.parentElement.cells).indexOf(cell);
+    
+    const mobileContainer = scheduleWrapper.querySelector('.mobile-view-container');
+    if (mobileContainer) {
+        const mobileCard = mobileContainer.querySelectorAll('.mobile-week-card')[rowIndex];
+        if (mobileCard) {
+            const field = mobileCard.querySelector(`.mobile-field[data-row="${rowIndex}"][data-cell="${cellIndex}"]`);
+            if (field) {
+                const valueSpan = field.querySelector('.mobile-field-value');
+                valueSpan.textContent = value;
+                valueSpan.classList.remove('mobile-field-placeholder');
+            }
+        }
+    }
+}
     // Desktop dropdown search functionality
     function filterDesktopItems(value) {
         const itemsEl = desktopDropdownList.querySelectorAll('.desktop-dropdown-item');
@@ -2061,17 +2084,19 @@ if (!document.activeElement ||
     }
 
     function selectMobileDropdownItem(value) {
-        if (currentDropdownData) {
-            currentDropdownData.cell.textContent = value;
-            if (currentDropdownData.fieldElement) {
-                const valueSpan = currentDropdownData.fieldElement.querySelector('.mobile-field-value');
-                valueSpan.textContent = value;
-                valueSpan.classList.remove('mobile-field-placeholder');
-            }
-            debouncedSave();
+    if (currentDropdownData) {
+        // Update both table cell and mobile field immediately
+        currentDropdownData.cell.textContent = value;
+        if (currentDropdownData.fieldElement) {
+            const valueSpan = currentDropdownData.fieldElement.querySelector('.mobile-field-value');
+            valueSpan.textContent = value;
+            valueSpan.classList.remove('mobile-field-placeholder');
         }
-        hideMobileDropdown();
+        // Save to Firebase in background
+        debouncedSave();
     }
+    hideMobileDropdown();
+}
 
     function selectMobileEventType(eventType) {
         if (currentDropdownData && currentDropdownData.rowIndex !== undefined) {
