@@ -132,6 +132,32 @@
     body.menu-open .header-icons .hamburger-icon { display: none; }
     body.menu-open .header-icons .close-icon { display: block; }
 
+    /* Status Indicator */
+    .status-indicator { 
+        font-size: 12px; 
+        font-weight: 600; 
+        padding: 6px 12px; 
+        border-radius: 999px; 
+        display: flex; 
+        align-items: center; 
+        gap: 6px; 
+        color: var(--text-light);
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+    }
+    
+    .status-indicator::before { 
+        content: ''; 
+        width: 8px; 
+        height: 8px; 
+        border-radius: 50%; 
+        background-color: currentColor; 
+    }
+    
+    .status-indicator[data-status="synced"] { color: var(--success-color); }
+    .status-indicator[data-status="syncing"] { color: var(--warning-color); }
+    .status-indicator[data-status="error"] { color: var(--danger-color); }
+
     .menu-overlay { 
         position: fixed; 
         top: 64px; 
@@ -988,6 +1014,18 @@
         .page-controls { 
             flex-direction: column;
             align-items: stretch;
+            padding: 16px;
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 60px;
+            z-index: 100;
+        }
+        
+        .page-controls .btn {
+            width: 100%;
+            justify-content: center;
+            margin-top: 8px;
         }
         
         .master-container { 
@@ -1006,6 +1044,7 @@
             display: flex; 
             flex-direction: column; 
             gap: 1rem; 
+            padding: 16px;
         }
         
         .title-block {
@@ -1140,6 +1179,7 @@
     <div class="top-bar">
         <a href="./sunday-dashboard.html" class="mobileLogo" title="Sunday Schedules"></a>
         <div class="header-right-controls">
+            <div class="status-indicator" data-status="synced">Synced</div>
             <div class="header-icons" id="menu-toggle-button">
                 <svg class="hamburger-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M22.5 7h-21a.5.5 0 010-1h21a.5.5 0 010 1zM22.5 13h-21a.5.5 0 010-1h21a.5.5 0 010 1zM22.5 19h-21a.5.5 0 010-1h21a.5.5 0 010 1z"></path></svg>
                 <svg class="close-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12.707 12l6.146-6.146a.5.5 0 00-.707-.707L12 11.293 5.854 5.146a.5.5 0 00-.707.707L11.293 12l-6.147 6.146a.5.5 0 10.707.707L12 12.707l6.146 6.146a.5.5 0 00.707-.707z"></path></svg>
@@ -1242,6 +1282,7 @@
     const scheduleWrapper = document.getElementById('schedule-content-wrapper');
     const dateSelectionModal = document.getElementById('date-selection-modal');
     const desktopDropdown = document.getElementById('desktop-dropdown');
+    const statusIndicator = document.querySelector('.status-indicator');
 
     // Mobile dropdown elements
     const dropdownBackdrop = document.getElementById('dropdown-backdrop');
@@ -1262,6 +1303,11 @@
         let timeout;
         return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), delay); };
     };
+
+    function updateStatus(text, status) {
+        statusIndicator.textContent = text;
+        statusIndicator.dataset.status = status;
+    }
 
     async function fetchMembers() {
         if (!currentUser) return;
@@ -1305,10 +1351,13 @@
                 if (!document.activeElement || document.activeElement.tagName === 'BODY' || !scheduleWrapper.contains(document.activeElement)) {
                     renderSchedule(scheduleData);
                 }
+                updateStatus('Synced', 'synced');
             } else {
                 alert("This schedule may have been deleted.");
                 window.location.href = './sunday-dashboard.html';
             }
+        }, error => {
+            updateStatus('Error', 'error');
         });
     }
 
@@ -1416,9 +1465,9 @@
                         <p class="special-event-text-mobile">${topicCell.textContent}</p>
                     </div>
                     <div class="mobile-actions">
-                        <button class="mobile-action-btn secondary change-event-btn" data-row="${rowIndex}">
-                            <span class="material-symbols-outlined">swap_horiz</span>
-                            Change Event Type
+                        <button class="mobile-action-btn secondary event-menu-btn" data-row="${rowIndex}">
+                            <span class="material-symbols-outlined">event</span>
+                            Event Options
                         </button>
                     </div>
                 `;
@@ -1461,7 +1510,7 @@
                     </div>
                     <div class="mobile-actions">
                         <button class="mobile-action-btn secondary event-menu-btn" data-row="${rowIndex}">
-                            <span class="material-symbols-outlined">more_vert</span>
+                            <span class="material-symbols-outlined">event</span>
                             Event Options
                         </button>
                     </div>
@@ -1499,16 +1548,6 @@
                 const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
                 activeRowForEvents = tableBody.rows[rowIndex];
                 showEventTypeMenu();
-            });
-        });
-
-        // Add event listeners to change event buttons (for special events)
-        mobileContainer.querySelectorAll('.change-event-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const rowIndex = btn.dataset.row;
-                const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
-                activeRowForEvents = tableBody.rows[rowIndex];
-                applyEventType('normal');
             });
         });
     }
@@ -1707,12 +1746,21 @@
         const tableBodyEl = scheduleWrapper.querySelector('.schedule-table tbody');
         if (!subtitleEl || !tableBodyEl) return;
 
+        updateStatus('Syncing...', 'syncing');
+        
         const payload = {
             dateRange: subtitleEl.textContent,
             tableHTML: tableBodyEl.innerHTML
         };
+        
         userSchedulesCollection.doc(currentScheduleId).update(payload)
-            .catch(err => console.error("Save failed:", err));
+            .then(() => {
+                updateStatus('Synced', 'synced');
+            })
+            .catch(err => {
+                console.error("Save failed:", err);
+                updateStatus('Error', 'error');
+            });
     }, 1500);
 
     function initCreationFlow() {
