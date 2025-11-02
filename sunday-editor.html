@@ -48,9 +48,6 @@
         --warning-color: #ed8936;
         --success-color: #38a169;
         --accent-color: #3182ce;
-        --co-visit-color: #dc2626;
-        --assembly-color: #059669;
-        --convention-color: #7c3aed;
     }
     
     @font-face {
@@ -94,7 +91,7 @@
         display: flex; 
         justify-content: space-between; 
         align-items: center; 
-        height: 64px; 
+        height: 70px; 
         padding: 0 20px; 
         max-width: 1200px; 
         margin: 0 auto; 
@@ -102,7 +99,7 @@
     .top-bar .mobileLogo { 
         display: block; 
         width: 80px; 
-        height: 64px; 
+        height: 70px; 
         background-image: url(https://www.jw.org/assets/ct/46605f23da/images/siteLogo-jworg-mobile.svg), none; 
         background-repeat: no-repeat; 
         background-size: contain; 
@@ -114,37 +111,10 @@
         align-items: center; 
         gap: 16px; 
     }
-    
-    /* Status Indicator */
-    .status-indicator { 
-        font-size: 12px; 
-        font-weight: 600; 
-        padding: 6px 12px; 
-        border-radius: 999px; 
-        display: flex; 
-        align-items: center; 
-        gap: 6px; 
-        color: var(--text-light);
-        background: rgba(255,255,255,0.1);
-        backdrop-filter: blur(10px);
-    }
-    
-    .status-indicator::before { 
-        content: ''; 
-        width: 8px; 
-        height: 8px; 
-        border-radius: 50%; 
-        background-color: currentColor; 
-    }
-    
-    .status-indicator[data-status="synced"] { color: var(--success-color); }
-    .status-indicator[data-status="syncing"] { color: var(--warning-color); }
-    .status-indicator[data-status="error"] { color: var(--danger-color); }
-    
     .header-icons { 
         display: flex; 
         align-items: center; 
-        height: 64px; 
+        height: 70px; 
         cursor: pointer; 
         padding: 12px;
         border-radius: var(--radius-md);
@@ -162,12 +132,38 @@
     body.menu-open .header-icons .hamburger-icon { display: none; }
     body.menu-open .header-icons .close-icon { display: block; }
 
+    /* Status Indicator */
+    .status-indicator { 
+        font-size: 14px; 
+        font-weight: 600; 
+        padding: 8px 16px; 
+        border-radius: 999px; 
+        display: flex; 
+        align-items: center; 
+        gap: 8px; 
+        color: var(--text-light);
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+    }
+    
+    .status-indicator::before { 
+        content: ''; 
+        width: 8px; 
+        height: 8px; 
+        border-radius: 50%; 
+        background-color: currentColor; 
+    }
+    
+    .status-indicator[data-status="synced"] { color: var(--success-color); }
+    .status-indicator[data-status="syncing"] { color: var(--warning-color); }
+    .status-indicator[data-status="error"] { color: var(--danger-color); }
+
     .menu-overlay { 
         position: fixed; 
-        top: 64px; 
+        top: 70px; 
         left: 0; 
         width: 100%; 
-        height: calc(100% - 64px); 
+        height: calc(100% - 70px); 
         background-color: rgba(0, 0, 0, 0.6); 
         z-index: 999; 
         opacity: 0; 
@@ -178,9 +174,9 @@
     .menu-overlay.is-open { opacity: 1; visibility: visible; }
     .slide-menu { 
         position: fixed; 
-        top: 64px; 
+        top: 70px; 
         right: 0; 
-        height: calc(100dvh - 64px); 
+        height: calc(100dvh - 70px); 
         width: 320px; 
         max-width: 90%; 
         background-color: var(--menu-new-bg); 
@@ -281,7 +277,7 @@
     .hidden { display: none !important; }
     
     main { 
-        padding-top: 84px; /* 64px navbar + 20px spacing */
+        padding-top: 90px; /* 70px navbar + 20px spacing */
         min-height: 100vh;
     }
     
@@ -749,61 +745,6 @@
         font-weight: 600;
     }
 
-    /* Event Type Selector */
-    .event-type-selector {
-        display: flex;
-        gap: 8px;
-        margin-bottom: 16px;
-        flex-wrap: wrap;
-    }
-    
-    .event-type-btn {
-        flex: 1;
-        min-width: 120px;
-        padding: 12px 16px;
-        border: 2px solid var(--border-color);
-        background: white;
-        border-radius: var(--radius-md);
-        cursor: pointer;
-        transition: all 0.2s ease;
-        font-family: 'Noto Sans Telugu', sans-serif;
-        font-weight: 500;
-        text-align: center;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 4px;
-    }
-    
-    .event-type-btn.active {
-        border-color: var(--primary-color);
-        background-color: var(--primary-light);
-        color: var(--primary-color);
-        font-weight: 600;
-    }
-    
-    .event-type-btn.co-visit.active {
-        border-color: var(--co-visit-color);
-        background-color: #fef2f2;
-        color: var(--co-visit-color);
-    }
-    
-    .event-type-btn.assembly.active {
-        border-color: var(--assembly-color);
-        background-color: #f0fdf4;
-        color: var(--assembly-color);
-    }
-    
-    .event-type-btn.convention.active {
-        border-color: var(--convention-color);
-        background-color: #faf5ff;
-        color: var(--convention-color);
-    }
-    
-    .event-type-icon {
-        font-size: 1.2rem;
-    }
-
     /* Mobile View Styles */
     .mobile-view-container { 
         display: none; 
@@ -840,9 +781,6 @@
         text-align: center;
         font-family: 'Noto Sans Telugu', sans-serif;
         position: relative;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
     }
     
     .week-date::after {
@@ -855,6 +793,39 @@
         height: 3px;
         background: var(--primary-color);
         border-radius: 2px;
+    }
+    
+    /* Single Event Type Selector Button for Mobile */
+    .event-type-selector {
+        display: flex;
+        margin-bottom: 20px;
+    }
+    
+    .event-type-dropdown-btn {
+        flex: 1;
+        padding: 12px 16px;
+        border: 2px solid var(--border-color);
+        background: white;
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        font-family: 'Noto Sans Telugu', sans-serif;
+        font-weight: 500;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        transition: all 0.2s ease;
+    }
+    
+    .event-type-dropdown-btn:hover {
+        border-color: var(--accent-color);
+    }
+    
+    .event-type-dropdown-btn.active {
+        border-color: var(--primary-color);
+        background-color: var(--primary-light);
+        color: var(--primary-color);
     }
     
     .week-fields {
@@ -1039,7 +1010,7 @@
         }
         
         main { 
-            padding-top: 70px; /* 60px navbar + 10px spacing */
+            padding-top: 80px; /* Increased to prevent navbar overlap */
         }
         
         .editor-main { 
@@ -1047,20 +1018,9 @@
         }
         
         .page-controls { 
-            padding: 16px; 
-            margin-bottom: 0;
-            background: white;
-            border-bottom: 1px solid var(--border-color);
-            position: sticky;
-            top: 60px;
-            z-index: 100;
-            justify-content: center;
-        }
-        
-        .page-controls .btn {
-            width: 100%;
-            justify-content: center;
-            margin-top: 8px;
+            flex-direction: column;
+            align-items: stretch;
+            margin-bottom: 16px;
         }
         
         .master-container { 
@@ -1079,7 +1039,6 @@
             display: flex; 
             flex-direction: column; 
             gap: 1rem; 
-            padding: 16px;
         }
         
         .title-block {
@@ -1098,16 +1057,6 @@
         
         .svg-divider {
             width: 300px;
-        }
-        
-        .event-type-selector {
-            gap: 6px;
-        }
-        
-        .event-type-btn {
-            min-width: calc(50% - 6px);
-            padding: 10px 12px;
-            font-size: 0.9rem;
         }
         
         .desktop-dropdown {
@@ -1510,14 +1459,15 @@
             // Check if this is a special event
             const isSpecialEvent = topicCell.classList.contains('special-event') && topicCell.colSpan === 4;
             const currentEventType = getEventTypeForRow(row);
+            const eventTypeLabel = getEventTypeLabel(currentEventType);
             
             if (isSpecialEvent) {
                 card.innerHTML = `
-                    <div class="week-date">
-                        <span>${dateCell.textContent}</span>
-                        <button class="mobile-action-btn secondary event-menu-btn" data-row="${rowIndex}">
-                            <span class="material-symbols-outlined">event</span>
-                            Event Options
+                    <h3 class="week-date">${dateCell.textContent}</h3>
+                    <div class="event-type-selector">
+                        <button class="event-type-dropdown-btn" data-row="${rowIndex}">
+                            <span>${eventTypeLabel}</span>
+                            <span class="material-symbols-outlined">arrow_drop_down</span>
                         </button>
                     </div>
                     <div class="special-event-mobile">
@@ -1526,22 +1476,13 @@
                 `;
             } else {
                 card.innerHTML = `
-                    <div class="week-date">
-                        <span>${dateCell.textContent}</span>
-                        <button class="mobile-action-btn secondary event-menu-btn" data-row="${rowIndex}">
-                            <span class="material-symbols-outlined">event</span>
-                            Event Options
-                        </button>
-                    </div>
+                    <h3 class="week-date">${dateCell.textContent}</h3>
                     
                     <div class="event-type-selector">
-                        ${eventTypes.map(event => `
-                            <button class="event-type-btn ${event.id} ${currentEventType === event.id ? 'active' : ''}" 
-                                    data-event-type="${event.id}" data-row="${rowIndex}">
-                                <span class="material-symbols-outlined event-type-icon">${event.icon}</span>
-                                <span>${event.name}</span>
-                            </button>
-                        `).join('')}
+                        <button class="event-type-dropdown-btn" data-row="${rowIndex}">
+                            <span>${eventTypeLabel}</span>
+                            <span class="material-symbols-outlined">arrow_drop_down</span>
+                        </button>
                     </div>
                     
                     <div class="week-fields">
@@ -1605,24 +1546,18 @@
             });
         });
 
-        // Add event listeners to event type buttons
-        mobileContainer.querySelectorAll('.event-type-btn').forEach(btn => {
+        // Add event listeners to event type dropdown buttons
+        mobileContainer.querySelectorAll('.event-type-dropdown-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const eventType = btn.dataset.eventType;
                 const rowIndex = btn.dataset.row;
-                changeEventType(rowIndex, eventType);
+                openEventTypeDropdown(rowIndex);
             });
         });
+    }
 
-        // Add event listeners to event menu buttons
-        mobileContainer.querySelectorAll('.event-menu-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const rowIndex = btn.dataset.row;
-                const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
-                activeRowForEvents = tableBody.rows[rowIndex];
-                showEventTypeMenu();
-            });
-        });
+    function getEventTypeLabel(eventType) {
+        const event = eventTypes.find(e => e.id === eventType);
+        return event ? event.name : 'Normal';
     }
 
     function getEventTypeForRow(row) {
@@ -1702,7 +1637,7 @@
     // Desktop dropdown functions
     function openDesktopDropdown(type, cell) {
         currentDropdownType = type;
-        activeCellForDropdown = cell;
+        activeCellForDropdown = { cell: cell };
         
         if (type === 'member') {
             showDesktopMemberDropdown(cell);
@@ -1765,7 +1700,7 @@
 
     function selectDesktopDropdownItem(value) {
         if (activeCellForDropdown) {
-            activeCellForDropdown.textContent = value;
+            activeCellForDropdown.cell.textContent = value;
             debouncedSave();
         }
         hideDesktopDropdown();
@@ -1829,29 +1764,6 @@
         showMobileDropdown();
     }
 
-    function showEventTypeMenu() {
-        dropdownTitle.textContent = 'Select Event Type';
-        dropdownContent.innerHTML = '';
-        
-        eventTypes.forEach(event => {
-            const item = document.createElement('button');
-            item.className = 'dropdown-item';
-            item.innerHTML = `
-                <span class="material-symbols-outlined" style="margin-right: 12px;">${event.icon}</span>
-                <span>${event.name}</span>
-            `;
-            item.addEventListener('click', () => {
-                const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
-                const rowIndex = Array.from(tableBody.rows).indexOf(activeRowForEvents);
-                changeEventType(rowIndex, event.id);
-                hideMobileDropdown();
-            });
-            dropdownContent.appendChild(item);
-        });
-        
-        showMobileDropdown();
-    }
-
     function showMobileDropdown() {
         dropdownBackdrop.classList.add('active');
         dropdownContainer.classList.add('active');
@@ -1884,6 +1796,27 @@
             debouncedSave();
         }
         hideMobileDropdown();
+    }
+
+    function openEventTypeDropdown(rowIndex) {
+        dropdownTitle.textContent = 'Select Event Type';
+        dropdownContent.innerHTML = '';
+        
+        eventTypes.forEach(event => {
+            const item = document.createElement('button');
+            item.className = 'dropdown-item';
+            item.innerHTML = `
+                <span class="material-symbols-outlined">${event.icon}</span>
+                <span>${event.name}</span>
+            `;
+            item.addEventListener('click', () => {
+                changeEventType(rowIndex, event.id);
+                hideMobileDropdown();
+            });
+            dropdownContent.appendChild(item);
+        });
+        
+        showMobileDropdown();
     }
 
     const debouncedSave = debounce(() => {
@@ -1986,17 +1919,77 @@
         // For desktop, show a simple dropdown
         if (window.innerWidth > 768) {
             showEventTypeMenu();
-            dropdownContainer.style.position = 'fixed';
             dropdownContainer.style.top = 'auto';
-            dropdownContainer.style.bottom = 'auto';
-            dropdownContainer.style.left = `${rect.left - 150}px`;
-            dropdownContainer.style.top = `${rect.bottom}px`;
+            dropdownContainer.style.bottom = `${window.innerHeight - rect.top}px`;
+            dropdownContainer.style.left = `${rect.left}px`;
             dropdownContainer.style.width = '200px';
             dropdownContainer.style.borderRadius = '12px';
-            dropdownContainer.style.transform = 'none';
         } else {
             showEventTypeMenu();
         }
+    }
+    
+    function showEventTypeMenu() {
+        dropdownTitle.textContent = 'Select Event Type';
+        dropdownContent.innerHTML = '';
+        
+        const eventTypes = [
+            { type: 'normal', name: 'Normal' },
+            { type: 'co-visit', name: 'CO Visit' },
+            { type: 'assembly', name: 'Assembly' },
+            { type: 'convention', name: 'Convention' }
+        ];
+        
+        eventTypes.forEach(event => {
+            const item = document.createElement('button');
+            item.className = 'dropdown-item';
+            item.textContent = event.name;
+            item.addEventListener('click', () => {
+                applyEventType(event.type);
+                hideMobileDropdown();
+            });
+            dropdownContent.appendChild(item);
+        });
+        
+        showMobileDropdown();
+    }
+    
+    function applyEventType(eventType) {
+        if (!activeRowForEvents) return;
+        const cells = Array.from(activeRowForEvents.cells);
+        const topicCell = cells[1];
+        const otherCells = cells.slice(2, 5);
+        topicCell.colSpan = 1;
+        topicCell.classList.remove('special-event');
+        topicCell.classList.add('editable-cell');
+        if(topicCell.dataset.originalContent) {
+           topicCell.innerHTML = topicCell.dataset.originalContent;
+        } else if (eventType !== 'normal') {
+           topicCell.innerHTML = '';
+        }
+        topicCell.removeAttribute('data-original-content');
+        otherCells.forEach((cell) => {
+            cell.style.display = '';
+            cell.classList.add('editable-cell');
+            if(cell.dataset.originalContent) cell.innerHTML = cell.dataset.originalContent;
+            cell.removeAttribute('data-original-content');
+        });
+        if (eventType !== 'normal') {
+            topicCell.dataset.originalContent = topicCell.innerHTML;
+            otherCells.forEach(cell => cell.dataset.originalContent = cell.innerHTML);
+            topicCell.colSpan = 4;
+            topicCell.classList.add('special-event');
+            topicCell.classList.remove('editable-cell');
+            topicCell.textContent = eventTexts[eventType];
+            otherCells.forEach(cell => {
+                cell.style.display = 'none';
+                cell.classList.remove('editable-cell');
+            });
+        }
+        
+        // Update mobile view
+        createMobileView();
+        debouncedSave();
     }
     
     async function generatePdf() {
