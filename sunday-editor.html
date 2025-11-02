@@ -91,7 +91,7 @@
         display: flex; 
         justify-content: space-between; 
         align-items: center; 
-        height: 64px; 
+        height: 70px; 
         padding: 0 20px; 
         max-width: 1200px; 
         margin: 0 auto; 
@@ -99,7 +99,7 @@
     .top-bar .mobileLogo { 
         display: block; 
         width: 80px; 
-        height: 64px; 
+        height: 70px; 
         background-image: url(https://www.jw.org/assets/ct/46605f23da/images/siteLogo-jworg-mobile.svg), none; 
         background-repeat: no-repeat; 
         background-size: contain; 
@@ -111,37 +111,10 @@
         align-items: center; 
         gap: 16px; 
     }
-    
-    /* Status Indicator */
-    .status-indicator { 
-        font-size: 12px; 
-        font-weight: 600; 
-        padding: 6px 12px; 
-        border-radius: 999px; 
-        display: flex; 
-        align-items: center; 
-        gap: 6px; 
-        color: var(--text-light);
-        background: rgba(255,255,255,0.1);
-        backdrop-filter: blur(10px);
-    }
-    
-    .status-indicator::before { 
-        content: ''; 
-        width: 8px; 
-        height: 8px; 
-        border-radius: 50%; 
-        background-color: currentColor; 
-    }
-    
-    .status-indicator[data-status="synced"] { color: var(--success-color); }
-    .status-indicator[data-status="syncing"] { color: var(--warning-color); }
-    .status-indicator[data-status="error"] { color: var(--danger-color); }
-    
     .header-icons { 
         display: flex; 
         align-items: center; 
-        height: 64px; 
+        height: 70px; 
         cursor: pointer; 
         padding: 12px;
         border-radius: var(--radius-md);
@@ -159,12 +132,38 @@
     body.menu-open .header-icons .hamburger-icon { display: none; }
     body.menu-open .header-icons .close-icon { display: block; }
 
+    /* Status Indicator */
+    .status-indicator { 
+        font-size: 14px; 
+        font-weight: 600; 
+        padding: 8px 16px; 
+        border-radius: 999px; 
+        display: flex; 
+        align-items: center; 
+        gap: 8px; 
+        color: var(--text-light);
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+    }
+    
+    .status-indicator::before { 
+        content: ''; 
+        width: 8px; 
+        height: 8px; 
+        border-radius: 50%; 
+        background-color: currentColor; 
+    }
+    
+    .status-indicator[data-status="synced"] { color: var(--success-color); }
+    .status-indicator[data-status="syncing"] { color: var(--warning-color); }
+    .status-indicator[data-status="error"] { color: var(--danger-color); }
+
     .menu-overlay { 
         position: fixed; 
-        top: 64px; 
+        top: 70px; 
         left: 0; 
         width: 100%; 
-        height: calc(100% - 64px); 
+        height: calc(100% - 70px); 
         background-color: rgba(0, 0, 0, 0.6); 
         z-index: 999; 
         opacity: 0; 
@@ -175,9 +174,9 @@
     .menu-overlay.is-open { opacity: 1; visibility: visible; }
     .slide-menu { 
         position: fixed; 
-        top: 64px; 
+        top: 70px; 
         right: 0; 
-        height: calc(100dvh - 64px); 
+        height: calc(100dvh - 70px); 
         width: 320px; 
         max-width: 90%; 
         background-color: var(--menu-new-bg); 
@@ -278,7 +277,7 @@
     .hidden { display: none !important; }
     
     main { 
-        padding-top: 84px; /* Fixed navbar spacing */
+        padding-top: 90px; /* 70px navbar + 20px spacing */
         min-height: 100vh;
     }
     
@@ -291,7 +290,7 @@
     .page-controls { 
         margin-bottom: 24px; 
         display: flex; 
-        justify-content: space-between;
+        justify-content: flex-end;
         align-items: center;
         gap: 12px;
     }
@@ -439,33 +438,6 @@
     .event-btn:hover { 
         background-color: #f0f0f0; 
         color: var(--text-primary);
-    }
-
-    .toolbar-btn { 
-        font-family: 'Inter', sans-serif; 
-        display: inline-flex; 
-        align-items: center; 
-        justify-content: center; 
-        gap: 8px; 
-        padding: 10px 16px; 
-        font-size: 14px; 
-        font-weight: 500; 
-        cursor: pointer; 
-        border: 1px solid var(--border-color); 
-        background-color: var(--surface-color); 
-        border-radius: var(--radius-md); 
-        text-decoration: none; 
-        color: var(--text-secondary); 
-        transition: all 0.2s ease;
-    }
-    .toolbar-btn:hover:not(:disabled) { 
-        background-color: #f9fafb; 
-        color: var(--text-primary); 
-        border-color: var(--accent-color);
-    }
-    .toolbar-btn:disabled { 
-        cursor: not-allowed; 
-        opacity: 0.5; 
     }
 
     /* ENHANCED DESKTOP DROPDOWN STYLING - Real dropdown look */
@@ -823,6 +795,61 @@
         border-radius: 2px;
     }
     
+    /* Event Type Selector at Top */
+    .event-type-selector {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+    
+    .event-type-btn {
+        flex: 1;
+        min-width: 120px;
+        padding: 12px 16px;
+        border: 2px solid var(--border-color);
+        background: white;
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-family: 'Noto Sans Telugu', sans-serif;
+        font-weight: 500;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+    }
+    
+    .event-type-btn.active {
+        border-color: var(--primary-color);
+        background-color: var(--primary-light);
+        color: var(--primary-color);
+        font-weight: 600;
+    }
+    
+    .event-type-btn.co-visit.active {
+        border-color: var(--danger-color);
+        background-color: #fef2f2;
+        color: var(--danger-color);
+    }
+    
+    .event-type-btn.assembly.active {
+        border-color: var(--success-color);
+        background-color: #f0fdf4;
+        color: var(--success-color);
+    }
+    
+    .event-type-btn.convention.active {
+        border-color: var(--accent-color);
+        background-color: #f0f9ff;
+        color: var(--accent-color);
+    }
+    
+    .event-type-icon {
+        font-size: 1.2rem;
+    }
+    
     .week-fields {
         display: flex;
         flex-direction: column;
@@ -1015,19 +1042,6 @@
         .page-controls { 
             flex-direction: column;
             align-items: stretch;
-            padding: 16px;
-            margin-bottom: 0;
-            background: white;
-            border-bottom: 1px solid var(--border-color);
-            position: sticky;
-            top: 60px;
-            z-index: 100;
-        }
-        
-        .page-controls .btn {
-            width: 100%;
-            justify-content: center;
-            margin-top: 8px;
         }
         
         .master-container { 
@@ -1046,7 +1060,6 @@
             display: flex; 
             flex-direction: column; 
             gap: 1rem; 
-            padding: 16px;
         }
         
         .title-block {
@@ -1071,8 +1084,14 @@
             display: none !important;
         }
         
-        .status-indicator {
-            margin-right: auto;
+        .event-type-selector {
+            gap: 6px;
+        }
+        
+        .event-type-btn {
+            min-width: calc(50% - 6px);
+            padding: 10px 12px;
+            font-size: 0.9rem;
         }
     }
 
@@ -1211,10 +1230,6 @@
 
 <div id="app-container" class="editor-main hidden">
     <div class="page-controls">
-        <a href="./sunday-dashboard.html" class="toolbar-btn">
-            <span class="material-symbols-outlined">arrow_back</span>
-            <span>Dashboard</span>
-        </a>
         <button id="print-button" class="btn">
             <span class="material-symbols-outlined">picture_as_pdf</span>
             <span>Download PDF</span>
@@ -1304,6 +1319,20 @@
         'అంశం-3': 'this is talk-3',
         'అంశం-4': 'this is talk-4'
     };
+
+    // Special event texts
+    const eventTexts = {
+        'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం',
+        'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో',
+        'convention': 'ప్రాదేశిక సమావేశం'
+    };
+
+    const eventTypes = [
+        { id: 'normal', name: 'Normal', icon: 'event', color: 'primary' },
+        { id: 'co-visit', name: 'CO Visit', icon: 'groups', color: 'co-visit' },
+        { id: 'assembly', name: 'Assembly', icon: 'celebration', color: 'assembly' },
+        { id: 'convention', name: 'Convention', icon: 'festival', color: 'convention' }
+    ];
 
     const debounce = (func, delay) => {
         let timeout;
@@ -1412,16 +1441,13 @@
             const row = cell.parentElement;
             const cellIndex = cell.cellIndex;
             
-            // Skip date column (index 0), actions column (index 5), and special event cells
-            if (cellIndex === 0 || cellIndex === 5 || cell.classList.contains('special-event')) return;
+            // Skip date column (index 0) and actions column (index 5)
+            if (cellIndex === 0 || cellIndex === 5) return;
             
             cell.classList.add('editable-cell');
             cell.removeAttribute('contenteditable');
             
             cell.addEventListener('click', (e) => {
-                // Double check we're not in a special event row
-                if (cell.classList.contains('special-event')) return;
-                
                 if (cellIndex === 1) { // Topic column
                     openDesktopDropdown('topic', cell);
                 } else { // Brother columns (2, 3, 4)
@@ -1463,23 +1489,38 @@
             
             // Check if this is a special event
             const isSpecialEvent = topicCell.classList.contains('special-event') && topicCell.colSpan === 4;
+            const currentEventType = getEventTypeForRow(row);
             
             if (isSpecialEvent) {
                 card.innerHTML = `
                     <h3 class="week-date">${dateCell.textContent}</h3>
+                    <div class="event-type-selector">
+                        ${eventTypes.map(event => `
+                            <button class="event-type-btn ${event.id} ${currentEventType === event.id ? 'active' : ''}" 
+                                    data-event-type="${event.id}" data-row="${rowIndex}">
+                                <span class="material-symbols-outlined event-type-icon">${event.icon}</span>
+                                <span>${event.name}</span>
+                            </button>
+                        `).join('')}
+                    </div>
                     <div class="special-event-mobile">
                         <p class="special-event-text-mobile">${topicCell.textContent}</p>
-                    </div>
-                    <div class="mobile-actions">
-                        <button class="mobile-action-btn secondary event-options-btn" data-row="${rowIndex}">
-                            <span class="material-symbols-outlined">event</span>
-                            Event Options
-                        </button>
                     </div>
                 `;
             } else {
                 card.innerHTML = `
                     <h3 class="week-date">${dateCell.textContent}</h3>
+                    
+                    <div class="event-type-selector">
+                        ${eventTypes.map(event => `
+                            <button class="event-type-btn ${event.id} ${currentEventType === event.id ? 'active' : ''}" 
+                                    data-event-type="${event.id}" data-row="${rowIndex}">
+                                <span class="material-symbols-outlined event-type-icon">${event.icon}</span>
+                                <span>${event.name}</span>
+                            </button>
+                        `).join('')}
+                    </div>
+                    
                     <div class="week-fields">
                         <div class="field-group">
                             <label>ప్రసంగ అంశం</label>
@@ -1514,12 +1555,6 @@
                             </div>
                         </div>
                     </div>
-                    <div class="mobile-actions">
-                        <button class="mobile-action-btn secondary event-options-btn" data-row="${rowIndex}">
-                            <span class="material-symbols-outlined">more_vert</span>
-                            Event Options
-                        </button>
-                    </div>
                 `;
             }
             
@@ -1547,21 +1582,94 @@
             });
         });
 
-        // Add event listeners to event options buttons
-        mobileContainer.querySelectorAll('.event-options-btn').forEach(btn => {
+        // Add event listeners to event type buttons
+        mobileContainer.querySelectorAll('.event-type-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
+                const eventType = btn.dataset.eventType;
                 const rowIndex = btn.dataset.row;
-                const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
-                activeRowForEvents = tableBody.rows[rowIndex];
-                showEventTypeMenu();
+                changeEventType(rowIndex, eventType);
             });
         });
+    }
+
+    function getEventTypeForRow(row) {
+        const topicCell = row.cells[1];
+        if (topicCell.classList.contains('special-event')) {
+            const text = topicCell.textContent;
+            if (text.includes('పర్యవేక్షకుని')) return 'co-visit';
+            if (text.includes('సమావేశ కార్యక్రమం')) return 'assembly';
+            if (text.includes('సమావేశం')) return 'convention';
+        }
+        return 'normal';
+    }
+
+    function changeEventType(rowIndex, eventType) {
+        const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
+        const row = tableBody.rows[rowIndex];
+        const topicCell = row.cells[1];
+        const speakerCell = row.cells[2];
+        const chairmanCell = row.cells[3];
+        const readerCell = row.cells[4];
+        
+        // Reset all cells first
+        topicCell.colSpan = 1;
+        topicCell.classList.remove('special-event');
+        topicCell.classList.add('editable-cell');
+        [speakerCell, chairmanCell, readerCell].forEach(cell => {
+            cell.style.display = '';
+            cell.classList.add('editable-cell');
+        });
+        
+        if (eventType !== 'normal') {
+            // Save current content if any
+            if (topicCell.textContent && !topicCell.classList.contains('special-event')) {
+                topicCell.dataset.originalContent = topicCell.textContent;
+            }
+            [speakerCell, chairmanCell, readerCell].forEach(cell => {
+                if (cell.textContent) {
+                    cell.dataset.originalContent = cell.textContent;
+                }
+            });
+            
+            // Apply special event
+            topicCell.colSpan = 4;
+            topicCell.classList.add('special-event');
+            topicCell.classList.remove('editable-cell');
+            topicCell.textContent = eventTexts[eventType];
+            [speakerCell, chairmanCell, readerCell].forEach(cell => {
+                cell.style.display = 'none';
+                cell.classList.remove('editable-cell');
+                cell.textContent = '';
+            });
+        } else {
+            // Restore normal event
+            if (topicCell.dataset.originalContent) {
+                topicCell.innerHTML = topicCell.dataset.originalContent;
+            } else {
+                topicCell.innerHTML = '';
+            }
+            [speakerCell, chairmanCell, readerCell].forEach(cell => {
+                if (cell.dataset.originalContent) {
+                    cell.innerHTML = cell.dataset.originalContent;
+                } else {
+                    cell.innerHTML = '';
+                }
+            });
+            topicCell.removeAttribute('data-original-content');
+            [speakerCell, chairmanCell, readerCell].forEach(cell => {
+                cell.removeAttribute('data-original-content');
+            });
+        }
+        
+        // Update mobile view
+        createMobileView();
+        debouncedSave();
     }
 
     // Desktop dropdown functions
     function openDesktopDropdown(type, cell) {
         currentDropdownType = type;
-        activeCellForDropdown = cell;
+        activeCellForDropdown = { cell: cell };
         
         if (type === 'member') {
             showDesktopMemberDropdown(cell);
@@ -1624,7 +1732,7 @@
 
     function selectDesktopDropdownItem(value) {
         if (activeCellForDropdown) {
-            activeCellForDropdown.textContent = value;
+            activeCellForDropdown.cell.textContent = value;
             debouncedSave();
         }
         hideDesktopDropdown();
@@ -1682,31 +1790,6 @@
             item.className = 'dropdown-item';
             item.textContent = topicName;
             item.addEventListener('click', () => selectMobileDropdownItem(topicText));
-            dropdownContent.appendChild(item);
-        });
-        
-        showMobileDropdown();
-    }
-
-    function showEventTypeMenu() {
-        dropdownTitle.textContent = 'Select Event Type';
-        dropdownContent.innerHTML = '';
-        
-        const eventTypes = [
-            { type: 'normal', name: 'Normal' },
-            { type: 'co-visit', name: 'CO Visit' },
-            { type: 'assembly', name: 'Assembly' },
-            { type: 'convention', name: 'Convention' }
-        ];
-        
-        eventTypes.forEach(event => {
-            const item = document.createElement('button');
-            item.className = 'dropdown-item';
-            item.textContent = event.name;
-            item.addEventListener('click', () => {
-                applyEventType(event.type);
-                hideMobileDropdown();
-            });
             dropdownContent.appendChild(item);
         });
         
@@ -1847,16 +1930,39 @@
         // For desktop, show a simple dropdown
         if (window.innerWidth > 768) {
             showEventTypeMenu();
-            dropdownContainer.style.position = 'fixed';
             dropdownContainer.style.top = 'auto';
             dropdownContainer.style.bottom = `${window.innerHeight - rect.top}px`;
-            dropdownContainer.style.left = `${rect.left - 150}px`;
+            dropdownContainer.style.left = `${rect.left}px`;
             dropdownContainer.style.width = '200px';
             dropdownContainer.style.borderRadius = '12px';
-            dropdownContainer.style.transform = 'translateY(0)';
         } else {
             showEventTypeMenu();
         }
+    }
+    
+    function showEventTypeMenu() {
+        dropdownTitle.textContent = 'Select Event Type';
+        dropdownContent.innerHTML = '';
+        
+        const eventTypes = [
+            { type: 'normal', name: 'Normal' },
+            { type: 'co-visit', name: 'CO Visit' },
+            { type: 'assembly', name: 'Assembly' },
+            { type: 'convention', name: 'Convention' }
+        ];
+        
+        eventTypes.forEach(event => {
+            const item = document.createElement('button');
+            item.className = 'dropdown-item';
+            item.textContent = event.name;
+            item.addEventListener('click', () => {
+                applyEventType(event.type);
+                hideMobileDropdown();
+            });
+            dropdownContent.appendChild(item);
+        });
+        
+        showMobileDropdown();
     }
     
     function applyEventType(eventType) {
@@ -1879,11 +1985,6 @@
             if(cell.dataset.originalContent) cell.innerHTML = cell.dataset.originalContent;
             cell.removeAttribute('data-original-content');
         });
-        const eventTexts = {
-            'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం',
-            'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో',
-            'convention': 'ప్రాదేశిక సమావేశం'
-        };
         if (eventType !== 'normal') {
             topicCell.dataset.originalContent = topicCell.innerHTML;
             otherCells.forEach(cell => cell.dataset.originalContent = cell.innerHTML);
