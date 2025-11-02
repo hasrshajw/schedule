@@ -1524,26 +1524,19 @@
     function initEditor() {
         if (currentListener) currentListener();
         currentListener = userSchedulesCollection.doc(currentScheduleId).onSnapshot(doc => {
-            if (doc.exists) {
-                const scheduleData = doc.data();
-                
-                
-                // Only prevent re-rendering if user is actively editing the subtitle
-if (!document.activeElement || 
-    document.activeElement.tagName === 'BODY' || 
-    !document.activeElement.classList.contains('subtitle')) {
-    renderSchedule(scheduleData);
-}
-                
-                
-                updateStatus('Synced', 'synced');
-            } else {
-                alert("This schedule may have been deleted.");
-                window.location.href = './sunday-dashboard.html';
-            }
-        }, error => {
-            updateStatus('Error', 'error');
-        });
+    if (doc.exists) {
+        const scheduleData = doc.data();
+        
+        // Always update the status, but don't re-render on every change
+        // to avoid conflicts with optimistic updates
+        updateStatus('Synced', 'synced');
+    } else {
+        alert("This schedule may have been deleted.");
+        window.location.href = './sunday-dashboard.html';
+    }
+}, error => {
+    updateStatus('Error', 'error');
+});
     }
 
     function renderSchedule(data) {
