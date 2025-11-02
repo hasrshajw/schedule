@@ -42,329 +42,139 @@
         --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
         --warning-color: #f59e0b;
         --success-color: #2e7d32;
-        --accent-color: #2563eb;
     }
 
-    @font-face {
+@font-face {
         font-family: "jw-icons-external";
         src: url("./jw-icons-external-d876da3.woff") format("woff");
         font-weight: normal; font-style: normal;
     }
 
-    body {
-        margin: 0; padding: 0;
-        font-family: 'Inter', sans-serif;
-        background-color: var(--body-bg);
-        color: var(--text-primary);
-        visibility: hidden; opacity: 0;
-        transition: opacity 0.3s ease-in;
-    }
-    body.auth-ready { visibility: visible; opacity: 1; }
-    body.menu-open { overflow: hidden; }
+body {
+    margin: 0; padding: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: var(--body-bg);
+    color: var(--text-primary);
+    visibility: hidden; opacity: 0;
+    transition: opacity 0.3s ease-in;
+}
+body.auth-ready { visibility: visible; opacity: 1; }
+body.menu-open { overflow: hidden; }
 
-    .site-header { background-color: var(--header-bg); padding: 0; color: var(--text-light); position: fixed; top: 0; left: 0; width: 100%; z-index: 900; }
-    .top-bar { display: flex; justify-content: space-between; align-items: center; height: 56px; padding: 0 15px 0 0; max-width: 1200px; margin: 0 auto; }
-    .top-bar .mobileLogo { display: block; width: 75px; height: 56px; background-image: url(https://www.jw.org/assets/ct/46605f23da/images/siteLogo-jworg-mobile.svg), none; background-repeat: no-repeat; background-size: contain; background-position: center left; flex-shrink: 0; margin-left: 0px; }
-    .header-right-controls { display: flex; align-items: center; gap: 15px; }
-    .header-icons { display: flex; align-items: center; height: 56px; cursor: pointer; }
-    .header-icons svg { height: 24px; width: 24px; color: var(--text-light); }
-    .header-icons .close-icon { display: none; }
-    body.menu-open .header-icons .hamburger-icon { display: none; }
-    body.menu-open .header-icons .close-icon { display: block; }
+.site-header { background-color: var(--header-bg); padding: 0; color: var(--text-light); position: fixed; top: 0; left: 0; width: 100%; z-index: 900; }
+.top-bar { display: flex; justify-content: space-between; align-items: center; height: 56px; padding: 0 15px 0 0; max-width: 1200px; margin: 0 auto; }
+.top-bar .mobileLogo { display: block; width: 75px; height: 56px; background-image: url(https://www.jw.org/assets/ct/46605f23da/images/siteLogo-jworg-mobile.svg), none; background-repeat: no-repeat; background-size: contain; background-position: center left; flex-shrink: 0; margin-left: 0px; }
+.header-right-controls { display: flex; align-items: center; gap: 15px; }
+.header-icons { display: flex; align-items: center; height: 56px; cursor: pointer; }
+.header-icons svg { height: 24px; width: 24px; color: var(--text-light); }
+.header-icons .close-icon { display: none; }
+body.menu-open .header-icons .hamburger-icon { display: none; }
+body.menu-open .header-icons .close-icon { display: block; }
 
-    .menu-overlay { position: fixed; top: 56px; left: 0; width: 100%; height: calc(100% - 56px); background-color: rgba(0, 0, 0, 0.6); z-index: 998; opacity: 0; visibility: hidden; transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; }
-    .menu-overlay.is-open { opacity: 1; visibility: visible; }
-    .slide-menu { position: fixed; top: 56px; right: 0; height: calc(100dvh - 56px); width: 320px; max-width: 90%; background-color: var(--menu-new-bg); z-index: 999; transform: translateX(100%); transition: transform 0.3s ease-in-out; display: flex; flex-direction: column; border-left: 1px solid var(--menu-new-border); }
-    .slide-menu.is-open { transform: translateX(0); }
+.menu-overlay { position: fixed; top: 56px; left: 0; width: 100%; height: calc(100% - 56px); background-color: rgba(0, 0, 0, 0.6); z-index: 998; opacity: 0; visibility: hidden; transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; }
+.menu-overlay.is-open { opacity: 1; visibility: visible; }
+.slide-menu { position: fixed; top: 56px; right: 0; height: calc(100dvh - 56px); width: 320px; max-width: 90%; background-color: var(--menu-new-bg); z-index: 999; transform: translateX(100%); transition: transform 0.3s ease-in-out; display: flex; flex-direction: column; border-left: 1px solid var(--menu-new-border); }
+.slide-menu.is-open { transform: translateX(0); }
 
-    .menu-links { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex-grow: 1; }
-    .menu-links li a { display: flex; align-items: center; color: var(--menu-new-text); background-color: var(--menu-new-bg); height: 50px; padding: 12px 5px 12px 12px; box-sizing: border-box; text-decoration: none; font-size: 1rem; transition: background-color 0.2s; border-top: 1px dotted #a7a7a7; }
-    .menu-links li:first-child a { border-top: none; }
-    .menu-links li a:hover { background-color: var(--menu-new-hover); }
+.menu-links { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex-grow: 1; }
+.menu-links li a { display: flex; align-items: center; color: var(--menu-new-text); background-color: var(--menu-new-bg); height: 50px; padding: 12px 5px 12px 12px; box-sizing: border-box; text-decoration: none; font-size: 1rem; transition: background-color 0.2s; border-top: 1px dotted #a7a7a7; }
+.menu-links li:first-child a { border-top: none; }
+.menu-links li a:hover { background-color: var(--menu-new-hover); }
 
-    .profile-section { padding: 16px; border-top: 1px solid var(--menu-new-border); flex-shrink: 0; background-color: #fafafa; margin-top: auto; }
-    .profile-info { display: flex; align-items: center; }
-    .profile-name { font-weight: bold; font-size: 1rem; color: #333; word-break: break-all; }
+.profile-section { padding: 16px; border-top: 1px solid var(--menu-new-border); flex-shrink: 0; background-color: #fafafa; margin-top: auto; }
+.profile-info { display: flex; align-items: center; }
+.profile-name { font-weight: bold; font-size: 1rem; color: #333; word-break: break-all; }
 
-    .iconLink-icon { font-family: "jw-icons-external"; font-size: 24px; display: inline-block; color: #757575; width: 30px; margin-right: 10px; text-align: center; }
-    .home-icon::before { content: "\e661"; }
-    .midweek-icon::before { content: "\e625"; }
-    .sunday-icon::before { content: "\e610"; }
-    .members-icon::before { content: "\e695"; }
+.iconLink-icon { font-family: "jw-icons-external"; font-size: 24px; display: inline-block; color: #757575; width: 30px; margin-right: 10px; text-align: center; }
+.home-icon::before { content: "\e661"; }
+.midweek-icon::before { content: "\e625"; }
+.sunday-icon::before { content: "\e610"; }
+.members-icon::before { content: "\e695"; }
 
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; border-radius: var(--radius-md); font-size: 1rem; font-weight: 600; cursor: pointer; border: none; text-decoration: none; background-color: var(--primary-color); color: white; transition: background-color 0.2s; }
-    .btn:hover:not(:disabled) { background-color: var(--primary-hover); }
-    .btn:disabled { cursor: not-allowed; opacity: 0.6; }
-    /* END: NEW NAVBAR STYLES */
 
-    /* START: ENHANCED EDITOR STYLES */
-    *, *::before, *::after { box-sizing: border-box; }
-    html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; border-radius: var(--radius-md); font-size: 1rem; font-weight: 600; cursor: pointer; border: none; text-decoration: none; background-color: var(--primary-color); color: white; transition: background-color 0.2s; }
+.btn:hover:not(:disabled) { background-color: var(--primary-hover); }
+.btn:disabled { cursor: not-allowed; opacity: 0.6; }
+/* END: NEW NAVBAR STYLES */
 
-    .hidden { display: none !important; }
+/* START: ORIGINAL EDITOR STYLES */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 
-    main { padding: calc(56px + 20px) 20px 20px; }
-    .editor-main { max-width: 1100px; margin: 0 auto; }
-    .page-controls { margin-bottom: 24px; display: flex; gap: 12px; justify-content: flex-end; }
+.hidden { display: none !important; }
 
-    .master-container { background: var(--surface-color); padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
-    .project-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color); }
-    .project-title { font-size: 1.75rem; font-weight: 700; margin: 0; flex-grow: 1; border: none; padding: 4px 8px; margin: -4px -8px; border-radius: var(--radius-md); font-family: 'Noto Sans Telugu', sans-serif; }
-    .project-title:focus { outline: 2px solid var(--primary-color); background-color: var(--primary-light); }
+main { padding: calc(56px + 20px) 20px 20px; }
+.editor-main { max-width: 1100px; margin: 0 auto; }
+.page-controls { margin-bottom: 24px; }
 
-    .schedule-block { margin-bottom: 32px; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 20px; background: white; }
-    .schedule-block:last-child { margin-bottom: 0; }
-    .schedule-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    .schedule-title { font-size: 1.25rem; font-weight: 600; margin: 0; color: var(--text-primary); font-family: 'Noto Sans Telugu', sans-serif; }
-    .schedule-actions { display: flex; gap: 8px; align-items: center; }
+.master-container { background: var(--surface-color); padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
+.project-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color); }
+.project-title { font-size: 1.75rem; font-weight: 700; margin: 0; flex-grow: 1; border: none; padding: 4px 8px; margin: -4px -8px; border-radius: var(--radius-md); font-family: 'Noto Sans Telugu', sans-serif; }
+.project-title:focus { outline: 2px solid var(--primary-color); background-color: var(--primary-light); }
 
-    /* NEW: Enhanced Event Type Dropdown */
-    .event-type-dropdown { position: relative; display: inline-block; }
-    .event-type-select { 
-        display: flex; 
-        align-items: center; 
-        gap: 8px; 
-        padding: 8px 12px; 
-        border: 1px solid var(--border-color); 
-        border-radius: var(--radius-md); 
-        background: white; 
-        cursor: pointer; 
-        font-size: 14px; 
-        font-weight: 500;
-        transition: all 0.2s;
-        min-width: 140px;
-    }
-    .event-type-select:hover { border-color: var(--accent-color); }
-    .event-type-select.active { border-color: var(--accent-color); box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1); }
-    .event-type-options { 
-        position: absolute; 
-        top: 100%; 
-        left: 0; 
-        right: 0; 
-        background: white; 
-        border: 1px solid var(--border-color); 
-        border-radius: var(--radius-md); 
-        box-shadow: var(--shadow-md); 
-        z-index: 100; 
-        display: none;
-        margin-top: 4px;
-    }
-    .event-type-options.active { display: block; }
-    .event-type-option { 
-        display: flex; 
-        align-items: center; 
-        gap: 8px; 
-        padding: 8px 12px; 
-        cursor: pointer; 
-        border: none; 
-        background: none; 
-        width: 100%; 
-        text-align: left;
-        font-size: 14px;
-    }
-    .event-type-option:hover { background: #f8fafc; }
-    .event-type-option.active { background: var(--primary-light); color: var(--primary-color); }
+.schedule-block { margin-bottom: 32px; }
+.schedule-block:last-child { margin-bottom: 0; }
+.schedule-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.schedule-title { font-size: 1.25rem; font-weight: 600; margin: 0; color: var(--text-secondary); font-family: 'Noto Sans Telugu', sans-serif; }
 
-    .status-indicator { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; display: flex; align-items: center; gap: 6px; }
-    .status-indicator::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background-color: currentColor; }
-    .status-indicator[data-status="synced"] { color: var(--success-color); background-color: #eaf5ea; }
-    .status-indicator[data-status="syncing"] { color: var(--warning-color); background-color: #fffbeb; }
-    .status-indicator[data-status="error"] { color: var(--danger-color); background-color: #fde8e8; }
+.status-indicator { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; display: flex; align-items: center; gap: 6px; }
+.status-indicator::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background-color: currentColor; }
+.status-indicator[data-status="synced"] { color: var(--success-color); background-color: #eaf5ea; }
+.status-indicator[data-status="syncing"] { color: var(--warning-color); background-color: #fffbeb; }
+.status-indicator[data-status="error"] { color: var(--danger-color); background-color: #fde8e8; }
 
-    .toolbar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); transition: all 0.2s; text-decoration: none; color: var(--text-secondary); }
-    .toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; border-color: #d1d5db; color: var(--text-primary); }
-    .toolbar-btn:disabled { cursor: not-allowed; opacity: 0.5; }
+.toolbar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-color); background-color: var(--surface-color); border-radius: var(--radius-md); transition: all 0.2s; text-decoration: none; color: var(--text-secondary); }
+.toolbar-btn:hover:not(:disabled) { background-color: #f9fafb; border-color: #d1d5db; color: var(--text-primary); }
+.toolbar-btn:disabled { cursor: not-allowed; opacity: 0.5; }
 
-    .schedule-block table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.25px; }
-    .schedule-block th, .schedule-block td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; }
-    .schedule-block .editable-cell:not([contenteditable="true"]) { cursor: pointer; }
-    .schedule-block .editable-cell:not([contenteditable="true"]):hover { background-color: #f9fafb; }
-    .schedule-block [contenteditable="true"]:focus { background-color: #fffbe5; }
-    .schedule-block .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; }
-    .schedule-block .cell-icon { height: 70%; max-height: 24px; object-fit: contain; flex-shrink: 0; }
-    .schedule-block .header-row .cell-icon { filter: brightness(0) invert(1); }
-    .schedule-block .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; }
-    .schedule-block .header-row td { font-size: 16px; color: #ffffff; height: 42px; }
-    .schedule-block .row-handle { display: none !important; }
-    .special-event-text { color: red; text-align: center !important; font-weight: 700; }
-    #event-context-menu, #member-dropdown { position: fixed; display: none; background: var(--surface-color); border-radius: var(--radius-md); box-shadow: var(--shadow-md); z-index: 1001; padding: 6px; min-width: 180px; border: 1px solid var(--border-color); }
-    .context-menu-item, .member-dropdown-item { font-family: 'Inter', sans-serif; display: block; width: 100%; padding: 8px 12px; cursor: pointer; font-size: 14px; border-radius: 6px; background: none; border: none; text-align: left; }
-    .context-menu-item:hover, .member-dropdown-item:hover { background: #f9fafb; }
-    .member-dropdown-item { display: flex; justify-content: space-between; align-items: center; }
-    #member-dropdown { max-height: 300px; overflow-y: auto; }
-    .servant-tag { font-size: 0.75rem; font-weight: 600; color: var(--primary-color); background-color: var(--primary-light); padding: 2px 6px; border-radius: 4px; }
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 16px; }
-    .modal-content { background: white; padding: 24px; border-radius: var(--radius-lg); width: 100%; max-width: 500px; max-height: 90vh; display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow-lg); }
-    #new-project-name { width: 100%; padding: 12px; font-size: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); }
-    #template-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md); }
-    #template-list li { padding: 12px; border-bottom: 1px solid var(--border-color); }
-    #template-list label { display: flex; align-items: center; gap: 10px; font-size: 16px; cursor: pointer; font-weight: 500; }
-    .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px; }
-    .modal-actions button { padding: 10px 20px; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); }
-    #cancel-template-selection { background-color: var(--surface-color); }
-    #confirm-template-selection { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
-    #print-container { position: absolute; left: -9999px; top: auto; width: 1100px; background: white; }
+.schedule-block table { width: 100%; border-collapse: collapse; border: 2px solid #4B0082; font-family: 'Noto Sans Telugu', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.25px; }
+.schedule-block th, .schedule-block td { border: 1px solid #333; padding: 0 8px; text-align: left; vertical-align: middle; position: relative; height: 36px; }
+.schedule-block .editable-cell:not([contenteditable="true"]) { cursor: pointer; }
+.schedule-block .editable-cell:not([contenteditable="true"]):hover { background-color: #f9fafb; }
+.schedule-block [contenteditable="true"]:focus { background-color: #fffbe5; }
+.schedule-block .cell-content-wrapper { display: flex; align-items: center; gap: 8px; height: 100%; }
+.schedule-block .cell-icon { height: 70%; max-height: 24px; object-fit: contain; flex-shrink: 0; }
+.schedule-block .header-row .cell-icon { filter: brightness(0) invert(1); }
+.schedule-block .header-content-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; height: 100%; }
+.schedule-block .header-row td { font-size: 16px; color: #ffffff; height: 42px; }
+.schedule-block .row-handle { display: none !important; }
+.special-event-text { color: red; text-align: center !important; font-weight: 700; }
+#event-context-menu, #member-dropdown { position: fixed; display: none; background: var(--surface-color); border-radius: var(--radius-md); box-shadow: var(--shadow-md); z-index: 1001; padding: 6px; min-width: 180px; border: 1px solid var(--border-color); }
+.context-menu-item, .member-dropdown-item { font-family: 'Inter', sans-serif; display: block; width: 100%; padding: 8px 12px; cursor: pointer; font-size: 14px; border-radius: 6px; background: none; border: none; text-align: left; }
+.context-menu-item:hover, .member-dropdown-item:hover { background: #f9fafb; }
+.member-dropdown-item { display: flex; justify-content: space-between; align-items: center; }
+#member-dropdown { max-height: 300px; overflow-y: auto; }
+.servant-tag { font-size: 0.75rem; font-weight: 600; color: var(--primary-color); background-color: var(--primary-light); padding: 2px 6px; border-radius: 4px; }
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 16px; }
+.modal-content { background: white; padding: 24px; border-radius: var(--radius-lg); width: 100%; max-width: 500px; max-height: 90vh; display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow-lg); }
+#new-project-name { width: 100%; padding: 12px; font-size: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); }
+#template-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md); }
+#template-list li { padding: 12px; border-bottom: 1px solid var(--border-color); }
+#template-list label { display: flex; align-items: center; gap: 10px; font-size: 16px; cursor: pointer; font-weight: 500; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px; }
+.modal-actions button { padding: 10px 20px; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); }
+#cancel-template-selection { background-color: var(--surface-color); }
+#confirm-template-selection { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
+#print-container { position: absolute; left: -9999px; top: auto; width: 1100px; background: white; }
+.mobile-view-container { display: none; }
+.date-input { cursor: pointer; -webkit-appearance: none; -moz-appearance: none; appearance: none; background-color: transparent; border: none; width: 100%; height: 100%; font-family: inherit; font-size: inherit; font-weight: inherit; text-align: left; padding-left: 8px; }
 
-    /* NEW: Enhanced Mobile View */
-    .mobile-view-container { display: none; }
-    .date-input { cursor: pointer; -webkit-appearance: none; -moz-appearance: none; appearance: none; background-color: transparent; border: none; width: 100%; height: 100%; font-family: inherit; font-size: inherit; font-weight: inherit; text-align: left; padding-left: 8px; }
-
-    /* NEW: Enhanced Mobile Styles */
-    @media (max-width: 768px) {
-        main { padding: 56px 0 0 0; }
-        .master-container { padding: 16px; border-radius: 0; box-shadow: none; }
-        .page-controls { padding: 0 16px; margin-bottom: 16px; justify-content: space-between; }
-        .project-header { flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px 0; margin-bottom: 16px; }
-        .project-title { font-size: 1.5rem; }
-        .schedule-block { margin-bottom: 24px; padding: 16px; border-radius: 12px; }
-        .schedule-block:last-child { margin-bottom: 0; }
-        .schedule-block table { display: none; }
-        .mobile-view-container { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 1.5rem; 
-            border: 1px solid var(--border-color); 
-            border-radius: var(--radius-lg); 
-            padding: 16px; 
-            background: #fafafa;
-        }
-        .mobile-item { 
-            background: white; 
-            padding: 16px; 
-            border-radius: var(--radius-md); 
-            border: 1px solid var(--border-color);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        .mobile-item .item-label { 
-            font-size: 1rem; 
-            font-weight: 700; 
-            color: var(--text-primary); 
-            margin-bottom: 12px; 
-            font-family: 'Noto Sans Telugu', sans-serif; 
-            padding-bottom: 8px;
-            border-bottom: 2px solid var(--primary-light);
-        }
-        .mobile-item .item-input { 
-            width: 100%; 
-            padding: 12px; 
-            border: 1px solid var(--border-color); 
-            border-radius: var(--radius-md); 
-            background-color: white; 
-            font-size: 1rem; 
-            font-weight: 500; 
-            color: var(--text-primary); 
-            margin-top: 4px; 
-            transition: all 0.2s;
-        }
-        .mobile-item .item-input:focus {
-            outline: none;
-            border-color: var(--accent-color);
-            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
-        }
-        .mobile-item .input-group { margin-bottom: 16px; }
-        .mobile-item .input-group:last-child { margin-bottom: 0; }
-
-        /* Enhanced Mobile Event Type Dropdown */
-        .mobile-event-type { 
-            margin-bottom: 16px; 
-            background: white;
-            padding: 16px;
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border-color);
-        }
-        .mobile-event-type .item-label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-        .mobile-event-type-select {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            background: white;
-            cursor: pointer;
-            font-weight: 500;
-        }
-        .mobile-event-type-options {
-            margin-top: 8px;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            overflow: hidden;
-            display: none;
-        }
-        .mobile-event-type-options.active {
-            display: block;
-        }
-        .mobile-event-type-option {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px;
-            border: none;
-            background: white;
-            width: 100%;
-            text-align: left;
-            cursor: pointer;
-            border-bottom: 1px solid var(--border-color);
-        }
-        .mobile-event-type-option:last-child {
-            border-bottom: none;
-        }
-        .mobile-event-type-option:hover {
-            background: #f8fafc;
-        }
-        .mobile-event-type-option.active {
-            background: var(--primary-light);
-            color: var(--primary-color);
-        }
-    }
-
-    /* NEW: Table Management Styles */
-    .table-management { display: flex; gap: 8px; margin-bottom: 16px; }
-    .table-management-btn { 
-        display: inline-flex; 
-        align-items: center; 
-        gap: 6px; 
-        padding: 8px 16px; 
-        border: 1px solid var(--border-color); 
-        background: white; 
-        border-radius: var(--radius-md); 
-        cursor: pointer; 
-        font-size: 14px; 
-        font-weight: 500;
-        transition: all 0.2s;
-    }
-    .table-management-btn:hover {
-        background: #f8fafc;
-        border-color: var(--accent-color);
-    }
-    .table-management-btn.primary {
-        background: var(--primary-color);
-        color: white;
-        border-color: var(--primary-color);
-    }
-    .table-management-btn.primary:hover {
-        background: var(--primary-hover);
-    }
-
-    /* Desktop-specific enhancements */
-    @media (min-width: 769px) {
-        .schedule-block:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            transition: box-shadow 0.2s ease;
-        }
-        .schedule-actions {
-            opacity: 0.7;
-            transition: opacity 0.2s;
-        }
-        .schedule-block:hover .schedule-actions {
-            opacity: 1;
-        }
-    }
+@media (max-width: 768px) {
+    main { padding: 56px 0 0 0; }
+    .master-container { padding: 16px; border-radius: 0; box-shadow: none; }
+    .page-controls { padding: 0 16px; margin-bottom: 16px; }
+    .project-header { flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px 0; margin-bottom: 16px; }
+    .project-title { font-size: 1.5rem; }
+    .schedule-block { margin-bottom: 24px; padding: 0 0 24px 0; border-bottom: 8px solid var(--background-color); }
+    .schedule-block:last-child { border-bottom: none; }
+    .schedule-block table { display: none; }
+    .mobile-view-container { display: flex; flex-direction: column; gap: 1.5rem; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 16px; }
+    .mobile-item .item-label { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; font-family: 'Noto Sans Telugu', sans-serif; }
+    .mobile-item .item-input { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-md); background-color: #f9fafb; font-size: 1rem; font-weight: 500; color: var(--text-secondary); margin-top: 4px; }
+    .mobile-item .input-group { margin-bottom: 12px; }
+    .mobile-item .input-group:last-child { margin-bottom: 0; }
+}
+/* END: ORIGINAL EDITOR STYLES */
 </style>
 </head>
 <body>
@@ -398,16 +208,6 @@
 
 <main id="app-container" class="editor-main hidden">
     <div class="page-controls">
-        <div class="table-management">
-            <button class="table-management-btn primary" id="add-table-btn">
-                <span class="material-symbols-outlined">add</span>
-                <span>Add Table</span>
-            </button>
-            <button class="table-management-btn" id="remove-table-btn">
-                <span class="material-symbols-outlined">delete</span>
-                <span>Remove Table</span>
-            </button>
-        </div>
         <button id="print-button" class="btn">
             <span class="material-symbols-outlined">picture_as_pdf</span>
             <span>Download PDF</span>
@@ -416,6 +216,7 @@
     <div class="master-container">
         <div id="project-header" class="project-header">
             <h1 id="project-title" contenteditable="true">Loading Project...</h1>
+            <!-- Status indicator was here, now moved to header -->
         </div>
         <div id="schedules-wrapper"></div>
     </div>
@@ -425,38 +226,10 @@
     <div class="schedule-block">
         <div class="schedule-header">
             <h2 class="schedule-title"></h2>
-            <div class="schedule-actions">
-                <!-- NEW: Enhanced Event Type Dropdown -->
-                <div class="event-type-dropdown">
-                    <div class="event-type-select">
-                        <span class="material-symbols-outlined">event</span>
-                        <span class="event-type-text">Normal</span>
-                        <span class="material-symbols-outlined" style="font-size: 16px; margin-left: auto;">arrow_drop_down</span>
-                    </div>
-                    <div class="event-type-options">
-                        <button class="event-type-option" data-event-type="normal">
-                            <span class="material-symbols-outlined">event</span>
-                            <span>Normal</span>
-                        </button>
-                        <button class="event-type-option" data-event-type="co-visit">
-                            <span class="material-symbols-outlined">groups</span>
-                            <span>CO Visit</span>
-                        </button>
-                        <button class="event-type-option" data-event-type="assembly">
-                            <span class="material-symbols-outlined">celebration</span>
-                            <span>Assembly</span>
-                        </button>
-                        <button class="event-type-option" data-event-type="convention">
-                            <span class="material-symbols-outlined">festival</span>
-                            <span>Convention</span>
-                        </button>
-                    </div>
-                </div>
-                <button class="toolbar-btn edit-btn">
-                    <span class="material-symbols-outlined">edit</span>
-                    <span>Edit</span>
-                </button>
-            </div>
+            <button class="toolbar-btn event-btn">
+                <span class="material-symbols-outlined">celebration</span>
+                <span>Event</span>
+            </button>
         </div>
         <table>
             <colgroup><col style="width: 60%;"><col style="width: 20%;"><col style="width: 20%;"></colgroup>
@@ -522,8 +295,6 @@
     const eventContextMenu = document.getElementById('event-context-menu');
     const memberDropdown = document.getElementById('member-dropdown');
     const statusIndicator = document.querySelector('.status-indicator');
-    const addTableBtn = document.getElementById('add-table-btn');
-    const removeTableBtn = document.getElementById('remove-table-btn');
     
     function updateStatus(text, status) {
         statusIndicator.textContent = text;
@@ -562,20 +333,13 @@
             this.titleEl = this.element.querySelector('.schedule-title');
             this.tableBody = this.element.querySelector('.schedule-table-body');
             this.mobileViewContainer = this.element.querySelector('.mobile-view-container');
-            this.eventTypeDropdown = this.element.querySelector('.event-type-dropdown');
-            this.eventTypeSelect = this.element.querySelector('.event-type-select');
-            this.eventTypeText = this.element.querySelector('.event-type-text');
-            this.eventTypeOptions = this.element.querySelector('.event-type-options');
-            this.editBtn = this.element.querySelector('.edit-btn');
+            this.eventBtn = this.element.querySelector('.event-btn');
             schedulesWrapper.appendChild(this.element);
         }
 
         render() {
             this.titleEl.textContent = this.data.title;
             this.tableBody.innerHTML = this.data.content;
-            
-            // Update event type dropdown to reflect current state
-            this.updateEventTypeDisplay();
             
             this.tableBody.querySelectorAll('td, th').forEach(cell => {
                 if (cell.hasAttribute('data-user-editable')) {
@@ -597,65 +361,10 @@
             this._createMobileView();
         }
 
-        updateEventTypeDisplay() {
-            const eventType = this.data.eventType || 'normal';
-            const eventTypeNames = {
-                'normal': 'Normal',
-                'co-visit': 'CO Visit',
-                'assembly': 'Assembly',
-                'convention': 'Convention'
-            };
-            
-            this.eventTypeText.textContent = eventTypeNames[eventType];
-            
-            // Update active state in dropdown options
-            this.eventTypeOptions.querySelectorAll('.event-type-option').forEach(option => {
-                option.classList.remove('active');
-                if (option.dataset.eventType === eventType) {
-                    option.classList.add('active');
-                }
-            });
-        }
-
         _createMobileView() {
             this.mobileViewContainer.innerHTML = '';
-            
-            // Add mobile event type dropdown
-            const eventTypeDiv = document.createElement('div');
-            eventTypeDiv.className = 'mobile-event-type';
-            eventTypeDiv.innerHTML = `
-                <div class="item-label">
-                    <span class="material-symbols-outlined">event</span>
-                    <span>Event Type</span>
-                </div>
-                <div class="mobile-event-type-select">${this.getEventTypeName(this.data.eventType || 'normal')}</div>
-                <div class="mobile-event-type-options">
-                    <button class="mobile-event-type-option ${this.data.eventType === 'normal' ? 'active' : ''}" data-event-type="normal">
-                        <span class="material-symbols-outlined">event</span>
-                        <span>Normal</span>
-                    </button>
-                    <button class="mobile-event-type-option ${this.data.eventType === 'co-visit' ? 'active' : ''}" data-event-type="co-visit">
-                        <span class="material-symbols-outlined">groups</span>
-                        <span>CO Visit</span>
-                    </button>
-                    <button class="mobile-event-type-option ${this.data.eventType === 'assembly' ? 'active' : ''}" data-event-type="assembly">
-                        <span class="material-symbols-outlined">celebration</span>
-                        <span>Assembly</span>
-                    </button>
-                    <button class="mobile-event-type-option ${this.data.eventType === 'convention' ? 'active' : ''}" data-event-type="convention">
-                        <span class="material-symbols-outlined">festival</span>
-                        <span>Convention</span>
-                    </button>
-                </div>
-            `;
-            this.mobileViewContainer.appendChild(eventTypeDiv);
-
             if (this.data.eventType && this.data.eventType !== 'normal') {
-                const eventTexts = { 
-                    'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం', 
-                    'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో', 
-                    'convention': 'ప్రాదేశిక సమావేశం' 
-                };
+                const eventTexts = { 'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం', 'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో', 'convention': 'ప్రాదేశిక సమావేశం' };
                 const firstRow = this.tableBody.rows[0];
                 const dateCell = firstRow.cells[2];
                 const dateInput = dateCell ? dateCell.querySelector('.date-input') : null;
@@ -741,16 +450,6 @@
             });
         }
         
-        getEventTypeName(eventType) {
-            const names = {
-                'normal': 'Normal',
-                'co-visit': 'CO Visit', 
-                'assembly': 'Assembly',
-                'convention': 'Convention'
-            };
-            return names[eventType] || 'Normal';
-        }
-
         getContent() {
             const tempBody = this.tableBody.cloneNode(true);
             const dateInput = tempBody.querySelector('.date-input');
@@ -798,7 +497,6 @@
                 `;
             }
 
-            this.updateEventTypeDisplay();
             this._createMobileView();
             if (shouldSave) this.parentProject.triggerSave();
         }
@@ -820,73 +518,12 @@
                 this.parentProject.triggerSave();
             });
 
-            // Enhanced event type dropdown
-            this.eventTypeSelect.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const isActive = this.eventTypeOptions.classList.contains('active');
-                
-                // Close all other dropdowns
-                document.querySelectorAll('.event-type-options').forEach(option => {
-                    option.classList.remove('active');
-                });
-                document.querySelectorAll('.event-type-select').forEach(select => {
-                    select.classList.remove('active');
-                });
-                
-                // Toggle current dropdown
-                if (!isActive) {
-                    this.eventTypeOptions.classList.add('active');
-                    this.eventTypeSelect.classList.add('active');
-                }
-            });
-
-            this.eventTypeOptions.addEventListener('click', (e) => {
-                const option = e.target.closest('.event-type-option');
-                if (option) {
-                    const eventType = option.dataset.eventType;
-                    this.applyEventType(eventType);
-                    this.eventTypeOptions.classList.remove('active');
-                    this.eventTypeSelect.classList.remove('active');
-                }
-            });
-
-            this.editBtn.addEventListener('click', (e) => {
-                // Toggle edit mode for the table title
-                this.titleEl.contentEditable = this.titleEl.contentEditable === 'true' ? 'false' : 'true';
-                if (this.titleEl.contentEditable === 'true') {
-                    this.titleEl.focus();
-                    // Select all text for easy editing
-                    const range = document.createRange();
-                    range.selectNodeContents(this.titleEl);
-                    const selection = window.getSelection();
-                    selection.removeAllRanges();
-                    selection.addRange(range);
-                }
-                this.parentProject.triggerSave();
-            });
-
-            // Mobile event type dropdown
-            this.mobileViewContainer.addEventListener('click', (e) => {
-                const mobileSelect = e.target.closest('.mobile-event-type-select');
-                if (mobileSelect) {
-                    const options = mobileSelect.nextElementSibling;
-                    options.classList.toggle('active');
-                }
-
-                const mobileOption = e.target.closest('.mobile-event-type-option');
-                if (mobileOption) {
-                    const select = mobileOption.closest('.mobile-event-type').querySelector('.mobile-event-type-select');
-                    const eventType = mobileOption.dataset.eventType;
-                    
-                    // Update select text
-                    select.textContent = mobileOption.textContent.trim();
-                    
-                    // Close dropdown
-                    mobileOption.closest('.mobile-event-type-options').classList.remove('active');
-                    
-                    // Apply event type
-                    this.applyEventType(eventType);
-                }
+            this.eventBtn.addEventListener('click', (e) => {
+                activeEventScheduleTable = this;
+                const rect = e.currentTarget.getBoundingClientRect();
+                eventContextMenu.style.display = 'block';
+                eventContextMenu.style.top = `${rect.bottom}px`;
+                eventContextMenu.style.left = `${rect.left}px`;
             });
         }
     }
@@ -911,15 +548,6 @@
             this.data.tables.forEach((tableData, index) => {
                 this.scheduleTables.push(new ScheduleTable(this, tableData, index));
             });
-            
-            // Update remove table button state
-            this.updateTableManagementButtons();
-        }
-
-        updateTableManagementButtons() {
-            if (removeTableBtn) {
-                removeTableBtn.disabled = this.scheduleTables.length <= 1;
-            }
         }
 
         triggerSave() {
@@ -940,7 +568,7 @@
                 }
             });
             const updatedTablesData = this.scheduleTables.map(table => ({
-                title: table.titleEl.textContent,
+                title: table.data.title,
                 content: table.getContent(),
                 eventType: table.data.eventType || 'normal'
             }));
@@ -958,40 +586,8 @@
                 });
         }
 
-        addTable() {
-            const newTableData = {
-                title: `New Table ${this.scheduleTables.length + 1}`,
-                content: '<tr><td data-user-editable="true"></td><td data-user-editable="true"></td><td data-user-editable="true"></td></tr>',
-                eventType: 'normal'
-            };
-            
-            this.data.tables.push(newTableData);
-            this.scheduleTables.push(new ScheduleTable(this, newTableData, this.scheduleTables.length));
-            this.updateTableManagementButtons();
-            this.triggerSave();
-        }
-
-        removeTable() {
-            if (this.scheduleTables.length <= 1) return;
-            
-            this.data.tables.pop();
-            const removedTable = this.scheduleTables.pop();
-            removedTable.element.remove();
-            this.updateTableManagementButtons();
-            this.triggerSave();
-        }
-
         setupEventListeners() {
             projectTitleEl.addEventListener('input', () => this.triggerSave());
-            
-            // Table management
-            if (addTableBtn) {
-                addTableBtn.addEventListener('click', () => this.addTable());
-            }
-            
-            if (removeTableBtn) {
-                removeTableBtn.addEventListener('click', () => this.removeTable());
-            }
         }
     }
 
@@ -1040,7 +636,6 @@
     async function initCreationFlow() {
         document.getElementById('project-header').style.display = 'none';
         document.getElementById('print-button').style.display = 'none';
-        document.querySelector('.table-management').style.display = 'none';
         const templatesCollection = db.collection("templates");
         const snapshot = await templatesCollection.orderBy("createdAt").get();
         templateList.innerHTML = '';
@@ -1081,6 +676,7 @@
         menuOverlay.addEventListener('click', closeMenu);
 
         // App-specific UI
+
         document.getElementById('print-button').addEventListener('click', generatePdf);
         document.getElementById('cancel-template-selection').addEventListener('click', () => window.location.href = './dashboard.html');
         document.getElementById('confirm-template-selection').addEventListener('click', async () => {
@@ -1139,54 +735,15 @@
                 if (activeCellForDropdown.mobileDiv) {
                     activeCellForDropdown.mobileDiv.textContent = newName;
                 }
-                if (activeProject) activeProject.triggerSave();
+                activeProject.triggerSave();
             }
             memberDropdown.style.display = 'none';
             activeCellForDropdown = null;
         });
 
-        // Close dropdowns when clicking outside
         document.addEventListener('click', (e) => {
-            if (!eventContextMenu.contains(e.target) && !e.target.closest('.event-btn')) { 
-                eventContextMenu.style.display = 'none'; 
-            }
-            if (!memberDropdown.contains(e.target) && !e.target.closest('.editable-cell')) { 
-                memberDropdown.style.display = 'none'; 
-            }
-            
-            // Close event type dropdowns when clicking outside
-            if (!e.target.closest('.event-type-dropdown')) {
-                document.querySelectorAll('.event-type-options').forEach(option => {
-                    option.classList.remove('active');
-                });
-                document.querySelectorAll('.event-type-select').forEach(select => {
-                    select.classList.remove('active');
-                });
-            }
-            
-            // Close mobile event type dropdowns when clicking outside
-            if (!e.target.closest('.mobile-event-type')) {
-                document.querySelectorAll('.mobile-event-type-options').forEach(option => {
-                    option.classList.remove('active');
-                });
-            }
-        });
-
-        // Close dropdowns on escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                document.querySelectorAll('.event-type-options').forEach(option => {
-                    option.classList.remove('active');
-                });
-                document.querySelectorAll('.event-type-select').forEach(select => {
-                    select.classList.remove('active');
-                });
-                document.querySelectorAll('.mobile-event-type-options').forEach(option => {
-                    option.classList.remove('active');
-                });
-                eventContextMenu.style.display = 'none';
-                memberDropdown.style.display = 'none';
-            }
+            if (!eventContextMenu.contains(e.target) && !e.target.closest('.event-btn')) { eventContextMenu.style.display = 'none'; }
+            if (!memberDropdown.contains(e.target) && !e.target.closest('.editable-cell')) { memberDropdown.style.display = 'none'; }
         });
     }
     
@@ -1255,54 +812,51 @@
         document.body.appendChild(printContainer);
 
         const itemsToPrint = [];
+        // INSIDE THE generatePdf function...
 
         for (const block of document.querySelectorAll('.schedule-block')) {
             const clone = block.cloneNode(true);
             
-            clone.querySelector('.schedule-actions').style.display = 'none';
+            clone.querySelector('.event-btn').style.display = 'none';
             clone.querySelector('.mobile-view-container').style.display = 'none';
             clone.querySelector('table').style.display = 'table';
             
             const titleEl = clone.querySelector('.schedule-title');
             if (titleEl) {
-                titleEl.style.display = 'block';
-                titleEl.style.marginBottom = '16px';
-                titleEl.style.fontSize = '18px';
-                titleEl.style.fontWeight = 'bold';
+                titleEl.style.display = 'none';
             }
-            clone.style.marginBottom = '20px';
-            clone.style.padding = '16px';
-            clone.style.border = '1px solid #ddd';
-            clone.style.background = 'white';
+            clone.style.marginBottom = '0';
+            
+            
+            clone.style.padding = '0';
+            clone.style.border = 'none';
+
+            // --- START: ADD THIS NEW CODE BLOCK ---
 
             // Increase the height of all table cells for better spacing in the PDF
             const allCells = clone.querySelectorAll('th, td');
             allCells.forEach(cell => {
-                cell.style.height = '40px';
-                cell.style.padding = '8px';
-                cell.style.fontSize = '12px';
+                cell.style.height = '40px'; // Adjust this value as needed
             });
+
+            // --- END: ADD THIS NEW CODE BLOCK ---
 
             printContainer.appendChild(clone);
             
-            const canvas = await html2canvas(clone, { 
-                scale: 2, 
-                useCORS: true, 
-                backgroundColor: '#ffffff',
-                logging: false 
-            });
+            const canvas = await html2canvas(clone, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
             
+            // --- And continue with the rest of the logic ---
             const imgData = canvas.toDataURL('image/jpeg', 0.8);
             const imgProps = pdf.getImageProperties(imgData);
             const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
             itemsToPrint.push({ imgData, width: USABLE_WIDTH, height: imgHeight });
-            
-            printContainer.removeChild(clone);
         }
         
         document.body.removeChild(printContainer);
-        
-        // Group all printable items into pages
+        let currentY = MARGIN_MM;
+        // --- START: NEW, ADVANCED PDF LAYOUT LOGIC ---
+
+        // Stage 1: Group all printable items into pages first.
         const pages = [];
         let currentPageItems = [];
         let currentPageHeight = 0;
@@ -1310,8 +864,8 @@
         itemsToPrint.forEach(item => {
             const itemHeightWithSpacing = currentPageItems.length > 0 ? item.height + PAGE_SPACING_MM : item.height;
             if (currentPageHeight + itemHeightWithSpacing > USABLE_HEIGHT && currentPageItems.length > 0) {
-                pages.push(currentPageItems);
-                currentPageItems = [item];
+                pages.push(currentPageItems); // Finalize the current page
+                currentPageItems = [item]; // Start a new page with the current item
                 currentPageHeight = item.height;
             } else {
                 currentPageItems.push(item);
@@ -1319,18 +873,22 @@
             }
         });
         if (currentPageItems.length > 0) {
-            pages.push(currentPageItems);
+            pages.push(currentPageItems); // Add the last page
         }
 
-        // Render each page
+        // Stage 2: Render each page with calculated vertical alignment.
         pages.forEach((pageItems, pageIndex) => {
             if (pageIndex > 0) {
                 pdf.addPage();
             }
 
+            // Calculate the total height of all content on this specific page
             const totalContentHeight = pageItems.reduce((sum, item) => sum + item.height, 0) + (PAGE_SPACING_MM * (pageItems.length - 1));
-            let startY = MARGIN_MM;
-            
+
+            let startY = MARGIN_MM; // Default: top-aligned
+
+            // *** This is the key logic for your request ***
+            // If there's more than one item on the page, center the entire content block vertically.
             if (pageItems.length > 1) {
                 const remainingSpace = USABLE_HEIGHT - totalContentHeight;
                 if (remainingSpace > 0) {
@@ -1338,12 +896,15 @@
                 }
             }
 
+            // Now, draw the items for this page starting at the calculated Y position
             let currentY = startY;
             pageItems.forEach(item => {
                 pdf.addImage(item.imgData, 'JPEG', MARGIN_MM, currentY, item.width, item.height);
                 currentY += item.height + PAGE_SPACING_MM;
             });
         });
+
+        // --- END: NEW LOGIC ---
 
         const fileName = `${projectTitleEl.textContent.trim() || 'schedule'}.pdf`;
         pdf.save(fileName);
