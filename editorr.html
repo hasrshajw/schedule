@@ -2011,23 +2011,26 @@ is this correct ?
     printContainer.style.padding = '20px';
     document.body.appendChild(printContainer);
 
-    // CAPTURE HEADER FOR PDF (FIRST PAGE ONLY)
-    const headerClone = document.querySelector('.schedule-display-header').cloneNode(true);
-    headerClone.style.display = 'block';
-    headerClone.style.marginBottom = '10px'; // Very small padding
-    headerClone.style.padding = '5px 0'; // Minimal padding
-    headerClone.style.background = 'white';
-    
-    // Ensure SVG line is visible in PDF
-    const svgDivider = headerClone.querySelector('.svg-divider');
-    if (svgDivider) {
-        svgDivider.style.display = 'block';
-        svgDivider.style.visibility = 'visible';
-    }
-    
-    printContainer.appendChild(headerClone);
-    
-    const headerCanvas = await html2canvas(headerClone, { 
+    // CREATE A SIMPLIFIED HEADER FOR PDF THAT WILL SHOW THE LINE
+    const headerHTML = `
+        <header class="schedule-display-header" style="display: block; margin-bottom: 10px; padding: 5px 0; background: white;">
+            <div class="title-block" style="text-align: center; margin-bottom: 0;">
+                <h1 style="font-family: 'Noto Sans Telugu', sans-serif; font-weight: 700; color: rgb(97, 40, 0); margin: 0 0 8px 0; font-size: 1.8em;">బహిరంగ ప్రసంగాల పట్టిక</h1>
+                <div class="subtitle-svg-container" style="position: relative; display: inline-block; margin-top: 0;">
+                    <p class="subtitle" style="margin: 0; font-size: 1.1em; font-weight: 500; color: #2d3748; background-color: white; padding: 6px 16px; display: inline-block; position: relative; z-index: 2; white-space: nowrap; border-radius: 8px; font-family: 'Noto Sans Telugu', sans-serif; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);">
+                        ${document.getElementById('date-range-subtitle').textContent}
+                    </p>
+                    <div style="width: 400px; height: 5px; background: linear-gradient(to right, #093261, #ffffff, #093261); display: block; position: absolute; left: 50%; transform: translateX(-50%); top: 50%; margin-top: -2.5px; z-index: 1;"></div>
+                </div>
+            </div>
+        </header>
+    `;
+
+    // Add the simplified header to print container
+    printContainer.innerHTML = headerHTML;
+
+    // Capture header
+    const headerCanvas = await html2canvas(printContainer, { 
         scale: 2, 
         useCORS: true, 
         backgroundColor: '#ffffff',
@@ -2038,8 +2041,8 @@ is this correct ?
     const headerProps = pdf.getImageProperties(headerImgData);
     const headerHeight = (headerProps.height * USABLE_WIDTH) / headerProps.width;
     
-    // Remove header from print container after capture
-    printContainer.removeChild(headerClone);
+    // Clear print container for tables
+    printContainer.innerHTML = '';
 
     const itemsToPrint = [];
 
