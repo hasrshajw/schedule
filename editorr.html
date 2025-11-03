@@ -1052,6 +1052,7 @@ is this correct ?
     let activeProject = null;
     let activeEventScheduleTable = null;
     let activeCellForDropdown = null;
+    let currentMobileEventTable = null;
 
     const appContainer = document.getElementById('app-container');
     const projectTitleEl = document.getElementById('project-title');
@@ -1061,6 +1062,21 @@ is this correct ?
     const eventContextMenu = document.getElementById('event-context-menu');
     const memberDropdown = document.getElementById('member-dropdown');
     const statusIndicator = document.querySelector('.status-indicator');
+    
+    // Event types configuration
+    const eventTypes = [
+        { id: 'normal', name: 'Normal', icon: 'event', color: 'primary' },
+        { id: 'co-visit', name: 'CO Visit', icon: 'groups', color: 'co-visit' },
+        { id: 'assembly', name: 'Assembly', icon: 'celebration', color: 'assembly' },
+        { id: 'convention', name: 'Convention', icon: 'festival', color: 'convention' }
+    ];
+
+    // Event texts for special events
+    const eventTexts = {
+        'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం',
+        'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో', 
+        'convention': 'ప్రాదేశిక సమావేశం'
+    };
     
     function updateStatus(text, status) {
         statusIndicator.textContent = text;
@@ -1132,12 +1148,6 @@ is this correct ?
             
             // Handle special events
             if (this.data.eventType && this.data.eventType !== 'normal') {
-                const eventTexts = { 
-                    'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం', 
-                    'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో', 
-                    'convention': 'ప్రాదేశిక సమావేశం' 
-                };
-                
                 const firstRow = this.tableBody.rows[0];
                 const dateCell = firstRow.cells[2];
                 const dateInput = dateCell ? dateCell.querySelector('.date-input') : null;
@@ -1148,7 +1158,7 @@ is this correct ?
                 card.innerHTML = `
                     <h3 class="week-date">${this.data.title}</h3>
                     <div class="event-type-dropdown">
-                        <div class="event-type-field" data-schedule-index="${this.index}">
+                        <div class="event-type-field" data-table-index="${this.index}">
                             <span class="event-type-value">
                                 <span class="material-symbols-outlined event-type-icon">${this._getEventTypeIcon(this.data.eventType)}</span>
                                 <span>${this._getEventTypeName(this.data.eventType)}</span>
@@ -1164,11 +1174,6 @@ is this correct ?
                     </div>
                 `;
                 this.mobileViewContainer.appendChild(card);
-                
-                // Add event listener to event type dropdown
-                card.querySelector('.event-type-field').addEventListener('click', (e) => {
-                    this._openMobileEventTypeDropdown(this.index, e.currentTarget);
-                });
                 return;
             }
 
@@ -1210,20 +1215,20 @@ is this correct ?
                     
                     let fieldsHTML = '';
                     
-                    // Add event type dropdown at the top
-                    const eventTypeName = this._getEventTypeName(this.data.eventType || 'normal');
-                    const eventTypeIcon = this._getEventTypeIcon(this.data.eventType || 'normal');
-                    
-                    fieldsHTML += `
-                        <div class="event-type-dropdown">
-                            <div class="event-type-field" data-schedule-index="${this.index}">
-                                <span class="event-type-value">
-                                    <span class="material-symbols-outlined event-type-icon">${eventTypeIcon}</span>
-                                    <span>${eventTypeName}</span>
-                                </span>
+                    // Add event type dropdown for the first card only
+                    if (rowIndex === 0 && label === Object.keys(groupedInputs)[0]) {
+                        const currentEventType = this.data.eventType || 'normal';
+                        fieldsHTML += `
+                            <div class="event-type-dropdown">
+                                <div class="event-type-field" data-table-index="${this.index}">
+                                    <span class="event-type-value">
+                                        <span class="material-symbols-outlined event-type-icon">${this._getEventTypeIcon(currentEventType)}</span>
+                                        <span>${this._getEventTypeName(currentEventType)}</span>
+                                    </span>
+                                </div>
                             </div>
-                        </div>
-                    `;
+                        `;
+                    }
                     
                     // Add date field for first row if it exists
                     if (rowIndex === 0) {
@@ -1252,6 +1257,14 @@ is this correct ?
                         
                         if (rowIndex === 0) {
                             // For first row non-date cells
+                            const inputEl = document.createElement('input');
+                            inputEl.type = 'text';
+                            inputEl.className = 'item-input';
+                            inputEl.value = cellText;
+                            inputEl.dataset.rowIndex = rowIndex;
+                            inputEl.dataset.cellIndex = cellIndex;
+                            inputEl.placeholder = 'Enter value';
+                            
                             fieldsHTML += `
                                 <div class="field-group">
                                     <label>${label || 'Field'}</label>
@@ -1283,12 +1296,15 @@ is this correct ?
                     `;
                     
                     this.mobileViewContainer.appendChild(card);
-                    
-                    // Add event listener to event type dropdown
-                    card.querySelector('.event-type-field').addEventListener('click', (e) => {
-                        this._openMobileEventTypeDropdown(this.index, e.currentTarget);
-                    });
                 }
+            });
+
+            // Add event listeners to event type fields
+            this.mobileViewContainer.querySelectorAll('.event-type-field').forEach(field => {
+                field.addEventListener('click', (e) => {
+                    const tableIndex = field.dataset.tableIndex;
+                    this._openMobileEventTypeDropdown(tableIndex, field);
+                });
             });
 
             // Add event listeners to mobile fields
@@ -1327,41 +1343,24 @@ is this correct ?
             });
         }
 
-        _getEventTypeName(eventType) {
-            const eventNames = {
-                'normal': 'Normal',
-                'co-visit': 'CO Visit', 
-                'assembly': 'Assembly',
-                'convention': 'Convention'
-            };
-            return eventNames[eventType] || 'Normal';
-        }
-
         _getEventTypeIcon(eventType) {
-            const eventIcons = {
-                'normal': 'event',
-                'co-visit': 'groups',
-                'assembly': 'celebration', 
-                'convention': 'festival'
-            };
-            return eventIcons[eventType] || 'event';
+            const eventTypeObj = eventTypes.find(event => event.id === eventType);
+            return eventTypeObj ? eventTypeObj.icon : 'event';
         }
 
-        _openMobileEventTypeDropdown(scheduleIndex, fieldElement) {
-            const eventTypes = [
-                { id: 'normal', name: 'Normal', icon: 'event' },
-                { id: 'co-visit', name: 'CO Visit', icon: 'groups' },
-                { id: 'assembly', name: 'Assembly', icon: 'celebration' },
-                { id: 'convention', name: 'Convention', icon: 'festival' }
-            ];
+        _getEventTypeName(eventType) {
+            const eventTypeObj = eventTypes.find(event => event.id === eventType);
+            return eventTypeObj ? eventTypeObj.name : 'Normal';
+        }
 
-            // Create mobile dropdown UI
+        _openMobileEventTypeDropdown(tableIndex, fieldElement) {
+            // Create mobile event type dropdown UI
             const dropdownHTML = `
-                <div class="dropdown-backdrop" id="mobile-dropdown-backdrop"></div>
-                <div class="dropdown-container" id="mobile-dropdown-container">
+                <div class="dropdown-backdrop" id="mobile-event-dropdown-backdrop"></div>
+                <div class="dropdown-container" id="mobile-event-dropdown-container">
                     <div class="dropdown-header">
                         <h3 class="dropdown-title">Select Event Type</h3>
-                        <button class="dropdown-close" id="mobile-dropdown-close">
+                        <button class="dropdown-close" id="mobile-event-dropdown-close">
                             <span class="material-symbols-outlined">close</span>
                         </button>
                     </div>
@@ -1379,17 +1378,17 @@ is this correct ?
             `;
 
             // Remove existing dropdown if any
-            const existingDropdown = document.getElementById('mobile-dropdown-container');
+            const existingDropdown = document.getElementById('mobile-event-dropdown-container');
             if (existingDropdown) {
                 existingDropdown.remove();
-                document.getElementById('mobile-dropdown-backdrop').remove();
+                document.getElementById('mobile-event-dropdown-backdrop').remove();
             }
 
             document.body.insertAdjacentHTML('beforeend', dropdownHTML);
 
-            const backdrop = document.getElementById('mobile-dropdown-backdrop');
-            const container = document.getElementById('mobile-dropdown-container');
-            const closeBtn = document.getElementById('mobile-dropdown-close');
+            const backdrop = document.getElementById('mobile-event-dropdown-backdrop');
+            const container = document.getElementById('mobile-event-dropdown-container');
+            const closeBtn = document.getElementById('mobile-event-dropdown-close');
 
             const hideDropdown = () => {
                 backdrop.classList.remove('active');
@@ -1408,14 +1407,6 @@ is this correct ?
                 if (item) {
                     const eventType = item.dataset.eventType;
                     this.applyEventType(eventType);
-                    
-                    // Update the event type field display
-                    const valueSpan = fieldElement.querySelector('.event-type-value');
-                    valueSpan.innerHTML = `
-                        <span class="material-symbols-outlined event-type-icon">${this._getEventTypeIcon(eventType)}</span>
-                        <span>${this._getEventTypeName(eventType)}</span>
-                    `;
-                    
                     hideDropdown();
                 }
             });
@@ -1562,11 +1553,6 @@ is this correct ?
                     delete firstRow.dataset.originalContent;
                 }
             } else {
-                const eventTexts = {
-                    'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం',
-                    'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో',
-                    'convention': 'ప్రాదేశిక సమావేశం'
-                };
                 allRows.forEach((row, index) => {
                     row.style.display = (index === 0) ? '' : 'none';
                 });
