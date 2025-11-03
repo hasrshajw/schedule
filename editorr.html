@@ -143,6 +143,99 @@ is this correct ?
         backdrop-filter: blur(2px);
     }
     
+    
+    
+    
+    
+    
+    /* ADD THESE STYLES FOR THE TITLE BLOCK */
+.schedule-display-header { 
+    text-align: center; 
+    margin-bottom: 0; 
+}
+
+.title-block { 
+    text-align: center; 
+    margin-bottom: 24px;
+}
+
+.title-block h1 { 
+    margin: 0 0 12px 0; 
+    font-size: 1.8em; 
+    font-weight: 700; 
+    color: rgb(97, 40, 0); 
+    font-family: 'Noto Sans Telugu', sans-serif; 
+    line-height: 1.3;
+}
+
+.subtitle-svg-container { 
+    position: relative; 
+    display: inline-block; 
+    margin-top: 0; 
+}
+
+.subtitle { 
+    margin: 0; 
+    font-size: 1.1em; 
+    font-weight: 500; 
+    color: var(--text-primary); 
+    background-color: var(--surface-color); 
+    padding: 8px 16px; 
+    display: inline-block; 
+    position: relative; 
+    z-index: 2; 
+    white-space: nowrap; 
+    border-radius: var(--radius-md); 
+    font-family: 'Noto Sans Telugu', sans-serif; 
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s;
+}
+
+.subtitle:focus { 
+    outline: 2px solid var(--primary-color); 
+    background-color: var(--primary-light); 
+}
+
+.svg-divider { 
+    width: 400px; 
+    height: 5px; 
+    display: block; 
+    position: absolute; 
+    left: 50%; 
+    transform: translateX(-50%); 
+    top: 50%; 
+    margin-top: -2.5px; 
+    z-index: 1; 
+}
+
+/* Mobile styles for the title block */
+@media (max-width: 768px) {
+    .title-block {
+        padding: 0 16px;
+        margin-bottom: 16px;
+    }
+    
+    .title-block h1 {
+        font-size: 1.5rem;
+    }
+    
+    .subtitle {
+        font-size: 1rem;
+        padding: 6px 12px;
+    }
+    
+    .svg-divider {
+        width: 300px;
+    }
+}
+
+
+
+
+
+
+
     /* Add this to your existing mobile CSS */
 .input-group {
     margin-bottom: 12px;
@@ -974,9 +1067,6 @@ is this correct ?
 .mobile-event-btn:active {
     transform: translateY(0);
 }
-        .schedule-header {
-        display: none !important;
-    }
     }
     /* END: ORIGINAL EDITOR STYLES */
 </style>
@@ -1018,12 +1108,32 @@ is this correct ?
         </button>
     </div>
     <div class="master-container">
-        <div id="project-header" class="project-header">
-            <h1 id="project-title" contenteditable="true">Loading Project...</h1>
-            <!-- Status indicator was here, now moved to header -->
+    <!-- ADD THIS TITLE BLOCK -->
+    <header class="schedule-display-header">
+        <div class="title-block">
+            <h1>బహిరంగ ప్రసంగాల పట్టిక</h1>
+            <div class="subtitle-svg-container">
+                <p class="subtitle" contenteditable="true">02-11-2025 నుండి 09-11-2025</p>
+                <svg class="svg-divider" role="presentation" viewBox="0 0 24039.797 260" preserveAspectRatio="xMidYMid slice">
+                    <defs>
+                        <radialGradient id="__id9__id4" gradientUnits="userSpaceOnUse" r="12020.601" cx="12019.898" cy="130" fx="12019.898" fy="130">
+                            <stop stop-color="#093261" stop-opacity="1" offset="0"></stop>
+                            <stop stop-color="#ffffff" stop-opacity="1" offset="1"></stop>
+                        </radialGradient>
+                    </defs>
+                    <rect x="0" y="0" width="24039.797" height="260" fill="url(#__id9__id4)"></rect>
+                </svg>
+            </div>
         </div>
-        <div id="schedules-wrapper"></div>
+    </header>
+    <!-- END OF TITLE BLOCK -->
+
+    <div id="project-header" class="project-header">
+        <h1 id="project-title" contenteditable="true">Loading Project...</h1>
+        <!-- Status indicator was here, now moved to header -->
     </div>
+    <div id="schedules-wrapper"></div>
+</div>
 </main>
 
 <template id="schedule-template">
