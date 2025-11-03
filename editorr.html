@@ -2008,43 +2008,51 @@ is this correct ?
     printContainer.style.top = '0';
     printContainer.style.width = '1100px';
     printContainer.style.background = 'white';
-    printContainer.style.padding = '20px';
+    printContainer.style.padding = '10px'; // Reduced padding
     document.body.appendChild(printContainer);
 
-    const itemsToPrint = [];
-
     try {
-        // CAPTURE SCHEDULE HEADER FOR FIRST PAGE
+        // CAPTURE HEADER SEPARATELY WITH MINIMAL PADDING
         const headerClone = document.querySelector('.schedule-display-header').cloneNode(true);
         headerClone.style.display = 'block';
-        headerClone.style.marginBottom = '20px';
-        headerClone.style.padding = '0';
-        headerClone.style.width = '100%';
+        headerClone.style.marginBottom = '5px'; // Very small bottom margin
+        headerClone.style.marginTop = '0'; // No top margin
+        headerClone.style.padding = '5px 0'; // Very small vertical padding
         
-        printContainer.appendChild(headerClone);
+        // Style the title and subtitle for minimal spacing
+        const titleEl = headerClone.querySelector('.title-block');
+        if (titleEl) {
+            titleEl.style.marginBottom = '8px'; // Reduced margin
+        }
         
-        const headerCanvas = await html2canvas(headerClone, { 
+        const subtitleEl = headerClone.querySelector('.subtitle');
+        if (subtitleEl) {
+            subtitleEl.style.margin = '2px 0'; // Minimal margin
+            subtitleEl.style.padding = '4px 12px'; // Reduced padding
+        }
+
+        const headerContainer = document.createElement('div');
+        headerContainer.style.padding = '0';
+        headerContainer.style.margin = '0';
+        headerContainer.appendChild(headerClone);
+        printContainer.appendChild(headerContainer);
+
+        // Capture header as image
+        const headerCanvas = await html2canvas(headerContainer, { 
             scale: 2, 
             useCORS: true, 
             backgroundColor: '#ffffff',
-            width: headerClone.scrollWidth,
-            height: headerClone.scrollHeight
+            logging: false
         });
         
-        const headerImgData = headerCanvas.toDataURL('image/jpeg', 0.8);
+        const headerImgData = headerCanvas.toDataURL('image/jpeg', 0.9);
         const headerProps = pdf.getImageProperties(headerImgData);
         const headerHeight = (headerProps.height * USABLE_WIDTH) / headerProps.width;
-        
-        // Add header as first item
-        itemsToPrint.push({ 
-            imgData: headerImgData, 
-            width: USABLE_WIDTH, 
-            height: headerHeight,
-            isHeader: true 
-        });
-        
+
         // Remove header from print container
-        printContainer.removeChild(headerClone);
+        printContainer.removeChild(headerContainer);
+
+        const itemsToPrint = [];
 
         // CAPTURE SCHEDULE BLOCKS
         for (const block of document.querySelectorAll('.schedule-block')) {
@@ -2073,18 +2081,14 @@ is this correct ?
             const canvas = await html2canvas(clone, { 
                 scale: 2, 
                 useCORS: true, 
-                backgroundColor: '#ffffff' 
+                backgroundColor: '#ffffff',
+                logging: false
             });
             
-            const imgData = canvas.toDataURL('image/jpeg', 0.8);
+            const imgData = canvas.toDataURL('image/jpeg', 0.9);
             const imgProps = pdf.getImageProperties(imgData);
             const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
-            itemsToPrint.push({ 
-                imgData, 
-                width: USABLE_WIDTH, 
-                height: imgHeight,
-                isHeader: false 
-            });
+            itemsToPrint.push({ imgData, width: USABLE_WIDTH, height: imgHeight });
             
             // Remove the clone after capturing
             printContainer.removeChild(clone);
@@ -2092,86 +2096,93 @@ is this correct ?
         
         document.body.removeChild(printContainer);
 
-        // ENHANCED PDF LAYOUT LOGIC WITH HEADER SUPPORT
+        // CALCULATE SPACE FOR HEADER + CONTENT
+        const HEADER_SPACING = 3; // Very small spacing between header and content
+        
+        // Stage 1: Group all printable items into pages, accounting for header on first page
         const pages = [];
         let currentPageItems = [];
         let currentPageHeight = 0;
         let isFirstPage = true;
 
-        itemsToPrint.forEach((item, index) => {
-            if (item.isHeader) {
-                // Header always goes on first page, start new page with header
-                if (currentPageItems.length > 0) {
-                    pages.push(currentPageItems);
-                }
+        itemsToPrint.forEach(item => {
+            // For first page, account for header height
+            const availableHeight = isFirstPage ? 
+                USABLE_HEIGHT - headerHeight - HEADER_SPACING : 
+                USABLE_HEIGHT;
+
+            const itemHeightWithSpacing = currentPageItems.length > 0 ? item.height + PAGE_SPACING_MM : item.height;
+            
+            if (currentPageHeight + itemHeightWithSpacing > availableHeight && currentPageItems.length > 0) {
+                pages.push({ items: currentPageItems, isFirstPage });
                 currentPageItems = [item];
                 currentPageHeight = item.height;
                 isFirstPage = false;
             } else {
-                const itemHeightWithSpacing = currentPageItems.length > 0 ? item.height + PAGE_SPACING_MM : item.height;
-                
-                // Special handling for first page after header
-                if (isFirstPage && currentPageHeight + itemHeightWithSpacing > USABLE_HEIGHT - 30) {
-                    pages.push(currentPageItems);
-                    currentPageItems = [item];
-                    currentPageHeight = item.height;
-                    isFirstPage = false;
-                } 
-                // Normal pagination for other pages
-                else if (!isFirstPage && currentPageHeight + itemHeightWithSpacing > USABLE_HEIGHT && currentPageItems.length > 0) {
-                    pages.push(currentPageItems);
-                    currentPageItems = [item];
-                    currentPageHeight = item.height;
-                } else {
-                    currentPageItems.push(item);
-                    currentPageHeight += itemHeightWithSpacing;
-                }
+                currentPageItems.push(item);
+                currentPageHeight += itemHeightWithSpacing;
             }
         });
         
         if (currentPageItems.length > 0) {
-            pages.push(currentPageItems);
+            pages.push({ items: currentPageItems, isFirstPage });
         }
 
-        // RENDER PAGES WITH HEADER ON FIRST PAGE
-        pages.forEach((pageItems, pageIndex) => {
+        // Stage 2: Render each page
+        pages.forEach((pageData, pageIndex) => {
             if (pageIndex > 0) {
                 pdf.addPage();
             }
 
+            const { items: pageItems, isFirstPage } = pageData;
+            let currentY = MARGIN_MM;
+
+            // ADD HEADER TO FIRST PAGE WITH MINIMAL PADDING
+            if (isFirstPage && pageIndex === 0) {
+                pdf.addImage(
+                    headerImgData, 
+                    'JPEG', 
+                    MARGIN_MM, 
+                    currentY, 
+                    USABLE_WIDTH, 
+                    headerHeight
+                );
+                currentY += headerHeight + HEADER_SPACING; // Very small spacing
+            }
+
+            // Calculate total content height for vertical centering (excluding header)
             const totalContentHeight = pageItems.reduce((sum, item) => sum + item.height, 0) + 
-                                    (PAGE_SPACING_MM * Math.max(0, pageItems.length - 1));
+                                    (PAGE_SPACING_MM * (pageItems.length - 1));
 
-            let startY = MARGIN_MM;
-            let remainingSpace = USABLE_HEIGHT - totalContentHeight;
+            // Calculate remaining space for vertical centering
+            const availableContentHeight = isFirstPage ? 
+                USABLE_HEIGHT - headerHeight - HEADER_SPACING : 
+                USABLE_HEIGHT;
 
-            // Special centering for first page with header
-            if (pageIndex === 0 && pageItems.length > 1 && remainingSpace > 0) {
-                startY = MARGIN_MM + (remainingSpace / 2);
+            let contentStartY = currentY;
+
+            // Center content vertically if there's extra space
+            if (pageItems.length > 0) {
+                const remainingSpace = availableContentHeight - totalContentHeight;
+                if (remainingSpace > 0) {
+                    contentStartY += remainingSpace / 2;
+                }
             }
-            // Center content on other pages if there's extra space
-            else if (pageIndex > 0 && pageItems.length > 1 && remainingSpace > 0) {
-                startY = MARGIN_MM + (remainingSpace / 2);
-            }
 
-            let currentY = startY;
+            // Draw schedule items
+            let itemY = contentStartY;
             pageItems.forEach(item => {
-                pdf.addImage(item.imgData, 'JPEG', MARGIN_MM, currentY, item.width, item.height);
-                currentY += item.height + PAGE_SPACING_MM;
+                pdf.addImage(item.imgData, 'JPEG', MARGIN_MM, itemY, item.width, item.height);
+                itemY += item.height + PAGE_SPACING_MM;
             });
         });
 
         const fileName = `${document.querySelector('.subtitle').textContent.trim() || 'schedule'}.pdf`;
         pdf.save(fileName);
-        
+
     } catch (error) {
         console.error("PDF generation failed:", error);
         alert("Sorry, there was an error creating the PDF. Please try again.");
-        
-        // Clean up print container if error occurs
-        if (document.body.contains(printContainer)) {
-            document.body.removeChild(printContainer);
-        }
     } finally {
         printButton.disabled = false;
         printButton.querySelector('span:last-child').textContent = 'Download PDF';
