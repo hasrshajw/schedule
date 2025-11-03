@@ -939,6 +939,41 @@ is this correct ?
         #event-context-menu {
             display: none !important;
         }
+        /* Mobile Event Button Styles */
+.mobile-event-button-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 16px;
+    padding: 0 16px;
+}
+
+.mobile-event-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 2px solid var(--primary-color);
+    background-color: var(--surface-color);
+    color: var(--primary-color);
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.mobile-event-btn:hover {
+    background-color: var(--primary-color);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.mobile-event-btn:active {
+    transform: translateY(0);
+}
     }
     /* END: ORIGINAL EDITOR STYLES */
 </style>
@@ -1082,506 +1117,442 @@ is this correct ?
         });
     }
 
-    class ScheduleTable {
-        constructor(parentProject, tableData, index) {
-            this.parentProject = parentProject;
-            this.data = tableData;
-            this.index = index;
-            this.initDOM();
-            this.render();
-            this.setupEventListeners();
-            this.applyEventType(this.data.eventType || 'normal', false);
-        }
 
-        initDOM() {
-            const templateClone = document.getElementById('schedule-template').content.cloneNode(true);
-            this.element = templateClone.querySelector('.schedule-block');
-            this.titleEl = this.element.querySelector('.schedule-title');
-            this.tableBody = this.element.querySelector('.schedule-table-body');
-            this.mobileViewContainer = this.element.querySelector('.mobile-view-container');
-            this.eventBtn = this.element.querySelector('.event-btn');
-            schedulesWrapper.appendChild(this.element);
-        }
 
-        render() {
-            this.titleEl.textContent = this.data.title;
-            this.tableBody.innerHTML = this.data.content;
-            
-            this.tableBody.querySelectorAll('td, th').forEach(cell => {
-                if (cell.hasAttribute('data-user-editable')) {
-                    const isFirstRow = cell.closest('tr') === this.tableBody.rows[0];
-                    if (isFirstRow) {
-                        const originalText = cell.textContent.trim();
-                        const dateValue = originalText.split('-').reverse().join('-');
-                        cell.innerHTML = `<input type="date" class="date-input" value="${dateValue || ''}">`;
-                        cell.removeAttribute('contenteditable');
-                    } else {
-                        cell.classList.add('editable-cell');
-                        cell.removeAttribute('contenteditable');
-                    }
+
+
+class ScheduleTable {
+    constructor(parentProject, tableData, index) {
+        this.parentProject = parentProject;
+        this.data = tableData;
+        this.index = index;
+        this.initDOM();
+        this.render();
+        this.setupEventListeners();
+        this.applyEventType(this.data.eventType || 'normal', false);
+    }
+
+    initDOM() {
+        const templateClone = document.getElementById('schedule-template').content.cloneNode(true);
+        this.element = templateClone.querySelector('.schedule-block');
+        this.titleEl = this.element.querySelector('.schedule-title');
+        this.tableBody = this.element.querySelector('.schedule-table-body');
+        this.mobileViewContainer = this.element.querySelector('.mobile-view-container');
+        this.eventBtn = this.element.querySelector('.event-btn');
+        schedulesWrapper.appendChild(this.element);
+    }
+
+    render() {
+        this.titleEl.textContent = this.data.title;
+        this.tableBody.innerHTML = this.data.content;
+        
+        this.tableBody.querySelectorAll('td, th').forEach(cell => {
+            if (cell.hasAttribute('data-user-editable')) {
+                const isFirstRow = cell.closest('tr') === this.tableBody.rows[0];
+                if (isFirstRow) {
+                    const originalText = cell.textContent.trim();
+                    const dateValue = originalText.split('-').reverse().join('-');
+                    cell.innerHTML = `<input type="date" class="date-input" value="${dateValue || ''}">`;
+                    cell.removeAttribute('contenteditable');
                 } else {
-                    cell.setAttribute('contenteditable', 'false');
+                    cell.classList.add('editable-cell');
+                    cell.removeAttribute('contenteditable');
                 }
-            });
-
-            this._createMobileView();
-        }
-
-        _createMobileView() {
-            this.mobileViewContainer.innerHTML = '';
-            
-            // Handle special events
-            if (this.data.eventType && this.data.eventType !== 'normal') {
-                const eventTexts = { 
-                    'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం', 
-                    'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో', 
-                    'convention': 'ప్రాదేశిక సమావేశం' 
-                };
-                
-                const firstRow = this.tableBody.rows[0];
-                const dateCell = firstRow.cells[2];
-                const dateInput = dateCell ? dateCell.querySelector('.date-input') : null;
-                const dateValue = dateInput ? dateInput.value : '';
-
-                const card = document.createElement('div');
-                card.className = 'mobile-week-card fade-in';
-                card.innerHTML = `
-                    <h3 class="week-date">${this.data.title}</h3>
-                    <div class="special-event-mobile">
-                        <p class="special-event-text-mobile">${eventTexts[this.data.eventType]}</p>
-                    </div>
-                    <div class="field-group">
-                        <label>తేదీ</label>
-                        <input type="date" class="date-input" data-row-index="0" data-cell-index="2" value="${dateValue}">
-                    </div>
-                    <div class="mobile-actions">
-                        <button class="mobile-action-btn event-type-btn" data-schedule-index="${this.index}">
-                            <span class="material-symbols-outlined">celebration</span>
-                            <span>Change Event Type</span>
-                        </button>
-                    </div>
-                `;
-                this.mobileViewContainer.appendChild(card);
-                return;
+            } else {
+                cell.setAttribute('contenteditable', 'false');
             }
+        });
 
-            // Create cards for normal schedule rows - PRESERVING ORIGINAL GROUPING LOGIC
-            Array.from(this.tableBody.rows).forEach((row, rowIndex) => {
-                if (row.classList.contains('header-row')) return;
+        this._createMobileView();
+    }
+
+    _createMobileView() {
+    this.mobileViewContainer.innerHTML = '';
+    
+    // ADD EVENT BUTTON TO MOBILE VIEW
+    const eventButtonContainer = document.createElement('div');
+    eventButtonContainer.className = 'mobile-event-button-container';
+    eventButtonContainer.innerHTML = `
+        <button class="mobile-event-btn">
+            <span class="material-symbols-outlined">celebration</span>
+            <span>Event Type</span>
+        </button>
+    `;
+    this.mobileViewContainer.appendChild(eventButtonContainer);
+    
+    // Add event listener to the mobile event button
+    eventButtonContainer.querySelector('.mobile-event-btn').addEventListener('click', (e) => {
+        this._openMobileEventTypeDropdown();
+    });
+      
+      
+    
+    // Handle special events
+    if (this.data.eventType && this.data.eventType !== 'normal') {
+        const eventTexts = { 
+            'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం', 
+            'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో', 
+            'convention': 'ప్రాదేశిక సమావేశం' 
+        };
+        
+        const firstRow = this.tableBody.rows[0];
+        const dateCell = firstRow.cells[2];
+        const dateInput = dateCell ? dateCell.querySelector('.date-input') : null;
+        const dateValue = dateInput ? dateInput.value : '';
+
+        const card = document.createElement('div');
+        card.className = 'mobile-week-card fade-in';
+        card.innerHTML = `
+            <h3 class="week-date">${this.data.title}</h3>
+            <div class="special-event-mobile">
+                <p class="special-event-text-mobile">${eventTexts[this.data.eventType]}</p>
+            </div>
+            <div class="field-group">
+                <label>తేదీ</label>
+                <input type="date" class="date-input" data-row-index="0" data-cell-index="2" value="${dateValue}">
+            </div>
+        `;
+        this.mobileViewContainer.appendChild(card);
+        return;
+    }
+
+    // Create ONE card for the entire schedule table
+    const card = document.createElement('div');
+    card.className = 'mobile-week-card fade-in';
+    
+    let fieldsHTML = '';
+
+    // Process all rows in the table
+    Array.from(this.tableBody.rows).forEach((row, rowIndex) => {
+        if (row.classList.contains('header-row')) return;
+        
+        const editableCellsInRow = Array.from(row.cells).filter(c => c.hasAttribute('data-user-editable'));
+        if (editableCellsInRow.length === 0) return;
+        
+        const groupedInputs = {};
+
+        // Group cells by their labels (same logic as original)
+        editableCellsInRow.forEach(cell => {
+            const cellIndex = cell.cellIndex;
+            let labelText = '';
+            
+            // Find label from previous cells in same row
+            for (let i = cellIndex - 1; i >= 0; i--) {
+                const potentialLabelCell = row.cells[i];
+                if (potentialLabelCell && !potentialLabelCell.hasAttribute('data-user-editable') && potentialLabelCell.textContent.trim() !== '') {
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = potentialLabelCell.innerHTML;
+                    labelText = tempDiv.textContent.trim().replace('⠿', '').replace(':', '');
+                    break;
+                }
+            }
+            
+            // If no label found, try the first cell of the row
+            if (!labelText && row.cells[0] && !row.cells[0].hasAttribute('data-user-editable')) {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = row.cells[0].innerHTML;
+                labelText = tempDiv.textContent.trim().replace('⠿', '').replace(':', '');
+            }
+            
+            if (!groupedInputs[labelText]) groupedInputs[labelText] = [];
+            groupedInputs[labelText].push({ cell, cellIndex, rowIndex });
+        });
+
+        // Create fields for each group
+        for (const label in groupedInputs) {
+            let groupHTML = '';
+            
+            groupedInputs[label].forEach(({ cell, cellIndex, rowIndex }) => {
+                const cellText = cell.textContent.trim();
                 
-                const editableCellsInRow = Array.from(row.cells).filter(c => c.hasAttribute('data-user-editable'));
-                if (editableCellsInRow.length === 0) return;
-                
-                const groupedInputs = {};
-
-                // ORIGINAL GROUPING LOGIC - preserve this exactly
-                editableCellsInRow.forEach(cell => {
-                    const cellIndex = cell.cellIndex;
-                    let labelText = '';
-                    for (let i = cellIndex - 1; i >= 0; i--) {
-                        const potentialLabelCell = row.cells[i];
-                        if (potentialLabelCell && !potentialLabelCell.hasAttribute('data-user-editable') && potentialLabelCell.textContent.trim() !== '') {
-                            const tempDiv = document.createElement('div');
-                            tempDiv.innerHTML = potentialLabelCell.innerHTML;
-                            labelText = tempDiv.textContent.trim().replace('⠿', '').replace(':', '');
-                            break;
-                        }
-                    }
-                    if (!labelText && row.cells[0] && !row.cells[0].hasAttribute('data-user-editable')) {
-                        const tempDiv = document.createElement('div');
-                        tempDiv.innerHTML = row.cells[0].innerHTML;
-                        labelText = tempDiv.textContent.trim().replace('⠿', '').replace(':', '');
-                    }
-                    if (!groupedInputs[labelText]) groupedInputs[labelText] = [];
-                    groupedInputs[labelText].push({cell, cellIndex});
-                });
-
-                // Create one card per group (preserving original structure)
-                for (const label in groupedInputs) {
-                    const card = document.createElement('div');
-                    card.className = 'mobile-week-card fade-in';
-                    
-                    let fieldsHTML = '';
-                    
-                    // Add date field for first row if it exists
-                    if (rowIndex === 0) {
-                        const dateCell = row.cells[2];
-                        const dateInput = dateCell ? dateCell.querySelector('.date-input') : null;
-                        const dateValue = dateInput ? dateInput.value : '';
-                        
-                        if (dateValue) {
-                            fieldsHTML += `
-                                <div class="field-group">
-                                    <label>తేదీ</label>
-                                    <input type="date" class="date-input" data-row-index="${rowIndex}" data-cell-index="2" value="${dateValue}">
-                                </div>
-                            `;
-                        }
-                    }
-
-                    // Create fields for each cell in this group
-                    groupedInputs[label].forEach(({cell, cellIndex}) => {
-                        const cellText = cell.textContent.trim();
-                        
-                        if (rowIndex === 0 && cellIndex === 2) {
-                            // Date already handled above
-                            return;
-                        }
-                        
-                        if (rowIndex === 0) {
-                            // For first row non-date cells
-                            const inputEl = document.createElement('input');
-                            inputEl.type = 'text';
-                            inputEl.className = 'item-input';
-                            inputEl.value = cellText;
-                            inputEl.dataset.rowIndex = rowIndex;
-                            inputEl.dataset.cellIndex = cellIndex;
-                            inputEl.placeholder = 'Enter value';
-                            
-                            fieldsHTML += `
-                                <div class="field-group">
-                                    <label>${label || 'Field'}</label>
-                                    <div class="mobile-field">
-                                        <input type="text" class="mobile-field-input" data-row-index="${rowIndex}" data-cell-index="${cellIndex}" value="${cellText}" placeholder="Enter value">
-                                    </div>
-                                </div>
-                            `;
-                        } else {
-                            // For member selection fields
-                            fieldsHTML += `
-                                <div class="field-group">
-                                    <label>${label || 'Field'}</label>
-                                    <div class="mobile-field member-field" data-row-index="${rowIndex}" data-cell-index="${cellIndex}">
-                                        <span class="mobile-field-value ${cellText ? '' : 'mobile-field-placeholder'}">
-                                            ${cellText || 'Select Name'}
-                                        </span>
-                                    </div>
-                                </div>
-                            `;
-                        }
-                    });
-
-                    card.innerHTML = `
-                        <h3 class="week-date">${label || this.data.title}</h3>
-                        <div class="week-fields">
-                            ${fieldsHTML}
-                        </div>
-                        <div class="mobile-actions">
-                            <button class="mobile-action-btn event-type-btn" data-schedule-index="${this.index}">
-                                <span class="material-symbols-outlined">celebration</span>
-                                <span>Event Type</span>
-                            </button>
+                // Handle date inputs (first row, cell index 2)
+                if (rowIndex === 0 && cellIndex === 2) {
+                    const dateInput = cell.querySelector('.date-input');
+                    const dateValue = dateInput ? dateInput.value : '';
+                    groupHTML += `
+                        <div class="input-group">
+                            <input type="date" class="date-input" data-row-index="${rowIndex}" data-cell-index="${cellIndex}" value="${dateValue}">
                         </div>
                     `;
-                    
-                    this.mobileViewContainer.appendChild(card);
-                }
-            });
-
-            // Add event listeners to mobile fields
-            this.mobileViewContainer.querySelectorAll('.member-field').forEach(field => {
-                field.addEventListener('click', (e) => {
-                    const rowIndex = field.dataset.rowIndex;
-                    const cellIndex = field.dataset.cellIndex;
-                    const targetCell = this.tableBody.rows[rowIndex].cells[cellIndex];
-                    this._openMobileDropdown(targetCell, field);
-                });
-            });
-
-            // Add event listeners to text inputs
-            this.mobileViewContainer.querySelectorAll('.mobile-field-input').forEach(input => {
-                input.addEventListener('input', (e) => {
-                    const rowIndex = input.dataset.rowIndex;
-                    const cellIndex = input.dataset.cellIndex;
-                    const targetCell = this.tableBody.rows[rowIndex].cells[cellIndex];
-                    targetCell.textContent = input.value;
-                    this.parentProject.triggerSave();
-                });
-            });
-
-            // Add event listeners to date inputs
-            this.mobileViewContainer.querySelectorAll('.date-input').forEach(input => {
-                input.addEventListener('change', (e) => {
-                    const rowIndex = input.dataset.rowIndex;
-                    const cellIndex = input.dataset.cellIndex;
-                    const targetCell = this.tableBody.rows[rowIndex].cells[cellIndex];
-                    const tableInput = targetCell.querySelector('.date-input');
-                    if (tableInput) {
-                        tableInput.value = input.value;
-                    }
-                    this.parentProject.triggerSave();
-                });
-            });
-
-            // Add event listeners to event type buttons
-            this.mobileViewContainer.querySelectorAll('.event-type-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    activeEventScheduleTable = this;
-                    this._openMobileEventTypeDropdown();
-                });
-            });
-        }
-
-        _openMobileDropdown(cell, fieldElement) {
-            const isInMinistry = this._isCellInMinistrySection(cell);
-            let listToShow;
-            
-            if (isInMinistry) {
-                // For ministry section: show both sisters and brothers
-                const sortedSisters = [...members.sisters].sort((a, b) => a.name.localeCompare(b.name));
-                const sortedBrothers = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
-                listToShow = [...sortedSisters, ...sortedBrothers];
-            } else {
-                // For other sections: show only brothers
-                listToShow = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
-            }
-
-            // Create mobile dropdown UI
-            const dropdownHTML = `
-                <div class="dropdown-backdrop" id="mobile-dropdown-backdrop"></div>
-                <div class="dropdown-container" id="mobile-dropdown-container">
-                    <div class="dropdown-header">
-                        <h3 class="dropdown-title">Select ${isInMinistry ? 'Member' : 'Brother'}</h3>
-                        <button class="dropdown-close" id="mobile-dropdown-close">
-                            <span class="material-symbols-outlined">close</span>
-                        </button>
-                    </div>
-                    <div class="dropdown-content">
-                        ${listToShow.map(member => `
-                            <button class="dropdown-item" data-name="${member.name}">
-                                <span>${member.name}</span>
-                                ${member.isServant ? '<span class="servant-tag">Servant</span>' : ''}
-                            </button>
-                        `).join('')}
-                    </div>
-                </div>
-            `;
-
-            // Remove existing dropdown if any
-            const existingDropdown = document.getElementById('mobile-dropdown-container');
-            if (existingDropdown) {
-                existingDropdown.remove();
-                document.getElementById('mobile-dropdown-backdrop').remove();
-            }
-
-            document.body.insertAdjacentHTML('beforeend', dropdownHTML);
-
-            const backdrop = document.getElementById('mobile-dropdown-backdrop');
-            const container = document.getElementById('mobile-dropdown-container');
-            const closeBtn = document.getElementById('mobile-dropdown-close');
-
-            const hideDropdown = () => {
-                backdrop.classList.remove('active');
-                container.classList.remove('active');
-                setTimeout(() => {
-                    backdrop.remove();
-                    container.remove();
-                }, 300);
-            };
-
-            backdrop.addEventListener('click', hideDropdown);
-            closeBtn.addEventListener('click', hideDropdown);
-
-            container.addEventListener('click', (e) => {
-                const item = e.target.closest('.dropdown-item');
-                if (item) {
-                    const newName = item.dataset.name;
-                    cell.textContent = newName;
-                    const valueSpan = fieldElement.querySelector('.mobile-field-value');
-                    valueSpan.textContent = newName;
-                    valueSpan.classList.remove('mobile-field-placeholder');
-                    this.parentProject.triggerSave();
-                    hideDropdown();
-                }
-            });
-
-            // Show dropdown
-            setTimeout(() => {
-                backdrop.classList.add('active');
-                container.classList.add('active');
-            }, 10);
-        }
-
-        _isCellInMinistrySection(cell) {
-            const table = cell.closest('table');
-            if (!table) return false;
-            
-            const allRows = Array.from(table.querySelectorAll('tbody > tr'));
-            const cellRow = cell.closest('tr');
-            const cellIndex = allRows.indexOf(cellRow);
-            
-            let ministryHeaderIndex = -1;
-            let nextHeaderIndex = allRows.length;
-            
-            // Look for the ministry section header
-            allRows.forEach((row, index) => {
-                if (row.classList.contains('header-row')) {
-                    // Check if this header row contains ministry section text
-                    const rowText = row.textContent.trim();
-                    if (rowText.includes('చక్కగా సువార్త ప్రకటించాలి') || rowText.includes('సువార్త ప్రకటించాలి')) {
-                        ministryHeaderIndex = index;
-                    } else if (ministryHeaderIndex !== -1 && index > ministryHeaderIndex) {
-                        // Found the next header after ministry section
-                        if (index < nextHeaderIndex) nextHeaderIndex = index;
-                    }
-                }
-            });
-            
-            if (ministryHeaderIndex === -1) return false;
-            
-            // Return true if the cell is between ministry header and next header
-            return cellIndex > ministryHeaderIndex && cellIndex < nextHeaderIndex;
-        }
-
-        _openMobileEventTypeDropdown() {
-            const eventTypes = [
-                { id: 'normal', name: 'Normal', icon: 'event' },
-                { id: 'co-visit', name: 'CO Visit', icon: 'groups' },
-                { id: 'assembly', name: 'Assembly', icon: 'celebration' },
-                { id: 'convention', name: 'Convention', icon: 'festival' }
-            ];
-
-            // Create mobile event type dropdown UI
-            const dropdownHTML = `
-                <div class="dropdown-backdrop" id="mobile-event-dropdown-backdrop"></div>
-                <div class="dropdown-container" id="mobile-event-dropdown-container">
-                    <div class="dropdown-header">
-                        <h3 class="dropdown-title">Select Event Type</h3>
-                        <button class="dropdown-close" id="mobile-event-dropdown-close">
-                            <span class="material-symbols-outlined">close</span>
-                        </button>
-                    </div>
-                    <div class="dropdown-content">
-                        ${eventTypes.map(event => `
-                            <button class="dropdown-item" data-event-type="${event.id}">
-                                <span style="display: flex; align-items: center; gap: 12px;">
-                                    <span class="material-symbols-outlined">${event.icon}</span>
-                                    <span>${event.name}</span>
+                } else {
+                    // Handle member selection fields
+                    groupHTML += `
+                        <div class="input-group">
+                            <div class="mobile-field member-field" data-row-index="${rowIndex}" data-cell-index="${cellIndex}">
+                                <span class="mobile-field-value ${cellText ? '' : 'mobile-field-placeholder'}">
+                                    ${cellText || 'Select Option'}
                                 </span>
-                            </button>
-                        `).join('')}
-                    </div>
-                </div>
-            `;
-
-            // Remove existing dropdown if any
-            const existingDropdown = document.getElementById('mobile-event-dropdown-container');
-            if (existingDropdown) {
-                existingDropdown.remove();
-                document.getElementById('mobile-event-dropdown-backdrop').remove();
-            }
-
-            document.body.insertAdjacentHTML('beforeend', dropdownHTML);
-
-            const backdrop = document.getElementById('mobile-event-dropdown-backdrop');
-            const container = document.getElementById('mobile-event-dropdown-container');
-            const closeBtn = document.getElementById('mobile-event-dropdown-close');
-
-            const hideDropdown = () => {
-                backdrop.classList.remove('active');
-                container.classList.remove('active');
-                setTimeout(() => {
-                    backdrop.remove();
-                    container.remove();
-                }, 300);
-            };
-
-            backdrop.addEventListener('click', hideDropdown);
-            closeBtn.addEventListener('click', hideDropdown);
-
-            container.addEventListener('click', (e) => {
-                const item = e.target.closest('.dropdown-item');
-                if (item) {
-                    const eventType = item.dataset.eventType;
-                    this.applyEventType(eventType);
-                    hideDropdown();
+                            </div>
+                        </div>
+                    `;
                 }
             });
 
-            // Show dropdown
-            setTimeout(() => {
-                backdrop.classList.add('active');
-                container.classList.add('active');
-            }, 10);
-        }
-        
-        getContent() {
-            const tempBody = this.tableBody.cloneNode(true);
-            const dateInput = tempBody.querySelector('.date-input');
-            if (dateInput && dateInput.value) {
-                const cell = dateInput.parentElement;
-                cell.textContent = dateInput.value.split('-').reverse().join('-');
-            }
-            tempBody.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
-            tempBody.querySelectorAll('.editable-cell').forEach(el => el.classList.remove('editable-cell'));
-            return tempBody.innerHTML;
-        }
-
-        applyEventType(eventType, shouldSave = true) {
-            this.data.eventType = eventType;
-            const allRows = this.tableBody.querySelectorAll('tr');
-            const firstRow = this.tableBody.rows[0];
-
-            if (eventType === 'normal') {
-                allRows.forEach(row => row.style.display = '');
-                if (firstRow && firstRow.dataset.originalContent) {
-                    firstRow.innerHTML = firstRow.dataset.originalContent;
-                    delete firstRow.dataset.originalContent;
-                }
-            } else {
-                const eventTexts = {
-                    'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం',
-                    'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో',
-                    'convention': 'ప్రాదేశిక సమావేశం'
-                };
-                allRows.forEach((row, index) => {
-                    row.style.display = (index === 0) ? '' : 'none';
-                });
-                let existingDateValue = '';
-                if (firstRow) {
-                    if (!firstRow.dataset.originalContent) firstRow.dataset.originalContent = firstRow.innerHTML;
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = firstRow.dataset.originalContent;
-                    const originalDateCell = tempDiv.querySelector('[data-user-editable]');
-                    if (originalDateCell) existingDateValue = originalDateCell.textContent.trim().split('-').reverse().join('-');
-                }
-                firstRow.innerHTML = `
-                    <th colspan="1" class="special-event-text">${eventTexts[eventType]}</th>
-                    <td style="text-align: right; font-weight: 700;">తేదీ:</td>
-                    <td data-user-editable="true"><input type="date" class="date-input" value="${existingDateValue}"></td>
+            // Only add label if it exists and group has content
+            if (groupHTML) {
+                fieldsHTML += `
+                    <div class="field-group">
+                        ${label ? `<label>${label}</label>` : ''}
+                        ${groupHTML}
+                    </div>
                 `;
             }
-
-            this._createMobileView();
-            if (shouldSave) this.parentProject.triggerSave();
         }
+    });
 
-        setupEventListeners() {
-            this.element.addEventListener('input', (e) => {
-                const input = e.target;
-                if(input.classList.contains('item-input')) {
-                    const rowIndex = input.dataset.rowIndex;
-                    const cellIndex = input.dataset.cellIndex;
-                    const targetCell = this.tableBody.rows[rowIndex].cells[cellIndex];
-                    if(input.type === 'date') {
-                        const tableInput = targetCell.querySelector('.date-input');
-                        if(tableInput) tableInput.value = input.value;
-                    } else {
-                         targetCell.textContent = input.textContent;
-                    }
-                }
-                this.parentProject.triggerSave();
-            });
+    card.innerHTML = `
+        <h3 class="week-date">${this.data.title}</h3>
+        <div class="week-fields">
+            ${fieldsHTML}
+        </div>
+    `;
+    
+    this.mobileViewContainer.appendChild(card);
 
-            this.eventBtn.addEventListener('click', (e) => {
-                activeEventScheduleTable = this;
-                const rect = e.currentTarget.getBoundingClientRect();
-                eventContextMenu.style.display = 'block';
-                eventContextMenu.style.top = `${rect.bottom}px`;
-                eventContextMenu.style.left = `${rect.left}px`;
-            });
-        }
+    // Add event listeners to mobile fields
+    this.mobileViewContainer.querySelectorAll('.member-field').forEach(field => {
+        field.addEventListener('click', (e) => {
+            const rowIndex = field.dataset.rowIndex;
+            const cellIndex = field.dataset.cellIndex;
+            const targetCell = this.tableBody.rows[rowIndex].cells[cellIndex];
+            this._openMobileDropdown(targetCell, field);
+        });
+    });
+
+    // Add event listeners to date inputs
+    this.mobileViewContainer.querySelectorAll('.date-input').forEach(input => {
+        input.addEventListener('change', (e) => {
+            const rowIndex = input.dataset.rowIndex;
+            const cellIndex = input.dataset.cellIndex;
+            const targetCell = this.tableBody.rows[rowIndex].cells[cellIndex];
+            const tableInput = targetCell.querySelector('.date-input');
+            if (tableInput) {
+                tableInput.value = input.value;
+            }
+            this.parentProject.triggerSave();
+        });
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+_openMobileEventTypeDropdown() {
+    const eventTypes = [
+        { id: 'normal', name: 'Normal', icon: 'event' },
+        { id: 'co-visit', name: 'CO Visit', icon: 'groups' },
+        { id: 'assembly', name: 'Assembly', icon: 'celebration' },
+        { id: 'convention', name: 'Convention', icon: 'festival' }
+    ];
+
+    // Create mobile event type dropdown UI
+    const dropdownHTML = `
+        <div class="dropdown-backdrop" id="mobile-event-dropdown-backdrop"></div>
+        <div class="dropdown-container" id="mobile-event-dropdown-container">
+            <div class="dropdown-header">
+                <h3 class="dropdown-title">Select Event Type</h3>
+                <button class="dropdown-close" id="mobile-event-dropdown-close">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="dropdown-content">
+                ${eventTypes.map(event => `
+                    <button class="dropdown-item" data-event-type="${event.id}">
+                        <span style="display: flex; align-items: center; gap: 12px;">
+                            <span class="material-symbols-outlined">${event.icon}</span>
+                            <span>${event.name}</span>
+                        </span>
+                    </button>
+                `).join('')}
+            </div>
+        </div>
+    `;
+
+    // Remove existing dropdown if any
+    const existingDropdown = document.getElementById('mobile-event-dropdown-container');
+    if (existingDropdown) {
+        existingDropdown.remove();
+        document.getElementById('mobile-event-dropdown-backdrop').remove();
     }
+
+    document.body.insertAdjacentHTML('beforeend', dropdownHTML);
+
+    const backdrop = document.getElementById('mobile-event-dropdown-backdrop');
+    const container = document.getElementById('mobile-event-dropdown-container');
+    const closeBtn = document.getElementById('mobile-event-dropdown-close');
+
+    const hideDropdown = () => {
+        backdrop.classList.remove('active');
+        container.classList.remove('active');
+        setTimeout(() => {
+            backdrop.remove();
+            container.remove();
+        }, 300);
+    };
+
+    backdrop.addEventListener('click', hideDropdown);
+    closeBtn.addEventListener('click', hideDropdown);
+
+    container.addEventListener('click', (e) => {
+        const item = e.target.closest('.dropdown-item');
+        if (item) {
+            const eventType = item.dataset.eventType;
+            this.applyEventType(eventType);
+            hideDropdown();
+        }
+    });
+
+    // Show dropdown
+    setTimeout(() => {
+        backdrop.classList.add('active');
+        container.classList.add('active');
+    }, 10);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+    _isCellInMinistrySection(cell) {
+    const table = cell.closest('table');
+    if (!table) return false;
+    
+    const allRows = Array.from(table.querySelectorAll('tbody > tr'));
+    const cellRow = cell.closest('tr');
+    const cellIndex = allRows.indexOf(cellRow);
+    
+    let ministryHeaderIndex = -1;
+    let nextHeaderIndex = allRows.length;
+    
+    // Look for the ministry section header
+    allRows.forEach((row, index) => {
+        if (row.classList.contains('header-row')) {
+            // Check if this header row contains ministry section text
+            const rowText = row.textContent.trim();
+            if (rowText.includes('చక్కగా సువార్త ప్రకటించాలి') || rowText.includes('సువార్త ప్రకటించాలి')) {
+                ministryHeaderIndex = index;
+            } else if (ministryHeaderIndex !== -1 && index > ministryHeaderIndex) {
+                // Found the next header after ministry section
+                if (index < nextHeaderIndex) nextHeaderIndex = index;
+            }
+        }
+    });
+    
+    if (ministryHeaderIndex === -1) return false;
+    
+    // Return true if the cell is between ministry header and next header
+    return cellIndex > ministryHeaderIndex && cellIndex < nextHeaderIndex;
+}
+
+    getContent() {
+        const tempBody = this.tableBody.cloneNode(true);
+        const dateInput = tempBody.querySelector('.date-input');
+        if (dateInput && dateInput.value) {
+            const cell = dateInput.parentElement;
+            cell.textContent = dateInput.value.split('-').reverse().join('-');
+        }
+        tempBody.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+        tempBody.querySelectorAll('.editable-cell').forEach(el => el.classList.remove('editable-cell'));
+        return tempBody.innerHTML;
+    }
+
+    applyEventType(eventType, shouldSave = true) {
+        this.data.eventType = eventType;
+        const allRows = this.tableBody.querySelectorAll('tr');
+        const firstRow = this.tableBody.rows[0];
+
+        if (eventType === 'normal') {
+            allRows.forEach(row => row.style.display = '');
+            if (firstRow && firstRow.dataset.originalContent) {
+                firstRow.innerHTML = firstRow.dataset.originalContent;
+                delete firstRow.dataset.originalContent;
+            }
+        } else {
+            const eventTexts = {
+                'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం',
+                'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో',
+                'convention': 'ప్రాదేశిక సమావేశం'
+            };
+            allRows.forEach((row, index) => {
+                row.style.display = (index === 0) ? '' : 'none';
+            });
+            let existingDateValue = '';
+            if (firstRow) {
+                if (!firstRow.dataset.originalContent) firstRow.dataset.originalContent = firstRow.innerHTML;
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = firstRow.dataset.originalContent;
+                const originalDateCell = tempDiv.querySelector('[data-user-editable]');
+                if (originalDateCell) existingDateValue = originalDateCell.textContent.trim().split('-').reverse().join('-');
+            }
+            firstRow.innerHTML = `
+                <th colspan="1" class="special-event-text">${eventTexts[eventType]}</th>
+                <td style="text-align: right; font-weight: 700;">తేదీ:</td>
+                <td data-user-editable="true"><input type="date" class="date-input" value="${existingDateValue}"></td>
+            `;
+        }
+
+        this._createMobileView();
+        if (shouldSave) this.parentProject.triggerSave();
+    }
+
+    setupEventListeners() {
+        this.element.addEventListener('input', (e) => {
+            const input = e.target;
+            if(input.classList.contains('item-input')) {
+                const rowIndex = input.dataset.rowIndex;
+                const cellIndex = input.dataset.cellIndex;
+                const targetCell = this.tableBody.rows[rowIndex].cells[cellIndex];
+                if(input.type === 'date') {
+                    const tableInput = targetCell.querySelector('.date-input');
+                    if(tableInput) tableInput.value = input.value;
+                } else {
+                     targetCell.textContent = input.textContent;
+                }
+            }
+            this.parentProject.triggerSave();
+        });
+
+        this.eventBtn.addEventListener('click', (e) => {
+            activeEventScheduleTable = this;
+            const rect = e.currentTarget.getBoundingClientRect();
+            eventContextMenu.style.display = 'block';
+            eventContextMenu.style.top = `${rect.bottom}px`;
+            eventContextMenu.style.left = `${rect.left}px`;
+        });
+    }
+}
+
+    
     
     class Project {
         constructor(id, initialData, collectionRef) {
@@ -1803,66 +1774,66 @@ is this correct ?
     }
     
     function isCellInMinistrySection(cell) {
-        const table = cell.closest('table');
-        if (!table) return false;
-        
-        const allRows = Array.from(table.querySelectorAll('tbody > tr'));
-        const cellRow = cell.closest('tr');
-        const cellIndex = allRows.indexOf(cellRow);
-        
-        let ministryHeaderIndex = -1;
-        let nextHeaderIndex = allRows.length;
-        
-        // Look for the ministry section header
-        allRows.forEach((row, index) => {
-            if (row.classList.contains('header-row')) {
-                // Check if this header row contains ministry section text
-                const rowText = row.textContent.trim();
-                if (rowText.includes('చక్కగా సువార్త ప్రకటించాలి') || rowText.includes('సువార్త ప్రకటించాలి')) {
-                    ministryHeaderIndex = index;
-                } else if (ministryHeaderIndex !== -1 && index > ministryHeaderIndex) {
-                    // Found the next header after ministry section
-                    if (index < nextHeaderIndex) nextHeaderIndex = index;
-                }
+    const table = cell.closest('table');
+    if (!table) return false;
+    
+    const allRows = Array.from(table.querySelectorAll('tbody > tr'));
+    const cellRow = cell.closest('tr');
+    const cellIndex = allRows.indexOf(cellRow);
+    
+    let ministryHeaderIndex = -1;
+    let nextHeaderIndex = allRows.length;
+    
+    // Look for the ministry section header
+    allRows.forEach((row, index) => {
+        if (row.classList.contains('header-row')) {
+            // Check if this header row contains ministry section text
+            const rowText = row.textContent.trim();
+            if (rowText.includes('చక్కగా సువార్త ప్రకటించాలి') || rowText.includes('సువార్త ప్రకటించాలి')) {
+                ministryHeaderIndex = index;
+            } else if (ministryHeaderIndex !== -1 && index > ministryHeaderIndex) {
+                // Found the next header after ministry section
+                if (index < nextHeaderIndex) nextHeaderIndex = index;
             }
-        });
-        
-        if (ministryHeaderIndex === -1) return false;
-        
-        // Return true if the cell is between ministry header and next header
-        return cellIndex > ministryHeaderIndex && cellIndex < nextHeaderIndex;
-    }
+        }
+    });
+    
+    if (ministryHeaderIndex === -1) return false;
+    
+    // Return true if the cell is between ministry header and next header
+    return cellIndex > ministryHeaderIndex && cellIndex < nextHeaderIndex;
+}
 
     function openMemberDropdown(cell, mobileDiv = null) {
-        const isInMinistry = isCellInMinistrySection(cell);
-        memberDropdown.innerHTML = '';
-        let listToShow;
-        
-        if (isInMinistry) {
-            // For ministry section: show both sisters and brothers
-            const sortedSisters = [...members.sisters].sort((a, b) => a.name.localeCompare(b.name));
-            const sortedBrothers = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
-            listToShow = [...sortedSisters, ...sortedBrothers];
-        } else {
-            // For other sections: show only brothers
-            listToShow = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
-        }
-
-        listToShow.forEach(member => { 
-            const item = document.createElement('button');
-            item.className = 'member-dropdown-item';
-            item.dataset.name = member.name;
-            item.innerHTML = `<span>${member.name}</span>` + (member.isServant ? '<span class="servant-tag">Servant</span>' : '');
-            memberDropdown.appendChild(item);
-        });
-
-        const rect = (mobileDiv || cell).getBoundingClientRect();
-        memberDropdown.style.display = 'block';
-        memberDropdown.style.top = `${rect.bottom}px`;
-        memberDropdown.style.left = `${rect.left}px`;
-        memberDropdown.style.width = `${rect.width}px`;
-        activeCellForDropdown = { realCell: cell, mobileDiv: mobileDiv };
+    const isInMinistry = isCellInMinistrySection(cell);
+    memberDropdown.innerHTML = '';
+    let listToShow;
+    
+    if (isInMinistry) {
+        // For ministry section: show both sisters and brothers
+        const sortedSisters = [...members.sisters].sort((a, b) => a.name.localeCompare(b.name));
+        const sortedBrothers = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
+        listToShow = [...sortedSisters, ...sortedBrothers];
+    } else {
+        // For other sections: show only brothers
+        listToShow = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
     }
+
+    listToShow.forEach(member => { 
+        const item = document.createElement('button');
+        item.className = 'member-dropdown-item';
+        item.dataset.name = member.name;
+        item.innerHTML = `<span>${member.name}</span>` + (member.isServant ? '<span class="servant-tag">Servant</span>' : '');
+        memberDropdown.appendChild(item);
+    });
+
+    const rect = (mobileDiv || cell).getBoundingClientRect();
+    memberDropdown.style.display = 'block';
+    memberDropdown.style.top = `${rect.bottom}px`;
+    memberDropdown.style.left = `${rect.left}px`;
+    memberDropdown.style.width = `${rect.width}px`;
+    activeCellForDropdown = { realCell: cell, mobileDiv: mobileDiv };
+}
 
     async function generatePdf() {
         const printButton = document.getElementById('print-button');
