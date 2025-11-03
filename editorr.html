@@ -2129,7 +2129,7 @@
         // Add header to first page
         if (isFirstPage) {
             pdf.addImage(headerImgData, 'JPEG', MARGIN_MM, startY, USABLE_WIDTH, headerHeight);
-            startY += headerHeight + 5; // Very small spacing after header
+            startY += headerHeight ; // Very small spacing after header
         }
 
         // Calculate vertical alignment for content
