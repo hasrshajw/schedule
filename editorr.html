@@ -2097,7 +2097,7 @@ is this correct ?
 
     itemsToPrint.forEach(item => {
         // For first page, account for header height
-        const availableHeight = isFirstPage ? USABLE_HEIGHT - headerHeight - 2 : USABLE_HEIGHT;
+        const availableHeight = isFirstPage ? USABLE_HEIGHT - headerHeight - 5 : USABLE_HEIGHT;
         
         const itemHeightWithSpacing = currentPageItems.length > 0 ? item.height + PAGE_SPACING_MM : item.height;
         
@@ -2130,12 +2130,12 @@ is this correct ?
         // Add header to first page
         if (isFirstPage) {
             pdf.addImage(headerImgData, 'JPEG', MARGIN_MM, startY, USABLE_WIDTH, headerHeight);
-            startY += headerHeight + 2; // Very small spacing after header
+            startY += headerHeight + 0; // Very small spacing after header
         }
 
         // Calculate vertical alignment for content
         if (pageItems.length > 1) {
-            const availableHeight = isFirstPage ? USABLE_HEIGHT - headerHeight - 2 : USABLE_HEIGHT;
+            const availableHeight = isFirstPage ? USABLE_HEIGHT - headerHeight - 5 : USABLE_HEIGHT;
             const remainingSpace = availableHeight - totalContentHeight;
             if (remainingSpace > 0) {
                 startY += remainingSpace / 2;
