@@ -2011,19 +2011,35 @@ is this correct ?
     printContainer.style.padding = '20px';
     document.body.appendChild(printContainer);
 
-    // CREATE HEADER FOR PDF - MINIMAL PADDING
+    // CAPTURE HEADER FOR PDF (FIRST PAGE ONLY)
     const headerClone = document.querySelector('.schedule-display-header').cloneNode(true);
     headerClone.style.display = 'block';
     headerClone.style.marginBottom = '10px'; // Very small padding
     headerClone.style.padding = '5px 0'; // Minimal padding
     headerClone.style.background = 'white';
     
-    // Ensure all elements in header are visible
-    headerClone.querySelector('.title-block').style.marginBottom = '5px';
-    headerClone.querySelector('.title-block h1').style.marginBottom = '5px';
-    headerClone.querySelector('.subtitle-svg-container').style.marginTop = '0';
+    // Ensure SVG line is visible in PDF
+    const svgDivider = headerClone.querySelector('.svg-divider');
+    if (svgDivider) {
+        svgDivider.style.display = 'block';
+        svgDivider.style.visibility = 'visible';
+    }
     
     printContainer.appendChild(headerClone);
+    
+    const headerCanvas = await html2canvas(headerClone, { 
+        scale: 2, 
+        useCORS: true, 
+        backgroundColor: '#ffffff',
+        logging: false
+    });
+    
+    const headerImgData = headerCanvas.toDataURL('image/jpeg', 0.9);
+    const headerProps = pdf.getImageProperties(headerImgData);
+    const headerHeight = (headerProps.height * USABLE_WIDTH) / headerProps.width;
+    
+    // Remove header from print container after capture
+    printContainer.removeChild(headerClone);
 
     const itemsToPrint = [];
 
@@ -2050,97 +2066,83 @@ is this correct ?
 
         printContainer.appendChild(clone);
         
-        const canvas = await html2canvas(clone, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+        const canvas = await html2canvas(clone, { 
+            scale: 2, 
+            useCORS: true, 
+            backgroundColor: '#ffffff',
+            logging: false
+        });
         
         const imgData = canvas.toDataURL('image/jpeg', 0.8);
         const imgProps = pdf.getImageProperties(imgData);
         const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
-        itemsToPrint.push({ imgData, width: USABLE_WIDTH, height: imgHeight, type: 'content' });
+        itemsToPrint.push({ imgData, width: USABLE_WIDTH, height: imgHeight });
         
         // Remove the clone after capturing
         printContainer.removeChild(clone);
     }
     
-    // CAPTURE HEADER SEPARATELY
-    const headerCanvas = await html2canvas(headerClone, { 
-        scale: 2, 
-        useCORS: true, 
-        backgroundColor: '#ffffff',
-        onclone: function(clonedDoc) {
-            // Ensure SVG background line is visible in the cloned document
-            const svg = clonedDoc.querySelector('.svg-divider');
-            if (svg) {
-                svg.style.display = 'block';
-            }
-        }
-    });
-    
-    const headerImgData = headerCanvas.toDataURL('image/jpeg', 0.8);
-    const headerImgProps = pdf.getImageProperties(headerImgData);
-    const headerImgHeight = (headerImgProps.height * USABLE_WIDTH) / headerImgProps.width;
-    
-    // Remove header clone and print container
-    printContainer.removeChild(headerClone);
     document.body.removeChild(printContainer);
 
     let currentY = MARGIN_MM;
 
-    // ADD HEADER TO FIRST PAGE
-    pdf.addImage(headerImgData, 'JPEG', MARGIN_MM, currentY, USABLE_WIDTH, headerImgHeight);
-    currentY += headerImgHeight + 5; // Small spacing after header
-
     // Stage 1: Group all printable items into pages first.
     const pages = [];
     let currentPageItems = [];
-    let currentPageHeight = headerImgHeight + 5; // Include header height for first page
+    let currentPageHeight = 0;
+    let isFirstPage = true;
 
     itemsToPrint.forEach(item => {
+        // For first page, account for header height
+        const availableHeight = isFirstPage ? USABLE_HEIGHT - headerHeight - 5 : USABLE_HEIGHT;
+        
         const itemHeightWithSpacing = currentPageItems.length > 0 ? item.height + PAGE_SPACING_MM : item.height;
-        if (currentPageHeight + itemHeightWithSpacing > USABLE_HEIGHT && currentPageItems.length > 0) {
-            pages.push(currentPageItems);
+        
+        if (currentPageHeight + itemHeightWithSpacing > availableHeight && currentPageItems.length > 0) {
+            pages.push({ items: currentPageItems, isFirstPage: isFirstPage });
             currentPageItems = [item];
-            currentPageHeight = item.height; // Reset height for new page (no header)
+            currentPageHeight = item.height;
+            isFirstPage = false;
         } else {
             currentPageItems.push(item);
             currentPageHeight += itemHeightWithSpacing;
         }
     });
+    
     if (currentPageItems.length > 0) {
-        pages.push(currentPageItems);
+        pages.push({ items: currentPageItems, isFirstPage: isFirstPage });
     }
 
-    // Stage 2: Render each page with calculated vertical alignment.
-    let isFirstPage = true;
-    
-    pages.forEach((pageItems, pageIndex) => {
+    // Stage 2: Render each page
+    pages.forEach((pageData, pageIndex) => {
         if (pageIndex > 0) {
             pdf.addPage();
-            currentY = MARGIN_MM; // Reset Y position for new pages
-            isFirstPage = false;
         }
 
+        const { items: pageItems, isFirstPage } = pageData;
         const totalContentHeight = pageItems.reduce((sum, item) => sum + item.height, 0) + (PAGE_SPACING_MM * (pageItems.length - 1));
 
-        let startY = currentY; // Start from current Y position
+        let startY = MARGIN_MM;
 
-        // For first page, we already added the header, so adjust accordingly
+        // Add header to first page
         if (isFirstPage) {
-            // Content starts after header
-            startY = currentY;
-        } else {
-            // For other pages, center content if there's space
-            if (pageItems.length > 1) {
-                const remainingSpace = USABLE_HEIGHT - totalContentHeight;
-                if (remainingSpace > 0) {
-                    startY = MARGIN_MM + (remainingSpace / 2);
-                }
+            pdf.addImage(headerImgData, 'JPEG', MARGIN_MM, startY, USABLE_WIDTH, headerHeight);
+            startY += headerHeight + 5; // Very small spacing after header
+        }
+
+        // Calculate vertical alignment for content
+        if (pageItems.length > 1) {
+            const availableHeight = isFirstPage ? USABLE_HEIGHT - headerHeight - 5 : USABLE_HEIGHT;
+            const remainingSpace = availableHeight - totalContentHeight;
+            if (remainingSpace > 0) {
+                startY += remainingSpace / 2;
             }
         }
 
-        let currentYPosition = startY;
+        let currentY = startY;
         pageItems.forEach(item => {
-            pdf.addImage(item.imgData, 'JPEG', MARGIN_MM, currentYPosition, item.width, item.height);
-            currentYPosition += item.height + PAGE_SPACING_MM;
+            pdf.addImage(item.imgData, 'JPEG', MARGIN_MM, currentY, item.width, item.height);
+            currentY += item.height + PAGE_SPACING_MM;
         });
     });
 
