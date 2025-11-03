@@ -2011,45 +2011,41 @@ is this correct ?
     printContainer.style.padding = '20px';
     document.body.appendChild(printContainer);
 
-    // 🔹 CAPTURE HEADER SEPARATELY FOR FIRST PAGE
+    // CAPTURE HEADER SEPARATELY FOR FIRST PAGE
     const headerClone = document.querySelector('.schedule-display-header').cloneNode(true);
     headerClone.style.display = 'block';
-    headerClone.style.marginBottom = '5px';
+    headerClone.style.marginBottom = '2px';
     headerClone.style.padding = '2px 0';
     headerClone.style.background = 'white';
 
-    // --- Minimize but preserve structure ---
+    // Keep exact visual design but minimize any vertical spacing
     const titleBlock = headerClone.querySelector('.title-block');
     if (titleBlock) {
-        titleBlock.style.marginBottom = '4px';
+        titleBlock.style.marginBottom = '2px';
         titleBlock.style.padding = '0';
     }
-
+    
     const title = headerClone.querySelector('h1');
     if (title) {
-        title.style.margin = '2px 0';
+        title.style.margin = '1px 0';
         title.style.padding = '0';
     }
-
+    
     const subtitleContainer = headerClone.querySelector('.subtitle-svg-container');
     if (subtitleContainer) {
-        subtitleContainer.style.margin = '3px 0';
+        subtitleContainer.style.margin = '1px 0';
         subtitleContainer.style.padding = '0';
     }
-
+    
     const subtitle = headerClone.querySelector('.subtitle');
     if (subtitle) {
-        subtitle.style.margin = '0 0 4px 0'; // small space below date text
+        subtitle.style.margin = '0';
         subtitle.style.padding = '3px 6px';
     }
-
-    // 🔹 Divider line below date (visible and well-spaced)
+    
     const svgDivider = headerClone.querySelector('.svg-divider');
     if (svgDivider) {
-        svgDivider.style.margin = '4px 0 6px 0'; // top/bottom margins for visibility
-        svgDivider.style.display = 'block';
-        svgDivider.style.width = '100%';
-        svgDivider.style.height = '2px';
+        svgDivider.style.margin = '1px 0';
     }
 
     const headerContainer = document.createElement('div');
@@ -2058,18 +2054,18 @@ is this correct ?
     headerContainer.style.background = 'white';
     headerContainer.appendChild(headerClone);
     printContainer.appendChild(headerContainer);
-
+    
     const headerCanvas = await html2canvas(headerContainer, { 
         scale: 2, 
         useCORS: true, 
         backgroundColor: '#ffffff',
         logging: false
     });
-
+    
     const headerImgData = headerCanvas.toDataURL('image/jpeg', 0.8);
     const headerProps = pdf.getImageProperties(headerImgData);
     const headerHeight = (headerProps.height * USABLE_WIDTH) / headerProps.width;
-
+    
     // Remove header from print container
     printContainer.removeChild(headerContainer);
 
@@ -2077,14 +2073,14 @@ is this correct ?
 
     for (const block of document.querySelectorAll('.schedule-block')) {
         const clone = block.cloneNode(true);
-
+        
         const eventBtn = clone.querySelector('.event-btn');
         if (eventBtn) eventBtn.style.display = 'none';
-        const mobileContainer = clone.querySelector('.mobile-view-container');
-        if (mobileContainer) mobileContainer.style.display = 'none';
-        const tableEl = clone.querySelector('table');
-        if (tableEl) tableEl.style.display = 'table';
-
+        const mobileView = clone.querySelector('.mobile-view-container');
+        if (mobileView) mobileView.style.display = 'none';
+        const table = clone.querySelector('table');
+        if (table) table.style.display = 'table';
+        
         const titleEl = clone.querySelector('.schedule-title');
         if (titleEl) titleEl.style.display = 'none';
 
@@ -2092,44 +2088,41 @@ is this correct ?
         clone.style.padding = '0';
         clone.style.border = 'none';
 
-        // Adjust table cells
+        // Increase table cell height slightly for readability
         const allCells = clone.querySelectorAll('th, td');
         allCells.forEach(cell => {
             cell.style.height = '40px';
         });
 
         printContainer.appendChild(clone);
-
+        
         const canvas = await html2canvas(clone, { 
             scale: 2, 
             useCORS: true, 
             backgroundColor: '#ffffff',
             logging: false
         });
-
+        
         const imgData = canvas.toDataURL('image/jpeg', 0.8);
         const imgProps = pdf.getImageProperties(imgData);
         const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
         itemsToPrint.push({ imgData, width: USABLE_WIDTH, height: imgHeight });
-
-        // Remove after capturing
+        
         printContainer.removeChild(clone);
     }
-
+    
     document.body.removeChild(printContainer);
 
-    // 🔹 Header–Table spacing
-    const HEADER_SPACING_MM = 1; // very tight gap between header and table
+    // Very small gap between header and table
+    const HEADER_SPACING_MM = 1; 
     const firstPageAvailableHeight = USABLE_HEIGHT - headerHeight - HEADER_SPACING_MM;
 
-    let currentY = MARGIN_MM;
     let isFirstPage = true;
-
-    // Group items into pages
     const pages = [];
     let currentPageItems = [];
     let currentPageHeight = 0;
 
+    // Split content into pages
     itemsToPrint.forEach(item => {
         const availableHeight = isFirstPage ? firstPageAvailableHeight : USABLE_HEIGHT;
         const itemHeightWithSpacing = currentPageItems.length > 0 ? item.height + PAGE_SPACING_MM : item.height;
@@ -2144,7 +2137,7 @@ is this correct ?
             currentPageHeight += itemHeightWithSpacing;
         }
     });
-
+    
     if (currentPageItems.length > 0) {
         pages.push(currentPageItems);
     }
@@ -2154,30 +2147,19 @@ is this correct ?
         if (pageIndex > 0) pdf.addPage();
 
         if (pageIndex === 0) {
-            // 🔹 FIRST PAGE
+            // FIRST PAGE: exact header + minimal spacing
             pdf.addImage(headerImgData, 'JPEG', MARGIN_MM, MARGIN_MM, USABLE_WIDTH, headerHeight);
-
+            
             const headerBottom = MARGIN_MM + headerHeight + HEADER_SPACING_MM;
-            let contentStartY = headerBottom;
+            let currentY = headerBottom;
 
-            let currentY = contentStartY;
             pageItems.forEach(item => {
                 pdf.addImage(item.imgData, 'JPEG', MARGIN_MM, currentY, item.width, item.height);
                 currentY += item.height + PAGE_SPACING_MM;
             });
         } else {
-            // 🔹 SUBSEQUENT PAGES
-            const totalContentHeight = pageItems.reduce((sum, item) => sum + item.height, 0) + (PAGE_SPACING_MM * (pageItems.length - 1));
-            let startY = MARGIN_MM;
-
-            if (pageItems.length > 1) {
-                const remainingSpace = USABLE_HEIGHT - totalContentHeight;
-                if (remainingSpace > 0) {
-                    startY = MARGIN_MM + (remainingSpace / 2);
-                }
-            }
-
-            let currentY = startY;
+            // OTHER PAGES
+            let currentY = MARGIN_MM;
             pageItems.forEach(item => {
                 pdf.addImage(item.imgData, 'JPEG', MARGIN_MM, currentY, item.width, item.height);
                 currentY += item.height + PAGE_SPACING_MM;
@@ -2191,6 +2173,7 @@ is this correct ?
     printButton.disabled = false;
     printButton.querySelector('span:last-child').textContent = 'Download PDF';
 }
+
 
 
 })();
