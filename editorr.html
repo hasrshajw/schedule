@@ -2011,17 +2011,17 @@ is this correct ?
     printContainer.style.padding = '20px';
     document.body.appendChild(printContainer);
 
-    // CAPTURE HEADER SEPARATELY FOR FIRST PAGE
+    // 🔹 CAPTURE HEADER SEPARATELY FOR FIRST PAGE
     const headerClone = document.querySelector('.schedule-display-header').cloneNode(true);
     headerClone.style.display = 'block';
     headerClone.style.marginBottom = '5px';
     headerClone.style.padding = '2px 0';
     headerClone.style.background = 'white';
 
-    // Minimize padding in header elements
+    // --- Minimize but preserve structure ---
     const titleBlock = headerClone.querySelector('.title-block');
     if (titleBlock) {
-        titleBlock.style.marginBottom = '5px';
+        titleBlock.style.marginBottom = '4px';
         titleBlock.style.padding = '0';
     }
 
@@ -2033,19 +2033,23 @@ is this correct ?
 
     const subtitleContainer = headerClone.querySelector('.subtitle-svg-container');
     if (subtitleContainer) {
-        subtitleContainer.style.margin = '2px 0';
+        subtitleContainer.style.margin = '3px 0';
         subtitleContainer.style.padding = '0';
     }
 
     const subtitle = headerClone.querySelector('.subtitle');
     if (subtitle) {
-        subtitle.style.margin = '0';
-        subtitle.style.padding = '4px 8px';
+        subtitle.style.margin = '0 0 4px 0'; // small space below date text
+        subtitle.style.padding = '3px 6px';
     }
 
+    // 🔹 Divider line below date (visible and well-spaced)
     const svgDivider = headerClone.querySelector('.svg-divider');
     if (svgDivider) {
-        svgDivider.style.margin = '2px 0';
+        svgDivider.style.margin = '4px 0 6px 0'; // top/bottom margins for visibility
+        svgDivider.style.display = 'block';
+        svgDivider.style.width = '100%';
+        svgDivider.style.height = '2px';
     }
 
     const headerContainer = document.createElement('div');
@@ -2088,7 +2092,7 @@ is this correct ?
         clone.style.padding = '0';
         clone.style.border = 'none';
 
-        // Increase the height of all table cells for better spacing in the PDF
+        // Adjust table cells
         const allCells = clone.querySelectorAll('th, td');
         allCells.forEach(cell => {
             cell.style.height = '40px';
@@ -2108,20 +2112,20 @@ is this correct ?
         const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
         itemsToPrint.push({ imgData, width: USABLE_WIDTH, height: imgHeight });
 
-        // Remove the clone after capturing
+        // Remove after capturing
         printContainer.removeChild(clone);
     }
 
     document.body.removeChild(printContainer);
 
-    // CALCULATE SPACE FOR FIRST PAGE WITH HEADER
-    const HEADER_SPACING_MM = 1; // Tight spacing between header and table
+    // 🔹 Header–Table spacing
+    const HEADER_SPACING_MM = 1; // very tight gap between header and table
     const firstPageAvailableHeight = USABLE_HEIGHT - headerHeight - HEADER_SPACING_MM;
 
     let currentY = MARGIN_MM;
     let isFirstPage = true;
 
-    // Stage 1: Group all printable items into pages
+    // Group items into pages
     const pages = [];
     let currentPageItems = [];
     let currentPageHeight = 0;
@@ -2145,16 +2149,16 @@ is this correct ?
         pages.push(currentPageItems);
     }
 
-    // Stage 2: Render each page
+    // Render pages
     pages.forEach((pageItems, pageIndex) => {
         if (pageIndex > 0) pdf.addPage();
 
         if (pageIndex === 0) {
-            // FIRST PAGE: Header with minimal gap
+            // 🔹 FIRST PAGE
             pdf.addImage(headerImgData, 'JPEG', MARGIN_MM, MARGIN_MM, USABLE_WIDTH, headerHeight);
 
             const headerBottom = MARGIN_MM + headerHeight + HEADER_SPACING_MM;
-            let contentStartY = headerBottom; // No centering — starts immediately below header
+            let contentStartY = headerBottom;
 
             let currentY = contentStartY;
             pageItems.forEach(item => {
@@ -2162,7 +2166,7 @@ is this correct ?
                 currentY += item.height + PAGE_SPACING_MM;
             });
         } else {
-            // SUBSEQUENT PAGES: Normal layout without header
+            // 🔹 SUBSEQUENT PAGES
             const totalContentHeight = pageItems.reduce((sum, item) => sum + item.height, 0) + (PAGE_SPACING_MM * (pageItems.length - 1));
             let startY = MARGIN_MM;
 
@@ -2187,6 +2191,7 @@ is this correct ?
     printButton.disabled = false;
     printButton.querySelector('span:last-child').textContent = 'Download PDF';
 }
+
 
 })();
 </script>
