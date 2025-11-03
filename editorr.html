@@ -2008,185 +2008,193 @@ is this correct ?
     printContainer.style.top = '0';
     printContainer.style.width = '1100px';
     printContainer.style.background = 'white';
-    printContainer.style.padding = '10px'; // Reduced padding
+    printContainer.style.padding = '20px';
     document.body.appendChild(printContainer);
 
-    try {
-        // CAPTURE HEADER SEPARATELY WITH MINIMAL PADDING
-        const headerClone = document.querySelector('.schedule-display-header').cloneNode(true);
-        headerClone.style.display = 'block';
-        headerClone.style.marginBottom = '5px'; // Very small bottom margin
-        headerClone.style.marginTop = '0'; // No top margin
-        headerClone.style.padding = '5px 0'; // Very small vertical padding
+    // CAPTURE HEADER SEPARATELY FOR FIRST PAGE
+    const headerClone = document.querySelector('.schedule-display-header').cloneNode(true);
+    headerClone.style.display = 'block';
+    headerClone.style.marginBottom = '5px'; // Very small bottom margin
+    headerClone.style.padding = '2px 0'; // Very small padding
+    headerClone.style.background = 'white';
+    
+    // Minimize padding in header elements
+    const titleBlock = headerClone.querySelector('.title-block');
+    if (titleBlock) {
+        titleBlock.style.marginBottom = '5px';
+        titleBlock.style.padding = '0';
+    }
+    
+    const title = headerClone.querySelector('h1');
+    if (title) {
+        title.style.margin = '2px 0';
+        title.style.padding = '0';
+    }
+    
+    const subtitleContainer = headerClone.querySelector('.subtitle-svg-container');
+    if (subtitleContainer) {
+        subtitleContainer.style.margin = '2px 0';
+        subtitleContainer.style.padding = '0';
+    }
+    
+    const subtitle = headerClone.querySelector('.subtitle');
+    if (subtitle) {
+        subtitle.style.margin = '0';
+        subtitle.style.padding = '4px 8px'; // Minimal padding
+    }
+    
+    const svgDivider = headerClone.querySelector('.svg-divider');
+    if (svgDivider) {
+        svgDivider.style.margin = '2px 0';
+    }
+
+    const headerContainer = document.createElement('div');
+    headerContainer.style.padding = '0';
+    headerContainer.style.margin = '0';
+    headerContainer.style.background = 'white';
+    headerContainer.appendChild(headerClone);
+    printContainer.appendChild(headerContainer);
+    
+    const headerCanvas = await html2canvas(headerContainer, { 
+        scale: 2, 
+        useCORS: true, 
+        backgroundColor: '#ffffff',
+        logging: false
+    });
+    
+    const headerImgData = headerCanvas.toDataURL('image/jpeg', 0.8);
+    const headerProps = pdf.getImageProperties(headerImgData);
+    const headerHeight = (headerProps.height * USABLE_WIDTH) / headerProps.width;
+    
+    // Remove header from print container
+    printContainer.removeChild(headerContainer);
+
+    const itemsToPrint = [];
+
+    for (const block of document.querySelectorAll('.schedule-block')) {
+        const clone = block.cloneNode(true);
         
-        // Style the title and subtitle for minimal spacing
-        const titleEl = headerClone.querySelector('.title-block');
+        clone.querySelector('.event-btn').style.display = 'none';
+        clone.querySelector('.mobile-view-container').style.display = 'none';
+        clone.querySelector('table').style.display = 'table';
+        
+        const titleEl = clone.querySelector('.schedule-title');
         if (titleEl) {
-            titleEl.style.marginBottom = '8px'; // Reduced margin
+            titleEl.style.display = 'none';
         }
+        clone.style.marginBottom = '0';
+        clone.style.padding = '0';
+        clone.style.border = 'none';
+
+        // Increase the height of all table cells for better spacing in the PDF
+        const allCells = clone.querySelectorAll('th, td');
+        allCells.forEach(cell => {
+            cell.style.height = '40px';
+        });
+
+        printContainer.appendChild(clone);
         
-        const subtitleEl = headerClone.querySelector('.subtitle');
-        if (subtitleEl) {
-            subtitleEl.style.margin = '2px 0'; // Minimal margin
-            subtitleEl.style.padding = '4px 12px'; // Reduced padding
-        }
-
-        const headerContainer = document.createElement('div');
-        headerContainer.style.padding = '0';
-        headerContainer.style.margin = '0';
-        headerContainer.appendChild(headerClone);
-        printContainer.appendChild(headerContainer);
-
-        // Capture header as image
-        const headerCanvas = await html2canvas(headerContainer, { 
+        const canvas = await html2canvas(clone, { 
             scale: 2, 
             useCORS: true, 
             backgroundColor: '#ffffff',
             logging: false
         });
         
-        const headerImgData = headerCanvas.toDataURL('image/jpeg', 0.9);
-        const headerProps = pdf.getImageProperties(headerImgData);
-        const headerHeight = (headerProps.height * USABLE_WIDTH) / headerProps.width;
+        const imgData = canvas.toDataURL('image/jpeg', 0.8);
+        const imgProps = pdf.getImageProperties(imgData);
+        const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
+        itemsToPrint.push({ imgData, width: USABLE_WIDTH, height: imgHeight });
+        
+        // Remove the clone after capturing
+        printContainer.removeChild(clone);
+    }
+    
+    document.body.removeChild(printContainer);
 
-        // Remove header from print container
-        printContainer.removeChild(headerContainer);
+    // CALCULATE SPACE FOR FIRST PAGE WITH HEADER
+    const HEADER_SPACING_MM = 3; // Very small spacing between header and content
+    const firstPageAvailableHeight = USABLE_HEIGHT - headerHeight - HEADER_SPACING_MM;
 
-        const itemsToPrint = [];
+    let currentY = MARGIN_MM;
+    let isFirstPage = true;
 
-        // CAPTURE SCHEDULE BLOCKS
-        for (const block of document.querySelectorAll('.schedule-block')) {
-            const clone = block.cloneNode(true);
-            
-            clone.querySelector('.event-btn').style.display = 'none';
-            clone.querySelector('.mobile-view-container').style.display = 'none';
-            clone.querySelector('table').style.display = 'table';
-            
-            const titleEl = clone.querySelector('.schedule-title');
-            if (titleEl) {
-                titleEl.style.display = 'none';
-            }
-            clone.style.marginBottom = '0';
-            clone.style.padding = '0';
-            clone.style.border = 'none';
+    // Stage 1: Group all printable items into pages first.
+    const pages = [];
+    let currentPageItems = [];
+    let currentPageHeight = 0;
 
-            // Increase the height of all table cells for better spacing in the PDF
-            const allCells = clone.querySelectorAll('th, td');
-            allCells.forEach(cell => {
-                cell.style.height = '40px';
-            });
-
-            printContainer.appendChild(clone);
-            
-            const canvas = await html2canvas(clone, { 
-                scale: 2, 
-                useCORS: true, 
-                backgroundColor: '#ffffff',
-                logging: false
-            });
-            
-            const imgData = canvas.toDataURL('image/jpeg', 0.9);
-            const imgProps = pdf.getImageProperties(imgData);
-            const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
-            itemsToPrint.push({ imgData, width: USABLE_WIDTH, height: imgHeight });
-            
-            // Remove the clone after capturing
-            printContainer.removeChild(clone);
+    itemsToPrint.forEach(item => {
+        const availableHeight = isFirstPage ? firstPageAvailableHeight : USABLE_HEIGHT;
+        const itemHeightWithSpacing = currentPageItems.length > 0 ? item.height + PAGE_SPACING_MM : item.height;
+        
+        if (currentPageHeight + itemHeightWithSpacing > availableHeight && currentPageItems.length > 0) {
+            pages.push(currentPageItems);
+            currentPageItems = [item];
+            currentPageHeight = item.height;
+            isFirstPage = false; // After first page, use full height
+        } else {
+            currentPageItems.push(item);
+            currentPageHeight += itemHeightWithSpacing;
         }
-        
-        document.body.removeChild(printContainer);
+    });
+    
+    if (currentPageItems.length > 0) {
+        pages.push(currentPageItems);
+    }
 
-        // CALCULATE SPACE FOR HEADER + CONTENT
-        const HEADER_SPACING = 3; // Very small spacing between header and content
-        
-        // Stage 1: Group all printable items into pages, accounting for header on first page
-        const pages = [];
-        let currentPageItems = [];
-        let currentPageHeight = 0;
-        let isFirstPage = true;
-
-        itemsToPrint.forEach(item => {
-            // For first page, account for header height
-            const availableHeight = isFirstPage ? 
-                USABLE_HEIGHT - headerHeight - HEADER_SPACING : 
-                USABLE_HEIGHT;
-
-            const itemHeightWithSpacing = currentPageItems.length > 0 ? item.height + PAGE_SPACING_MM : item.height;
-            
-            if (currentPageHeight + itemHeightWithSpacing > availableHeight && currentPageItems.length > 0) {
-                pages.push({ items: currentPageItems, isFirstPage });
-                currentPageItems = [item];
-                currentPageHeight = item.height;
-                isFirstPage = false;
-            } else {
-                currentPageItems.push(item);
-                currentPageHeight += itemHeightWithSpacing;
-            }
-        });
-        
-        if (currentPageItems.length > 0) {
-            pages.push({ items: currentPageItems, isFirstPage });
+    // Stage 2: Render each page with calculated layout.
+    pages.forEach((pageItems, pageIndex) => {
+        if (pageIndex > 0) {
+            pdf.addPage();
         }
 
-        // Stage 2: Render each page
-        pages.forEach((pageData, pageIndex) => {
-            if (pageIndex > 0) {
-                pdf.addPage();
+        if (pageIndex === 0) {
+            // FIRST PAGE: Add header at top with minimal padding
+            pdf.addImage(headerImgData, 'JPEG', MARGIN_MM, MARGIN_MM, USABLE_WIDTH, headerHeight);
+            
+            // Calculate remaining space for content
+            const headerBottom = MARGIN_MM + headerHeight + HEADER_SPACING_MM;
+            const contentHeight = pageItems.reduce((sum, item) => sum + item.height, 0) + (PAGE_SPACING_MM * (pageItems.length - 1));
+            const remainingSpace = USABLE_HEIGHT - headerBottom - contentHeight;
+            
+            let contentStartY = headerBottom;
+            
+            // If there's extra space, center the content below the header
+            if (remainingSpace > 0 && pageItems.length > 0) {
+                contentStartY = headerBottom + (remainingSpace / 2);
             }
 
-            const { items: pageItems, isFirstPage } = pageData;
-            let currentY = MARGIN_MM;
+            let currentY = contentStartY;
+            pageItems.forEach(item => {
+                pdf.addImage(item.imgData, 'JPEG', MARGIN_MM, currentY, item.width, item.height);
+                currentY += item.height + PAGE_SPACING_MM;
+            });
+        } else {
+            // SUBSEQUENT PAGES: Normal layout without header
+            const totalContentHeight = pageItems.reduce((sum, item) => sum + item.height, 0) + (PAGE_SPACING_MM * (pageItems.length - 1));
 
-            // ADD HEADER TO FIRST PAGE WITH MINIMAL PADDING
-            if (isFirstPage && pageIndex === 0) {
-                pdf.addImage(
-                    headerImgData, 
-                    'JPEG', 
-                    MARGIN_MM, 
-                    currentY, 
-                    USABLE_WIDTH, 
-                    headerHeight
-                );
-                currentY += headerHeight + HEADER_SPACING; // Very small spacing
-            }
+            let startY = MARGIN_MM;
 
-            // Calculate total content height for vertical centering (excluding header)
-            const totalContentHeight = pageItems.reduce((sum, item) => sum + item.height, 0) + 
-                                    (PAGE_SPACING_MM * (pageItems.length - 1));
-
-            // Calculate remaining space for vertical centering
-            const availableContentHeight = isFirstPage ? 
-                USABLE_HEIGHT - headerHeight - HEADER_SPACING : 
-                USABLE_HEIGHT;
-
-            let contentStartY = currentY;
-
-            // Center content vertically if there's extra space
-            if (pageItems.length > 0) {
-                const remainingSpace = availableContentHeight - totalContentHeight;
+            if (pageItems.length > 1) {
+                const remainingSpace = USABLE_HEIGHT - totalContentHeight;
                 if (remainingSpace > 0) {
-                    contentStartY += remainingSpace / 2;
+                    startY = MARGIN_MM + (remainingSpace / 2);
                 }
             }
 
-            // Draw schedule items
-            let itemY = contentStartY;
+            let currentY = startY;
             pageItems.forEach(item => {
-                pdf.addImage(item.imgData, 'JPEG', MARGIN_MM, itemY, item.width, item.height);
-                itemY += item.height + PAGE_SPACING_MM;
+                pdf.addImage(item.imgData, 'JPEG', MARGIN_MM, currentY, item.width, item.height);
+                currentY += item.height + PAGE_SPACING_MM;
             });
-        });
+        }
+    });
 
-        const fileName = `${document.querySelector('.subtitle').textContent.trim() || 'schedule'}.pdf`;
-        pdf.save(fileName);
-
-    } catch (error) {
-        console.error("PDF generation failed:", error);
-        alert("Sorry, there was an error creating the PDF. Please try again.");
-    } finally {
-        printButton.disabled = false;
-        printButton.querySelector('span:last-child').textContent = 'Download PDF';
-    }
+    const fileName = `${document.querySelector('.subtitle').textContent.trim() || 'schedule'}.pdf`;
+    pdf.save(fileName);
+    printButton.disabled = false;
+    printButton.querySelector('span:last-child').textContent = 'Download PDF';
 }
 })();
 </script>
