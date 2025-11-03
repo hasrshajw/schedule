@@ -944,6 +944,7 @@ is this correct ?
     display: flex;
     justify-content: center;
     margin-bottom: 16px;
+    padding: 0 16px;
 }
 
 .mobile-event-btn {
@@ -1179,20 +1180,14 @@ is this correct ?
 
                 const card = document.createElement('div');
                 card.className = 'mobile-week-card fade-in';
-                
-                // Add event button to special event card
-                const eventButtonHTML = `
-                    <div class="mobile-event-button-container">
-                        <button class="mobile-event-btn">
-                            <span class="material-symbols-outlined">celebration</span>
-                            <span>Event Type</span>
-                        </button>
-                    </div>
-                `;
-
                 card.innerHTML = `
-                    ${eventButtonHTML}
                     <h3 class="week-date">${this.data.title}</h3>
+                    <div class="field-group">
+                        <label>Event Type</label>
+                        <div class="mobile-field event-type-field">
+                            <span class="mobile-field-value">${this._getEventTypeDisplayName(this.data.eventType)}</span>
+                        </div>
+                    </div>
                     <div class="special-event-mobile">
                         <p class="special-event-text-mobile">${eventTexts[this.data.eventType]}</p>
                     </div>
@@ -1203,8 +1198,8 @@ is this correct ?
                 `;
                 this.mobileViewContainer.appendChild(card);
                 
-                // Add event listener for special event card
-                card.querySelector('.mobile-event-btn').addEventListener('click', (e) => {
+                // Add event listener to event type field
+                card.querySelector('.event-type-field').addEventListener('click', () => {
                     this._openMobileEventTypeDropdown();
                 });
                 return;
@@ -1213,16 +1208,6 @@ is this correct ?
             // Create ONE card for the entire schedule table
             const card = document.createElement('div');
             card.className = 'mobile-week-card fade-in';
-            
-            // ADD EVENT BUTTON AT THE TOP OF THE CARD
-            const eventButtonHTML = `
-                <div class="mobile-event-button-container">
-                    <button class="mobile-event-btn">
-                        <span class="material-symbols-outlined">celebration</span>
-                        <span>Event Type</span>
-                    </button>
-                </div>
-            `;
             
             let fieldsHTML = '';
 
@@ -1305,19 +1290,19 @@ is this correct ?
             });
 
             card.innerHTML = `
-                ${eventButtonHTML}
                 <h3 class="week-date">${this.data.title}</h3>
+                <div class="field-group">
+                    <label>Event Type</label>
+                    <div class="mobile-field event-type-field">
+                        <span class="mobile-field-value">${this._getEventTypeDisplayName(this.data.eventType)}</span>
+                    </div>
+                </div>
                 <div class="week-fields">
                     ${fieldsHTML}
                 </div>
             `;
             
             this.mobileViewContainer.appendChild(card);
-
-            // Add event listeners to mobile event button
-            card.querySelector('.mobile-event-btn').addEventListener('click', (e) => {
-                this._openMobileEventTypeDropdown();
-            });
 
             // Add event listeners to mobile fields
             this.mobileViewContainer.querySelectorAll('.member-field').forEach(field => {
@@ -1342,6 +1327,21 @@ is this correct ?
                     this.parentProject.triggerSave();
                 });
             });
+
+            // Add event listener to event type field
+            card.querySelector('.event-type-field').addEventListener('click', () => {
+                this._openMobileEventTypeDropdown();
+            });
+        }
+
+        _getEventTypeDisplayName(eventType) {
+            const eventNames = {
+                'normal': 'Normal',
+                'co-visit': 'CO Visit',
+                'assembly': 'Assembly',
+                'convention': 'Convention'
+            };
+            return eventNames[eventType] || 'Normal';
         }
 
         _openMobileDropdown(cell, fieldElement) {
@@ -1424,37 +1424,6 @@ is this correct ?
             }, 10);
         }
 
-        _isCellInMinistrySection(cell) {
-            const table = cell.closest('table');
-            if (!table) return false;
-            
-            const allRows = Array.from(table.querySelectorAll('tbody > tr'));
-            const cellRow = cell.closest('tr');
-            const cellIndex = allRows.indexOf(cellRow);
-            
-            let ministryHeaderIndex = -1;
-            let nextHeaderIndex = allRows.length;
-            
-            // Look for the ministry section header
-            allRows.forEach((row, index) => {
-                if (row.classList.contains('header-row')) {
-                    // Check if this header row contains ministry section text
-                    const rowText = row.textContent.trim();
-                    if (rowText.includes('చక్కగా సువార్త ప్రకటించాలి') || rowText.includes('సువార్త ప్రకటించాలి')) {
-                        ministryHeaderIndex = index;
-                    } else if (ministryHeaderIndex !== -1 && index > ministryHeaderIndex) {
-                        // Found the next header after ministry section
-                        if (index < nextHeaderIndex) nextHeaderIndex = index;
-                    }
-                }
-            });
-            
-            if (ministryHeaderIndex === -1) return false;
-            
-            // Return true if the cell is between ministry header and next header
-            return cellIndex > ministryHeaderIndex && cellIndex < nextHeaderIndex;
-        }
-
         _openMobileEventTypeDropdown() {
             const eventTypes = [
                 { id: 'normal', name: 'Normal', icon: 'event' },
@@ -1525,6 +1494,37 @@ is this correct ?
                 backdrop.classList.add('active');
                 container.classList.add('active');
             }, 10);
+        }
+
+        _isCellInMinistrySection(cell) {
+            const table = cell.closest('table');
+            if (!table) return false;
+            
+            const allRows = Array.from(table.querySelectorAll('tbody > tr'));
+            const cellRow = cell.closest('tr');
+            const cellIndex = allRows.indexOf(cellRow);
+            
+            let ministryHeaderIndex = -1;
+            let nextHeaderIndex = allRows.length;
+            
+            // Look for the ministry section header
+            allRows.forEach((row, index) => {
+                if (row.classList.contains('header-row')) {
+                    // Check if this header row contains ministry section text
+                    const rowText = row.textContent.trim();
+                    if (rowText.includes('చక్కగా సువార్త ప్రకటించాలి') || rowText.includes('సువార్త ప్రకటించాలి')) {
+                        ministryHeaderIndex = index;
+                    } else if (ministryHeaderIndex !== -1 && index > ministryHeaderIndex) {
+                        // Found the next header after ministry section
+                        if (index < nextHeaderIndex) nextHeaderIndex = index;
+                    }
+                }
+            });
+            
+            if (ministryHeaderIndex === -1) return false;
+            
+            // Return true if the cell is between ministry header and next header
+            return cellIndex > ministryHeaderIndex && cellIndex < nextHeaderIndex;
         }
 
         getContent() {
@@ -1604,7 +1604,7 @@ is this correct ?
             });
         }
     }
-    
+
     class Project {
         constructor(id, initialData, collectionRef) {
             this.id = id;
