@@ -1066,7 +1066,7 @@
         <!-- ADDED TITLE BLOCK -->
         <header class="schedule-display-header">
             <div class="title-block">
-                <h1>బహిరంగ ప్రసంగాల పట్టిక</h1>
+                <h1>వారం మధ్యలో జరిగే మీటింగ్ షెడ్యూల్</h1>
                 <div class="subtitle-svg-container">
                     <p class="subtitle" contenteditable="true" id="date-range-subtitle">Loading dates...</p>
                     <svg class="svg-divider" role="presentation" viewBox="0 0 24039.797 260" preserveAspectRatio="xMidYMid slice">
@@ -2014,7 +2014,7 @@
     const headerHTML = `
         <header class="schedule-display-header" style="display: block; margin-bottom: 10px; padding: 5px 0; background: white;">
             <div class="title-block" style="text-align: center; margin-bottom: 0;">
-                <h1 style="font-family: 'Noto Sans Telugu', sans-serif; font-weight: 700; color: rgb(97, 40, 0); margin: 0 0 8px 0; font-size: 1.8em;">బహిరంగ ప్రసంగాల పట్టిక</h1>
+                <h1 style="font-family: 'Noto Sans Telugu', sans-serif; font-weight: 700; color: rgb(97, 40, 0); margin: 0 0 8px 0; font-size: 1.8em;">వారం మధ్యలో జరిగే మీటింగ్ షెడ్యూల్</h1>
                 <div class="subtitle-svg-container" style="position: relative; display: inline-block; margin-top: 0;">
                     <p class="subtitle" style="margin: 0; font-size: 1.1em; font-weight: 500; color: #2d3748; background-color: white; padding: 6px 16px; display: inline-block; position: relative; z-index: 2; white-space: nowrap; border-radius: 8px; font-family: 'Noto Sans Telugu', sans-serif; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);">
                         ${document.getElementById('date-range-subtitle').textContent}
@@ -2063,7 +2063,7 @@
         // Increase the height of all table cells for better spacing in the PDF
         const allCells = clone.querySelectorAll('th, td');
         allCells.forEach(cell => {
-            cell.style.height = '38px';
+            cell.style.height = '40px';
         });
 
         printContainer.appendChild(clone);
