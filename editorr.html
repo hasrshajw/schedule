@@ -1123,148 +1123,144 @@ class ScheduleTable {
     }
 
     _createMobileView() {
-        this.mobileViewContainer.innerHTML = '';
+    this.mobileViewContainer.innerHTML = '';
+    
+    // Handle special events
+    if (this.data.eventType && this.data.eventType !== 'normal') {
+        const eventTexts = { 
+            'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం', 
+            'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో', 
+            'convention': 'ప్రాదేశిక సమావేశం' 
+        };
         
-        // Handle special events
-        if (this.data.eventType && this.data.eventType !== 'normal') {
-            const eventTexts = { 
-                'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం', 
-                'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో', 
-                'convention': 'ప్రాదేశిక సమావేశం' 
-            };
-            
-            const firstRow = this.tableBody.rows[0];
-            const dateCell = firstRow.cells[2];
+        const firstRow = this.tableBody.rows[0];
+        const dateCell = firstRow.cells[2];
+        const dateInput = dateCell ? dateCell.querySelector('.date-input') : null;
+        const dateValue = dateInput ? dateInput.value : '';
+
+        const card = document.createElement('div');
+        card.className = 'mobile-week-card fade-in';
+        card.innerHTML = `
+            <h3 class="week-date">${this.data.title}</h3>
+            <div class="special-event-mobile">
+                <p class="special-event-text-mobile">${eventTexts[this.data.eventType]}</p>
+            </div>
+            <div class="field-group">
+                <label>తేదీ</label>
+                <input type="date" class="date-input" data-row-index="0" data-cell-index="2" value="${dateValue}">
+            </div>
+        `;
+        this.mobileViewContainer.appendChild(card);
+        return;
+    }
+
+    // Create ONE card for the entire schedule table
+    const card = document.createElement('div');
+    card.className = 'mobile-week-card fade-in';
+    
+    let fieldsHTML = '';
+    let hasDateField = false;
+
+    // Process all rows in the table
+    Array.from(this.tableBody.rows).forEach((row, rowIndex) => {
+        if (row.classList.contains('header-row')) return;
+        
+        // Extract date from first row if available
+        if (rowIndex === 0 && !hasDateField) {
+            const dateCell = row.cells[2];
             const dateInput = dateCell ? dateCell.querySelector('.date-input') : null;
             const dateValue = dateInput ? dateInput.value : '';
-
-            const card = document.createElement('div');
-            card.className = 'mobile-week-card fade-in';
-            card.innerHTML = `
-                <h3 class="week-date">${this.data.title}</h3>
-                <div class="special-event-mobile">
-                    <p class="special-event-text-mobile">${eventTexts[this.data.eventType]}</p>
-                </div>
-                <div class="field-group">
-                    <label>తేదీ</label>
-                    <input type="date" class="date-input" data-row-index="0" data-cell-index="2" value="${dateValue}">
-                </div>
-            `;
-            this.mobileViewContainer.appendChild(card);
-            return;
-        }
-
-        // Create cards for normal schedule rows
-        Array.from(this.tableBody.rows).forEach((row, rowIndex) => {
-            if (row.classList.contains('header-row')) return;
             
-            const card = document.createElement('div');
-            card.className = 'mobile-week-card fade-in';
-            
-            // Extract date from first row if available
-            let dateValue = '';
-            if (rowIndex === 0) {
-                const dateCell = row.cells[2];
-                const dateInput = dateCell ? dateCell.querySelector('.date-input') : null;
-                dateValue = dateInput ? dateInput.value : '';
-            }
-            
-            // Get row title from first non-editable cell or use schedule title
-            let rowTitle = this.data.title;
-            for (let i = 0; i < row.cells.length; i++) {
-                if (!row.cells[i].hasAttribute('data-user-editable') && row.cells[i].textContent.trim()) {
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = row.cells[i].innerHTML;
-                    rowTitle = tempDiv.textContent.trim().replace('⠿', '').replace(':', '');
-                    break;
-                }
-            }
-
-            let fieldsHTML = '';
-            
-            // Date field for first row
-            if (rowIndex === 0 && dateValue) {
+            if (dateValue) {
                 fieldsHTML += `
                     <div class="field-group">
                         <label>తేదీ</label>
-                        <input type="date" class="date-input" data-row-index="${rowIndex}" data-cell-index="2" value="${dateValue}">
+                        <input type="date" class="date-input" data-row-index="0" data-cell-index="2" value="${dateValue}">
+                    </div>
+                `;
+                hasDateField = true;
+            }
+        }
+
+        // Process editable cells in this row
+        Array.from(row.cells).forEach((cell, cellIndex) => {
+            if (cell.hasAttribute('data-user-editable') && cellIndex !== 2) { // Skip date cell already handled
+                let label = '';
+                
+                // Find label from header row
+                const headerRow = this.tableBody.querySelector('.header-row');
+                if (headerRow && headerRow.cells[cellIndex]) {
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = headerRow.cells[cellIndex].innerHTML;
+                    label = tempDiv.textContent.trim().replace('⠿', '').replace(':', '');
+                }
+                
+                // If no header label, try previous cells in same row
+                if (!label) {
+                    for (let i = cellIndex - 1; i >= 0; i--) {
+                        if (!row.cells[i].hasAttribute('data-user-editable') && row.cells[i].textContent.trim()) {
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = row.cells[i].innerHTML;
+                            label = tempDiv.textContent.trim().replace('⠿', '').replace(':', '');
+                            break;
+                        }
+                    }
+                }
+                
+                // If still no label, use a generic one based on cell index
+                if (!label) {
+                    const labels = ['', 'ప్రసంగ అంశం', 'ప్రసంగీకుడు', 'చైర్మన్', 'కావలికోట రీడర్'];
+                    label = labels[cellIndex] || `Field ${cellIndex}`;
+                }
+                
+                const cellText = cell.textContent.trim();
+                fieldsHTML += `
+                    <div class="field-group">
+                        <label>${label}</label>
+                        <div class="mobile-field member-field" data-row-index="${rowIndex}" data-cell-index="${cellIndex}">
+                            <span class="mobile-field-value ${cellText ? '' : 'mobile-field-placeholder'}">
+                                ${cellText || 'Select Option'}
+                            </span>
+                        </div>
                     </div>
                 `;
             }
-
-            // Create fields for editable cells
-            Array.from(row.cells).forEach((cell, cellIndex) => {
-                if (cell.hasAttribute('data-user-editable') && cellIndex !== 2) {
-                    let label = '';
-                    
-                    // Find label from header or previous cells
-                    const headerRow = this.tableBody.querySelector('.header-row');
-                    if (headerRow && headerRow.cells[cellIndex]) {
-                        const tempDiv = document.createElement('div');
-                        tempDiv.innerHTML = headerRow.cells[cellIndex].innerHTML;
-                        label = tempDiv.textContent.trim().replace('⠿', '').replace(':', '');
-                    }
-                    
-                    // If no header label, try previous cells in same row
-                    if (!label) {
-                        for (let i = cellIndex - 1; i >= 0; i--) {
-                            if (!row.cells[i].hasAttribute('data-user-editable') && row.cells[i].textContent.trim()) {
-                                const tempDiv = document.createElement('div');
-                                tempDiv.innerHTML = row.cells[i].innerHTML;
-                                label = tempDiv.textContent.trim().replace('⠿', '').replace(':', '');
-                                break;
-                            }
-                        }
-                    }
-                    
-                    const cellText = cell.textContent.trim();
-                    fieldsHTML += `
-                        <div class="field-group">
-                            <label>${label || 'Field'}</label>
-                            <div class="mobile-field member-field" data-row-index="${rowIndex}" data-cell-index="${cellIndex}">
-                                <span class="mobile-field-value ${cellText ? '' : 'mobile-field-placeholder'}">
-                                    ${cellText || 'Select Option'}
-                                </span>
-                            </div>
-                        </div>
-                    `;
-                }
-            });
-
-            card.innerHTML = `
-                <h3 class="week-date">${rowTitle}</h3>
-                <div class="week-fields">
-                    ${fieldsHTML}
-                </div>
-            `;
-            
-            this.mobileViewContainer.appendChild(card);
         });
+    });
 
-        // Add event listeners to mobile fields
-        this.mobileViewContainer.querySelectorAll('.member-field').forEach(field => {
-            field.addEventListener('click', (e) => {
-                const rowIndex = field.dataset.rowIndex;
-                const cellIndex = field.dataset.cellIndex;
-                const targetCell = this.tableBody.rows[rowIndex].cells[cellIndex];
-                this._openMobileDropdown(targetCell, field);
-            });
-        });
+    card.innerHTML = `
+        <h3 class="week-date">${this.data.title}</h3>
+        <div class="week-fields">
+            ${fieldsHTML}
+        </div>
+    `;
+    
+    this.mobileViewContainer.appendChild(card);
 
-        // Add event listeners to date inputs
-        this.mobileViewContainer.querySelectorAll('.date-input').forEach(input => {
-            input.addEventListener('change', (e) => {
-                const rowIndex = input.dataset.rowIndex;
-                const cellIndex = input.dataset.cellIndex;
-                const targetCell = this.tableBody.rows[rowIndex].cells[cellIndex];
-                const tableInput = targetCell.querySelector('.date-input');
-                if (tableInput) {
-                    tableInput.value = input.value;
-                }
-                this.parentProject.triggerSave();
-            });
+    // Add event listeners to mobile fields
+    this.mobileViewContainer.querySelectorAll('.member-field').forEach(field => {
+        field.addEventListener('click', (e) => {
+            const rowIndex = field.dataset.rowIndex;
+            const cellIndex = field.dataset.cellIndex;
+            const targetCell = this.tableBody.rows[rowIndex].cells[cellIndex];
+            this._openMobileDropdown(targetCell, field);
         });
-    } // END OF _createMobileView METHOD
+    });
+
+    // Add event listeners to date inputs
+    this.mobileViewContainer.querySelectorAll('.date-input').forEach(input => {
+        input.addEventListener('change', (e) => {
+            const rowIndex = input.dataset.rowIndex;
+            const cellIndex = input.dataset.cellIndex;
+            const targetCell = this.tableBody.rows[rowIndex].cells[cellIndex];
+            const tableInput = targetCell.querySelector('.date-input');
+            if (tableInput) {
+                tableInput.value = input.value;
+            }
+            this.parentProject.triggerSave();
+        });
+    });
+}
 
     _openMobileDropdown(cell, fieldElement) {
         const isInMinistry = this._isCellInMinistrySection(cell);
