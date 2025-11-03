@@ -2011,38 +2011,38 @@ is this correct ?
     printContainer.style.padding = '20px';
     document.body.appendChild(printContainer);
 
-    // CAPTURE HEADER SEPARATELY FOR FIRST PAGE
+    // === CAPTURE HEADER SEPARATELY ===
     const headerClone = document.querySelector('.schedule-display-header').cloneNode(true);
     headerClone.style.display = 'block';
-    headerClone.style.marginBottom = '2px';
-    headerClone.style.padding = '2px 0';
+    headerClone.style.margin = '0';
+    headerClone.style.padding = '0';
     headerClone.style.background = 'white';
-
-    // Keep exact visual design but minimize any vertical spacing
+    
+    // Tighten inner header spacing but keep all elements
     const titleBlock = headerClone.querySelector('.title-block');
     if (titleBlock) {
-        titleBlock.style.marginBottom = '2px';
+        titleBlock.style.margin = '0';
         titleBlock.style.padding = '0';
     }
-    
+
     const title = headerClone.querySelector('h1');
     if (title) {
-        title.style.margin = '1px 0';
+        title.style.margin = '2px 0';
         title.style.padding = '0';
     }
-    
+
     const subtitleContainer = headerClone.querySelector('.subtitle-svg-container');
     if (subtitleContainer) {
         subtitleContainer.style.margin = '1px 0';
         subtitleContainer.style.padding = '0';
     }
-    
+
     const subtitle = headerClone.querySelector('.subtitle');
     if (subtitle) {
         subtitle.style.margin = '0';
-        subtitle.style.padding = '3px 6px';
+        subtitle.style.padding = '2px 6px';
     }
-    
+
     const svgDivider = headerClone.querySelector('.svg-divider');
     if (svgDivider) {
         svgDivider.style.margin = '1px 0';
@@ -2054,79 +2054,68 @@ is this correct ?
     headerContainer.style.background = 'white';
     headerContainer.appendChild(headerClone);
     printContainer.appendChild(headerContainer);
-    
+
     const headerCanvas = await html2canvas(headerContainer, { 
         scale: 2, 
         useCORS: true, 
         backgroundColor: '#ffffff',
         logging: false
     });
-    
+
     const headerImgData = headerCanvas.toDataURL('image/jpeg', 0.8);
     const headerProps = pdf.getImageProperties(headerImgData);
     const headerHeight = (headerProps.height * USABLE_WIDTH) / headerProps.width;
-    
-    // Remove header from print container
+
     printContainer.removeChild(headerContainer);
 
+    // === CAPTURE EACH TABLE BLOCK ===
     const itemsToPrint = [];
-
     for (const block of document.querySelectorAll('.schedule-block')) {
         const clone = block.cloneNode(true);
-        
-        const eventBtn = clone.querySelector('.event-btn');
-        if (eventBtn) eventBtn.style.display = 'none';
-        const mobileView = clone.querySelector('.mobile-view-container');
-        if (mobileView) mobileView.style.display = 'none';
-        const table = clone.querySelector('table');
-        if (table) table.style.display = 'table';
-        
+        const btn = clone.querySelector('.event-btn');
+        const mob = clone.querySelector('.mobile-view-container');
         const titleEl = clone.querySelector('.schedule-title');
-        if (titleEl) titleEl.style.display = 'none';
 
+        if (btn) btn.style.display = 'none';
+        if (mob) mob.style.display = 'none';
+        if (titleEl) titleEl.style.display = 'none';
         clone.style.marginBottom = '0';
         clone.style.padding = '0';
         clone.style.border = 'none';
 
-        // Increase table cell height slightly for readability
-        const allCells = clone.querySelectorAll('th, td');
-        allCells.forEach(cell => {
-            cell.style.height = '40px';
+        // Table cell height adjustment
+        clone.querySelectorAll('th, td').forEach(cell => {
+            cell.style.height = '38px';
         });
 
         printContainer.appendChild(clone);
-        
         const canvas = await html2canvas(clone, { 
             scale: 2, 
             useCORS: true, 
             backgroundColor: '#ffffff',
             logging: false
         });
-        
+
         const imgData = canvas.toDataURL('image/jpeg', 0.8);
         const imgProps = pdf.getImageProperties(imgData);
         const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
         itemsToPrint.push({ imgData, width: USABLE_WIDTH, height: imgHeight });
-        
         printContainer.removeChild(clone);
     }
-    
     document.body.removeChild(printContainer);
 
-    // Very small gap between header and table
-    const HEADER_SPACING_MM = 1; 
+    // === PAGE ARRANGEMENT ===
+    const HEADER_SPACING_MM = 1.5; // reduced from 3 to make header-table gap smaller
     const firstPageAvailableHeight = USABLE_HEIGHT - headerHeight - HEADER_SPACING_MM;
-
     let isFirstPage = true;
     const pages = [];
     let currentPageItems = [];
     let currentPageHeight = 0;
 
-    // Split content into pages
     itemsToPrint.forEach(item => {
         const availableHeight = isFirstPage ? firstPageAvailableHeight : USABLE_HEIGHT;
         const itemHeightWithSpacing = currentPageItems.length > 0 ? item.height + PAGE_SPACING_MM : item.height;
-        
+
         if (currentPageHeight + itemHeightWithSpacing > availableHeight && currentPageItems.length > 0) {
             pages.push(currentPageItems);
             currentPageItems = [item];
@@ -2137,28 +2126,24 @@ is this correct ?
             currentPageHeight += itemHeightWithSpacing;
         }
     });
-    
-    if (currentPageItems.length > 0) {
-        pages.push(currentPageItems);
-    }
+    if (currentPageItems.length > 0) pages.push(currentPageItems);
 
-    // Render pages
+    // === RENDER PDF ===
     pages.forEach((pageItems, pageIndex) => {
         if (pageIndex > 0) pdf.addPage();
 
         if (pageIndex === 0) {
-            // FIRST PAGE: exact header + minimal spacing
+            // FIRST PAGE with header
             pdf.addImage(headerImgData, 'JPEG', MARGIN_MM, MARGIN_MM, USABLE_WIDTH, headerHeight);
-            
-            const headerBottom = MARGIN_MM + headerHeight + HEADER_SPACING_MM;
-            let currentY = headerBottom;
 
+            // Start content directly below header (no vertical centering)
+            let currentY = MARGIN_MM + headerHeight + HEADER_SPACING_MM;
             pageItems.forEach(item => {
                 pdf.addImage(item.imgData, 'JPEG', MARGIN_MM, currentY, item.width, item.height);
                 currentY += item.height + PAGE_SPACING_MM;
             });
         } else {
-            // OTHER PAGES
+            // Other pages (no header)
             let currentY = MARGIN_MM;
             pageItems.forEach(item => {
                 pdf.addImage(item.imgData, 'JPEG', MARGIN_MM, currentY, item.width, item.height);
@@ -2169,12 +2154,9 @@ is this correct ?
 
     const fileName = `${document.querySelector('.subtitle').textContent.trim() || 'schedule'}.pdf`;
     pdf.save(fileName);
-
     printButton.disabled = false;
     printButton.querySelector('span:last-child').textContent = 'Download PDF';
 }
-
-
 
 })();
 </script>
