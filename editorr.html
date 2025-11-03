@@ -2014,18 +2014,12 @@ is this correct ?
     const itemsToPrint = [];
 
     try {
-        // CAPTURE HEADER FIRST
+        // CAPTURE SCHEDULE HEADER FOR FIRST PAGE
         const headerClone = document.querySelector('.schedule-display-header').cloneNode(true);
         headerClone.style.display = 'block';
         headerClone.style.marginBottom = '20px';
         headerClone.style.padding = '0';
-        headerClone.style.background = 'white';
-        
-        // Hide any interactive elements in header
-        const subtitle = headerClone.querySelector('.subtitle');
-        if (subtitle) {
-            subtitle.removeAttribute('contenteditable');
-        }
+        headerClone.style.width = '100%';
         
         printContainer.appendChild(headerClone);
         
@@ -2033,14 +2027,15 @@ is this correct ?
             scale: 2, 
             useCORS: true, 
             backgroundColor: '#ffffff',
-            logging: false
+            width: headerClone.scrollWidth,
+            height: headerClone.scrollHeight
         });
         
-        const headerImgData = headerCanvas.toDataURL('image/jpeg', 0.9);
+        const headerImgData = headerCanvas.toDataURL('image/jpeg', 0.8);
         const headerProps = pdf.getImageProperties(headerImgData);
         const headerHeight = (headerProps.height * USABLE_WIDTH) / headerProps.width;
         
-        // Add header to itemsToPrint as first item
+        // Add header as first item
         itemsToPrint.push({ 
             imgData: headerImgData, 
             width: USABLE_WIDTH, 
@@ -2051,31 +2046,26 @@ is this correct ?
         // Remove header from print container
         printContainer.removeChild(headerClone);
 
-        // CAPTURE ALL SCHEDULE BLOCKS
+        // CAPTURE SCHEDULE BLOCKS
         for (const block of document.querySelectorAll('.schedule-block')) {
             const clone = block.cloneNode(true);
             
-            // Hide interactive elements
             clone.querySelector('.event-btn').style.display = 'none';
             clone.querySelector('.mobile-view-container').style.display = 'none';
             clone.querySelector('table').style.display = 'table';
             
-            // Hide schedule titles for cleaner PDF
             const titleEl = clone.querySelector('.schedule-title');
             if (titleEl) {
                 titleEl.style.display = 'none';
             }
-            
             clone.style.marginBottom = '0';
             clone.style.padding = '0';
             clone.style.border = 'none';
-            clone.style.background = 'white';
 
             // Increase the height of all table cells for better spacing in the PDF
             const allCells = clone.querySelectorAll('th, td');
             allCells.forEach(cell => {
                 cell.style.height = '40px';
-                cell.style.background = 'white';
             });
 
             printContainer.appendChild(clone);
@@ -2083,8 +2073,7 @@ is this correct ?
             const canvas = await html2canvas(clone, { 
                 scale: 2, 
                 useCORS: true, 
-                backgroundColor: '#ffffff',
-                logging: false
+                backgroundColor: '#ffffff' 
             });
             
             const imgData = canvas.toDataURL('image/jpeg', 0.8);
@@ -2101,35 +2090,42 @@ is this correct ?
             printContainer.removeChild(clone);
         }
         
-        // Clean up
         document.body.removeChild(printContainer);
 
-        // ENHANCED PDF LAYOUT LOGIC WITH HEADER ON FIRST PAGE
+        // ENHANCED PDF LAYOUT LOGIC WITH HEADER SUPPORT
         const pages = [];
         let currentPageItems = [];
         let currentPageHeight = 0;
         let isFirstPage = true;
 
         itemsToPrint.forEach((item, index) => {
-            const itemHeightWithSpacing = currentPageItems.length > 0 ? item.height + PAGE_SPACING_MM : item.height;
-            
-            // Special handling for first page with header
-            if (isFirstPage && item.isHeader) {
-                // Header always goes on first page
-                currentPageItems.push(item);
-                currentPageHeight += item.height;
-                isFirstPage = false;
-                return;
-            }
-            
-            // Check if item fits on current page
-            if (currentPageHeight + itemHeightWithSpacing > USABLE_HEIGHT && currentPageItems.length > 0) {
-                pages.push(currentPageItems);
+            if (item.isHeader) {
+                // Header always goes on first page, start new page with header
+                if (currentPageItems.length > 0) {
+                    pages.push(currentPageItems);
+                }
                 currentPageItems = [item];
                 currentPageHeight = item.height;
+                isFirstPage = false;
             } else {
-                currentPageItems.push(item);
-                currentPageHeight += itemHeightWithSpacing;
+                const itemHeightWithSpacing = currentPageItems.length > 0 ? item.height + PAGE_SPACING_MM : item.height;
+                
+                // Special handling for first page after header
+                if (isFirstPage && currentPageHeight + itemHeightWithSpacing > USABLE_HEIGHT - 30) {
+                    pages.push(currentPageItems);
+                    currentPageItems = [item];
+                    currentPageHeight = item.height;
+                    isFirstPage = false;
+                } 
+                // Normal pagination for other pages
+                else if (!isFirstPage && currentPageHeight + itemHeightWithSpacing > USABLE_HEIGHT && currentPageItems.length > 0) {
+                    pages.push(currentPageItems);
+                    currentPageItems = [item];
+                    currentPageHeight = item.height;
+                } else {
+                    currentPageItems.push(item);
+                    currentPageHeight += itemHeightWithSpacing;
+                }
             }
         });
         
@@ -2144,39 +2140,25 @@ is this correct ?
             }
 
             const totalContentHeight = pageItems.reduce((sum, item) => sum + item.height, 0) + 
-                                    (PAGE_SPACING_MM * (pageItems.length - 1));
+                                    (PAGE_SPACING_MM * Math.max(0, pageItems.length - 1));
 
             let startY = MARGIN_MM;
+            let remainingSpace = USABLE_HEIGHT - totalContentHeight;
 
-            // Center content vertically only if there's extra space
-            if (pageItems.length > 1) {
-                const remainingSpace = USABLE_HEIGHT - totalContentHeight;
-                if (remainingSpace > 0) {
-                    startY = MARGIN_MM + (remainingSpace / 2);
-                }
+            // Special centering for first page with header
+            if (pageIndex === 0 && pageItems.length > 1 && remainingSpace > 0) {
+                startY = MARGIN_MM + (remainingSpace / 2);
+            }
+            // Center content on other pages if there's extra space
+            else if (pageIndex > 0 && pageItems.length > 1 && remainingSpace > 0) {
+                startY = MARGIN_MM + (remainingSpace / 2);
             }
 
-            // Special handling for first page with header
-            if (pageIndex === 0 && pageItems[0] && pageItems[0].isHeader) {
-                const headerItem = pageItems[0];
-                pdf.addImage(headerItem.imgData, 'JPEG', MARGIN_MM, startY, headerItem.width, headerItem.height);
-                
-                // Position remaining items after header
-                let currentY = startY + headerItem.height + PAGE_SPACING_MM;
-                
-                for (let i = 1; i < pageItems.length; i++) {
-                    const item = pageItems[i];
-                    pdf.addImage(item.imgData, 'JPEG', MARGIN_MM, currentY, item.width, item.height);
-                    currentY += item.height + PAGE_SPACING_MM;
-                }
-            } else {
-                // Normal page rendering
-                let currentY = startY;
-                pageItems.forEach(item => {
-                    pdf.addImage(item.imgData, 'JPEG', MARGIN_MM, currentY, item.width, item.height);
-                    currentY += item.height + PAGE_SPACING_MM;
-                });
-            }
+            let currentY = startY;
+            pageItems.forEach(item => {
+                pdf.addImage(item.imgData, 'JPEG', MARGIN_MM, currentY, item.width, item.height);
+                currentY += item.height + PAGE_SPACING_MM;
+            });
         });
 
         const fileName = `${document.querySelector('.subtitle').textContent.trim() || 'schedule'}.pdf`;
@@ -2186,7 +2168,7 @@ is this correct ?
         console.error("PDF generation failed:", error);
         alert("Sorry, there was an error creating the PDF. Please try again.");
         
-        // Clean up on error
+        // Clean up print container if error occurs
         if (document.body.contains(printContainer)) {
             document.body.removeChild(printContainer);
         }
@@ -2195,7 +2177,6 @@ is this correct ?
         printButton.querySelector('span:last-child').textContent = 'Download PDF';
     }
 }
-
 })();
 </script>
 
