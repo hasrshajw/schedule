@@ -142,6 +142,15 @@ is this correct ?
         transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; 
         backdrop-filter: blur(2px);
     }
+    
+    /* Add this to your existing mobile CSS */
+.input-group {
+    margin-bottom: 12px;
+}
+
+.input-group:last-child {
+    margin-bottom: 0;
+}
     .menu-overlay.is-open { opacity: 1; visibility: visible; }
     .slide-menu { 
         position: fixed; 
@@ -1159,73 +1168,83 @@ class ScheduleTable {
     card.className = 'mobile-week-card fade-in';
     
     let fieldsHTML = '';
-    let hasDateField = false;
 
     // Process all rows in the table
     Array.from(this.tableBody.rows).forEach((row, rowIndex) => {
         if (row.classList.contains('header-row')) return;
         
-        // Extract date from first row if available
-        if (rowIndex === 0 && !hasDateField) {
-            const dateCell = row.cells[2];
-            const dateInput = dateCell ? dateCell.querySelector('.date-input') : null;
-            const dateValue = dateInput ? dateInput.value : '';
+        const editableCellsInRow = Array.from(row.cells).filter(c => c.hasAttribute('data-user-editable'));
+        if (editableCellsInRow.length === 0) return;
+        
+        const groupedInputs = {};
+
+        // Group cells by their labels (same logic as original)
+        editableCellsInRow.forEach(cell => {
+            const cellIndex = cell.cellIndex;
+            let labelText = '';
             
-            if (dateValue) {
+            // Find label from previous cells in same row
+            for (let i = cellIndex - 1; i >= 0; i--) {
+                const potentialLabelCell = row.cells[i];
+                if (potentialLabelCell && !potentialLabelCell.hasAttribute('data-user-editable') && potentialLabelCell.textContent.trim() !== '') {
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = potentialLabelCell.innerHTML;
+                    labelText = tempDiv.textContent.trim().replace('⠿', '').replace(':', '');
+                    break;
+                }
+            }
+            
+            // If no label found, try the first cell of the row
+            if (!labelText && row.cells[0] && !row.cells[0].hasAttribute('data-user-editable')) {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = row.cells[0].innerHTML;
+                labelText = tempDiv.textContent.trim().replace('⠿', '').replace(':', '');
+            }
+            
+            if (!groupedInputs[labelText]) groupedInputs[labelText] = [];
+            groupedInputs[labelText].push({ cell, cellIndex, rowIndex });
+        });
+
+        // Create fields for each group
+        for (const label in groupedInputs) {
+            let groupHTML = '';
+            
+            groupedInputs[label].forEach(({ cell, cellIndex, rowIndex }) => {
+                const cellText = cell.textContent.trim();
+                
+                // Handle date inputs (first row, cell index 2)
+                if (rowIndex === 0 && cellIndex === 2) {
+                    const dateInput = cell.querySelector('.date-input');
+                    const dateValue = dateInput ? dateInput.value : '';
+                    groupHTML += `
+                        <div class="input-group">
+                            <input type="date" class="date-input" data-row-index="${rowIndex}" data-cell-index="${cellIndex}" value="${dateValue}">
+                        </div>
+                    `;
+                } else {
+                    // Handle member selection fields
+                    groupHTML += `
+                        <div class="input-group">
+                            <div class="mobile-field member-field" data-row-index="${rowIndex}" data-cell-index="${cellIndex}">
+                                <span class="mobile-field-value ${cellText ? '' : 'mobile-field-placeholder'}">
+                                    ${cellText || 'Select Option'}
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            // Only add label if it exists and group has content
+            if (groupHTML) {
                 fieldsHTML += `
                     <div class="field-group">
-                        <label>తేదీ</label>
-                        <input type="date" class="date-input" data-row-index="0" data-cell-index="2" value="${dateValue}">
+                        ${label ? `<label>${label}</label>` : ''}
+                        ${groupHTML}
                     </div>
                 `;
-                hasDateField = true;
             }
         }
-
-        // Process editable cells in this row
-        Array.from(row.cells).forEach((cell, cellIndex) => {
-            if (cell.hasAttribute('data-user-editable') && cellIndex !== 2) { // Skip date cell already handled
-                let label = '';
-                
-                // Find label from header row
-                const headerRow = this.tableBody.querySelector('.header-row');
-                if (headerRow && headerRow.cells[cellIndex]) {
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = headerRow.cells[cellIndex].innerHTML;
-                    label = tempDiv.textContent.trim().replace('⠿', '').replace(':', '');
-                }
-                
-                // If no header label, try previous cells in same row
-                if (!label) {
-                    for (let i = cellIndex - 1; i >= 0; i--) {
-                        if (!row.cells[i].hasAttribute('data-user-editable') && row.cells[i].textContent.trim()) {
-                            const tempDiv = document.createElement('div');
-                            tempDiv.innerHTML = row.cells[i].innerHTML;
-                            label = tempDiv.textContent.trim().replace('⠿', '').replace(':', '');
-                            break;
-                        }
-                    }
-                }
-                
-                // If still no label, use a generic one based on cell index
-                if (!label) {
-                    const labels = ['', 'ప్రసంగ అంశం', 'ప్రసంగీకుడు', 'చైర్మన్', 'కావలికోట రీడర్'];
-                    label = labels[cellIndex] || `Field ${cellIndex}`;
-                }
-                
-                const cellText = cell.textContent.trim();
-                fieldsHTML += `
-                    <div class="field-group">
-                        <label>${label}</label>
-                        <div class="mobile-field member-field" data-row-index="${rowIndex}" data-cell-index="${cellIndex}">
-                            <span class="mobile-field-value ${cellText ? '' : 'mobile-field-placeholder'}">
-                                ${cellText || 'Select Option'}
-                            </span>
-                        </div>
-                    </div>
-                `;
-            }
-        });
     });
 
     card.innerHTML = `
