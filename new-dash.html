@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course & Content - Exam Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        :root {
+            --body-bg: #F9FAFB; --widget-bg: #FFFFFF; --border-color: #E5E7EB;
+            --text-primary: #002726; --text-secondary: #6B7280; --brand-green: #33C375;
+            --hover-bg: #F3F4F6; --danger-color: #EF4444;
+            --c-primary: #002726; --c-primary-dark: #001A19; --c-accent: #33C375; --c-accent-light: #D1FAE5;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --radius-lg: 0.75rem; --space-md: 1rem; --space-lg: 1.5rem; --space-xl: 2.5rem;
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'IBM Plex Sans', sans-serif; background-color: var(--body-bg); color: var(--text-primary); font-size: 14px; overflow: hidden; }
+        .dashboard-container { display: grid; grid-template-columns: 260px 1fr; height: 100vh; position: relative; }
+        .sidebar { background-color: var(--widget-bg); border-right: 1px solid var(--border-color); padding: 2rem 1.5rem; display: flex; flex-direction: column; position: relative; transition: transform 0.3s ease-in-out; }
+        .sidebar-header { display: flex; align-items: center; margin-bottom: 3rem; } .logo-image { height: 40px; }
+        .main-nav { flex-grow: 1; } .main-nav ul { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+        .main-nav a { display: flex; align-items: center; gap: 1rem; text-decoration: none; color: var(--text-primary); font-weight: 500; padding: 0.75rem 1rem; border-radius: 8px; transition: background-color 0.2s ease, color 0.2s ease; }
+        .main-nav a i { font-size: 1.5rem; color: var(--text-secondary); transition: color 0.2s ease; }
+        .main-nav a:hover { background-color: var(--hover-bg); } .main-nav a.active { background-color: var(--hover-bg); font-weight: 600; } .main-nav a.active i { color: var(--brand-green); }
+        .profile-section { margin-top: auto; padding-top: 1.5rem; border-top: 1px solid var(--border-color); display: flex; align-items: center; gap: 0.75rem; cursor: pointer; }
+        .profile-content-wrapper { display: flex; align-items: center; gap: 0.75rem; width: 100%; }
+        .profile-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+        .profile-details { flex-grow: 1; min-width: 0; }
+        .profile-name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+        .profile-email { font-size: 0.8rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+        .profile-options i { font-size: 1.5rem; color: var(--text-secondary); transition: transform 0.2s ease; }
+        .profile-popup { position: absolute; bottom: 90px; left: 1.5rem; right: 1.5rem; background-color: var(--widget-bg); border-radius: 12px; box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); padding: 0.75rem; z-index: 100; opacity: 0; pointer-events: none; transform: translateY(10px) scale(0.95); transition: opacity 0.2s ease, transform 0.2s ease; }
+        .profile-popup.active { opacity: 1; pointer-events: all; transform: translateY(0) scale(1); }
+        .popup-header { display: flex; align-items: center; gap: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-color); }
+        .popup-list { list-style: none; padding-top: 0.5rem; } .popup-list a { display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem; border-radius: 6px; text-decoration: none; color: var(--text-primary); }
+        .popup-list a:hover { background-color: var(--hover-bg); } .popup-list a i { font-size: 1.2rem; color: var(--text-secondary); }
+        .popup-list a.logout i { color: var(--danger-color); } .popup-list a.logout { color: var(--danger-color); }
+        .main-area { display: flex; flex-direction: column; overflow-y: auto; }
+        .main-header { padding: 1.25rem 3rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background-color: var(--widget-bg); position: sticky; top: 0; z-index: 10; }
+        .main-header h1 { font-size: 1.5rem; font-weight: 600; }
+        .hero-section { background-color: var(--text-primary); color: #FFFFFF; padding: 3rem; }
+        .hero-title { font-size: 2.5rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 1.5rem; }
+        .progress-bar-wrapper { display: flex; align-items: center; gap: 1rem; }
+        .progress-bar { width: 100%; height: 8px; background-color: rgba(255,255,255,0.2); border-radius: 4px; overflow: hidden; }
+        .progress-bar .progress { height: 100%; background-color: var(--brand-green); border-radius: 4px; transition: width 0.5s ease-out; }
+        .progress-text { font-weight: 600; font-size: 1rem; }
+        .content-body { padding: 2rem 3rem 3rem 3rem; max-width: 900px; margin: 0 auto; width: 100%; }
+        .chapter-group { margin-bottom: var(--space-xl); }
+        .chapter-title { font-size: 1.5rem; font-weight: 600; color: var(--text-primary); margin-bottom: var(--space-lg); padding-bottom: var(--space-md); border-bottom: 1px solid var(--border-color); }
+        .content-list { display: flex; flex-direction: column; gap: 0.75rem; }
+        .card { display: flex; align-items: center; gap: 1rem; background-color: var(--widget-bg); padding: 0.75rem; border-radius: var(--radius-lg); box-shadow: var(--shadow); border: 1px solid var(--border-color); transition: var(--transition); position: relative; cursor: pointer; }
+        .card:not([data-status='locked']):hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+        .card-prefix { width: 48px; height: 48px; flex-shrink: 0; border-radius: 50%; display: grid; place-items: center; font-size: 1.5rem; font-weight: 600; }
+        .card-info { flex-grow: 1; } .card-title { font-weight: 600; font-size: 1rem; color: var(--text-primary); }
+        .card-meta { font-size: 0.85rem; color: var(--text-secondary); }
+        .card-button { background-color: var(--c-primary); color: #FFFFFF; border: none; border-radius: 0.75rem; padding: 0.6rem 1rem; font-size: 0.9rem; font-weight: 600; transition: background-color 0.2s ease; min-width: 120px; text-align: center; }
+        .card-button:hover { background-color: var(--c-primary-dark); }
+        .card-status-icon { font-size: 1.5rem; color: var(--c-accent); margin-left: auto; }
+        .card[data-status="completed"] { background-color: #F8F8F8; }
+        .card[data-status="completed"] .card-title { color: var(--text-secondary); }
+        .card-prefix--completed { background-color: var(--c-accent-light); color: var(--c-accent); }
+        .card[data-status="next"] { border-color: var(--c-primary); }
+        .card-prefix--default { background-color: #e0e0e0; color: var(--c-primary); }
+        .card[data-status="locked"] { opacity: 0.7; background-color: var(--hover-bg); cursor: not-allowed; }
+        .card-prefix--locked { background-color: #E5E7EB; color: var(--text-secondary); }
+        .card-button--locked { background-color: var(--border-color); color: var(--text-secondary); cursor: not-allowed; }
+        .menu-toggle { display: none; } .sidebar-close-btn { display: none; }
+        
+        @keyframes shimmer { 100% { transform: translateX(100%); } }
+        .skeleton { background-color: #e2e8f0; position: relative; overflow: hidden; }
+        .skeleton::after { content: ''; position: absolute; top: 0; right: 0; bottom: 0; left: 0; transform: translateX(-100%); background-image: linear-gradient(90deg, rgba(255, 255, 255, 0) 0, rgba(255, 255, 255, 0.2) 20%, rgba(255, 255, 255, 0.5) 60%, rgba(255, 255, 255, 0)); animation: shimmer 2s infinite; }
+        .skeleton-line { height: 14px; border-radius: 4px; }
+        .skeleton-avatar { width: 40px; height: 40px; border-radius: 50%; }
+
+        @media (max-width: 1024px) {
+            .dashboard-container { grid-template-columns: 1fr; }
+            .sidebar { position: fixed; top: 0; left: 0; height: 100%; width: 80%; max-width: 300px; z-index: 1000; transform: translateX(-100%); box-shadow: 0 0 30px rgba(0,0,0,0.1); }
+            .sidebar.active { transform: translateX(0); }
+            .main-header { padding: 1.25rem 1.5rem; } .main-header h1 { font-size: 1.25rem; }
+            .hero-section { padding: 2rem 1.5rem; } .hero-title { font-size: 2.25rem; }
+            .content-body { padding: 1.5rem; }
+            .menu-toggle { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; font-size: 1.5rem; color: var(--text-primary); cursor: pointer; border: 2px solid var(--border-color); border-radius: 8px; }
+            .sidebar-close-btn { display: flex; align-items: center; justify-content: center; position: absolute; top: 1.5rem; right: 1.5rem; font-size: 1.75rem; color: var(--danger-color); cursor: pointer; border: none; background: none; }
+            .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 999; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+            .overlay.active { opacity: 1; pointer-events: auto; }
+            .chapter-title { font-size: 1.25rem; }
+            .card { padding: 0.6rem; } .card-title { font-size: 0.95rem; } .card-meta { font-size: 0.8rem; } .card-button { font-size: 0.85rem; min-width: 110px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="loading-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 9999; display: flex; align-items: center; justify-content: center; font-weight: 600;">Loading Course...</div>
+    <div class="overlay" id="overlay"></div>
+    <div class="dashboard-container" style="display: none;">
+        <aside class="sidebar" id="sidebar">
+            <button class="sidebar-close-btn" id="sidebar-close-btn"><i class='bx bx-x'></i></button>
+            <div class="sidebar-header"><img src="" alt="Logo" class="logo-image"></div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="course.html" class="active"><i class='bx bx-book-open'></i> Course & Content</a></li>
+                    <li><a href="leaderboard.html"><i class='bx bx-bar-chart-alt-2'></i> Leaderboard</a></li>
+                    <li><a href="programs.html"><i class='bx bx-briefcase-alt-2'></i> Explore Programs</a></li>
+                    <li><a href="community.html"><i class='bx bx-group'></i> Community</a></li>
+                    <li><a href="help.html"><i class='bx bx-help-circle'></i> Help & Support</a></li>
+                </ul>
+            </nav>
+            <div class="profile-section" id="profile-section">
+                <!-- Skeleton loader for profile -->
+                <div class="profile-content-wrapper skeleton">
+                    <div class="skeleton skeleton-avatar"></div>
+                    <div style="flex-grow: 1; min-width: 0;">
+                        <div class="skeleton skeleton-line" style="width: 70%; height: 14px; margin-bottom: 0.5rem;"></div>
+                        <div class="skeleton skeleton-line" style="width: 90%; height: 12px;"></div>
+                    </div>
+                </div>
+                <div class="profile-content-wrapper" style="display: none;">
+                    <img src="" alt="Profile Picture" class="profile-avatar">
+                    <div class="profile-details"><span class="profile-name"></span><span class="profile-email"></span></div>
+                    <div class="profile-options"><i class='bx bx-chevron-down'></i></div>
+                </div>
+            </div>
+            <div class="profile-popup" id="profile-popup">
+                <div class="popup-header">
+                    <img src="" alt="Profile Picture" class="profile-avatar">
+                    <div class="profile-details"><span class="profile-name"></span><span class="profile-email"></span></div>
+                </div>
+                <ul class="popup-list">
+                    <li><a href="profile.html"><i class='bx bx-user'></i> Profile</a></li>
+                    <li><a href="#" class="logout" id="logout-btn"><i class='bx bx-log-out'></i> Logout</a></li>
+                </ul>
+            </div>
+        </aside>
+        <main class="main-area">
+            <header class="main-header">
+                <i class='bx bx-menu menu-toggle' id="menu-toggle"></i>
+                <h1>Course & Content</h1>
+            </header>
+            <div id="real-content" style="display: none;">
+                <section class="hero-section">
+                    <h1 class="hero-title" id="course-title"></h1>
+                    <div class="progress-bar-wrapper">
+                        <div class="progress-bar"><div class="progress" id="course-progress"></div></div>
+                        <span class="progress-text" id="progress-text"></span>
+                    </div>
+                </section>
+                <div class="content-body" id="content-body"></div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const firebaseConfig = {
+                apiKey: "AIzaSyCSW52Vl2UIC7eeM4uXKcSPdHflZCl3WJQ",
+                authDomain: "exam-2e799.firebaseapp.com",
+                projectId: "exam-2e799",
+                storageBucket: "exam-2e799.firebasestorage.app",
+                messagingSenderId: "472506328501",
+                appId: "1:472506328501:web:f239c42baed2f4b9f925fc",
+                measurementId: "G-NX21HT3JKT"
+            };
+            firebase.initializeApp(firebaseConfig);
+            const auth = firebase.auth();
+            const db = firebase.firestore();
+            const DEFAULT_AVATAR = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRWxmiQqKsGu4P4FulnB-hDH6_RyTFPzHo67Q&s';
+            
+            let currentUser = null;
+
+            const setupEventListeners = () => {
+                document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
+                const profileSection = document.getElementById('profile-section');
+                const profilePopup = document.getElementById('profile-popup');
+                profileSection.addEventListener('click', e => { e.stopPropagation(); profilePopup.classList.toggle('active'); profileSection.classList.toggle('active'); });
+                document.addEventListener('click', e => { if (!profileSection.contains(e.target)) { profilePopup.classList.remove('active'); profileSection.classList.remove('active'); } });
+                const sidebar = document.getElementById('sidebar');
+                const menuToggle = document.getElementById('menu-toggle');
+                const closeBtn = document.getElementById('sidebar-close-btn');
+                const overlay = document.getElementById('overlay');
+                const toggleMenu = () => { sidebar.classList.toggle('active'); overlay.classList.toggle('active'); };
+                menuToggle.addEventListener('click', toggleMenu);
+                closeBtn.addEventListener('click', toggleMenu);
+                overlay.addEventListener('click', toggleMenu);
+            };
+
+            const updateProfileUI = (userProfile) => {
+                const logoUrl = "https://ihtnas.com/assets/ihtnas-nav.png"; // Replace with your logo logic if dynamic
+                if(logoUrl) document.querySelector('.logo-image').src = logoUrl;
+                
+                const profileToUse = userProfile || JSON.parse(localStorage.getItem('userProfile'));
+                if(profileToUse) {
+                    document.querySelectorAll('.profile-avatar').forEach(el => { el.src = profileToUse.photoURL || DEFAULT_AVATAR; el.onerror = () => { el.src = DEFAULT_AVATAR; }; });
+                    document.querySelectorAll('.profile-name').forEach(el => el.textContent = profileToUse.displayName);
+                    document.querySelectorAll('.profile-email').forEach(el => el.textContent = profileToUse.email);
+                    document.querySelector('.profile-content-wrapper.skeleton').style.display = 'none';
+                    document.querySelector('.profile-content-wrapper:not(.skeleton)').style.display = 'flex';
+                }
+            };
+            
+            setupEventListeners();
+
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    currentUser = user;
+                    const userDoc = await db.collection('users').doc(user.uid).get();
+                    if (!userDoc.exists) { window.location.href = 'index.html'; return; }
+                    updateProfileUI(userDoc.data());
+                    loadCoursePage();
+                } else { window.location.href = 'index.html'; }
+            });
+
+            const loadCoursePage = async () => {
+                const urlParams = new URLSearchParams(window.location.search);
+                const courseId = urlParams.get('id');
+
+                if (!courseId) {
+                    // If no ID, try to find the user's latest enrollment and redirect
+                    const enrollmentsQuery = await db.collection('enrollments').where('userId', '==', currentUser.uid).orderBy('enrolledAt', 'desc').limit(1).get();
+                    if (!enrollmentsQuery.empty) {
+                        const latestEnrollment = enrollmentsQuery.docs[0].data();
+                        window.location.replace(`course.html?id=${latestEnrollment.courseId}`);
+                    } else {
+                        window.location.replace('course-enroll.html');
+                    }
+                    return;
+                }
+
+                // Perform the two required reads
+                const [courseDoc, progressDoc] = await Promise.all([
+                    db.collection('courses').doc(courseId).get(),
+                    db.collection('users').doc(currentUser.uid).collection('progressSummary').doc(courseId).get()
+                ]);
+
+                if (!courseDoc.exists) {
+                    document.getElementById('content-body').innerHTML = '<h1>Course not found.</h1>';
+                    document.getElementById('loading-overlay').style.display = 'none';
+                    document.querySelector('.dashboard-container').style.display = 'grid';
+                    return;
+                }
+
+                const courseData = courseDoc.data();
+                const progressData = progressDoc.exists ? progressDoc.data().completedLessons : {};
+
+                renderPage(courseId, courseData, progressData);
+            };
+
+            const renderPage = (courseId, courseData, progressData) => {
+                // Set hero content
+                document.getElementById('course-title').textContent = courseData.name;
+                
+                // Calculate and display progress
+                const curriculumItems = (courseData.curriculum || []).flatMap(chapter => chapter.items || []);
+                const totalItems = curriculumItems.length;
+                const completedItems = Object.keys(progressData).length;
+                const progressPercent = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
+
+                document.getElementById('course-progress').style.width = `${progressPercent}%`;
+                document.getElementById('progress-text').textContent = `${progressPercent}% Complete`;
+
+                // Render course outline
+                const contentBody = document.getElementById('content-body');
+                contentBody.innerHTML = '';
+                const firstUncompletedItem = curriculumItems.find(item => !progressData[item.id]);
+
+                (courseData.curriculum || []).forEach(chapter => {
+                    const chapterGroup = document.createElement('div');
+                    chapterGroup.className = 'chapter-group';
+                    chapterGroup.innerHTML = `<h3 class="chapter-title">${chapter.chapterTitle}</h3><div class="content-list"></div>`;
+                    const listContainer = chapterGroup.querySelector('.content-list');
+
+                    (chapter.items || []).forEach(item => {
+                        const card = document.createElement('div');
+                        card.className = 'card';
+
+                        const isCompleted = progressData[item.id];
+                        const isNext = firstUncompletedItem && item.id === firstUncompletedItem.id;
+                        let status, prefixClass, buttonHtml = '', statusIcon = '';
+                        const iconClass = item.type === 'quiz' ? 'bxs-help-circle' : 'bxs-file-blank';
+                        
+                        if (isCompleted) {
+                            status = 'completed';
+                            prefixClass = 'card-prefix--completed';
+                            statusIcon = `<div class="card-status-icon"><i class="bx bxs-check-circle"></i></div>`;
+                            buttonHtml = `<button class="card-button">${item.type === 'quiz' ? 'View Results' : 'Review'}</button>`;
+                        } else if (isNext) {
+                            status = 'next';
+                            prefixClass = 'card-prefix--default';
+                            buttonHtml = `<button class="card-button">Start</button>`;
+                        } else {
+                            status = 'locked';
+                            prefixClass = 'card-prefix--locked';
+                            buttonHtml = `<button class="card-button card-button--locked">Locked</button>`;
+                        }
+
+                        card.dataset.status = status;
+                        card.innerHTML = `
+                            <div class="card-prefix ${prefixClass}"><i class='bx ${iconClass}'></i></div>
+                            <div class="card-info"><p class="card-title">${item.title}</p></div>
+                            ${statusIcon}${buttonHtml}`;
+
+                        if (status !== 'locked') {
+                            card.addEventListener('click', () => {
+                                window.location.href = `lesson-view.html?id=${courseId}&lesson=${item.id}`;
+                            });
+                        }
+                        
+                        listContainer.appendChild(card);
+                    });
+                    contentBody.appendChild(chapterGroup);
+                });
+
+                // Show content
+                document.getElementById('loading-overlay').style.display = 'none';
+                document.querySelector('.dashboard-container').style.display = 'grid';
+                document.getElementById('real-content').style.display = 'block';
+            };
+        });
+    </script>
+</body>
+</html>
