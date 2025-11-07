@@ -19,12 +19,12 @@
         --header-bg: #1a1a1a;
         --text-light: #ffffff;
         --body-bg: #f9fafb;
-        --menu-new-text: #2c3e50;
+        --menu-new-text: #1e40af;
         --menu-new-bg: #ffffff;
         --menu-new-border: #e5e7eb;
         --menu-new-hover: #f8fafc;
-        --primary-color: #0d9488;
-        --primary-hover: #0f766e;
+        --primary-color: #0f766e;
+        --primary-hover: #0d9488;
         --primary-light: #ecfdf5;
         --danger-color: #dc2626;
         --danger-hover: #b91c1c;
@@ -34,15 +34,17 @@
         --text-secondary: #6b7280;
         --surface-color: #ffffff;
         --radius-sm: 6px;
-        --radius-md: 12px;
-        --radius-lg: 20px;
-        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --radius-md: 10px;
+        --radius-lg: 16px;
+        --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
         --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-        --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
         --warning-color: #d97706;
-        --success-color: #059669;
-        --gradient-primary: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
-        --gradient-accent: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        --success-color: #16a34a;
+        --transition-fast: 0.15s ease-out;
+        --transition-smooth: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
     @font-face {
         font-family: "jw-icons-external";
@@ -61,13 +63,14 @@
         line-height: 1.6;
         visibility: hidden;
         opacity: 0;
-        transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: opacity 0.4s var(--transition-smooth);
+        overscroll-behavior: none;
     }
     body.auth-ready { visibility: visible; opacity: 1; }
     body.menu-open { overflow: hidden; }
     body.dropdown-open { overflow: hidden; }
     .site-header {
-        background: var(--header-bg);
+        background-color: var(--header-bg);
         padding: 0;
         color: var(--text-light);
         position: fixed;
@@ -76,31 +79,34 @@
         width: 100%;
         z-index: 900;
         box-shadow: var(--shadow-md);
+        backdrop-filter: blur(20px);
     }
     .top-bar {
         display: flex;
         justify-content: space-between;
         align-items: center;
         height: 64px;
-        padding: 0 16px;
+        padding: 0 20px;
         max-width: 1200px;
         margin: 0 auto;
     }
     .top-bar .mobileLogo {
         display: block;
-        width: 80px;
-        height: 64px;
+        width: 120px;
+        height: 40px;
         background-image: ur[](https://www.jw.org/assets/ct/46605f23da/images/siteLogo-jworg-mobile.svg), none;
         background-repeat: no-repeat;
         background-size: contain;
         background-position: center left;
         flex-shrink: 0;
-        margin-left: 4px;
+        margin-left: -8px;
+        transition: opacity var(--transition-fast);
     }
+    .top-bar .mobileLogo:hover { opacity: 0.8; }
     .header-right-controls {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 16px;
     }
     .header-icons {
         display: flex;
@@ -108,6 +114,11 @@
         justify-content: center;
         height: 64px;
         width: 64px;
+        border-radius: var(--radius-lg);
+        transition: background-color var(--transition-fast);
+    }
+    .header-icons:hover {
+        background-color: rgba(255, 255, 255, 0.05);
     }
     .hamburger {
       cursor: pointer;
@@ -116,13 +127,20 @@
       justify-content: center;
       height: 100%;
       width: 100%;
+      padding: 8px;
+      border-radius: var(--radius-lg);
+      transition: all var(--transition-smooth);
+    }
+    .hamburger:hover {
+        background-color: rgba(255, 255, 255, 0.05);
     }
     .hamburger input {
       display: none;
     }
     .hamburger svg {
       height: 24px;
-      transition: transform 400ms cubic-bezier(0.4, 0, 0.2, 1);
+      width: 24px;
+      transition: transform 400ms var(--transition-smooth);
     }
     .line {
       fill: none;
@@ -130,18 +148,18 @@
       stroke-linecap: round;
       stroke-linejoin: round;
       stroke-width: 2.5;
-      transition: stroke-dasharray 400ms cubic-bezier(0.4, 0, 0.2, 1),
-                  stroke-dashoffset 400ms cubic-bezier(0.4, 0, 0.2, 1);
+      transition: stroke-dasharray 400ms var(--transition-smooth),
+                  stroke-dashoffset 400ms var(--transition-smooth);
     }
     .line-top-bottom {
-      stroke-dasharray: 10 50;
+      stroke-dasharray: 10 40;
     }
     .hamburger input:checked + svg {
       transform: rotate(90deg);
     }
     .hamburger input:checked + svg .line-top-bottom {
-      stroke-dasharray: 16 200;
-      stroke-dashoffset: -25;
+      stroke-dasharray: 15 200;
+      stroke-dashoffset: -20;
     }
     .menu-overlay {
         position: fixed;
@@ -153,14 +171,8 @@
         z-index: 998;
         opacity: 0;
         visibility: hidden;
-        transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.3s;
+        transition: opacity 0.3s var(--transition-smooth), visibility 0.3s var(--transition-smooth);
         backdrop-filter: blur(8px);
-    }
-    .input-group {
-        margin-bottom: 16px;
-    }
-    .input-group:last-child {
-        margin-bottom: 0;
     }
     .menu-overlay.is-open { opacity: 1; visibility: visible; }
     .slide-menu {
@@ -169,15 +181,16 @@
         right: 0;
         height: calc(100dvh - 64px);
         width: 340px;
-        max-width: 85%;
+        max-width: 85vw;
         background-color: var(--menu-new-bg);
         z-index: 999;
         transform: translateX(100%);
-        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: transform 0.4s var(--transition-smooth);
         display: flex;
         flex-direction: column;
         border-left: 1px solid var(--menu-new-border);
-        box-shadow: var(--shadow-lg);
+        box-shadow: var(--shadow-xl);
+        overflow: hidden;
     }
     .slide-menu.is-open { transform: translateX(0); }
     .menu-links {
@@ -186,31 +199,56 @@
         padding: 8px 0;
         overflow-y: auto;
         flex-grow: 1;
+        scrollbar-width: thin;
+        scrollbar-color: #e5e7eb transparent;
+    }
+    .menu-links::-webkit-scrollbar {
+        width: 4px;
+    }
+    .menu-links::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .menu-links::-webkit-scrollbar-thumb {
+        background-color: #e5e7eb;
+        border-radius: 2px;
     }
     .menu-links li a {
         display: flex;
         align-items: center;
-        color: var(--menu-new-text);
-        background-color: var(--menu-new-bg);
+        color: var(--text-primary);
+        background-color: transparent;
         height: 56px;
-        padding: 0 16px;
+        padding: 0 24px;
         text-decoration: none;
         font-size: 16px;
         font-weight: 500;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        border-top: 1px solid transparent;
+        transition: all var(--transition-fast);
+        border-top: none;
+        position: relative;
     }
-    .menu-links li:first-child a { border-top: none; }
-    .menu-links li a:hover { 
+    .menu-links li a::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 4px;
+        background: var(--primary-color);
+        transform: scaleY(0);
+        transition: transform 0.2s var(--transition-smooth);
+    }
+    .menu-links li a:hover {
         background-color: var(--menu-new-hover);
-        border-top-color: var(--primary-color);
         color: var(--primary-color);
     }
+    .menu-links li a:hover::before {
+        transform: scaleY(1);
+    }
     .profile-section {
-        padding: 20px;
+        padding: 20px 24px;
         border-top: 1px solid var(--menu-new-border);
         flex-shrink: 0;
-        background-color: #f9fafb;
+        background-color: #f8fafc;
         margin-top: auto;
     }
     .profile-info { 
@@ -246,7 +284,9 @@
         width: 24px;
         height: 24px;
         margin-right: 16px;
-        transition: color 0.2s;
+        text-align: center;
+        transition: color var(--transition-fast);
+        flex-shrink: 0;
     }
     .menu-links li a:hover .iconLink-icon {
         color: var(--primary-color);
@@ -262,29 +302,48 @@
         gap: 8px;
         padding: 12px 24px;
         border-radius: var(--radius-md);
-        font-size: 16px;
+        font-size: 15px;
         font-weight: 600;
         cursor: pointer;
         border: none;
         text-decoration: none;
-        background: var(--gradient-primary);
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
         color: white;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all var(--transition-smooth);
         box-shadow: var(--shadow-sm);
-        min-height: 48px;
+        position: relative;
+        overflow: hidden;
+    }
+    .btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s;
+    }
+    .btn:hover:not(:disabled)::before {
+        left: 100%;
     }
     .btn:hover:not(:disabled) {
-        background: var(--primary-hover);
+        background: linear-gradient(135deg, var(--primary-hover), var(--primary-color));
         transform: translateY(-2px);
         box-shadow: var(--shadow-md);
     }
     .btn:active:not(:disabled) {
         transform: translateY(0);
     }
-    .btn:disabled { cursor: not-allowed; opacity: 0.6; }
+    .btn:disabled { 
+        cursor: not-allowed; 
+        opacity: 0.6; 
+        transform: none;
+        box-shadow: var(--shadow-xs);
+    }
     .schedule-display-header {
         text-align: center;
-        margin-bottom: 32px;
+        margin-bottom: 0;
     }
     .title-block {
         text-align: center;
@@ -293,12 +352,16 @@
     }
     .title-block h1 {
         margin: 0 0 16px 0;
-        font-size: 2.5rem;
-        font-weight: 900;
+        font-size: 2.25rem;
+        font-weight: 800;
         color: #7c2d12;
         font-family: 'Noto Sans Telugu', sans-serif;
         line-height: 1.2;
-        letter-spacing: -0.02em;
+        letter-spacing: -0.025em;
+        background: linear-gradient(135deg, #7c2d12, #b45309);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
     .subtitle-svg-container {
         position: relative;
@@ -307,7 +370,7 @@
     }
     .subtitle {
         margin: 0;
-        font-size: 1.25rem;
+        font-size: 1.125rem;
         font-weight: 600;
         color: var(--text-primary);
         background-color: var(--surface-color);
@@ -320,25 +383,27 @@
         font-family: 'Noto Sans Telugu', sans-serif;
         border: 1px solid var(--border-color);
         box-shadow: var(--shadow-md);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all var(--transition-smooth);
+        backdrop-filter: blur(10px);
     }
     .subtitle:focus {
-        outline: none;
-        box-shadow: 0 0 0 3px var(--primary-light);
+        outline: 2px solid var(--primary-color);
+        outline-offset: 2px;
         background-color: var(--primary-light);
+        transform: scale(1.02);
     }
     .svg-divider {
         width: 500px;
-        height: 8px;
+        height: 6px;
         display: block;
         position: absolute;
         left: 50%;
         transform: translateX(-50%);
         top: 50%;
-        margin-top: -4px;
+        margin-top: -3px;
         z-index: 1;
-        background: var(--gradient-accent);
-        border-radius: 4px;
+        background: linear-gradient(90deg, transparent, #0f766e, transparent);
+        border-radius: 3px;
     }
     .hidden { display: none !important; }
     main {
@@ -359,12 +424,14 @@
     .master-container {
         background: var(--surface-color);
         padding: 32px;
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-md);
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-lg);
         border: 1px solid var(--border-color);
+        overflow: hidden;
     }
     .schedule-block {
         margin-bottom: 40px;
+        animation: fadeIn 0.5s var(--transition-smooth);
     }
     .schedule-block:last-child {
         margin-bottom: 0;
@@ -378,7 +445,7 @@
         border-bottom: 1px solid var(--border-color);
     }
     .schedule-title {
-        font-size: 1.5rem;
+        font-size: 1.375rem;
         font-weight: 700;
         margin: 0;
         color: var(--text-primary);
@@ -392,7 +459,7 @@
         display: flex;
         align-items: center;
         gap: 6px;
-        transition: all 0.2s;
+        transition: all var(--transition-fast);
     }
     .status-indicator::before {
         content: '';
@@ -404,21 +471,21 @@
     }
     .status-indicator[data-status="synced"] {
         color: var(--success-color);
-        background-color: var(--primary-light);
+        background-color: rgba(22, 163, 74, 0.1);
     }
     .status-indicator[data-status="syncing"] {
         color: var(--warning-color);
-        background-color: #fef3c7;
+        background-color: rgba(217, 119, 6, 0.1);
     }
     .status-indicator[data-status="error"] {
         color: var(--danger-color);
-        background-color: #fee2e2;
+        background-color: rgba(220, 38, 38, 0.1);
     }
     .toolbar-btn {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 6px;
+        gap: 8px;
         padding: 10px 16px;
         font-size: 14px;
         font-weight: 500;
@@ -426,26 +493,46 @@
         border: 1px solid var(--border-color);
         background-color: var(--surface-color);
         border-radius: var(--radius-md);
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all var(--transition-smooth);
         text-decoration: none;
         color: var(--text-secondary);
-        min-height: 40px;
+        position: relative;
+        overflow: hidden;
+    }
+    .toolbar-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(0,0,0,0.03), transparent);
+        transition: left 0.5s;
+    }
+    .toolbar-btn:hover:not(:disabled)::before {
+        left: 100%;
     }
     .toolbar-btn:hover:not(:disabled) {
-        background-color: var(--menu-new-hover);
+        background-color: #f8fafc;
         border-color: var(--primary-color);
         color: var(--primary-color);
         transform: translateY(-1px);
     }
-    .toolbar-btn:disabled { cursor: not-allowed; opacity: 0.5; }
+    .toolbar-btn:disabled { 
+        cursor: not-allowed; 
+        opacity: 0.4; 
+    }
     .schedule-block table {
         width: 100%;
-        border-collapse: collapse;
+        border-collapse: separate;
+        border-spacing: 0;
         border: 2px solid #4B0082;
         font-family: 'Noto Sans Telugu', sans-serif;
         font-size: 15px;
-        font-weight: 700;
+        font-weight: 600;
         letter-spacing: 0.5px;
+        border-radius: var(--radius-md);
+        overflow: hidden;
         box-shadow: var(--shadow-sm);
     }
     .schedule-block th, .schedule-block td {
@@ -454,37 +541,34 @@
         text-align: left;
         vertical-align: middle;
         position: relative;
-        height: 44px;
-        transition: background-color 0.2s;
+        height: 48px;
+        transition: all var(--transition-fast);
+    }
+    .schedule-block th {
+        background: linear-gradient(135deg, #4B0082, #6a0dad);
+        color: white;
+        font-weight: 700;
+    }
+    .schedule-block td {
+        background: white;
     }
     .schedule-block .editable-cell:not([contenteditable="true"]) {
         cursor: pointer;
         position: relative;
     }
     .schedule-block .editable-cell:not([contenteditable="true"]):hover {
-        background-color: var(--primary-light);
-    }
-    .schedule-block .editable-cell:not([contenteditable="true"]):hover::after {
-        content: '';
-        position: absolute;
-        right: 4px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 16px;
-        height: 16px;
-        background: var(--primary-color);
-        mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M5 12h14M12 5v14"/></svg>') no-repeat center;
-        mask-size: contain;
+        background-color: #f8fafc;
+        border-left: 3px solid var(--primary-color);
     }
     .schedule-block [contenteditable="true"]:focus {
-        background-color: #fffbeb;
-        outline: 2px solid var(--primary-color);
+        background-color: #fef3c7;
+        outline: 2px solid var(--warning-color);
         outline-offset: -2px;
     }
     .schedule-block .cell-content-wrapper {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 10px;
         height: 100%;
     }
     .schedule-block .cell-icon {
@@ -492,6 +576,7 @@
         max-height: 28px;
         object-fit: contain;
         flex-shrink: 0;
+        opacity: 0.8;
     }
     .schedule-block .header-row .cell-icon {
         filter: brightness(0) invert(1);
@@ -500,71 +585,79 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 8px;
+        gap: 10px;
         height: 100%;
     }
     .schedule-block .header-row td {
-        font-size: 18px;
+        font-size: 16px;
         color: #ffffff;
-        height: 48px;
-        background: var(--gradient-primary);
-        font-weight: 800;
+        height: 50px;
+        font-weight: 700;
     }
     .schedule-block .row-handle {
         display: none !important;
     }
     .special-event-text {
-        color: var(--danger-color);
+        color: #dc2626;
         text-align: center !important;
         font-weight: 800;
-        font-size: 1.1rem;
+        font-size: 1.1em;
+        background: linear-gradient(135deg, #fee2e2, #fecaca);
+        padding: 8px;
+        border-radius: var(--radius-sm);
     }
     #event-context-menu, #member-dropdown {
         position: fixed;
         display: none;
         background: var(--surface-color);
         border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-lg);
+        box-shadow: var(--shadow-xl);
         z-index: 1001;
-        padding: 8px;
+        padding: 8px 0;
         min-width: 200px;
         border: 1px solid var(--border-color);
+        max-height: 320px;
+        overflow-y: auto;
         backdrop-filter: blur(20px);
     }
     .context-menu-item, .member-dropdown-item {
         font-family: 'Inter', sans-serif;
         display: block;
         width: 100%;
-        padding: 12px 16px;
+        padding: 12px 20px;
         cursor: pointer;
         font-size: 15px;
         border-radius: var(--radius-sm);
         background: none;
         border: none;
         text-align: left;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all var(--transition-fast);
         display: flex;
         align-items: center;
         gap: 12px;
+        color: var(--text-primary);
+        font-weight: 500;
     }
     .context-menu-item:hover, .member-dropdown-item:hover {
-        background: var(--menu-new-hover);
+        background: linear-gradient(135deg, #f8fafc, #e2e8f0);
         color: var(--primary-color);
+        transform: translateX(4px);
     }
     .member-dropdown-item {
         justify-content: space-between;
     }
     #member-dropdown {
-        max-height: 320px;
+        max-height: 300px;
         overflow-y: auto;
     }
     .servant-tag {
-        font-size: 12px;
+        font-size: 0.75rem;
         font-weight: 600;
         color: var(--primary-color);
         background-color: var(--primary-light);
         padding: 4px 8px;
-        border-radius: 12px;
+        border-radius: 6px;
+        box-shadow: var(--shadow-xs);
     }
     .modal-overlay {
         position: fixed;
@@ -572,29 +665,31 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0,0,0,0.6);
+        background: rgba(0,0,0,0.5);
         display: none;
         justify-content: center;
         align-items: center;
         z-index: 1000;
         padding: 20px;
-        backdrop-filter: blur(8px);
+        backdrop-filter: blur(20px);
+        transition: opacity 0.3s var(--transition-smooth);
     }
     .modal-content {
         background: var(--surface-color);
         padding: 32px;
-        border-radius: var(--radius-lg);
+        border-radius: var(--radius-xl);
         width: 100%;
         max-width: 560px;
         max-height: 90vh;
         display: flex;
         flex-direction: column;
-        gap: 20px;
-        box-shadow: var(--shadow-lg);
+        gap: 24px;
+        box-shadow: var(--shadow-xl);
         transform: scale(0.95) translateY(20px);
         opacity: 0;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all 0.3s var(--transition-smooth);
         overflow: hidden;
+        border: 1px solid var(--border-color);
     }
     .modal-overlay.active {
         display: flex;
@@ -609,13 +704,15 @@
         font-size: 16px;
         border-radius: var(--radius-md);
         border: 1px solid var(--border-color);
-        transition: border-color 0.2s, box-shadow 0.2s;
+        background: #f8fafc;
+        transition: all var(--transition-fast);
         font-family: inherit;
     }
     #new-project-name:focus {
         outline: none;
         border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px var(--primary-light);
+        background: white;
+        box-shadow: 0 0 0 3px rgba(16, 118, 110, 0.1);
     }
     #template-list, #edit-weeks-list {
         list-style: none;
@@ -625,14 +722,15 @@
         border: 1px solid var(--border-color);
         border-radius: var(--radius-md);
         max-height: 300px;
+        background: #f8fafc;
     }
     #template-list li, #edit-weeks-list li {
-        padding: 16px;
-        border-bottom: 1px solid var(--border-color);
-        transition: background-color 0.2s;
+        padding: 0;
+        border-bottom: 1px solid #f1f5f9;
+        transition: background-color var(--transition-fast);
     }
     #template-list li:hover, #edit-weeks-list li:hover {
-        background-color: var(--menu-new-hover);
+        background: white;
     }
     #template-list label, #edit-weeks-list label {
         display: flex;
@@ -641,38 +739,47 @@
         font-size: 16px;
         cursor: pointer;
         font-weight: 500;
-        transition: color 0.2s;
+        padding: 16px 20px;
+        transition: padding-left var(--transition-fast);
+    }
+    #template-list label:hover, #edit-weeks-list label:hover {
+        padding-left: 28px;
     }
     .modal-actions {
         display: flex;
         justify-content: flex-end;
         gap: 16px;
         margin-top: 24px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border-color);
     }
     .modal-actions button {
         padding: 12px 24px;
         border-radius: var(--radius-md);
-        font-size: 16px;
+        font-size: 15px;
         font-weight: 600;
         cursor: pointer;
         border: 1px solid var(--border-color);
-        transition: all 0.2s;
-        min-height: 48px;
+        transition: all var(--transition-smooth);
+        font-family: inherit;
     }
     #cancel-template-selection, #cancel-weeks-edit {
         background-color: var(--surface-color);
         color: var(--text-secondary);
     }
     #cancel-template-selection:hover, #cancel-weeks-edit:hover {
-        background-color: #f3f4f6;
+        background-color: #f8fafc;
+        border-color: var(--primary-color);
+        color: var(--primary-color);
     }
     #confirm-template-selection, #confirm-weeks-edit {
-        background: var(--gradient-primary);
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
         color: white;
         border-color: var(--primary-color);
     }
     #confirm-template-selection:hover, #confirm-weeks-edit:hover {
-        background: var(--primary-hover);
+        background: linear-gradient(135deg, var(--primary-hover), var(--primary-color));
+        transform: translateY(-1px);
     }
     #print-container {
         position: absolute;
@@ -697,18 +804,21 @@
         font-size: inherit;
         font-weight: inherit;
         text-align: left;
-        padding-left: 12px;
+        padding-left: 8px;
         color: var(--text-primary);
     }
+    .date-input:focus {
+        outline: none;
+    }
     .fade-in {
-        animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        animation: fadeIn 0.4s var(--transition-smooth);
     }
     .slide-up {
-        animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        animation: slideUp 0.4s var(--transition-smooth);
     }
     @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
     }
     @keyframes slideUp {
         from {
@@ -730,8 +840,8 @@
         z-index: 1100;
         opacity: 0;
         visibility: hidden;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        backdrop-filter: blur(8px);
+        transition: all 0.3s var(--transition-smooth);
+        backdrop-filter: blur(10px);
     }
     .dropdown-backdrop.active {
         opacity: 1;
@@ -746,18 +856,19 @@
         border-radius: 28px 28px 0 0;
         z-index: 1101;
         transform: translateY(100%);
-        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: transform 0.4s var(--transition-smooth);
         max-height: 85vh;
         display: flex;
         flex-direction: column;
-        box-shadow: var(--shadow-lg);
-        border-top: 1px solid var(--border-color);
+        box-shadow: var(--shadow-xl);
+        border: 1px solid var(--border-color);
+        overflow: hidden;
     }
     .dropdown-container.active {
         transform: translateY(0);
     }
     .dropdown-header {
-        padding: 24px 24px 16px;
+        padding: 24px 28px 16px;
         border-bottom: 1px solid var(--border-color);
         display: flex;
         justify-content: space-between;
@@ -776,8 +887,8 @@
         margin: 0;
     }
     .dropdown-close {
-        background: none;
-        border: none;
+        background: #f8fafc;
+        border: 1px solid var(--border-color);
         padding: 12px;
         cursor: pointer;
         border-radius: 50%;
@@ -785,41 +896,69 @@
         align-items: center;
         justify-content: center;
         color: var(--text-secondary);
-        transition: all 0.2s;
-        width: 40px;
-        height: 40px;
+        transition: all var(--transition-fast);
+        width: 44px;
+        height: 44px;
     }
     .dropdown-close:hover {
-        background-color: var(--menu-new-hover);
+        background-color: #e2e8f0;
+        border-color: var(--primary-color);
         color: var(--primary-color);
+        transform: scale(1.05);
     }
     .dropdown-content {
         flex: 1;
         overflow-y: auto;
         padding: 12px 0;
         max-height: 400px;
+        scrollbar-width: thin;
+        scrollbar-color: #e5e7eb transparent;
+    }
+    .dropdown-content::-webkit-scrollbar {
+        width: 4px;
+    }
+    .dropdown-content::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .dropdown-content::-webkit-scrollbar-thumb {
+        background-color: #e5e7eb;
+        border-radius: 2px;
     }
     .dropdown-item {
         display: flex;
         align-items: center;
         justify-content: space-between;
         width: 100%;
-        padding: 20px 24px;
+        padding: 20px 28px;
         border: none;
         background: none;
         cursor: pointer;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all var(--transition-smooth);
         font-family: 'Noto Sans Telugu', sans-serif;
         font-size: 1.1rem;
         text-align: left;
         color: var(--text-primary);
         border-bottom: 1px solid transparent;
-        min-height: 56px;
+        position: relative;
     }
-    .dropdown-item:hover, .dropdown-item:focus {
-        background-color: var(--menu-new-hover);
-        border-bottom-color: var(--primary-color);
+    .dropdown-item::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 4px;
+        background: var(--primary-color);
+        transform: scaleX(0);
+        transition: transform var(--transition-fast);
+    }
+    .dropdown-item:hover {
+        background-color: #f8fafc;
+        border-bottom-color: var(--border-color);
         color: var(--primary-color);
+    }
+    .dropdown-item:hover::before {
+        transform: scaleX(1);
     }
     .dropdown-item:last-child {
         border-bottom: none;
@@ -828,11 +967,23 @@
         display: none;
     }
     @media (max-width: 768px) {
+        .top-bar {
+            height: 60px;
+            padding: 0 16px;
+        }
+        .mobileLogo {
+            width: 100px;
+            height: 36px;
+        }
+        .header-icons {
+            height: 60px;
+            width: 60px;
+        }
         main {
-            padding: 64px 0 0 0;
+            padding: 60px 0 0 0;
         }
         .editor-main {
-            padding: 0;
+            padding: 0 8px;
         }
         .master-container {
             padding: 0;
@@ -843,9 +994,10 @@
             margin: 0;
         }
         .page-controls {
-            padding: 80px 20px 20px;
+            padding: 80px 16px 20px;
             margin-bottom: 0;
             gap: 12px;
+            justify-content: center;
         }
         #toggle-all-mobile {
             display: inline-flex;
@@ -853,30 +1005,25 @@
             background: var(--surface-color);
             color: var(--text-secondary);
             border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 12px 24px;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-        #toggle-all-mobile:hover {
-            background: var(--menu-new-hover);
-            border-color: var(--primary-color);
-            color: var(--primary-color);
+            font-size: 14px;
+            padding: 10px 20px;
+            border-radius: var(--radius-md);
         }
         .title-block {
-            padding: 0 20px 20px;
+            padding: 0 16px;
             margin-bottom: 20px;
         }
         .title-block h1 {
-            font-size: 2rem;
+            font-size: 1.75rem;
+            margin-bottom: 12px;
         }
         .subtitle {
-            font-size: 1.1rem;
+            font-size: 1rem;
             padding: 10px 20px;
         }
         .svg-divider {
             width: 280px;
-            height: 6px;
+            height: 4px;
         }
         .schedule-block {
             margin-bottom: 0;
@@ -892,23 +1039,22 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
-            padding: 0 20px 20px;
+            padding: 0 16px 24px;
         }
         .mobile-week-card {
             background: var(--surface-color);
             border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
+            border-radius: var(--radius-xl);
             margin-bottom: 0;
-            box-shadow: var(--shadow-sm);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-md);
+            transition: all 0.4s var(--transition-smooth);
             overflow: hidden;
             transform: translateY(8px);
-            opacity: 0.8;
+            opacity: 0;
         }
-        .mobile-week-card.active {
+        .mobile-week-card.animate-in {
             transform: translateY(0);
             opacity: 1;
-            box-shadow: var(--shadow-md);
         }
         .mobile-week-header {
             display: flex;
@@ -916,28 +1062,47 @@
             align-items: center;
             cursor: pointer;
             padding: 24px;
-            background: var(--gradient-primary);
-            color: white;
-            transition: all 0.3s;
-            min-height: 72px;
+            background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+            border-bottom: 1px solid var(--border-color);
+            transition: all var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+        .mobile-week-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--primary-color);
+            transform: scaleX(0);
+            transition: transform 0.3s var(--transition-smooth);
         }
         .mobile-week-header:hover {
-            background: var(--primary-hover);
+            background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+        }
+        .mobile-week-header.active::before {
+            transform: scaleX(1);
         }
         .week-date {
             font-size: 1.25rem;
-            font-weight: 800;
-            color: white;
+            font-weight: 700;
+            color: var(--text-primary);
             margin: 0;
             font-family: 'Noto Sans Telugu', sans-serif;
             text-align: left;
             flex: 1;
         }
         .accordion-icon {
-            color: white;
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--text-secondary);
+            transition: transform 0.4s var(--transition-smooth);
             font-size: 28px;
-            font-variation-settings: 'FILL' 0, 'wght' 400;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .mobile-week-card.active .accordion-icon {
             transform: rotate(180deg);
@@ -945,7 +1110,7 @@
         .mobile-week-body {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), padding 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: max-height 0.5s var(--transition-smooth), padding 0.5s var(--transition-smooth);
             padding: 0 24px;
         }
         .mobile-week-card.active .mobile-week-body {
@@ -968,18 +1133,18 @@
         .field-group label {
             font-size: 1rem;
             font-weight: 600;
-            color: var(--text-primary);
+            color: var(--text-secondary);
             font-family: 'Noto Sans Telugu', sans-serif;
             display: flex;
             align-items: center;
             gap: 8px;
-            letter-spacing: 0.5px;
+            position: relative;
         }
         .field-group label::before {
             content: '';
             width: 4px;
             height: 20px;
-            background: var(--primary-color);
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
             border-radius: 2px;
             flex-shrink: 0;
         }
@@ -992,26 +1157,41 @@
             font-family: 'Noto Sans Telugu', sans-serif;
             font-weight: 600;
             position: relative;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s var(--transition-smooth);
             display: flex;
             justify-content: space-between;
             align-items: center;
             min-height: 64px;
+            overflow: hidden;
+        }
+        .mobile-field::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: var(--primary-color);
+            transform: scaleX(0);
+            transition: transform var(--transition-fast);
         }
         .mobile-field:hover {
             border-color: var(--primary-color);
             background-color: white;
             box-shadow: var(--shadow-sm);
-            transform: translateY(-1px);
+            transform: translateX(4px);
+        }
+        .mobile-field:hover::before {
+            transform: scaleX(1);
         }
         .mobile-field::after {
             content: "";
             width: 20px;
             height: 20px;
-            background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 9L12 15L18 9' stroke='%230d9488' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 9L12 15L18 9' stroke='%230f766e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3C/path%3E%3C/svg%3E");
             background-size: contain;
             background-repeat: no-repeat;
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.3s var(--transition-smooth);
             flex-shrink: 0;
         }
         .mobile-field.active::after {
@@ -1025,7 +1205,7 @@
         .mobile-field-placeholder {
             color: var(--text-secondary);
             font-style: italic;
-            font-weight: 400;
+            opacity: 0.7;
         }
         .date-input {
             width: 100%;
@@ -1037,21 +1217,23 @@
             font-size: 1.05rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s var(--transition-smooth);
         }
         .date-input:focus {
             outline: none;
             border-color: var(--primary-color);
             background-color: white;
-            box-shadow: 0 0 0 3px var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(16, 118, 110, 0.1);
+            transform: scale(1.02);
         }
         .special-event-mobile {
             text-align: center;
             padding: 24px;
-            background: linear-gradient(135deg, #fee2e2, #fecaca);
-            border-radius: var(--radius-lg);
-            border: 2px dashed var(--danger-color);
+            background: linear-gradient(135deg, #fef2f2, #fee2e2);
+            border-radius: var(--radius-xl);
+            border: 2px dashed #fca5a5;
             margin-top: 20px;
+            box-shadow: var(--shadow-sm);
             animation: pulse 2s infinite;
         }
         @keyframes pulse {
@@ -1061,46 +1243,63 @@
         .special-event-text-mobile {
             color: var(--danger-color);
             font-weight: 800;
-            font-size: 1.2rem;
+            font-size: 1.125rem;
             margin: 0;
             font-family: 'Noto Sans Telugu', sans-serif;
-            letter-spacing: 0.5px;
+            line-height: 1.4;
+        }
+        .modal-content {
+            padding: 28px;
+            max-width: 90vw;
+            margin: auto;
+        }
+        .modal-actions {
+            padding-top: 20px;
+            gap: 12px;
         }
         #member-dropdown, #event-context-menu {
             display: none !important;
-        }
-        .modal-content {
-            padding: 24px;
-            margin: 20px;
-            border-radius: var(--radius-lg);
         }
         .dropdown-container {
             border-radius: 24px 24px 0 0;
             max-height: 90vh;
         }
-        .dropdown-content {
-            padding: 0 20px 20px;
+        .dropdown-header {
+            padding: 20px 24px 12px;
         }
         .dropdown-item {
-            padding: 20px;
-            min-height: 60px;
-            border-radius: var(--radius-md);
-            margin-bottom: 8px;
-            background: #fafbfc;
-            border: 1px solid transparent;
-            transition: all 0.2s;
-        }
-        .dropdown-item:hover {
-            background: white;
-            border-color: var(--primary-color);
-            transform: scale(1.02);
+            padding: 18px 24px;
+            font-size: 1rem;
         }
     }
-    @media (prefers-reduced-motion: reduce) {
-        *, *::before, *::after {
-            animation-duration: 0.01ms !important;
-            animation-iteration-count: 1 !important;
-            transition-duration: 0.01ms !important;
+    @media (max-width: 480px) {
+        .title-block h1 {
+            font-size: 1.5rem;
+        }
+        .subtitle {
+            font-size: 0.95rem;
+            padding: 8px 16px;
+        }
+        .mobile-view-container {
+            padding: 0 12px 20px;
+            gap: 16px;
+        }
+        .mobile-week-header {
+            padding: 20px;
+        }
+        .mobile-week-body {
+            padding: 0 20px 20px;
+        }
+        .week-fields {
+            gap: 16px;
+            padding-top: 20px;
+        }
+        .mobile-field {
+            padding: 16px;
+            min-height: 56px;
+        }
+        .date-input {
+            padding: 16px;
         }
     }
 </style>
@@ -1110,11 +1309,11 @@
     <div class="top-bar">
         <a href="./dashboard.html" class="mobileLogo" title="Dashboard" aria-label="Dashboard"></a>
         <div class="header-right-controls">
-            <div class="status-indicator" data-status="synced" aria-live="polite">Synced</div>
+            <div class="status-indicator" data-status="synced" role="status" aria-live="polite">Synced</div>
             <div class="header-icons">
-                <label class="hamburger">
+                <label class="hamburger" for="menu-checkbox" aria-label="Open menu">
                   <input type="checkbox" id="menu-checkbox">
-                  <svg viewBox="0 0 32 32">
+                  <svg viewBox="0 0 32 32" aria-hidden="true">
                     <path class="line line-top-bottom" d="M27 10 13 10C10.8 10 9 8.2 9 6 9 3.5 10.8 2 13 2 15.2 2 17 3.8 17 6L17 26C17 28.2 18.8 30 21 30 23.2 30 25 28.2 25 26 25 23.8 23.2 22 21 22L7 22"></path>
                     <path class="line" d="M7 16 27 16"></path>
                   </svg>
@@ -1123,38 +1322,38 @@
         </div>
     </div>
 </header>
-<div class="menu-overlay" id="menu-overlay"></div>
-<div class="slide-menu" id="slide-menu">
-    <ul class="menu-links">
-        <li><a href="./home.html"><span class="iconLink-icon home-icon"></span><span>Home</span></a></li>
-        <li><a href="./mid-week.html"><span class="iconLink-icon midweek-icon"></span><span>Mid-Week Schedules</span></a></li>
-        <li><a href="./sunday-dashboard.html"><span class="iconLink-icon sunday-icon"></span><span>Sunday Schedules</span></a></li>
-        <li><a href="./members.html"><span class="iconLink-icon members-icon"></span><span>Members</span></a></li>
+<div class="menu-overlay" id="menu-overlay" aria-hidden="true"></div>
+<div class="slide-menu" id="slide-menu" role="navigation" aria-label="Main navigation">
+    <ul class="menu-links" role="list">
+        <li><a href="./home.html" role="menuitem"><span class="iconLink-icon home-icon" aria-hidden="true"></span><span>Home</span></a></li>
+        <li><a href="./mid-week.html" role="menuitem"><span class="iconLink-icon midweek-icon" aria-hidden="true"></span><span>Mid-Week Schedules</span></a></li>
+        <li><a href="./sunday-dashboard.html" role="menuitem"><span class="iconLink-icon sunday-icon" aria-hidden="true"></span><span>Sunday Schedules</span></a></li>
+        <li><a href="./members.html" role="menuitem"><span class="iconLink-icon members-icon" aria-hidden="true"></span><span>Members</span></a></li>
     </ul>
     <div class="profile-section">
         <div class="profile-info">
-             <div class="profile-avatar">U</div>
+             <div class="profile-avatar" aria-hidden="true">U</div>
              <div class="profile-name">Loading...</div>
         </div>
     </div>
 </div>
-<main id="app-container" class="editor-main hidden">
-    <div class="page-controls">
-        <button id="edit-weeks-button" class="btn" style="display: none;" aria-label="Edit Weeks">
-            <span class="material-symbols-outlined">edit_calendar</span>
+<main id="app-container" class="editor-main hidden" role="main" aria-label="Schedule Editor">
+    <div class="page-controls" role="toolbar">
+        <button id="edit-weeks-button" class="btn" style="display: none;" aria-label="Edit weeks">
+            <span class="material-symbols-outlined" aria-hidden="true">edit_calendar</span>
             <span>Edit Weeks</span>
         </button>
         <button id="print-button" class="btn" style="display: none;" aria-label="Download PDF">
-            <span class="material-symbols-outlined">picture_as_pdf</span>
+            <span class="material-symbols-outlined" aria-hidden="true">picture_as_pdf</span>
             <span>Download PDF</span>
         </button>
     </div>
-    <div class="master-container">
+    <div class="master-container" role="region" aria-label="Schedule content">
         <header class="schedule-display-header">
             <div class="title-block">
                 <h1>వారం మధ్యలో జరిగే మీటింగ్ షెడ్యూల్</h1>
                 <div class="subtitle-svg-container">
-                    <p class="subtitle" contenteditable="true" id="date-range-subtitle" aria-label="Date Range">Loading dates...</p>
+                    <p class="subtitle" contenteditable="true" id="date-range-subtitle" aria-label="Date range">Loading dates...</p>
                     <svg class="svg-divider" role="presentation" viewBox="0 0 24039.797 260" preserveAspectRatio="xMidYMid slice">
                         <defs>
                             <radialGradient id="__id9__id4" gradientUnits="userSpaceOnUse" r="12020.601" cx="12019.898" cy="130" fx="12019.898" fy="130">
@@ -1167,53 +1366,53 @@
                 </div>
             </div>
         </header>
-        <button id="toggle-all-mobile" class="btn">
-            <span class="material-symbols-outlined">unfold_more</span>
+        <button id="toggle-all-mobile" class="btn" aria-label="Toggle all sections">
+            <span class="material-symbols-outlined" aria-hidden="true">unfold_more</span>
             <span>Open All</span>
         </button>
-        <div id="schedules-wrapper"></div>
+        <div id="schedules-wrapper" aria-live="polite"></div>
     </div>
 </main>
 <template id="schedule-template">
-    <div class="schedule-block">
+    <div class="schedule-block" role="region">
         <div class="schedule-header">
-            <h2 class="schedule-title"></h2>
-            <button class="toolbar-btn event-btn" aria-label="Set Event">
-                <span class="material-symbols-outlined">celebration</span>
+            <h2 class="schedule-title" aria-label="Schedule title"></h2>
+            <button class="toolbar-btn event-btn" aria-label="Set event type">
+                <span class="material-symbols-outlined" aria-hidden="true">celebration</span>
                 <span>Event</span>
             </button>
         </div>
-        <table>
+        <table role="table" aria-label="Schedule table">
             <colgroup><col style="width: 60%;"><col style="width: 20%;"><col style="width: 20%;"></colgroup>
-            <tbody class="schedule-table-body"></tbody>
+            <tbody class="schedule-table-body" role="rowgroup"></tbody>
         </table>
-        <div class="mobile-view-container"></div>
+        <div class="mobile-view-container" aria-hidden="true"></div>
     </div>
 </template>
-<div id="event-context-menu" role="menu" aria-label="Event Types">
+<div id="event-context-menu" role="menu" aria-label="Event type options">
     <button class="context-menu-item" data-event-type="normal" role="menuitem">Normal</button>
     <button class="context-menu-item" data-event-type="co-visit" role="menuitem">CO Visit</button>
     <button class="context-menu-item" data-event-type="assembly" role="menuitem">Assembly</button>
     <button class="context-menu-item" data-event-type="convention" role="menuitem">Convention</button>
 </div>
-<div id="member-dropdown" role="listbox" aria-label="Select Member"></div>
-<div id="template-selection-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="template-title">
+<div id="member-dropdown" role="listbox" aria-label="Member selection"></div>
+<div id="template-selection-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="template-modal-title">
     <div class="modal-content">
-        <h2 id="template-title">Create a New Schedule</h2>
+        <h2 id="template-modal-title">Create a New Schedule</h2>
         <p>Give your new project a name and select the templates to include.</p>
-        <input type="text" id="new-project-name" placeholder="Enter Project Name" aria-label="Project Name">
-        <ul id="template-list" role="list"></ul>
+        <input type="text" id="new-project-name" placeholder="Enter Project Name" aria-label="Project name">
+        <ul id="template-list" role="listbox"></ul>
         <div class="modal-actions">
             <button id="cancel-template-selection">Cancel</button>
             <button id="confirm-template-selection">Create Schedule</button>
         </div>
     </div>
 </div>
-<div id="edit-weeks-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="edit-weeks-title">
+<div id="edit-weeks-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="edit-weeks-modal-title">
     <div class="modal-content">
-        <h2 id="edit-weeks-title">Edit Schedule Weeks</h2>
+        <h2 id="edit-weeks-modal-title">Edit Schedule Weeks</h2>
         <p>Add or remove weeks from this schedule. Unchecking a week will remove it and its data permanently.</p>
-        <ul id="edit-weeks-list" role="list"></ul>
+        <ul id="edit-weeks-list" role="listbox"></ul>
         <div class="modal-actions">
             <button id="cancel-weeks-edit">Cancel</button>
             <button id="confirm-weeks-edit">Update Schedule</button>
@@ -1310,6 +1509,12 @@
             this.render();
             this.setupEventListeners();
             this.applyEventType(this.data.eventType || 'normal', false);
+            if (window.innerWidth <= 768) {
+                setTimeout(() => {
+                    const card = this.mobileViewContainer.querySelector('.mobile-week-card');
+                    if (card) card.classList.add('animate-in');
+                }, index * 100);
+            }
         }
         initDOM() {
             const templateClone = document.getElementById('schedule-template').content.cloneNode(true);
@@ -1333,6 +1538,9 @@
                         cell.removeAttribute('contenteditable');
                     } else {
                         cell.classList.add('editable-cell');
+                        cell.setAttribute('tabindex', '0');
+                        cell.setAttribute('role', 'button');
+                        cell.setAttribute('aria-label', 'Edit cell');
                         cell.removeAttribute('contenteditable');
                     }
                 } else {
@@ -1355,14 +1563,15 @@
                 return `
                     <div class="field-group">
                         <label>Event Type</label>
-                        <div class="mobile-field event-type-field">
+                        <div class="mobile-field event-type-field" tabindex="0" role="button" aria-label="Select event type">
                             <span class="mobile-field-value">${this._getEventTypeDisplayName(this.data.eventType)}</span>
+                            <span class="material-symbols-outlined" style="font-size: 20px; opacity: 0.6;">arrow_drop_down</span>
                         </div>
                     </div>
                     <div class="special-event-mobile"><p class="special-event-text-mobile">${eventTexts[this.data.eventType]}</p></div>
                     <div class="field-group">
                         <label>తేదీ</label>
-                        <input type="date" class="date-input" value="${dateValue}">
+                        <input type="date" class="date-input" value="${dateValue}" aria-label="Date">
                     </div>`;
             } else {
                 let fieldsHTML = '';
@@ -1400,7 +1609,7 @@
                                 const dateValue = dateInput ? dateInput.value : '';
                                 groupHTML += `<div class="input-group"><input type="date" class="date-input" data-row-index="${rowIndex}" data-cell-index="${cellIndex}" value="${dateValue}"></div>`;
                             } else {
-                                groupHTML += `<div class="input-group"><div class="mobile-field member-field" data-row-index="${rowIndex}" data-cell-index="${cellIndex}"><span class="mobile-field-value ${cellText ? '' : 'mobile-field-placeholder'}">${cellText || 'Select Option'}</span></div></div>`;
+                                groupHTML += `<div class="input-group"><div class="mobile-field member-field" data-row-index="${rowIndex}" data-cell-index="${cellIndex}" tabindex="0" role="button" aria-label="Select ${label}"><span class="mobile-field-value ${cellText ? '' : 'mobile-field-placeholder'}">${cellText || 'Select Option'}</span><span class="material-symbols-outlined" style="font-size: 20px; opacity: 0.6;">arrow_drop_down</span></div></div>`;
                             }
                         });
                         if (groupHTML) fieldsHTML += `<div class="field-group">${label ? `<label>${label}</label>` : ''}${groupHTML}</div>`;
@@ -1409,8 +1618,9 @@
                 return `
                     <div class="field-group">
                         <label>Event Type</label>
-                        <div class="mobile-field event-type-field">
+                        <div class="mobile-field event-type-field" tabindex="0" role="button" aria-label="Select event type">
                             <span class="mobile-field-value">${this._getEventTypeDisplayName(this.data.eventType)}</span>
+                            <span class="material-symbols-outlined" style="font-size: 20px; opacity: 0.6;">arrow_drop_down</span>
                         </div>
                     </div>
                     <div class="week-fields">${fieldsHTML}</div>`;
@@ -1420,10 +1630,13 @@
             this.mobileViewContainer.innerHTML = '';
             const card = document.createElement('div');
             card.className = 'mobile-week-card';
+            card.setAttribute('tabindex', '0');
+            card.setAttribute('role', 'button');
+            card.setAttribute('aria-expanded', 'false');
             card.innerHTML = `
                 <div class="mobile-week-header">
                     <h3 class="week-date">${this.data.title}</h3>
-                    <span class="material-symbols-outlined accordion-icon">expand_more</span>
+                    <span class="material-symbols-outlined accordion-icon" aria-hidden="true">expand_more</span>
                 </div>
                 <div class="mobile-week-body"></div>`;
             const cardBody = card.querySelector('.mobile-week-body');
@@ -1441,10 +1654,17 @@
         _setupMobileEventListeners(card) {
             card.querySelectorAll('.member-field').forEach(field => {
                 field.addEventListener('click', (e) => {
+                    e.stopPropagation();
                     const rowIndex = field.dataset.rowIndex;
                     const cellIndex = field.dataset.cellIndex;
                     const targetCell = this.tableBody.rows[rowIndex].cells[cellIndex];
                     this._openMobileDropdown(targetCell, field);
+                });
+                field.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        field.click();
+                    }
                 });
             });
             card.querySelectorAll('.date-input').forEach(input => {
@@ -1455,8 +1675,27 @@
                     setTimeout(updateDateRangeSubtitle, 100);
                 });
             });
-            card.querySelector('.event-type-field').addEventListener('click', () => {
+            card.querySelector('.event-type-field').addEventListener('click', (e) => {
+                e.stopPropagation();
                 this._openMobileEventTypeDropdown();
+            });
+            card.querySelector('.event-type-field').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    card.querySelector('.event-type-field').click();
+                }
+            });
+            card.addEventListener('click', (e) => {
+                if (e.target.closest('.mobile-field') || e.target.closest('.date-input')) return;
+                const isExpanded = card.getAttribute('aria-expanded') === 'true';
+                card.setAttribute('aria-expanded', !isExpanded);
+                card.classList.toggle('active');
+            });
+            card.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    card.click();
+                }
             });
         }
         _getEventTypeDisplayName(eventType) {
@@ -1475,13 +1714,13 @@
             }
             const dropdownHTML = `
                 <div class="dropdown-backdrop" id="mobile-dropdown-backdrop"></div>
-                <div class="dropdown-container" id="mobile-dropdown-container">
+                <div class="dropdown-container" id="mobile-dropdown-container" role="dialog" aria-modal="true" aria-labelledby="member-dropdown-title">
                     <div class="dropdown-header">
-                        <h3 class="dropdown-title">Select ${isInMinistry ? 'Member' : 'Brother'}</h3>
-                        <button class="dropdown-close" id="mobile-dropdown-close"><span class="material-symbols-outlined">close</span></button>
+                        <h3 class="dropdown-title" id="member-dropdown-title">Select ${isInMinistry ? 'Member' : 'Brother'}</h3>
+                        <button class="dropdown-close" id="mobile-dropdown-close"><span class="material-symbols-outlined" aria-hidden="true">close</span></button>
                     </div>
-                    <div class="dropdown-content">
-                        ${listToShow.map(member => `<button class="dropdown-item" data-name="${member.name}" role="option"><span>${member.name}</span>${member.isServant ? '<span class="servant-tag">Servant</span>' : ''}</button>`).join('')}
+                    <div class="dropdown-content" role="listbox">
+                        ${listToShow.map(member => `<button class="dropdown-item" role="option" data-name="${member.name}"><span>${member.name}</span>${member.isServant ? '<span class="servant-tag">Servant</span>' : ''}</button>`).join('')}
                     </div>
                 </div>`;
             const existingDropdown = document.getElementById('mobile-dropdown-container');
@@ -1490,13 +1729,15 @@
                 document.getElementById('mobile-dropdown-backdrop').remove();
             }
             document.body.insertAdjacentHTML('beforeend', dropdownHTML);
+            document.body.classList.add('dropdown-open');
             const backdrop = document.getElementById('mobile-dropdown-backdrop');
             const container = document.getElementById('mobile-dropdown-container');
             const closeBtn = document.getElementById('mobile-dropdown-close');
             const hideDropdown = () => {
+                document.body.classList.remove('dropdown-open');
                 backdrop.classList.remove('active');
                 container.classList.remove('active');
-                setTimeout(() => { backdrop.remove(); container.remove(); }, 300);
+                setTimeout(() => { backdrop.remove(); container.remove(); }, 400);
             };
             backdrop.addEventListener('click', hideDropdown);
             closeBtn.addEventListener('click', hideDropdown);
@@ -1512,6 +1753,9 @@
                     hideDropdown();
                 }
             });
+            container.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') hideDropdown();
+            });
             setTimeout(() => { backdrop.classList.add('active'); container.classList.add('active'); }, 10);
         }
         _openMobileEventTypeDropdown() {
@@ -1523,13 +1767,13 @@
             ];
             const dropdownHTML = `
                 <div class="dropdown-backdrop" id="mobile-event-dropdown-backdrop"></div>
-                <div class="dropdown-container" id="mobile-event-dropdown-container">
+                <div class="dropdown-container" id="mobile-event-dropdown-container" role="dialog" aria-modal="true" aria-labelledby="event-dropdown-title">
                     <div class="dropdown-header">
-                        <h3 class="dropdown-title">Select Event Type</h3>
-                        <button class="dropdown-close" id="mobile-event-dropdown-close"><span class="material-symbols-outlined">close</span></button>
+                        <h3 class="dropdown-title" id="event-dropdown-title">Select Event Type</h3>
+                        <button class="dropdown-close" id="mobile-event-dropdown-close"><span class="material-symbols-outlined" aria-hidden="true">close</span></button>
                     </div>
-                    <div class="dropdown-content">
-                        ${eventTypes.map(event => `<button class="dropdown-item" data-event-type="${event.id}" role="option"><span style="display: flex; align-items: center; gap: 16px;"><span class="material-symbols-outlined" style="font-size: 24px; color: var(--primary-color);">${event.icon}</span><span>${event.name}</span></span></button>`).join('')}
+                    <div class="dropdown-content" role="listbox">
+                        ${eventTypes.map(event => `<button class="dropdown-item" role="option" data-event-type="${event.id}"><span style="display: flex; align-items: center; gap: 16px;"><span class="material-symbols-outlined" style="font-size: 24px; opacity: 0.8;">${event.icon}</span><span>${event.name}</span></span></button>`).join('')}
                     </div>
                 </div>`;
             const existingDropdown = document.getElementById('mobile-event-dropdown-container');
@@ -1538,13 +1782,15 @@
                 document.getElementById('mobile-event-dropdown-backdrop').remove();
             }
             document.body.insertAdjacentHTML('beforeend', dropdownHTML);
+            document.body.classList.add('dropdown-open');
             const backdrop = document.getElementById('mobile-event-dropdown-backdrop');
             const container = document.getElementById('mobile-event-dropdown-container');
             const closeBtn = document.getElementById('mobile-event-dropdown-close');
             const hideDropdown = () => {
+                document.body.classList.remove('dropdown-open');
                 backdrop.classList.remove('active');
                 container.classList.remove('active');
-                setTimeout(() => { backdrop.remove(); container.remove(); }, 300);
+                setTimeout(() => { backdrop.remove(); container.remove(); }, 400);
             };
             backdrop.addEventListener('click', hideDropdown);
             closeBtn.addEventListener('click', hideDropdown);
@@ -1555,6 +1801,9 @@
                     this.applyEventType(eventType);
                     hideDropdown();
                 }
+            });
+            container.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') hideDropdown();
             });
             setTimeout(() => { backdrop.classList.add('active'); container.classList.add('active'); }, 10);
         }
@@ -1629,15 +1878,25 @@
                 this.parentProject.triggerSave();
             });
             this.eventBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 activeEventScheduleTable = this;
                 const rect = e.currentTarget.getBoundingClientRect();
                 eventContextMenu.style.display = 'block';
                 eventContextMenu.style.top = `${rect.bottom + window.scrollY}px`;
                 eventContextMenu.style.left = `${rect.left + window.scrollX}px`;
+                eventContextMenu.querySelectorAll('.context-menu-item').forEach((item, idx) => {
+                    setTimeout(() => item.focus(), idx * 50);
+                });
             });
             this.element.addEventListener('change', (e) => {
                 if (e.target.classList.contains('date-input')) {
                     setTimeout(updateDateRangeSubtitle, 100);
+                }
+            });
+            this.element.addEventListener('keydown', (e) => {
+                if (e.target.classList.contains('editable-cell') && (e.key === 'Enter' || e.key === ' ')) {
+                    e.preventDefault();
+                    openMemberDropdown(e.target, null);
                 }
             });
         }
@@ -1682,6 +1941,7 @@
                     this.isSaving = false;
                 })
                 .catch(err => {
+                    console.error("Save failed:", err);
                     updateStatus('Error', 'error');
                     this.isSaving = false;
                 });
@@ -1696,7 +1956,10 @@
             appContainer.classList.remove('hidden');
             document.body.classList.add('auth-ready');
             const profileNameEl = document.querySelector('.profile-name');
-            if (profileNameEl) profileNameEl.textContent = user.email;
+            if (profileNameEl) {
+                const emailParts = user.email.split('@')[0];
+                profileNameEl.textContent = emailParts.charAt(0).toUpperCase() + emailParts.slice(1);
+            }
             setupGlobalUI();
             const params = new URLSearchParams(window.location.search);
             currentProjectId = params.get('id');
@@ -1720,6 +1983,7 @@
                 }
                  updateStatus('Synced', 'synced');
             } else {
+                alert("This schedule may have been deleted.");
                 window.location.href = './dashboard.html';
             }
         }, error => {
@@ -1735,11 +1999,13 @@
         } else {
             snapshot.docs.forEach(doc => {
                 const li = document.createElement('li');
+                li.setAttribute('role', 'option');
                 li.innerHTML = `<label><input type="checkbox" data-id="${doc.id}" data-name="${doc.data().name}" data-content="${encodeURIComponent(doc.data().content)}"> ${doc.data().name}</label>`;
                 templateList.appendChild(li);
             });
         }
         templateSelectionModal.classList.add('active');
+        templateSelectionModal.querySelector('#new-project-name').focus();
     }
     async function openWeekEditor() {
         if (!activeProject) return;
@@ -1755,10 +2021,12 @@
         allTemplates.forEach(template => {
             const isChecked = currentTemplateTitles.includes(template.name);
             const li = document.createElement('li');
+            li.setAttribute('role', 'option');
             li.innerHTML = `<label><input type="checkbox" data-id="${template.id}" data-name="${template.name}" data-content="${encodeURIComponent(template.content)}" ${isChecked ? 'checked' : ''}> ${template.name}</label>`;
             editWeeksList.appendChild(li);
         });
         editWeeksModal.classList.add('active');
+        editWeeksModal.querySelector('input[type="checkbox"]').focus();
     }
     async function handleUpdateWeeks() {
         if (!activeProject) return;
@@ -1789,6 +2057,7 @@
             editWeeksModal.classList.remove('active');
             updateStatus('Synced', 'synced');
         } catch (error) {
+            console.error("Error updating weeks:", error);
             alert("Failed to update schedule. Please try again.");
             updateStatus('Error', 'error');
         } finally {
@@ -1805,6 +2074,7 @@
             menuOverlay.classList.remove('is-open');
             body.classList.remove('menu-open');
             menuCheckbox.checked = false;
+            menuCheckbox.focus();
         }
         menuCheckbox.addEventListener('change', () => {
             if(menuCheckbox.checked) {
@@ -1844,6 +2114,9 @@
         confirmWeeksEditBtn.addEventListener('click', handleUpdateWeeks);
         document.querySelectorAll('.modal-overlay').forEach(modal => {
             modal.addEventListener('click', (e) => { if(e.target === modal) modal.classList.remove('active'); });
+            modal.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') modal.classList.remove('active');
+            });
         });
         eventContextMenu.addEventListener('click', (e) => {
             const target = e.target.closest('.context-menu-item');
@@ -1852,6 +2125,13 @@
             }
             eventContextMenu.style.display = 'none';
             activeEventScheduleTable = null;
+        });
+        eventContextMenu.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                eventContextMenu.style.display = 'none';
+                activeEventScheduleTable = null;
+                document.activeElement.blur();
+            }
         });
         schedulesWrapper.addEventListener('click', e => {
             const header = e.target.closest('.mobile-week-header');
@@ -1901,6 +2181,13 @@
             if (!eventContextMenu.contains(e.target) && !e.target.closest('.event-btn')) { eventContextMenu.style.display = 'none'; }
             if (!memberDropdown.contains(e.target) && !e.target.closest('.editable-cell')) { memberDropdown.style.display = 'none'; }
         });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                eventContextMenu.style.display = 'none';
+                memberDropdown.style.display = 'none';
+                document.querySelectorAll('.mobile-week-card').forEach(card => card.classList.remove('active'));
+            }
+        });
     }
     function isCellInMinistrySection(cell) {
         const table = cell.closest('table');
@@ -1933,6 +2220,7 @@
             const item = document.createElement('button');
             item.className = 'member-dropdown-item';
             item.dataset.name = member.name;
+            item.setAttribute('role', 'option');
             item.innerHTML = `<span>${member.name}</span>${member.isServant ? '<span class="servant-tag">Servant</span>' : ''}`;
             memberDropdown.appendChild(item);
         });
@@ -1941,6 +2229,9 @@
         memberDropdown.style.top = `${rect.bottom + window.scrollY}px`;
         memberDropdown.style.left = `${rect.left + window.scrollX}px`;
         memberDropdown.style.width = `${rect.width}px`;
+        memberDropdown.querySelectorAll('.member-dropdown-item').forEach((item, idx) => {
+            setTimeout(() => item.focus(), idx * 50);
+        });
         activeCellForDropdown = { realCell: cell, mobileDiv: mobileDiv };
     }
    async function generatePdf() {
@@ -1974,8 +2265,8 @@
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF('p', 'mm', 'a4');
     const A4_WIDTH_MM = 210, A4_HEIGHT_MM = 297;
-const MARGIN_X_MM = 15; 
-const MARGIN_Y_MM = 10; 
+const MARGIN_X_MM = 15; // Increased horizontal margin
+const MARGIN_Y_MM = 10; // Original vertical margin
 const PAGE_SPACING_MM = 5;
     const USABLE_WIDTH = A4_WIDTH_MM - (MARGIN_X_MM * 2);
 const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_Y_MM * 2);
