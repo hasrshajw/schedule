@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signing Out - Schedule Editor</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2d3748;
+            --light-gray: #F3F4F6;
+            --text-color: #1f2937;
+            --text-light: #6b7280;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--light-gray);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            color: var(--text-color);
+            text-align: center;
+        }
+
+        .logout-container {
+            padding: 2rem;
+        }
+        
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 5px solid rgba(45, 55, 72, 0.2);
+            border-bottom-color: var(--primary-color);
+            border-radius: 50%;
+            display: inline-block;
+            animation: rotation 1s linear infinite;
+            margin-bottom: 1.5rem;
+        }
+
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        p {
+            color: var(--text-light);
+            margin-top: 0.5rem;
+        }
+        
+        a {
+            color: var(--primary-color);
+            font-weight: 500;
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="logout-container" id="logout-container">
+        <div class="spinner"></div>
+        <h1>Signing out...</h1>
+        <p>Please wait a moment.</p>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDLK5f4C-nfG6fz0ajqqay1q9TTN6rxgmQ",
+            authDomain: "schedule-harsha.firebaseapp.com",
+            projectId: "schedule-harsha",
+            storageBucket: "schedule-harsha.firebasestorage.app",
+            messagingSenderId: "965478014820",
+            appId: "1:965478014820:web:1c36c5d890a27e599aa471"
+        };
+        firebase.initializeApp(firebaseConfig);
+
+        // Function to handle logout
+        const handleLogout = () => {
+            firebase.auth().signOut()
+                .then(() => {
+                    // Sign-out successful. Redirect to login page.
+                    window.location.replace('./login.html');
+                })
+                .catch((error) => {
+                    // An error happened.
+                    console.error('Logout Error:', error);
+                    const container = document.getElementById('logout-container');
+                    container.innerHTML = `
+                        <h1>Logout Failed</h1>
+                        <p>Something went wrong. Please try again or return to the login page manually.</p>
+                        <a href="./login.html">Go to Login</a>
+                    `;
+                });
+        };
+        
+        // Call the logout function as soon as the page loads and Firebase is ready.
+        firebase.auth().onAuthStateChanged(user => {
+             // We call signOut regardless of whether a user is found,
+             // to ensure a clean state before redirecting.
+             handleLogout();
+        });
+    </script>
+</body>
+</html>
