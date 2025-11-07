@@ -106,26 +106,41 @@
         align-items: center; 
         gap: 15px; 
     }
-    .header-icons { 
-        display: flex; 
-        align-items: center; 
-        height: 56px; 
-        cursor: pointer; 
-        padding: 12px;
-        border-radius: var(--radius-md);
-        transition: background-color 0.2s;
+    
+    .hamburger {
+      cursor: pointer;
+      height: 3em;
+      width: 3em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    .header-icons:hover {
-        background-color: rgba(255,255,255,0.1);
+    .hamburger input {
+      display: none;
     }
-    .header-icons svg { 
-        height: 24px; 
-        width: 24px; 
-        color: var(--text-light); 
+    .hamburger svg {
+      height: 2em;
+      transition: transform 600ms cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .header-icons .close-icon { display: none; }
-    body.menu-open .header-icons .hamburger-icon { display: none; }
-    body.menu-open .header-icons .close-icon { display: block; }
+    .line {
+      fill: none;
+      stroke: white;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 3;
+      transition: stroke-dasharray 600ms cubic-bezier(0.4, 0, 0.2, 1),
+                  stroke-dashoffset 600ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .line-top-bottom {
+      stroke-dasharray: 12 63;
+    }
+    .hamburger input:checked + svg {
+      transform: rotate(-45deg);
+    }
+    .hamburger input:checked + svg .line-top-bottom {
+      stroke-dasharray: 20 300;
+      stroke-dashoffset: -32.42;
+    }
 
     .menu-overlay { 
         position: fixed; 
@@ -627,26 +642,11 @@
         animation: fadeIn 0.3s ease-in-out;
     }
     
-    .slide-up {
-        animation: slideUp 0.3s ease-out;
-    }
-    
     @keyframes fadeIn {
         from { opacity: 0; }
         to { opacity: 1; }
     }
     
-    @keyframes slideUp {
-        from { 
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to { 
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
     .dropdown-backdrop {
         position: fixed;
         top: 0;
@@ -744,41 +744,6 @@
     
     .dropdown-item:hover {
         background-color: #f8fafc;
-    }
-
-    .mobile-event-button-container {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 16px;
-        padding: 0 16px;
-    }
-
-    .mobile-event-btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        padding: 12px 20px;
-        border-radius: var(--radius-md);
-        font-size: 1rem;
-        font-weight: 600;
-        cursor: pointer;
-        border: 2px solid var(--primary-color);
-        background-color: var(--surface-color);
-        color: var(--primary-color);
-        transition: all 0.2s ease;
-        text-decoration: none;
-    }
-
-    .mobile-event-btn:hover {
-        background-color: var(--primary-color);
-        color: white;
-        transform: translateY(-1px);
-        box-shadow: var(--shadow-md);
-    }
-
-    .mobile-event-btn:active {
-        transform: translateY(0);
     }
 
     #toggle-all-mobile {
@@ -1024,10 +989,13 @@
         <a href="./dashboard.html" class="mobileLogo" title="Dashboard"></a>
         <div class="header-right-controls">
             <div class="status-indicator" data-status="synced">Synced</div>
-            <div class="header-icons" id="menu-toggle-button">
-                <svg class="hamburger-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M22.5 7h-21a.5.5 0 010-1h21a.5.5 0 010 1zM22.5 13h-21a.5.5 0 010-1h21a.5.5 0 010 1zM22.5 19h-21a.5.5 0 010-1h21a.5.5 0 010 1z"></path></svg>
-                <svg class="close-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12.707 12l6.146-6.146a.5.5 0 00-.707-.707L12 11.293 5.854 5.146a.5.5 0 00-.707.707L11.293 12l-6.147 6.146a.5.5 0 10.707.707L12 12.707l6.146 6.146a.5.5 0 00.707-.707z"></path></svg>
-            </div>
+            <label class="hamburger" id="menu-toggle-button">
+              <input type="checkbox" id="menu-toggle-input">
+              <svg viewBox="0 0 32 32">
+                <path class="line line-top-bottom" d="M27 10 13 10C10.8 10 9 8.2 9 6 9 3.5 10.8 2 13 2 15.2 2 17 3.8 17 6L17 26C17 28.2 18.8 30 21 30 23.2 30 25 28.2 25 26 25 23.8 23.2 22 21 22L7 22"></path>
+                <path class="line" d="M7 16 27 16"></path>
+              </svg>
+            </label>
         </div>
     </div>
 </header>
@@ -1289,7 +1257,7 @@
                 };
                 
                 const firstRow = this.tableBody.rows[0];
-                const dateCell = firstRow.cells[2];
+                const dateCell = firstRow.cells.length > 2 ? firstRow.cells[2] : firstRow.cells[0];
                 const dateInput = dateCell ? dateCell.querySelector('.date-input') : null;
                 const dateValue = dateInput ? dateInput.value : '';
                 
@@ -1541,11 +1509,8 @@
             allRows.forEach((row, index) => {
                 if (row.classList.contains('header-row')) {
                     const rowText = row.textContent.trim();
-                    if (rowText.includes('చక్కగా సువార్త ప్రకటించాలి') || rowText.includes('సువార్త ప్రకటించాలి')) {
-                        ministryHeaderIndex = index;
-                    } else if (ministryHeaderIndex !== -1 && index > ministryHeaderIndex && index < nextHeaderIndex) {
-                        nextHeaderIndex = index;
-                    }
+                    if (rowText.includes('చక్కగా సువార్త ప్రకటించాలి') || rowText.includes('సువార్త ప్రకటించాలి')) ministryHeaderIndex = index;
+                    else if (ministryHeaderIndex !== -1 && index > ministryHeaderIndex && index < nextHeaderIndex) nextHeaderIndex = index;
                 }
             });
             
@@ -1590,7 +1555,13 @@
                 firstRow.innerHTML = `<th colspan="1" class="special-event-text">${eventTexts[eventType]}</th><td style="text-align: right; font-weight: 700;">తేదీ:</td><td data-user-editable="true"><input type="date" class="date-input" value="${existingDateValue}"></td>`;
             }
 
+            const currentCardState = this.mobileViewContainer.querySelector('.mobile-week-card')?.classList.contains('active');
             this._createMobileView();
+            if (currentCardState) {
+                const newCard = this.mobileViewContainer.querySelector('.mobile-week-card');
+                if (newCard) newCard.classList.add('active');
+            }
+            
             if (shouldSave) this.parentProject.triggerSave();
         }
 
@@ -1810,6 +1781,7 @@
 
     function setupGlobalUI() {
         const menuToggleButton = document.getElementById('menu-toggle-button');
+        const menuToggleInput = document.getElementById('menu-toggle-input');
         const slideMenu = document.getElementById('slide-menu');
         const menuOverlay = document.getElementById('menu-overlay');
         const body = document.body;
@@ -1818,14 +1790,17 @@
             slideMenu.classList.remove('is-open');
             menuOverlay.classList.remove('is-open');
             body.classList.remove('menu-open');
+            menuToggleInput.checked = false;
         }
 
         menuToggleButton.addEventListener('click', () => {
-            if (body.classList.contains('menu-open')) closeMenu();
-            else {
+            body.classList.toggle('menu-open');
+            if (body.classList.contains('menu-open')) {
                 slideMenu.classList.add('is-open');
                 menuOverlay.classList.add('is-open');
-                body.classList.add('menu-open');
+            } else {
+                slideMenu.classList.remove('is-open');
+                menuOverlay.classList.remove('is-open');
             }
         });
         menuOverlay.addEventListener('click', closeMenu);
@@ -1930,14 +1905,11 @@
     function isCellInMinistrySection(cell) {
         const table = cell.closest('table');
         if (!table) return false;
-        
         const allRows = Array.from(table.querySelectorAll('tbody > tr'));
         const cellRow = cell.closest('tr');
         const cellIndex = allRows.indexOf(cellRow);
-        
         let ministryHeaderIndex = -1;
         let nextHeaderIndex = allRows.length;
-        
         allRows.forEach((row, index) => {
             if (row.classList.contains('header-row')) {
                 const rowText = row.textContent.trim();
@@ -1945,7 +1917,6 @@
                 else if (ministryHeaderIndex !== -1 && index > ministryHeaderIndex && index < nextHeaderIndex) nextHeaderIndex = index;
             }
         });
-        
         if (ministryHeaderIndex === -1) return false;
         return cellIndex > ministryHeaderIndex && cellIndex < nextHeaderIndex;
     }
@@ -1954,7 +1925,6 @@
         const isInMinistry = isCellInMinistrySection(cell);
         memberDropdown.innerHTML = '';
         let listToShow;
-        
         if (isInMinistry) {
             const sortedSisters = [...members.sisters].sort((a, b) => a.name.localeCompare(b.name));
             const sortedBrothers = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
@@ -1980,6 +1950,45 @@
     }
 
    async function generatePdf() {
+    let isEmpty = false;
+    let emptyCellWeek = '';
+    const scheduleBlocks = document.querySelectorAll('.schedule-block');
+    for (const block of scheduleBlocks) {
+        const table = block.querySelector('table');
+        const title = block.querySelector('.schedule-title').textContent;
+        const eventType = activeProject.scheduleTables.find(t => t.data.title === title)?.data.eventType || 'normal';
+
+        if (eventType !== 'normal') {
+            const dateInput = table.querySelector('.date-input');
+            if (!dateInput || !dateInput.value) {
+                isEmpty = true;
+                emptyCellWeek = title;
+                break;
+            }
+        } else {
+            const editableCells = table.querySelectorAll('td[data-user-editable]');
+            for (const cell of editableCells) {
+                if (cell.textContent.trim() === '') {
+                    isEmpty = true;
+                    emptyCellWeek = title;
+                    break;
+                }
+            }
+            if (isEmpty) break;
+            const dateInput = table.querySelector('.date-input');
+            if (!dateInput || !dateInput.value) {
+                 isEmpty = true;
+                 emptyCellWeek = title;
+                 break;
+            }
+        }
+    }
+
+    if (isEmpty) {
+        alert(`Please fill all fields before downloading. The week "${emptyCellWeek}" has an empty field.`);
+        return;
+    }
+       
     printButton.disabled = true;
     printButton.querySelector('span:last-child').textContent = 'Generating...';
 
@@ -1993,18 +2002,7 @@
     printContainer.id = 'print-container';
     document.body.appendChild(printContainer);
 
-    const headerHTML = `
-        <header class="schedule-display-header" style="display: block; margin-bottom: 10px; padding: 5px 0; background: white;">
-            <div class="title-block" style="text-align: center; margin-bottom: 0;">
-                <h1 style="font-family: 'Noto Sans Telugu', sans-serif; font-weight: 700; color: rgb(97, 40, 0); margin: 0 0 8px 0; font-size: 1.8em;">వారం మధ్యలో జరిగే మీటింగ్ షెడ్యూల్</h1>
-                <div class="subtitle-svg-container" style="position: relative; display: inline-block; margin-top: 0;">
-                    <p class="subtitle" style="margin: 0; font-size: 1.1em; font-weight: 500; color: #2d3748; background-color: white; padding: 6px 16px; display: inline-block; position: relative; z-index: 2; white-space: nowrap; border-radius: 8px; font-family: 'Noto Sans Telugu', sans-serif; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);">
-                        ${document.getElementById('date-range-subtitle').textContent}
-                    </p>
-                    <div style="width: 400px; height: 5px; background: linear-gradient(to right, #093261, #ffffff, #093261); display: block; position: absolute; left: 50%; transform: translateX(-50%); top: 50%; margin-top: -2.5px; z-index: 1;"></div>
-                </div>
-            </div>
-        </header>`;
+    const headerHTML = `<header class="schedule-display-header" style="display: block; margin-bottom: 10px; padding: 5px 0; background: white;"><div class="title-block" style="text-align: center; margin-bottom: 0;"><h1 style="font-family: 'Noto Sans Telugu', sans-serif; font-weight: 700; color: rgb(97, 40, 0); margin: 0 0 8px 0; font-size: 1.8em;">వారం మధ్యలో జరిగే మీటింగ్ షెడ్యూల్</h1><div class="subtitle-svg-container" style="position: relative; display: inline-block; margin-top: 0;"><p class="subtitle" style="margin: 0; font-size: 1.1em; font-weight: 500; color: #2d3748; background-color: white; padding: 6px 16px; display: inline-block; position: relative; z-index: 2; white-space: nowrap; border-radius: 8px; font-family: 'Noto Sans Telugu', sans-serif; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);">${document.getElementById('date-range-subtitle').textContent}</p><div style="width: 400px; height: 5px; background: linear-gradient(to right, #093261, #ffffff, #093261); display: block; position: absolute; left: 50%; transform: translateX(-50%); top: 50%; margin-top: -2.5px; z-index: 1;"></div></div></div></header>`;
     printContainer.innerHTML = headerHTML;
 
     const headerCanvas = await html2canvas(printContainer, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false });
@@ -2016,6 +2014,14 @@
     const itemsToPrint = [];
     for (const block of document.querySelectorAll('.schedule-block')) {
         const clone = block.cloneNode(true);
+        const dateInput = clone.querySelector('.date-input');
+        if (dateInput && dateInput.value) {
+            const formattedDate = dateInput.value.split('-').reverse().join('-');
+            const dateCell = dateInput.parentElement;
+            dateCell.innerHTML = formattedDate;
+            dateCell.style.textAlign = 'left';
+            dateCell.style.paddingLeft = '8px';
+        }
         clone.querySelector('.event-btn').style.display = 'none';
         clone.querySelector('.mobile-view-container').style.display = 'none';
         clone.querySelector('table').style.display = 'table';
