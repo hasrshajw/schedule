@@ -67,8 +67,7 @@
         transition: opacity 0.3s ease-in;
     }
     body.auth-ready { visibility: visible; opacity: 1; }
-    body.menu-open { overflow: hidden; }
-    body.dropdown-open { overflow: hidden; }
+    body.menu-open, body.dropdown-open { overflow: hidden; }
 
     .site-header { 
         background-color: var(--header-bg); 
@@ -106,6 +105,11 @@
         align-items: center; 
         gap: 15px; 
     }
+    .status-indicator { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; display: flex; align-items: center; gap: 6px; }
+    .status-indicator::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background-color: currentColor; }
+    .status-indicator[data-status="synced"] { color: var(--success-color); background-color: #eaf5ea; }
+    .status-indicator[data-status="syncing"] { color: var(--warning-color); background-color: #fffbeb; }
+    .status-indicator[data-status="error"] { color: var(--danger-color); background-color: #fde8e8; }
     .header-icons { 
         display: flex; 
         align-items: center; 
@@ -244,6 +248,7 @@
         justify-content: flex-end;
         align-items: center;
         gap: 12px;
+        position: relative;
     }
     
     .master-container { 
@@ -382,7 +387,7 @@
     }
     .event-btn:hover { background-color: #f0f0f0; color: var(--text-primary); }
 
-    .desktop-dropdown { 
+    .desktop-dropdown, #date-navigation-dropdown { 
         position: absolute; 
         background: rgba(255, 255, 255, 0.9); 
         backdrop-filter: blur(8px);
@@ -401,7 +406,9 @@
         display: block;
     }
     
-    .desktop-dropdown.active {
+    #date-navigation-dropdown { width: auto; min-width: 200px; }
+
+    .desktop-dropdown.active, #date-navigation-dropdown.active {
         opacity: 1;
         visibility: visible;
         transform: scale(1) translateY(0);
@@ -417,80 +424,31 @@
     .desktop-dropdown-search svg { margin-right: 8px; }
     
     .desktop-dropdown-search input {
-        width: 100%;
-        border: none;
-        outline: none;
-        background: transparent;
-        font-size: 14px;
-        color: var(--text-primary);
+        width: 100%; border: none; outline: none; background: transparent; font-size: 14px; color: var(--text-primary);
     }
     
     .desktop-dropdown-list {
-        max-height: 260px;
-        overflow-y: auto;
-        scrollbar-width: thin;
-        scrollbar-color: var(--accent-color) transparent;
+        max-height: 260px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--accent-color) transparent;
     }
     .desktop-dropdown-list::-webkit-scrollbar { width: 6px; }
     .desktop-dropdown-list::-webkit-scrollbar-thumb { background: var(--accent-color); border-radius: 3px; }
     
     .desktop-dropdown-item { 
-        display: flex; 
-        align-items: center; 
-        width: 100%; 
-        padding: 12px 16px; 
-        border: none; 
-        background: none; 
-        cursor: pointer; 
-        transition: background-color 0.2s;
-        font-family: 'Noto Sans Telugu', sans-serif;
-        font-size: 14px;
-        text-align: left;
-        color: var(--text-primary);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        display: flex; align-items: center; width: 100%; padding: 12px 16px; border: none; background: none; cursor: pointer; transition: background-color 0.2s; font-family: 'Noto Sans Telugu', sans-serif; font-size: 14px; text-align: left; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     .desktop-dropdown-item:hover { background: rgba(0,123,255,0.08); color: var(--accent-color); }
     .desktop-dropdown-item.active { background: rgba(0,123,255,0.15); color: var(--accent-color); font-weight: 500; }
     
     .servant-tag { 
-        font-size: 0.75rem; 
-        font-weight: 600; 
-        color: var(--primary-color); 
-        background-color: var(--primary-light); 
-        padding: 4px 8px; 
-        border-radius: 12px; 
-        margin-left: auto;
-        margin-right: 8px;
+        font-size: 0.75rem; font-weight: 600; color: var(--primary-color); background-color: var(--primary-light); padding: 4px 8px; border-radius: 12px; margin-left: auto; margin-right: 8px;
     }
 
     .desktop-event-menu { 
-        position: fixed; 
-        display: none; 
-        background: white; 
-        border-radius: var(--radius-md); 
-        box-shadow: var(--shadow-lg); 
-        z-index: 1001; 
-        padding: 8px; 
-        min-width: 180px; 
-        border: 1px solid var(--border-color); 
+        position: fixed; display: none; background: white; border-radius: var(--radius-md); box-shadow: var(--shadow-lg); z-index: 1001; padding: 8px; min-width: 180px; border: 1px solid var(--border-color); 
     }
     
     .desktop-event-item { 
-        display: flex; 
-        align-items: center; 
-        width: 100%; 
-        padding: 10px 12px; 
-        border: none; 
-        background: none; 
-        cursor: pointer; 
-        transition: background-color 0.2s;
-        font-family: 'Inter', sans-serif;
-        font-size: 0.9rem;
-        text-align: left;
-        color: var(--text-primary);
-        border-radius: 4px;
+        display: flex; align-items: center; width: 100%; padding: 10px 12px; border: none; background: none; cursor: pointer; transition: background-color 0.2s; font-family: 'Inter', sans-serif; font-size: 0.9rem; text-align: left; color: var(--text-primary); border-radius: 4px;
     }
     .desktop-event-item:hover { background-color: #f8fafc; }
 
@@ -503,46 +461,17 @@
     .special-event:after { display: none; }
 
     .modal-overlay { 
-        position: fixed; 
-        top: 0; 
-        left: 0; 
-        width: 100%; 
-        height: 100%; 
-        background: rgba(0,0,0,0.6); 
-        display: none; 
-        justify-content: center; 
-        align-items: center; 
-        z-index: 1000; 
-        padding: 16px; 
-        backdrop-filter: blur(4px);
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 16px; backdrop-filter: blur(4px);
     }
     .modal-content { 
-        background: white; 
-        padding: 24px; 
-        border-radius: var(--radius-lg); 
-        width: 100%; 
-        max-width: 500px; 
-        max-height: 90vh; 
-        display: flex; 
-        flex-direction: column; 
-        gap: 16px; 
-        box-shadow: var(--shadow-lg); 
-        transform: scale(0.9);
-        opacity: 0;
-        transition: all 0.3s ease;
+        background: white; padding: 24px; border-radius: var(--radius-lg); width: 100%; max-width: 500px; max-height: 90vh; display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow-lg); transform: scale(0.9); opacity: 0; transition: all 0.3s ease;
     }
     
     .modal-overlay.active { display: flex; }
     .modal-overlay.active .modal-content { transform: scale(1); opacity: 1; }
     
     #new-schedule-name { 
-        width: 100%; 
-        padding: 12px 16px; 
-        font-size: 16px; 
-        border-radius: var(--radius-md); 
-        border: 2px solid var(--border-color); 
-        font-family: 'Inter', sans-serif;
-        transition: border-color 0.2s;
+        width: 100%; padding: 12px 16px; font-size: 16px; border-radius: var(--radius-md); border: 2px solid var(--border-color); font-family: 'Inter', sans-serif; transition: border-color 0.2s;
     }
     #new-schedule-name:focus { outline: none; border-color: var(--accent-color); }
     
@@ -593,7 +522,6 @@
     .dropdown-item.active { background-color: var(--primary-light); color: var(--primary-color); font-weight: 600; }
 
     .mobile-view-container { display: none; }
-    
     .mobile-week-card { background: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow-sm); transition: all 0.3s ease; position: relative; overflow: hidden; }
     .mobile-week-card:last-child { margin-bottom: 0; }
     .mobile-week-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
@@ -662,7 +590,7 @@
         <div class="header-right-controls">
             <div class="status-indicator" data-status="synced">Synced</div>
             <div class="header-icons">
-                <label class="hamburger">
+                 <label class="hamburger">
                   <input type="checkbox" id="menu-checkbox">
                   <svg viewBox="0 0 32 32">
                     <path class="line line-top-bottom" d="M27 10 13 10C10.8 10 9 8.2 9 6 9 3.5 10.8 2 13 2 15.2 2 17 3.8 17 6L17 26C17 28.2 18.8 30 21 30 23.2 30 25 28.2 25 26 25 23.8 23.2 22 21 22L7 22"></path>
@@ -691,6 +619,13 @@
 
 <div id="app-container" class="editor-main hidden">
     <div class="page-controls">
+        <button id="date-nav-button" class="btn">
+            <span class="material-symbols-outlined">calendar_month</span>
+            <span>Go to Week</span>
+        </button>
+        <div id="date-navigation-dropdown">
+            <div class="desktop-dropdown-list" id="date-navigation-list"></div>
+        </div>
         <button id="edit-weeks-button" class="btn">
             <span class="material-symbols-outlined">edit_calendar</span>
             <span>Edit Weeks</span>
@@ -770,20 +705,9 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
     
-    let currentUser = null;
-    let currentScheduleId = null;
-    let userSchedulesCollection = null;
-    let membersCollection = null;
-    let currentListener = null;
-    let activeRowForEvents = null;
+    let currentUser = null, currentScheduleId = null, userSchedulesCollection = null, membersCollection = null, currentListener = null, activeRowForEvents = null;
     let members = { brothers: [], sisters: [] };
-    let activeCellForDropdown = null;
-    let currentDropdownType = null;
-    let currentDropdownData = null;
-    let desktopDropdownSearch = null;
-    let desktopDropdownList = null;
-    let mobileSearchInput = null;
-    let currentFocus = -1;
+    let activeCellForDropdown = null, currentDropdownType = null, currentDropdownData = null, desktopDropdownSearch = null, desktopDropdownList = null, mobileSearchInput = null;
 
     const scheduleWrapper = document.getElementById('schedule-content-wrapper');
     const dateSelectionModal = document.getElementById('date-selection-modal');
@@ -796,31 +720,16 @@
     const dropdownContent = document.getElementById('dropdown-content');
     const dropdownClose = document.getElementById('dropdown-close');
     const mobileDropdownSearch = document.getElementById('mobile-dropdown-search');
+    const dateNavButton = document.getElementById('date-nav-button');
+    const dateNavDropdown = document.getElementById('date-navigation-dropdown');
+    const dateNavList = document.getElementById('date-navigation-list');
 
-    const topics = {
-        'అంశం-1': 'this is talk-1', 'అంశం-2': 'this is talk-2', 'అంశం-3': 'this is talk-3', 'అంశం-4': 'this is talk-4'
-    };
+    const topics = {'అంశం-1': 'this is talk-1', 'అంశం-2': 'this is talk-2', 'అంశం-3': 'this is talk-3', 'అంశం-4': 'this is talk-4'};
+    const eventTexts = {'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం', 'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో', 'convention': 'ప్రాదేశిక సమావేశం'};
+    const eventTypes = [{ id: 'normal', name: 'Normal', icon: 'event' }, { id: 'co-visit', name: 'CO Visit', icon: 'groups' }, { id: 'assembly', name: 'Assembly', icon: 'celebration' }, { id: 'convention', name: 'Convention', icon: 'festival' }];
+    const debounce = (func, delay) => { let timeout; return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), delay); }; };
 
-    const eventTexts = {
-        'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం', 'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో', 'convention': 'ప్రాదేశిక సమావేశం'
-    };
-
-    const eventTypes = [
-        { id: 'normal', name: 'Normal', icon: 'event', color: 'primary' },
-        { id: 'co-visit', name: 'CO Visit', icon: 'groups', color: 'co-visit' },
-        { id: 'assembly', name: 'Assembly', icon: 'celebration', color: 'assembly' },
-        { id: 'convention', name: 'Convention', icon: 'festival', color: 'convention' }
-    ];
-
-    const debounce = (func, delay) => {
-        let timeout;
-        return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), delay); };
-    };
-
-    function updateStatus(text, status) {
-        statusIndicator.textContent = text;
-        statusIndicator.dataset.status = status;
-    }
+    function updateStatus(text, status) { statusIndicator.textContent = text; statusIndicator.dataset.status = status; }
 
     async function fetchMembers() {
         if (!currentUser) return;
@@ -829,11 +738,7 @@
         members = { brothers: [], sisters: [] };
         snapshot.forEach(doc => {
             const member = { id: doc.id, ...doc.data() };
-            if (member.type === 'brother') {
-                members.brothers.push(member);
-            } else {
-                members.sisters.push(member);
-            }
+            if (member.type === 'brother') members.brothers.push(member); else members.sisters.push(member);
         });
     }
 
@@ -845,9 +750,7 @@
             document.body.classList.add('auth-ready');
             const profileNameEl = document.querySelector('.profile-name');
             if (profileNameEl) profileNameEl.textContent = user.email;
-            
             setupGlobalUI();
-
             const params = new URLSearchParams(window.location.search);
             currentScheduleId = params.get('id');
             if (currentScheduleId) initEditor(); else initCreationFlow();
@@ -858,7 +761,6 @@
 
     function initEditor() {
         if (currentListener) currentListener();
-        
         userSchedulesCollection.doc(currentScheduleId).get().then(doc => {
             if (doc.exists) {
                 renderSchedule(doc.data());
@@ -868,12 +770,7 @@
                 window.location.href = './sunday-dashboard.html';
             }
         }).catch(error => updateStatus('Error', 'error'));
-        
-        currentListener = userSchedulesCollection.doc(currentScheduleId).onSnapshot(doc => {
-            if (doc.exists) {
-                updateStatus('Synced', 'synced');
-            }
-        }, error => updateStatus('Error', 'error'));
+        currentListener = userSchedulesCollection.doc(currentScheduleId).onSnapshot(doc => { if (doc.exists) updateStatus('Synced', 'synced'); }, error => updateStatus('Error', 'error'));
     }
 
     function renderSchedule(data) {
@@ -884,10 +781,7 @@
                     <h1>బహిరంగ ప్రసంగాల పట్టిక</h1>
                     <div class="subtitle-svg-container">
                         <p class="subtitle" contenteditable="true">${data.dateRange || ''}</p>
-                        <svg class="svg-divider" role="presentation" viewBox="0 0 24039.797 260" preserveAspectRatio="xMidYMid slice">
-                            <defs><radialGradient id="__id9__id4" gradientUnits="userSpaceOnUse" r="12020.601" cx="12019.898" cy="130" fx="12019.898" fy="130"><stop stop-color="#093261" stop-opacity="1" offset="0"></stop><stop stop-color="#ffffff" stop-opacity="1" offset="1"></stop></radialGradient></defs>
-                            <rect x="0" y="0" width="24039.797" height="260" fill="url(#__id9__id4)"></rect>
-                        </svg>
+                        <svg class="svg-divider" role="presentation" viewBox="0 0 24039.797 260" preserveAspectRatio="xMidYMid slice"><defs><radialGradient id="__id9__id4" gradientUnits="userSpaceOnUse" r="12020.601" cx="12019.898" cy="130" fx="12019.898" fy="130"><stop stop-color="#093261" stop-opacity="1" offset="0"></stop><stop stop-color="#ffffff" stop-opacity="1" offset="1"></stop></radialGradient></defs><rect x="0" y="0" width="24039.797" height="260" fill="url(#__id9__id4)"></rect></svg>
                     </div>
                 </div>
             </header>
@@ -911,6 +805,7 @@
         });
 
         createMobileView();
+        populateDateNavigation();
         scheduleWrapper.addEventListener('input', debouncedSave);
         scheduleWrapper.querySelectorAll('.event-btn').forEach(btn => btn.addEventListener('click', openEventMenu));
         document.getElementById('app-container').classList.remove('hidden');
@@ -951,6 +846,30 @@
         mobileContainer.querySelectorAll('.event-type-field').forEach(field => field.addEventListener('click', (e) => {
             openMobileEventTypeDropdown(field.dataset.row, field);
         }));
+    }
+
+    function populateDateNavigation() {
+        dateNavList.innerHTML = '';
+        const dates = getCurrentScheduleDates();
+        if (dates.length > 0) {
+            dateNavButton.style.display = 'inline-flex';
+            dates.forEach((date, index) => {
+                const item = document.createElement('div');
+                item.className = 'desktop-dropdown-item';
+                item.textContent = date;
+                item.dataset.index = index;
+                item.addEventListener('click', () => {
+                    const targetRow = scheduleWrapper.querySelector(`.schedule-table tbody tr:nth-child(${index + 1})`);
+                    if (targetRow) {
+                        targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                    dateNavDropdown.classList.remove('active');
+                });
+                dateNavList.appendChild(item);
+            });
+        } else {
+            dateNavButton.style.display = 'none';
+        }
     }
 
     function getEventTypeForRow(row) {
@@ -1445,6 +1364,8 @@
         });
         menuOverlay.addEventListener('click', closeMenu);
 
+        dateNavButton.addEventListener('click', () => dateNavDropdown.classList.toggle('active'));
+
         document.getElementById('print-button').addEventListener('click', generatePdf);
         document.getElementById('edit-weeks-button').addEventListener('click', openWeekEditor);
         
@@ -1473,6 +1394,7 @@
         document.addEventListener('click', (e) => {
             if (!desktopDropdown.contains(e.target) && !e.target.closest('.editable-cell')) hideDesktopDropdown();
             if (!desktopEventMenu.contains(e.target) && !e.target.closest('.event-btn')) hideDesktopEventMenu();
+            if (!dateNavButton.contains(e.target) && !dateNavDropdown.contains(e.target)) dateNavDropdown.classList.remove('active');
         });
 
         desktopEventMenu.addEventListener('click', (e) => {
