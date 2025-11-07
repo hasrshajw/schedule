@@ -281,7 +281,7 @@
     .page-controls { 
         margin-bottom: 24px; 
         display: flex; 
-        justify-content: flex-end;
+        justify-content: center;
         align-items: center;
         gap: 12px;
     }
@@ -294,8 +294,8 @@
         border: 1px solid var(--border-color);
     }
     
-    .schedule-display-header { text-align: center; margin-bottom: 24px; }
-    .title-block { text-align: center; }
+    .schedule-display-header { text-align: center; margin-bottom: 0; }
+    .title-block { text-align: center; margin-bottom: 24px; }
     .title-block h1 { 
         margin: 0 0 12px 0; 
         font-size: 1.8em; 
@@ -702,7 +702,6 @@
     .dropdown-item.active { background-color: var(--primary-light); color: var(--primary-color); font-weight: 600; }
 
     .mobile-view-container { display: none; }
-    #toggle-all-mobile { display: none; }
     .event-type-dropdown { margin-bottom: 20px; }
     .event-type-field {
         padding: 16px; border: 2px solid var(--border-color); border-radius: var(--radius-md);
@@ -751,6 +750,8 @@
         margin: 0; font-family: 'Noto Sans Telugu', sans-serif;
     }
 
+    #toggle-all-mobile { display: none; }
+
     .fade-in { animation: fadeIn 0.3s ease-in-out; }
     .slide-up { animation: slideUp 0.3s ease-out; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -758,7 +759,7 @@
 
     @media (max-width: 768px) {
         main { padding-top: 66px; }
-        .editor-main { padding: 16px; }
+        .editor-main { padding: 10px; }
         .master-container { 
             padding: 0; 
             border-radius: 0; 
@@ -775,8 +776,11 @@
         #toggle-all-mobile {
             display: inline-flex;
             margin: 0 auto 16px;
+            background: var(--surface-color);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
         }
-        .title-block { margin-bottom: 16px; }
+        .title-block { padding: 0 16px; margin-bottom: 16px; }
         .title-block h1 { font-size: 1.5rem; }
         .subtitle { font-size: 1rem; padding: 6px 12px; }
         .svg-divider { width: 300px; }
@@ -1081,22 +1085,14 @@
                     <div class="subtitle-svg-container">
                         <p class="subtitle" contenteditable="true">${data.dateRange || ''}</p>
                         <svg class="svg-divider" role="presentation" viewBox="0 0 24039.797 260" preserveAspectRatio="xMidYMid slice">
-                            <defs>
-                                <radialGradient id="__id9__id4" gradientUnits="userSpaceOnUse" r="12020.601" cx="12019.898" cy="130" fx="12019.898" fy="130">
-                                    <stop stop-color="#093261" stop-opacity="1" offset="0"></stop>
-                                    <stop stop-color="#ffffff" stop-opacity="1" offset="1"></stop>
-                                </radialGradient>
-                            </defs>
+                            <defs><radialGradient id="__id9__id4" gradientUnits="userSpaceOnUse" r="12020.601" cx="12019.898" cy="130" fx="12019.898" fy="130"><stop stop-color="#093261" stop-opacity="1" offset="0"></stop><stop stop-color="#ffffff" stop-opacity="1" offset="1"></stop></radialGradient></defs>
                             <rect x="0" y="0" width="24039.797" height="260" fill="url(#__id9__id4)"></rect>
                         </svg>
                     </div>
                 </div>
             </header>
             <main>
-                <button id="toggle-all-mobile" class="btn">
-                    <span class="material-symbols-outlined">unfold_more</span>
-                    <span>Expand All</span>
-                </button>
+                <button id="toggle-all-mobile" class="btn"><span class="material-symbols-outlined">unfold_more</span><span>Expand All</span></button>
                 <table class="schedule-table">
                     <thead>
                         <tr>
@@ -1113,10 +1109,8 @@
         scheduleWrapper.querySelectorAll('tbody td').forEach(cell => {
             const cellIndex = cell.cellIndex;
             if (cellIndex === 0 || cellIndex === 5 || cell.classList.contains('special-event')) return;
-            
             cell.classList.add('editable-cell');
             cell.removeAttribute('contenteditable');
-            
             cell.addEventListener('click', () => {
                 if (cellIndex === 1) openDesktopDropdown('topic', cell);
                 else openDesktopDropdown('member', cell);
@@ -1150,9 +1144,24 @@
             mobileContainer.appendChild(card);
         });
 
-        mobileContainer.querySelectorAll('.topic-field, .member-field, .event-type-field').forEach(field => {
+        _rebindAllMobileListeners();
+    }
+    
+    function updateMobileCardBody(rowIndex) {
+        const mobileContainer = scheduleWrapper.querySelector('.mobile-view-container');
+        const card = mobileContainer.querySelectorAll('.mobile-week-card')[rowIndex];
+        if (!card) return;
+        const tableRow = scheduleWrapper.querySelector('.schedule-table tbody').rows[rowIndex];
+        const newBodyHTML = getMobileCardBodyHTML(tableRow, rowIndex);
+        card.querySelector('.mobile-week-body').innerHTML = newBodyHTML;
+        _rebindMobileCardListeners(card);
+    }
+    
+    function _rebindMobileCardListeners(card) {
+        card.querySelectorAll('.topic-field, .member-field, .event-type-field').forEach(field => {
             field.addEventListener('click', () => {
                 const rowIndex = field.dataset.row;
+                const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
                 if (field.classList.contains('topic-field') || field.classList.contains('member-field')) {
                     const cellIndex = field.dataset.cell;
                     const cell = tableBody.rows[rowIndex].cells[cellIndex];
@@ -1164,53 +1173,22 @@
             });
         });
     }
+    
+    function _rebindAllMobileListeners() {
+        scheduleWrapper.querySelectorAll('.mobile-week-card').forEach(card => _rebindMobileCardListeners(card));
+    }
 
     function getMobileCardBodyHTML(row, rowIndex) {
         const [topicCell, speakerCell, chairmanCell, readerCell] = [row.cells[1], row.cells[2], row.cells[3], row.cells[4]];
         const isSpecialEvent = topicCell.classList.contains('special-event');
         const eventTypeInfo = eventTypes.find(event => event.id === getEventTypeForRow(row)) || eventTypes[0];
         
-        const eventTypeDropdownHTML = `
-            <div class="event-type-dropdown">
-                <div class="event-type-field" data-row="${rowIndex}">
-                    <span class="event-type-value">
-                        <span class="material-symbols-outlined event-type-icon">${eventTypeInfo.icon}</span>
-                        <span>${eventTypeInfo.name}</span>
-                    </span>
-                </div>
-            </div>`;
+        const eventTypeDropdownHTML = `<div class="event-type-dropdown"><div class="event-type-field" data-row="${rowIndex}"><span class="event-type-value"><span class="material-symbols-outlined event-type-icon">${eventTypeInfo.icon}</span><span>${eventTypeInfo.name}</span></span></div></div>`;
 
         if (isSpecialEvent) {
             return `${eventTypeDropdownHTML}<div class="special-event-mobile"><p class="special-event-text-mobile">${topicCell.textContent}</p></div>`;
         } else {
-            return `
-                ${eventTypeDropdownHTML}
-                <div class="week-fields">
-                    <div class="field-group">
-                        <label>ప్రసంగ అంశం</label>
-                        <div class="mobile-field topic-field" data-row="${rowIndex}" data-cell="1">
-                            <span class="mobile-field-value ${topicCell.textContent ? '' : 'mobile-field-placeholder'}">${topicCell.textContent || 'Select Topic'}</span>
-                        </div>
-                    </div>
-                    <div class="field-group">
-                        <label>ప్రసంగీకుడు</label>
-                        <div class="mobile-field member-field" data-row="${rowIndex}" data-cell="2">
-                            <span class="mobile-field-value ${speakerCell.textContent ? '' : 'mobile-field-placeholder'}">${speakerCell.textContent || 'Select Brother'}</span>
-                        </div>
-                    </div>
-                    <div class="field-group">
-                        <label>చైర్మన్</label>
-                        <div class="mobile-field member-field" data-row="${rowIndex}" data-cell="3">
-                            <span class="mobile-field-value ${chairmanCell.textContent ? '' : 'mobile-field-placeholder'}">${chairmanCell.textContent || 'Select Brother'}</span>
-                        </div>
-                    </div>
-                    <div class="field-group">
-                        <label>కావలికోట రీడర్</label>
-                        <div class="mobile-field member-field" data-row="${rowIndex}" data-cell="4">
-                            <span class="mobile-field-value ${readerCell.textContent ? '' : 'mobile-field-placeholder'}">${readerCell.textContent || 'Select Brother'}</span>
-                        </div>
-                    </div>
-                </div>`;
+            return `${eventTypeDropdownHTML}<div class="week-fields"><div class="field-group"><label>ప్రసంగ అంశం</label><div class="mobile-field topic-field" data-row="${rowIndex}" data-cell="1"><span class="mobile-field-value ${topicCell.textContent ? '' : 'mobile-field-placeholder'}">${topicCell.textContent || 'Select Topic'}</span></div></div><div class="field-group"><label>ప్రసంగీకుడు</label><div class="mobile-field member-field" data-row="${rowIndex}" data-cell="2"><span class="mobile-field-value ${speakerCell.textContent ? '' : 'mobile-field-placeholder'}">${speakerCell.textContent || 'Select Brother'}</span></div></div><div class="field-group"><label>చైర్మన్</label><div class="mobile-field member-field" data-row="${rowIndex}" data-cell="3"><span class="mobile-field-value ${chairmanCell.textContent ? '' : 'mobile-field-placeholder'}">${chairmanCell.textContent || 'Select Brother'}</span></div></div><div class="field-group"><label>కావలికోట రీడర్</label><div class="mobile-field member-field" data-row="${rowIndex}" data-cell="4"><span class="mobile-field-value ${readerCell.textContent ? '' : 'mobile-field-placeholder'}">${readerCell.textContent || 'Select Brother'}</span></div></div></div>`;
         }
     }
 
@@ -1247,7 +1225,7 @@
             topicCell.removeAttribute('data-original-content');
             [speakerCell, chairmanCell, readerCell].forEach(cell => cell.removeAttribute('data-original-content'));
         }
-        createMobileView();
+        updateMobileCardBody(rowIndex);
         debouncedSave();
     }
 
@@ -1457,6 +1435,7 @@
         if (currentDropdownData && currentDropdownData.rowIndex !== undefined) {
             changeEventType(currentDropdownData.rowIndex, eventType);
         }
+        hideMobileDropdown();
     }
 
     function filterMobileItems(value) {
@@ -1771,15 +1750,20 @@
             if(header) {
                 const card = header.closest('.mobile-week-card');
                 const isAlreadyOpen = card.classList.contains('active');
-                scheduleWrapper.querySelectorAll('.mobile-week-card').forEach(c => c.classList.remove('active'));
-                if (!isAlreadyOpen) card.classList.add('active');
+                if(!e.target.closest('.mobile-field')) { // Prevent toggle when clicking fields
+                    if (isAlreadyOpen) {
+                        card.classList.remove('active');
+                    } else {
+                        card.classList.add('active');
+                    }
+                }
             }
         });
         
         const toggleAllBtn = document.getElementById('toggle-all-mobile');
         if(toggleAllBtn) {
             toggleAllBtn.addEventListener('click', () => {
-                const allCards = scheduleWrapper.querySelectorAll('.mobile-week-card');
+                const allCards = scheduleWrapper.querySelectorAll('.mobile-view-container .mobile-week-card');
                 const areAnyOpen = Array.from(allCards).some(card => card.classList.contains('active'));
                 const textSpan = toggleAllBtn.querySelector('span:last-child');
                 const iconSpan = toggleAllBtn.querySelector('.material-symbols-outlined');
