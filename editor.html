@@ -784,14 +784,9 @@
             border: none;
         }
         .page-controls { 
-    padding: 16px; 
-    margin-bottom: 0;
-    background-color: var(--surface-color);
-    border-bottom: 1px solid var(--border-color);
-    position: sticky;
-    top: 56px;
-    z-index: 10;
-}
+            padding: 16px; 
+            margin-bottom: 0; 
+        }
 
         #toggle-all-mobile {
             display: inline-flex;
@@ -1986,9 +1981,12 @@
 
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF('p', 'mm', 'a4');
-    const A4_WIDTH_MM = 210, A4_HEIGHT_MM = 297, MARGIN_MM = 10, PAGE_SPACING_MM = 5; 
-    const USABLE_WIDTH = A4_WIDTH_MM - (MARGIN_MM * 2);
-    const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_MM * 2);
+    const A4_WIDTH_MM = 210, A4_HEIGHT_MM = 297;
+const MARGIN_X_MM = 15; // Increased horizontal margin
+const MARGIN_Y_MM = 10; // Original vertical margin
+const PAGE_SPACING_MM = 5;
+    const USABLE_WIDTH = A4_WIDTH_MM - (MARGIN_X_MM * 2);
+const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_Y_MM * 2);
 
     const printContainer = document.createElement('div');
     printContainer.id = 'print-container';
@@ -2068,9 +2066,9 @@
         if (pageIndex > 0) pdf.addPage();
         const { items: pageItems, isFirstPage } = pageData;
         const totalContentHeight = pageItems.reduce((sum, item) => sum + item.height, 0) + (PAGE_SPACING_MM * (pageItems.length - 1));
-        let startY = MARGIN_MM;
+        let startY = MARGIN_Y_MM;
         if (isFirstPage) {
-            pdf.addImage(headerImgData, 'JPEG', MARGIN_MM, startY, USABLE_WIDTH, headerHeight);
+            pdf.addImage(headerImgData, 'JPEG', MARGIN_X_MM, startY, USABLE_WIDTH, headerHeight);
             startY += headerHeight;
         }
         if (pageItems.length > 1) {
@@ -2080,7 +2078,7 @@
         }
         let currentY = startY;
         pageItems.forEach(item => {
-            pdf.addImage(item.imgData, 'JPEG', MARGIN_MM, currentY, item.width, item.height);
+            pdf.addImage(item.imgData, 'JPEG', MARGIN_X_MM, currentY, item.width, item.height);
             currentY += item.height + PAGE_SPACING_MM;
         });
     });
