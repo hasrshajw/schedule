@@ -268,7 +268,7 @@
     .hidden { display: none !important; }
     
     main { 
-        padding-top: 76px; /* 56px navbar + 20px spacing */
+        padding-top: 76px;
         min-height: 100vh;
     }
     
@@ -1103,16 +1103,21 @@
             </main>
         `;
         
-        scheduleWrapper.querySelectorAll('tbody td').forEach((cell) => {
+        scheduleWrapper.querySelectorAll('tbody td').forEach(cell => {
+            const row = cell.parentElement;
             const cellIndex = cell.cellIndex;
-            if (cellIndex === 0 || cellIndex === 5) return;
+
+            if (cellIndex === 0 || cellIndex === 5 || cell.classList.contains('special-event')) return;
             
             cell.classList.add('editable-cell');
             cell.removeAttribute('contenteditable');
             
-            cell.addEventListener('click', (e) => {
-                if (cellIndex === 1) openDesktopDropdown('topic', cell);
-                else openDesktopDropdown('member', cell);
+            cell.addEventListener('click', () => {
+                if (cellIndex === 1) {
+                    openDesktopDropdown('topic', cell);
+                } else {
+                    openDesktopDropdown('member', cell);
+                }
             });
         });
 
@@ -1129,9 +1134,7 @@
         mobileContainer.innerHTML = '';
         
         Array.from(tableBody.rows).forEach((row, rowIndex) => {
-            const cells = Array.from(row.cells);
-            const dateText = cells[0].textContent;
-            
+            const dateText = row.cells[0].textContent;
             const card = document.createElement('div');
             card.className = 'mobile-week-card fade-in';
             const cardBodyContent = getMobileCardBodyHTML(row, rowIndex);
@@ -1141,43 +1144,29 @@
                     <h3 class="week-date">${dateText}</h3>
                     <span class="material-symbols-outlined accordion-icon">expand_more</span>
                 </div>
-                <div class="mobile-week-body">
-                    ${cardBodyContent}
-                </div>`;
+                <div class="mobile-week-body">${cardBodyContent}</div>`;
             mobileContainer.appendChild(card);
         });
 
-        mobileContainer.querySelectorAll('.topic-field').forEach(field => {
-            field.addEventListener('click', (e) => {
-                const rowIndex = field.dataset.row, cellIndex = field.dataset.cell;
-                const cell = tableBody.rows[rowIndex].cells[cellIndex];
-                openMobileDropdown('topic', cell, field);
-            });
-        });
-
-        mobileContainer.querySelectorAll('.member-field').forEach(field => {
-            field.addEventListener('click', (e) => {
-                const rowIndex = field.dataset.row, cellIndex = field.dataset.cell;
-                const cell = tableBody.rows[rowIndex].cells[cellIndex];
-                openMobileDropdown('member', cell, field);
-            });
-        });
-
-        mobileContainer.querySelectorAll('.event-type-field').forEach(field => {
+        mobileContainer.querySelectorAll('.topic-field, .member-field, .event-type-field').forEach(field => {
             field.addEventListener('click', (e) => {
                 const rowIndex = field.dataset.row;
-                openMobileEventTypeDropdown(rowIndex, field);
+                if (field.classList.contains('topic-field') || field.classList.contains('member-field')) {
+                    const cellIndex = field.dataset.cell;
+                    const cell = tableBody.rows[rowIndex].cells[cellIndex];
+                    const type = field.classList.contains('topic-field') ? 'topic' : 'member';
+                    openMobileDropdown(type, cell, field);
+                } else if (field.classList.contains('event-type-field')) {
+                    openMobileEventTypeDropdown(rowIndex, field);
+                }
             });
         });
     }
 
     function getMobileCardBodyHTML(row, rowIndex) {
-        const cells = Array.from(row.cells);
-        const [topicCell, speakerCell, chairmanCell, readerCell] = [cells[1], cells[2], cells[3], cells[4]];
-        
-        const isSpecialEvent = topicCell.classList.contains('special-event') && topicCell.colSpan === 4;
-        const currentEventType = getEventTypeForRow(row);
-        const eventTypeInfo = eventTypes.find(event => event.id === currentEventType) || eventTypes[0];
+        const [topicCell, speakerCell, chairmanCell, readerCell] = [row.cells[1], row.cells[2], row.cells[3], row.cells[4]];
+        const isSpecialEvent = topicCell.classList.contains('special-event');
+        const eventTypeInfo = eventTypes.find(event => event.id === getEventTypeForRow(row)) || eventTypes[0];
         
         const eventTypeDropdownHTML = `
             <div class="event-type-dropdown">
@@ -1190,11 +1179,7 @@
             </div>`;
 
         if (isSpecialEvent) {
-            return `
-                ${eventTypeDropdownHTML}
-                <div class="special-event-mobile">
-                    <p class="special-event-text-mobile">${topicCell.textContent}</p>
-                </div>`;
+            return `${eventTypeDropdownHTML}<div class="special-event-mobile"><p class="special-event-text-mobile">${topicCell.textContent}</p></div>`;
         } else {
             return `
                 ${eventTypeDropdownHTML}
@@ -1244,8 +1229,7 @@
         
         topicCell.colSpan = 1;
         topicCell.classList.remove('special-event');
-        topicCell.classList.add('editable-cell');
-        [speakerCell, chairmanCell, readerCell].forEach(cell => { cell.style.display = ''; cell.classList.add('editable-cell'); });
+        [speakerCell, chairmanCell, readerCell].forEach(cell => cell.style.display = '');
         
         if (eventType !== 'normal') {
             if (topicCell.textContent && !topicCell.classList.contains('special-event')) topicCell.dataset.originalContent = topicCell.textContent;
@@ -1253,9 +1237,8 @@
             
             topicCell.colSpan = 4;
             topicCell.classList.add('special-event');
-            topicCell.classList.remove('editable-cell');
             topicCell.textContent = eventTexts[eventType];
-            [speakerCell, chairmanCell, readerCell].forEach(cell => { cell.style.display = 'none'; cell.classList.remove('editable-cell'); cell.textContent = ''; });
+            [speakerCell, chairmanCell, readerCell].forEach(cell => { cell.style.display = 'none'; cell.textContent = ''; });
         } else {
             topicCell.innerHTML = topicCell.dataset.originalContent || '';
             [speakerCell, chairmanCell, readerCell].forEach(cell => { cell.innerHTML = cell.dataset.originalContent || ''; });
@@ -1325,7 +1308,6 @@
     function hideDesktopDropdown() {
         desktopDropdown.classList.remove('active');
         setTimeout(() => { desktopDropdown.style.display = 'none'; }, 250);
-        currentDropdownType = null;
         activeCellForDropdown = null;
     }
 
@@ -1343,14 +1325,11 @@
         const cellIndex = Array.from(cell.parentElement.cells).indexOf(cell);
         const mobileContainer = scheduleWrapper.querySelector('.mobile-view-container');
         if (mobileContainer) {
-            const mobileCard = mobileContainer.querySelectorAll('.mobile-week-card')[rowIndex];
-            if (mobileCard) {
-                const field = mobileCard.querySelector(`.mobile-field[data-row="${rowIndex}"][data-cell="${cellIndex}"]`);
-                if (field) {
-                    const valueSpan = field.querySelector('.mobile-field-value');
-                    valueSpan.textContent = value;
-                    valueSpan.classList.remove('mobile-field-placeholder');
-                }
+            const field = mobileContainer.querySelector(`.mobile-field[data-row="${rowIndex}"][data-cell="${cellIndex}"]`);
+            if (field) {
+                const valueSpan = field.querySelector('.mobile-field-value');
+                valueSpan.textContent = value;
+                valueSpan.classList.remove('mobile-field-placeholder');
             }
         }
     }
@@ -1383,7 +1362,6 @@
     }
 
     function openMobileDropdown(type, cell, fieldElement) {
-        currentDropdownType = type;
         currentDropdownData = { cell, fieldElement };
         fieldElement.classList.add('active');
         if (type === 'member') showMobileMemberDropdown();
@@ -1393,7 +1371,6 @@
     }
 
     function openMobileEventTypeDropdown(rowIndex, fieldElement) {
-        currentDropdownType = 'event-type';
         currentDropdownData = { rowIndex, fieldElement };
         fieldElement.classList.add('active');
         showMobileEventTypeDropdown();
@@ -1459,7 +1436,6 @@
         dropdownContainer.classList.remove('active');
         if (currentDropdownData && currentDropdownData.fieldElement) currentDropdownData.fieldElement.classList.remove('active');
         document.body.classList.remove('dropdown-open');
-        currentDropdownType = null;
         currentDropdownData = null;
     }
 
