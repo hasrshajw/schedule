@@ -828,23 +828,6 @@
             margin-top: -1px;
         }
     }
-
-    .pdf-page-container {
-        background: white; padding: 20px; font-family: 'Noto Sans Telugu', sans-serif;
-        width: 1100px; margin-bottom: 20px;
-    }
-    .pdf-table {
-        width: 100%; border-collapse: collapse; font-family: 'Noto Sans Telugu', sans-serif;
-        border: 2px solid #000; table-layout: fixed !important;
-    }
-    .pdf-table th, .pdf-table td {
-        border: 1px solid #000; padding: 8px 6px; font-family: 'Noto Sans Telugu', sans-serif;
-        font-weight: 700; height: 35px; vertical-align: middle; box-sizing: border-box;
-        overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important;
-    }
-    .pdf-table thead th { background-color: #F3E5D7; font-size: 1.0em; padding: 8px 6px; }
-    .pdf-header { text-align: center; margin-bottom: 20px; }
-    .pdf-title { font-family: 'Noto Sans Telugu', sans-serif; font-weight: 700; color: rgb(97, 40, 0); margin: 0; }
 </style>
 </head>
 <body>
@@ -1071,7 +1054,15 @@
                     <h1>బహిరంగ ప్రసంగాల పట్టిక</h1>
                     <div class="subtitle-svg-container">
                         <p class="subtitle" contenteditable="true">${data.dateRange || ''}</p>
-                        <div style="width: 550px; height: 5px; background: linear-gradient(to right, #ffffff, #093261, #ffffff); display: block; position: absolute; left: 50%; transform: translateX(-50%); top: 50%; margin-top: -2.5px; z-index: 1;"></div>
+                        <svg class="svg-divider" role="presentation" viewBox="0 0 24039.797 260" preserveAspectRatio="xMidYMid slice">
+                            <defs>
+                                <radialGradient id="__id9__id4" gradientUnits="userSpaceOnUse" r="12020.601" cx="12019.898" cy="130" fx="12019.898" fy="130">
+                                    <stop stop-color="#093261" stop-opacity="1" offset="0"></stop>
+                                    <stop stop-color="#ffffff" stop-opacity="1" offset="1"></stop>
+                                </radialGradient>
+                            </defs>
+                            <rect x="0" y="0" width="24039.797" height="260" fill="url(#__id9__id4)"></rect>
+                        </svg>
                     </div>
                 </div>
             </header>
@@ -1615,19 +1606,27 @@
         const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_MM * 2);
 
         try {
+            const scheduleData = document.getElementById('schedule-content-wrapper');
+            const tableRows = Array.from(scheduleData.querySelectorAll('tbody tr'));
+            const headerElement = scheduleData.querySelector('.schedule-display-header');
+
             const tempContainer = document.createElement('div');
             tempContainer.style.position = 'absolute';
             tempContainer.style.left = '-9999px';
             tempContainer.style.width = '1100px';
-            tempContainer.style.top = '0';
             document.body.appendChild(tempContainer);
+            
+            const headerClone = headerElement.cloneNode(true);
+            tempContainer.appendChild(headerClone);
+            const headerCanvas = await html2canvas(headerClone, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+            const headerImgData = headerCanvas.toDataURL('image/jpeg', 0.9);
+            const headerProps = pdf.getImageProperties(headerImgData);
+            const headerHeight = (headerProps.height * USABLE_WIDTH) / headerProps.width;
+            tempContainer.innerHTML = '';
 
-            const scheduleData = document.getElementById('schedule-content-wrapper');
-            const title = scheduleData.querySelector('h1').textContent;
-            const subtitle = scheduleData.querySelector('.subtitle').textContent;
-            const tableRows = Array.from(scheduleData.querySelectorAll('tbody tr'));
 
-            const rowsFirstPage = 15, rowsOtherPages = 17;
+            const rowsFirstPage = 13;
+            const rowsOtherPages = 17;
             let currentRow = 0, pageCount = 0;
 
             while (currentRow < tableRows.length) {
@@ -1635,23 +1634,6 @@
                 
                 const pageContainer = document.createElement('div');
                 pageContainer.className = 'pdf-page-container';
-                pageContainer.style.width = '1100px';
-                
-                if (pageCount === 0) {
-                     pageContainer.innerHTML = `
-                        <div class="schedule-display-header" style="text-align: center; margin-bottom: 20px;">
-                            <div class="title-block">
-                                <h1 style="margin: 0 0 12px 0; font-size: 1.8em; font-weight: 700; color: rgb(97, 40, 0); font-family: 'Noto Sans Telugu', sans-serif; line-height: 1.3;">${title}</h1>
-                                <div class="subtitle-svg-container" style="position: relative; display: inline-block; margin-top: 0;">
-                                    <p class="subtitle" style="margin: 0; font-size: 1.1em; font-weight: 500; color: #2d3748; background-color: white; padding: 8px 16px; display: inline-block; position: relative; z-index: 2; white-space: nowrap; border-radius: 8px; font-family: 'Noto Sans Telugu', sans-serif; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);">${subtitle}</p>
-                                    <svg class="svg-divider" style="width: 400px; height: 5px; display: block; position: absolute; left: 50%; transform: translateX(-50%); top: 50%; margin-top: -2.5px; z-index: 1;" role="presentation" viewBox="0 0 24039.797 260" preserveAspectRatio="xMidYMid slice">
-                                        <defs><radialGradient id="__id9__id4_pdf" gradientUnits="userSpaceOnUse" r="12020.601" cx="12019.898" cy="130" fx="12019.898" fy="130"><stop stop-color="#093261" stop-opacity="1" offset="0"></stop><stop stop-color="#ffffff" stop-opacity="1" offset="1"></stop></radialGradient></defs>
-                                        <rect x="0" y="0" width="24039.797" height="260" fill="url(#__id9__id4_pdf)"></rect>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>`;
-                }
 
                 const table = document.createElement('table');
                 table.className = 'pdf-table';
@@ -1668,10 +1650,7 @@
                         cell.innerHTML = originalRow.cells[j].innerHTML;
                         if (originalRow.cells[1].classList.contains('special-event')) {
                             if (j === 1) {
-                                cell.className = 'special-event';
-                                cell.colSpan = 4;
-                                cell.style.width = '85%';
-                                j += 3;
+                                cell.className = 'special-event'; cell.colSpan = 4; cell.style.width = '85%'; j += 3;
                             }
                         }
                         row.appendChild(cell);
@@ -1689,9 +1668,14 @@
                 const imgData = canvas.toDataURL('image/jpeg', 0.85);
                 const imgProps = pdf.getImageProperties(imgData);
                 const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
-                const verticalPosition = Math.max(0, (USABLE_HEIGHT - imgHeight) / 2);
                 
-                pdf.addImage(imgData, 'JPEG', MARGIN_MM, MARGIN_MM + verticalPosition, USABLE_WIDTH, imgHeight, undefined, 'FAST');
+                let currentY = MARGIN_MM;
+                if (pageCount === 0) {
+                    pdf.addImage(headerImgData, 'JPEG', MARGIN_MM, currentY, USABLE_WIDTH, headerHeight);
+                    currentY += headerHeight + 5;
+                }
+                
+                pdf.addImage(imgData, 'JPEG', MARGIN_MM, currentY, USABLE_WIDTH, imgHeight, undefined, 'FAST');
                 tempContainer.removeChild(pageContainer);
                 currentRow = endRow;
                 pageCount++;
