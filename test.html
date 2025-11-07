@@ -400,102 +400,248 @@
         overflow: hidden;
         display: block;
     }
-    .desktop-dropdown.active { opacity: 1; visibility: visible; transform: scale(1) translateY(0); }
-    .desktop-dropdown-search { display: flex; align-items: center; padding: 10px 14px; border-bottom: 1px solid var(--border-color); background: rgba(255,255,255,0.7); }
+    
+    .desktop-dropdown.active {
+        opacity: 1;
+        visibility: visible;
+        transform: scale(1) translateY(0);
+    }
+    
+    .desktop-dropdown-search {
+        display: flex;
+        align-items: center;
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--border-color);
+        background: rgba(255,255,255,0.7);
+    }
     .desktop-dropdown-search svg { margin-right: 8px; }
-    .desktop-dropdown-search input { width: 100%; border: none; outline: none; background: transparent; font-size: 14px; color: var(--text-primary); }
-    .desktop-dropdown-list { max-height: 260px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--accent-color) transparent; }
+    
+    .desktop-dropdown-search input {
+        width: 100%;
+        border: none;
+        outline: none;
+        background: transparent;
+        font-size: 14px;
+        color: var(--text-primary);
+    }
+    
+    .desktop-dropdown-list {
+        max-height: 260px;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: var(--accent-color) transparent;
+    }
     .desktop-dropdown-list::-webkit-scrollbar { width: 6px; }
     .desktop-dropdown-list::-webkit-scrollbar-thumb { background: var(--accent-color); border-radius: 3px; }
-    .desktop-dropdown-item { display: flex; align-items: center; width: 100%; padding: 12px 16px; border: none; background: none; cursor: pointer; transition: background-color 0.2s; font-family: 'Noto Sans Telugu', sans-serif; font-size: 14px; text-align: left; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    
+    .desktop-dropdown-item { 
+        display: flex; 
+        align-items: center; 
+        width: 100%; 
+        padding: 12px 16px; 
+        border: none; 
+        background: none; 
+        cursor: pointer; 
+        transition: background-color 0.2s;
+        font-family: 'Noto Sans Telugu', sans-serif;
+        font-size: 14px;
+        text-align: left;
+        color: var(--text-primary);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
     .desktop-dropdown-item:hover { background: rgba(0,123,255,0.08); color: var(--accent-color); }
     .desktop-dropdown-item.active { background: rgba(0,123,255,0.15); color: var(--accent-color); font-weight: 500; }
-    .servant-tag { font-size: 0.75rem; font-weight: 600; color: var(--primary-color); background-color: var(--primary-light); padding: 4px 8px; border-radius: 12px; margin-left: auto; margin-right: 8px; }
+    
+    .servant-tag { 
+        font-size: 0.75rem; 
+        font-weight: 600; 
+        color: var(--primary-color); 
+        background-color: var(--primary-light); 
+        padding: 4px 8px; 
+        border-radius: 12px; 
+        margin-left: auto;
+        margin-right: 8px;
+    }
 
-    .desktop-event-menu { position: fixed; display: none; background: white; border-radius: var(--radius-md); box-shadow: var(--shadow-lg); z-index: 1001; padding: 8px; min-width: 180px; border: 1px solid var(--border-color); }
-    .desktop-event-item { display: flex; align-items: center; width: 100%; padding: 10px 12px; border: none; background: none; cursor: pointer; transition: background-color 0.2s; font-family: 'Inter', sans-serif; font-size: 0.9rem; text-align: left; color: var(--text-primary); border-radius: 4px; }
+    .desktop-event-menu { 
+        position: fixed; 
+        display: none; 
+        background: white; 
+        border-radius: var(--radius-md); 
+        box-shadow: var(--shadow-lg); 
+        z-index: 1001; 
+        padding: 8px; 
+        min-width: 180px; 
+        border: 1px solid var(--border-color); 
+    }
+    
+    .desktop-event-item { 
+        display: flex; 
+        align-items: center; 
+        width: 100%; 
+        padding: 10px 12px; 
+        border: none; 
+        background: none; 
+        cursor: pointer; 
+        transition: background-color 0.2s;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.9rem;
+        text-align: left;
+        color: var(--text-primary);
+        border-radius: 4px;
+    }
     .desktop-event-item:hover { background-color: #f8fafc; }
 
     .editable-cell { cursor: pointer; transition: all 0.2s ease; position: relative; border-radius: 4px; }
     .editable-cell:hover { background-color: #f0f8ff; box-shadow: inset 0 0 0 1px var(--accent-color); }
     .editable-cell:after { content: ""; position: absolute; right: 8px; top: 50%; transform: translateY(-50%); opacity: 0.5; transition: opacity 0.2s; width: 16px; height: 16px; background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 9L12 15L18 9' stroke='%23002726' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3C/path%3E%3C/svg%3E"); background-size: contain; background-repeat: no-repeat; }
     .editable-cell:hover:after { opacity: 1; }
+    
     .special-event { cursor: default !important; }
     .special-event:after { display: none; }
 
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 16px; backdrop-filter: blur(4px); }
-    .modal-content { background: white; padding: 24px; border-radius: var(--radius-lg); width: 100%; max-width: 500px; max-height: 90vh; display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow-lg); transform: scale(0.9); opacity: 0; transition: all 0.3s ease; }
+    .modal-overlay { 
+        position: fixed; 
+        top: 0; 
+        left: 0; 
+        width: 100%; 
+        height: 100%; 
+        background: rgba(0,0,0,0.6); 
+        display: none; 
+        justify-content: center; 
+        align-items: center; 
+        z-index: 1000; 
+        padding: 16px; 
+        backdrop-filter: blur(4px);
+    }
+    .modal-content { 
+        background: white; 
+        padding: 24px; 
+        border-radius: var(--radius-lg); 
+        width: 100%; 
+        max-width: 500px; 
+        max-height: 90vh; 
+        display: flex; 
+        flex-direction: column; 
+        gap: 16px; 
+        box-shadow: var(--shadow-lg); 
+        transform: scale(0.9);
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
+    
     .modal-overlay.active { display: flex; }
     .modal-overlay.active .modal-content { transform: scale(1); opacity: 1; }
-    #new-schedule-name { width: 100%; padding: 12px 16px; font-size: 16px; border-radius: var(--radius-md); border: 2px solid var(--border-color); font-family: 'Inter', sans-serif; transition: border-color 0.2s; }
+    
+    #new-schedule-name { 
+        width: 100%; 
+        padding: 12px 16px; 
+        font-size: 16px; 
+        border-radius: var(--radius-md); 
+        border: 2px solid var(--border-color); 
+        font-family: 'Inter', sans-serif;
+        transition: border-color 0.2s;
+    }
     #new-schedule-name:focus { outline: none; border-color: var(--accent-color); }
-    #date-checklist { list-style: none; padding: 0; margin: 0; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md); max-height: 40vh; }
-    #date-checklist label { display: flex; align-items: center; gap: 10px; font-size: 16px; cursor: pointer; font-weight: 500; padding: 12px 16px; border-bottom: 1px solid var(--border-color); transition: background-color 0.2s; }
+    
+    #date-checklist { 
+        list-style: none; padding: 0; margin: 0; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md); max-height: 40vh; 
+    }
+    #date-checklist label { 
+        display: flex; align-items: center; gap: 10px; font-size: 16px; cursor: pointer; font-weight: 500; padding: 12px 16px; border-bottom: 1px solid var(--border-color); transition: background-color 0.2s; 
+    }
     #date-checklist label:last-child { border-bottom: none; }
     #date-checklist label:hover { background-color: #f8fafc; }
-    .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px; }
-    .modal-actions button { font-family: 'Inter', sans-serif; padding: 10px 20px; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; cursor: pointer; border: 2px solid var(--border-color); transition: all 0.2s ease; }
+    
+    .modal-actions { 
+        display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px; 
+    }
+    .modal-actions button { 
+        font-family: 'Inter', sans-serif; padding: 10px 20px; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; cursor: pointer; border: 2px solid var(--border-color); transition: all 0.2s ease; 
+    }
     #cancel-creation { background-color: var(--surface-color); }
     #cancel-creation:hover { border-color: var(--text-secondary); }
     #confirm-creation { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
     #confirm-creation:hover { background-color: var(--primary-hover); border-color: var(--primary-hover); }
 
-    .dropdown-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1100; opacity: 0; visibility: hidden; transition: all 0.3s ease; backdrop-filter: blur(4px); }
+    .dropdown-backdrop {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1100; opacity: 0; visibility: hidden; transition: all 0.3s ease; backdrop-filter: blur(4px);
+    }
     .dropdown-backdrop.active { opacity: 1; visibility: visible; }
-    .dropdown-container { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-radius: 24px 24px 0 0; z-index: 1101; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); max-height: 80vh; display: flex; flex-direction: column; box-shadow: 0 -10px 30px rgba(0,0,0,0.2); }
+    
+    .dropdown-container {
+        position: fixed; bottom: 0; left: 0; right: 0; background: white; border-radius: 24px 24px 0 0; z-index: 1101; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); max-height: 80vh; display: flex; flex-direction: column; box-shadow: 0 -10px 30px rgba(0,0,0,0.2);
+    }
     .dropdown-container.active { transform: translateY(0); }
-    .dropdown-header { padding: 20px 24px 12px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+    
+    .dropdown-header {
+        padding: 20px 24px 12px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
+    }
     .dropdown-title { font-size: 1.2rem; font-weight: 600; color: var(--text-primary); font-family: 'Noto Sans Telugu', sans-serif; }
     .dropdown-close { background: none; border: none; padding: 8px; cursor: pointer; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text-secondary); transition: background-color 0.2s; }
     .dropdown-close:hover { background-color: #f5f5f5; }
+    
     .mobile-dropdown-search { display: flex; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--border-color); background: rgba(255,255,255,0.7); }
     .mobile-dropdown-search svg { margin-right: 8px; }
     .mobile-dropdown-search input { width: 100%; border: none; outline: none; background: transparent; font-size: 16px; color: var(--text-primary); }
+    
     .dropdown-content { flex: 1; overflow-y: auto; padding: 8px 0; max-height: 300px; }
     .dropdown-item { display: flex; align-items: center; width: 100%; padding: 16px 24px; border: none; background: none; cursor: pointer; transition: background-color 0.2s; font-family: 'Noto Sans Telugu', sans-serif; font-size: 1rem; text-align: left; color: var(--text-primary); }
     .dropdown-item:hover { background-color: #f8fafc; }
     .dropdown-item.active { background-color: var(--primary-light); color: var(--primary-color); font-weight: 600; }
 
     .mobile-view-container { display: none; }
-    #toggle-all-mobile { display: none; }
+    
+    .mobile-week-card { background: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow-sm); transition: all 0.3s ease; position: relative; overflow: hidden; }
+    .mobile-week-card:last-child { margin-bottom: 0; }
+    .mobile-week-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    
+    .week-date { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin: 0 0 20px 0; padding-bottom: 12px; border-bottom: 2px solid var(--border-color); text-align: center; font-family: 'Noto Sans Telugu', sans-serif; position: relative; }
+    .week-date::after { content: ''; position: absolute; bottom: -2px; left: 50%; transform: translateX(-50%); width: 60px; height: 3px; background: var(--primary-color); border-radius: 2px; }
+    
+    .event-type-dropdown { margin-bottom: 20px; }
+    .event-type-field { padding: 16px; border: 2px solid var(--border-color); border-radius: var(--radius-md); background-color: #fafafa; cursor: pointer; font-family: 'Noto Sans Telugu', sans-serif; font-weight: 500; position: relative; transition: all 0.2s ease; display: flex; justify-content: space-between; align-items: center; min-height: 56px; }
+    .event-type-field:hover { border-color: var(--accent-color); background-color: white; }
+    .event-type-field::after { content: ""; width: 16px; height: 16px; background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 9L12 15L18 9' stroke='%23002726' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3C/path%3E%3C/svg%3E"); background-size: contain; background-repeat: no-repeat; transition: transform 0.2s ease; }
+    .event-type-field.active::after { transform: rotate(180deg); }
+    .event-type-value { flex: 1; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+    .event-type-placeholder { color: var(--text-secondary); font-style: italic; }
+    .event-type-icon { font-size: 1.2rem; }
+    
+    .week-fields { display: flex; flex-direction: column; gap: 16px; }
+    .field-group { display: flex; flex-direction: column; gap: 8px; }
+    .field-group label { font-size: 0.95rem; font-weight: 600; color: var(--text-secondary); font-family: 'Noto Sans Telugu', sans-serif; display: flex; align-items: center; gap: 6px; }
+    .field-group label::before { content: ''; width: 4px; height: 16px; background: var(--primary-color); border-radius: 2px; }
+    
+    .mobile-field { padding: 16px; border: 2px solid var(--border-color); border-radius: var(--radius-md); background-color: #fafafa; cursor: pointer; font-family: 'Noto Sans Telugu', sans-serif; font-weight: 500; position: relative; transition: all 0.2s ease; display: flex; justify-content: space-between; align-items: center; min-height: 56px; }
+    .mobile-field:hover { border-color: var(--accent-color); background-color: white; }
+    .mobile-field::after { content: ""; width: 16px; height: 16px; background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 9L12 15L18 9' stroke='%23002726' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3C/path%3E%3C/svg%3E"); background-size: contain; background-repeat: no-repeat; transition: transform 0.2s ease; }
+    .mobile-field.active::after { transform: rotate(180deg); }
+    .mobile-field-value { flex: 1; color: var(--text-primary); }
+    .mobile-field-placeholder { color: var(--text-secondary); font-style: italic; }
+    
+    .special-event-mobile { text-align: center; padding: 20px; background: linear-gradient(135deg, #fff5f5, #fed7d7); border-radius: var(--radius-lg); border: 2px dashed #fed7d7; margin: 16px 0; }
+    .special-event-text-mobile { color: var(--danger-color); font-weight: 700; font-size: 1.1rem; margin: 0; font-family: 'Noto Sans Telugu', sans-serif; }
+    
     .fade-in { animation: fadeIn 0.3s ease-in-out; }
     .slide-up { animation: slideUp 0.3s ease-out; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
     @media (max-width: 768px) {
-        main { padding-top: calc(56px + 10px); }
-        .editor-main { padding: 0 16px 16px; }
+        main { padding-top: 76px; }
+        .editor-main { padding: 16px; }
         .page-controls { justify-content: center; }
         .master-container { padding: 0; border-radius: 0; box-shadow: none; background: transparent; border: none; }
         .schedule-table { display: none; }
         .mobile-view-container { display: flex; flex-direction: column; gap: 1rem; }
-        #toggle-all-mobile { display: inline-flex; margin: 0 auto 16px; background: var(--surface-color); color: var(--text-secondary); border: 1px solid var(--border-color); }
-        .title-block { padding: 0; margin-bottom: 16px; }
+        .title-block { padding: 0 16px; margin-bottom: 16px; }
         .title-block h1 { font-size: 1.5rem; }
         .subtitle { font-size: 1rem; padding: 6px 12px; }
         .svg-divider { width: 300px; }
         .desktop-dropdown, .desktop-event-menu { display: none !important; }
-
-        .mobile-week-card { background: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--radius-lg); margin-bottom: 0; box-shadow: var(--shadow-sm); transition: all 0.3s ease; overflow: hidden; }
-        .mobile-week-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; padding: 20px; }
-        .week-date { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin: 0; font-family: 'Noto Sans Telugu', sans-serif; text-align: left; }
-        .accordion-icon { color: var(--text-secondary); transition: transform 0.3s ease; }
-        .mobile-week-card.active .accordion-icon { transform: rotate(180deg); }
-        .mobile-week-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-in-out, padding 0.4s ease-in-out; padding: 0 20px; }
-        .mobile-week-card.active .mobile-week-body { max-height: 2000px; padding: 0 20px 20px 20px; border-top: 1px solid var(--border-color); margin-top: -1px; }
-        .week-fields { display: flex; flex-direction: column; gap: 16px; padding-top: 20px; }
-        .field-group { display: flex; flex-direction: column; gap: 8px; }
-        .field-group label { font-size: 0.95rem; font-weight: 600; color: var(--text-secondary); font-family: 'Noto Sans Telugu', sans-serif; display: flex; align-items: center; gap: 6px; }
-        .field-group label::before { content: ''; width: 4px; height: 16px; background: var(--primary-color); border-radius: 2px; }
-        .mobile-field { padding: 16px; border: 2px solid var(--border-color); border-radius: var(--radius-md); background-color: #fafafa; cursor: pointer; font-family: 'Noto Sans Telugu', sans-serif; font-weight: 500; position: relative; transition: all 0.2s ease; display: flex; justify-content: space-between; align-items: center; min-height: 56px; }
-        .mobile-field:hover { border-color: var(--accent-color); background-color: white; }
-        .mobile-field::after { content: ""; width: 16px; height: 16px; background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 9L12 15L18 9' stroke='%23002726' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3C/path%3E%3C/svg%3E"); background-size: contain; background-repeat: no-repeat; transition: transform 0.2s ease; }
-        .mobile-field.active::after { transform: rotate(180deg); }
-        .mobile-field-value { flex: 1; color: var(--text-primary); }
-        .mobile-field-placeholder { color: var(--text-secondary); font-style: italic; }
-        .special-event-mobile { text-align: center; padding: 20px; background: linear-gradient(135deg, #fff5f5, #fed7d7); border-radius: var(--radius-lg); border: 2px dashed #fed7d7; margin-top: 16px; }
-        .special-event-text-mobile { color: var(--danger-color); font-weight: 700; font-size: 1.1rem; margin: 0; font-family: 'Noto Sans Telugu', sans-serif; }
     }
 
     .pdf-page-container { background: white; padding: 20px; font-family: 'Noto Sans Telugu', sans-serif; width: 1100px; margin-bottom: 20px; }
@@ -516,7 +662,7 @@
         <div class="header-right-controls">
             <div class="status-indicator" data-status="synced">Synced</div>
             <div class="header-icons">
-                 <label class="hamburger">
+                <label class="hamburger">
                   <input type="checkbox" id="menu-checkbox">
                   <svg viewBox="0 0 32 32">
                     <path class="line line-top-bottom" d="M27 10 13 10C10.8 10 9 8.2 9 6 9 3.5 10.8 2 13 2 15.2 2 17 3.8 17 6L17 26C17 28.2 18.8 30 21 30 23.2 30 25 28.2 25 26 25 23.8 23.2 22 21 22L7 22"></path>
@@ -555,29 +701,16 @@
         </button>
     </div>
     <div class="master-container">
-        <header class="schedule-display-header">
-            <div class="title-block">
-                <h1>బహిరంగ ప్రసంగాల పట్టిక</h1>
-                <div class="subtitle-svg-container">
-                    <p class="subtitle" contenteditable="true" id="date-range-subtitle">Loading dates...</p>
-                    <svg class="svg-divider" role="presentation" viewBox="0 0 24039.797 260" preserveAspectRatio="xMidYMid slice">
-                        <defs><radialGradient id="__id9__id4" gradientUnits="userSpaceOnUse" r="12020.601" cx="12019.898" cy="130" fx="12019.898" fy="130"><stop stop-color="#093261" stop-opacity="1" offset="0"></stop><stop stop-color="#ffffff" stop-opacity="1" offset="1"></stop></radialGradient></defs>
-                        <rect x="0" y="0" width="24039.797" height="260" fill="url(#__id9__id4)"></rect>
-                    </svg>
-                </div>
-            </div>
-        </header>
-        <button id="toggle-all-mobile" class="btn">
-            <span class="material-symbols-outlined">unfold_more</span>
-            <span>Open All</span>
-        </button>
         <div id="schedule-content-wrapper"></div>
     </div>
 </div>
 
 <div class="desktop-dropdown" id="desktop-dropdown">
     <div class="desktop-dropdown-search">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
         <input type="text" id="desktop-dropdown-search" placeholder="Search...">
     </div>
     <div class="desktop-dropdown-list" id="desktop-dropdown-list"></div>
@@ -594,10 +727,15 @@
 <div class="dropdown-container" id="dropdown-container">
     <div class="dropdown-header">
         <h3 class="dropdown-title" id="dropdown-title">Select Option</h3>
-        <button class="dropdown-close" id="dropdown-close"><span class="material-symbols-outlined">close</span></button>
+        <button class="dropdown-close" id="dropdown-close">
+            <span class="material-symbols-outlined">close</span>
+        </button>
     </div>
     <div class="mobile-dropdown-search" id="mobile-dropdown-search" style="display: none;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
         <input type="text" id="mobile-search-input" placeholder="Search...">
     </div>
     <div class="dropdown-content" id="dropdown-content"></div>
@@ -632,10 +770,20 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
     
-    let currentUser = null, currentScheduleId = null, userSchedulesCollection = null, membersCollection = null, currentListener = null, activeRowForEvents = null;
+    let currentUser = null;
+    let currentScheduleId = null;
+    let userSchedulesCollection = null;
+    let membersCollection = null;
+    let currentListener = null;
+    let activeRowForEvents = null;
     let members = { brothers: [], sisters: [] };
-    let activeCellForDropdown = null, currentDropdownType = null, currentDropdownData = null;
-    let desktopDropdownSearch = null, desktopDropdownList = null, mobileSearchInput = null;
+    let activeCellForDropdown = null;
+    let currentDropdownType = null;
+    let currentDropdownData = null;
+    let desktopDropdownSearch = null;
+    let desktopDropdownList = null;
+    let mobileSearchInput = null;
+    let currentFocus = -1;
 
     const scheduleWrapper = document.getElementById('schedule-content-wrapper');
     const dateSelectionModal = document.getElementById('date-selection-modal');
@@ -649,13 +797,30 @@
     const dropdownClose = document.getElementById('dropdown-close');
     const mobileDropdownSearch = document.getElementById('mobile-dropdown-search');
 
-    const topics = { 'అంశం-1': 'this is talk-1', 'అంశం-2': 'this is talk-2', 'అంశం-3': 'this is talk-3', 'అంశం-4': 'this is talk-4' };
-    const eventTexts = { 'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం', 'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో', 'convention': 'ప్రాదేశిక సమావేశం' };
-    const eventTypes = [ { id: 'normal', name: 'Normal', icon: 'event' }, { id: 'co-visit', name: 'CO Visit', icon: 'groups' }, { id: 'assembly', name: 'Assembly', icon: 'celebration' }, { id: 'convention', name: 'Convention', icon: 'festival' } ];
+    const topics = {
+        'అంశం-1': 'this is talk-1', 'అంశం-2': 'this is talk-2', 'అంశం-3': 'this is talk-3', 'అంశం-4': 'this is talk-4'
+    };
 
-    const debounce = (func, delay) => { let timeout; return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), delay); }; };
+    const eventTexts = {
+        'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం', 'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో', 'convention': 'ప్రాదేశిక సమావేశం'
+    };
 
-    function updateStatus(text, status) { statusIndicator.textContent = text; statusIndicator.dataset.status = status; }
+    const eventTypes = [
+        { id: 'normal', name: 'Normal', icon: 'event', color: 'primary' },
+        { id: 'co-visit', name: 'CO Visit', icon: 'groups', color: 'co-visit' },
+        { id: 'assembly', name: 'Assembly', icon: 'celebration', color: 'assembly' },
+        { id: 'convention', name: 'Convention', icon: 'festival', color: 'convention' }
+    ];
+
+    const debounce = (func, delay) => {
+        let timeout;
+        return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), delay); };
+    };
+
+    function updateStatus(text, status) {
+        statusIndicator.textContent = text;
+        statusIndicator.dataset.status = status;
+    }
 
     async function fetchMembers() {
         if (!currentUser) return;
@@ -664,7 +829,11 @@
         members = { brothers: [], sisters: [] };
         snapshot.forEach(doc => {
             const member = { id: doc.id, ...doc.data() };
-            if (member.type === 'brother') members.brothers.push(member);
+            if (member.type === 'brother') {
+                members.brothers.push(member);
+            } else {
+                members.sisters.push(member);
+            }
         });
     }
 
@@ -676,39 +845,68 @@
             document.body.classList.add('auth-ready');
             const profileNameEl = document.querySelector('.profile-name');
             if (profileNameEl) profileNameEl.textContent = user.email;
+            
             setupGlobalUI();
+
             const params = new URLSearchParams(window.location.search);
             currentScheduleId = params.get('id');
             if (currentScheduleId) initEditor(); else initCreationFlow();
-        } else { window.location.replace('./login.html'); }
+        } else {
+            window.location.replace('./login.html');
+        }
     });
 
     function initEditor() {
         if (currentListener) currentListener();
+        
         userSchedulesCollection.doc(currentScheduleId).get().then(doc => {
             if (doc.exists) {
                 renderSchedule(doc.data());
                 updateStatus('Synced', 'synced');
-            } else { alert("This schedule may have been deleted."); window.location.href = './sunday-dashboard.html'; }
+            } else {
+                alert("This schedule may have been deleted.");
+                window.location.href = './sunday-dashboard.html';
+            }
         }).catch(error => updateStatus('Error', 'error'));
+        
         currentListener = userSchedulesCollection.doc(currentScheduleId).onSnapshot(doc => {
-            if (doc.exists) updateStatus('Synced', 'synced');
+            if (doc.exists) {
+                updateStatus('Synced', 'synced');
+            }
         }, error => updateStatus('Error', 'error'));
     }
 
     function renderSchedule(data) {
         document.title = data.name;
         scheduleWrapper.innerHTML = `
-            <header class="schedule-display-header"><div class="title-block"><h1>బహిరంగ ప్రసంగాల పట్టిక</h1><div class="subtitle-svg-container"><p class="subtitle" contenteditable="true">${data.dateRange || ''}</p><svg class="svg-divider" role="presentation" viewBox="0 0 24039.797 260" preserveAspectRatio="xMidYMid slice"><defs><radialGradient id="__id9__id4" gradientUnits="userSpaceOnUse" r="12020.601" cx="12019.898" cy="130" fx="12019.898" fy="130"><stop stop-color="#093261" stop-opacity="1" offset="0"></stop><stop stop-color="#ffffff" stop-opacity="1" offset="1"></stop></radialGradient></defs><rect x="0" y="0" width="24039.797" height="260" fill="url(#__id9__id4)"></rect></svg></div></div></header>
-            <main><table class="schedule-table"><thead><tr><th>తేదీ</th><th>ప్రసంగ అంశం</th><th>ప్రసంగీకుడు</th><th>చైర్మన్</th><th>కావలికోట రీడర్</th><th class="actions-col">Actions</th></tr></thead><tbody>${data.tableHTML}</tbody></table><div class="mobile-view-container"></div></main>`;
+            <header class="schedule-display-header">
+                <div class="title-block">
+                    <h1>బహిరంగ ప్రసంగాల పట్టిక</h1>
+                    <div class="subtitle-svg-container">
+                        <p class="subtitle" contenteditable="true">${data.dateRange || ''}</p>
+                        <svg class="svg-divider" role="presentation" viewBox="0 0 24039.797 260" preserveAspectRatio="xMidYMid slice">
+                            <defs><radialGradient id="__id9__id4" gradientUnits="userSpaceOnUse" r="12020.601" cx="12019.898" cy="130" fx="12019.898" fy="130"><stop stop-color="#093261" stop-opacity="1" offset="0"></stop><stop stop-color="#ffffff" stop-opacity="1" offset="1"></stop></radialGradient></defs>
+                            <rect x="0" y="0" width="24039.797" height="260" fill="url(#__id9__id4)"></rect>
+                        </svg>
+                    </div>
+                </div>
+            </header>
+            <main>
+                <table class="schedule-table">
+                    <thead><tr><th>తేదీ</th><th>ప్రసంగ అంశం</th><th>ప్రసంగీకుడు</th><th>చైర్మన్</th><th>కావలికోట రీడర్</th><th class="actions-col">Actions</th></tr></thead>
+                    <tbody>${data.tableHTML}</tbody>
+                </table>
+                <div class="mobile-view-container"></div>
+            </main>`;
         
-        scheduleWrapper.querySelectorAll('tbody td').forEach(cell => {
+        scheduleWrapper.querySelectorAll('tbody td').forEach((cell) => {
             const cellIndex = cell.cellIndex;
             if (cellIndex === 0 || cellIndex === 5) return;
             cell.classList.add('editable-cell');
             cell.removeAttribute('contenteditable');
-            cell.addEventListener('click', () => {
-                if (cellIndex === 1) openDesktopDropdown('topic', cell); else openDesktopDropdown('member', cell);
+            cell.addEventListener('click', (e) => {
+                if (cellIndex === 1) openDesktopDropdown('topic', cell);
+                else openDesktopDropdown('member', cell);
             });
         });
 
@@ -725,34 +923,36 @@
         mobileContainer.innerHTML = '';
         
         Array.from(tableBody.rows).forEach((row, rowIndex) => {
+            const cells = Array.from(row.cells);
+            const dateCell = cells[0], topicCell = cells[1], speakerCell = cells[2], chairmanCell = cells[3], readerCell = cells[4];
             const card = document.createElement('div');
-            card.className = 'mobile-week-card';
-            card.innerHTML = `<div class="mobile-week-header"><h3 class="week-date">${row.cells[0].textContent}</h3><span class="material-symbols-outlined accordion-icon">expand_more</span></div><div class="mobile-week-body"></div>`;
-            const cardBody = card.querySelector('.mobile-week-body');
-            cardBody.innerHTML = getMobileCardBodyHTML(row);
+            card.className = 'mobile-week-card fade-in';
+            const isSpecialEvent = topicCell.classList.contains('special-event') && topicCell.colSpan === 4;
+            const currentEventType = getEventTypeForRow(row);
+            const currentEventTypeName = eventTypes.find(event => event.id === currentEventType)?.name || 'Normal';
+            const currentEventTypeIcon = eventTypes.find(event => event.id === currentEventType)?.icon || 'event';
+            
+            if (isSpecialEvent) {
+                card.innerHTML = `<h3 class="week-date">${dateCell.textContent}</h3><div class="event-type-dropdown"><div class="event-type-field" data-row="${rowIndex}"><span class="event-type-value"><span class="material-symbols-outlined event-type-icon">${currentEventTypeIcon}</span><span>${currentEventTypeName}</span></span></div></div><div class="special-event-mobile"><p class="special-event-text-mobile">${topicCell.textContent}</p></div>`;
+            } else {
+                card.innerHTML = `<h3 class="week-date">${dateCell.textContent}</h3><div class="event-type-dropdown"><div class="event-type-field" data-row="${rowIndex}"><span class="event-type-value"><span class="material-symbols-outlined event-type-icon">${currentEventTypeIcon}</span><span>${currentEventTypeName}</span></span></div></div><div class="week-fields"><div class="field-group"><label>ప్రసంగ అంశం</label><div class="mobile-field topic-field" data-row="${rowIndex}" data-cell="1"><span class="mobile-field-value ${topicCell.textContent ? '' : 'mobile-field-placeholder'}">${topicCell.textContent || 'Select Topic'}</span></div></div><div class="field-group"><label>ప్రసంగీకుడు</label><div class="mobile-field member-field" data-row="${rowIndex}" data-cell="2"><span class="mobile-field-value ${speakerCell.textContent ? '' : 'mobile-field-placeholder'}">${speakerCell.textContent || 'Select Brother'}</span></div></div><div class="field-group"><label>చైర్మన్</label><div class="mobile-field member-field" data-row="${rowIndex}" data-cell="3"><span class="mobile-field-value ${chairmanCell.textContent ? '' : 'mobile-field-placeholder'}">${chairmanCell.textContent || 'Select Brother'}</span></div></div><div class="field-group"><label>కావలికోట రీడర్</label><div class="mobile-field member-field" data-row="${rowIndex}" data-cell="4"><span class="mobile-field-value ${readerCell.textContent ? '' : 'mobile-field-placeholder'}">${readerCell.textContent || 'Select Brother'}</span></div></div></div>`;
+            }
             mobileContainer.appendChild(card);
-            setupMobileEventListeners(card, row);
         });
+
+        mobileContainer.querySelectorAll('.topic-field').forEach(field => field.addEventListener('click', (e) => {
+            const { row: rowIndex, cell: cellIndex } = field.dataset;
+            openMobileDropdown('topic', tableBody.rows[rowIndex].cells[cellIndex], field);
+        }));
+        mobileContainer.querySelectorAll('.member-field').forEach(field => field.addEventListener('click', (e) => {
+            const { row: rowIndex, cell: cellIndex } = field.dataset;
+            openMobileDropdown('member', tableBody.rows[rowIndex].cells[cellIndex], field);
+        }));
+        mobileContainer.querySelectorAll('.event-type-field').forEach(field => field.addEventListener('click', (e) => {
+            openMobileEventTypeDropdown(field.dataset.row, field);
+        }));
     }
 
-    function getMobileCardBodyHTML(row) {
-        const [dateCell, topicCell, speakerCell, chairmanCell, readerCell] = row.cells;
-        const isSpecialEvent = topicCell.classList.contains('special-event') && topicCell.colSpan === 4;
-        const currentEventType = getEventTypeForRow(row);
-        const eventTypeInfo = eventTypes.find(event => event.id === currentEventType) || { name: 'Normal', icon: 'event' };
-        if (isSpecialEvent) {
-            return `<div class="event-type-dropdown"><div class="event-type-field" data-row="${row.rowIndex}"><span class="event-type-value"><span class="material-symbols-outlined event-type-icon">${eventTypeInfo.icon}</span><span>${eventTypeInfo.name}</span></span></div></div><div class="special-event-mobile"><p class="special-event-text-mobile">${topicCell.textContent}</p></div>`;
-        } else {
-            return `<div class="event-type-dropdown"><div class="event-type-field" data-row="${row.rowIndex}"><span class="event-type-value"><span class="material-symbols-outlined event-type-icon">${eventTypeInfo.icon}</span><span>${eventTypeInfo.name}</span></span></div></div><div class="week-fields"><div class="field-group"><label>ప్రసంగ అంశం</label><div class="mobile-field topic-field" data-row="${row.rowIndex}" data-cell="1"><span class="mobile-field-value ${topicCell.textContent ? '' : 'mobile-field-placeholder'}">${topicCell.textContent || 'Select Topic'}</span></div></div><div class="field-group"><label>ప్రసంగీకుడు</label><div class="mobile-field member-field" data-row="${row.rowIndex}" data-cell="2"><span class="mobile-field-value ${speakerCell.textContent ? '' : 'mobile-field-placeholder'}">${speakerCell.textContent || 'Select Brother'}</span></div></div><div class="field-group"><label>చైర్మన్</label><div class="mobile-field member-field" data-row="${row.rowIndex}" data-cell="3"><span class="mobile-field-value ${chairmanCell.textContent ? '' : 'mobile-field-placeholder'}">${chairmanCell.textContent || 'Select Brother'}</span></div></div><div class="field-group"><label>కావలికోట రీడర్</label><div class="mobile-field member-field" data-row="${row.rowIndex}" data-cell="4"><span class="mobile-field-value ${readerCell.textContent ? '' : 'mobile-field-placeholder'}">${readerCell.textContent || 'Select Brother'}</span></div></div></div>`;
-        }
-    }
-
-    function setupMobileEventListeners(card, row) {
-        card.querySelectorAll('.topic-field').forEach(field => field.addEventListener('click', () => openMobileDropdown('topic', row.cells[field.dataset.cell], field)));
-        card.querySelectorAll('.member-field').forEach(field => field.addEventListener('click', () => openMobileDropdown('member', row.cells[field.dataset.cell], field)));
-        card.querySelector('.event-type-field')?.addEventListener('click', () => openMobileEventTypeDropdown(row.rowIndex - 1, field));
-    }
-    
     function getEventTypeForRow(row) {
         const topicCell = row.cells[1];
         if (topicCell.classList.contains('special-event')) {
@@ -765,7 +965,7 @@
     }
 
     function changeEventType(rowIndex, eventType) {
-        const row = scheduleWrapper.querySelector(`.schedule-table tbody tr:nth-child(${rowIndex + 1})`);
+        const row = scheduleWrapper.querySelector(`.schedule-table tbody tr:nth-child(${parseInt(rowIndex) + 1})`);
         if (!row) return;
         const [dateCell, topicCell, speakerCell, chairmanCell, readerCell] = row.cells;
         
@@ -777,8 +977,10 @@
         if (eventType !== 'normal') {
             if (topicCell.textContent && !topicCell.classList.contains('special-event')) topicCell.dataset.originalContent = topicCell.textContent;
             [speakerCell, chairmanCell, readerCell].forEach(cell => { if (cell.textContent) cell.dataset.originalContent = cell.textContent; });
+            
             topicCell.colSpan = 4;
-            topicCell.classList.add('special-event', 'editable-cell');
+            topicCell.classList.add('special-event');
+            topicCell.classList.remove('editable-cell');
             topicCell.textContent = eventTexts[eventType];
             [speakerCell, chairmanCell, readerCell].forEach(cell => { cell.style.display = 'none'; cell.classList.remove('editable-cell'); cell.textContent = ''; });
         } else {
@@ -787,13 +989,7 @@
             topicCell.removeAttribute('data-original-content');
             [speakerCell, chairmanCell, readerCell].forEach(cell => cell.removeAttribute('data-original-content'));
         }
-        
-        const mobileCard = scheduleWrapper.querySelector(`.mobile-view-container .mobile-week-card:nth-child(${rowIndex + 1})`);
-        if(mobileCard) {
-            const cardBody = mobileCard.querySelector('.mobile-week-body');
-            cardBody.innerHTML = getMobileCardBodyHTML(row);
-            setupMobileEventListeners(mobileCard, row);
-        }
+        createMobileView();
         debouncedSave();
     }
 
@@ -808,7 +1004,7 @@
         desktopDropdownList.innerHTML = '';
         const sortedBrothers = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
         if (sortedBrothers.length === 0) {
-            desktopDropdownList.innerHTML = '<div style="padding: 12px 16px; color: var(--text-secondary);">No brothers found.</div>';
+            desktopDropdownList.innerHTML = '<div style="padding: 12px 16px; color: var(--text-secondary);">No brothers available</div>';
         } else {
             sortedBrothers.forEach(member => {
                 const item = document.createElement('div');
@@ -835,10 +1031,11 @@
 
     function showDesktopDropdown(cell) {
         const rect = cell.getBoundingClientRect();
+        const { innerHeight: viewportHeight, innerWidth: viewportWidth } = window;
         let top = rect.bottom + window.scrollY, left = rect.left + window.scrollX;
         const dropdownHeight = 300, dropdownWidth = 340;
-        if (top + dropdownHeight > window.innerHeight + window.scrollY) top = rect.top + window.scrollY - dropdownHeight;
-        if (left + dropdownWidth > window.innerWidth + window.scrollX) left = window.innerWidth + window.scrollX - dropdownWidth - 10;
+        if (top + dropdownHeight > window.scrollY + viewportHeight) top = rect.top + window.scrollY - dropdownHeight;
+        if (left + dropdownWidth > window.scrollX + viewportWidth) left = window.scrollX + viewportWidth - dropdownWidth - 10;
         if (left < window.scrollX) left = window.scrollX + 10;
         desktopDropdown.style.top = `${top}px`;
         desktopDropdown.style.left = `${left}px`;
@@ -865,8 +1062,8 @@
     }
 
     function updateCorrespondingMobileField(cell, value) {
-        const rowIndex = cell.parentElement.rowIndex - 1;
-        const cellIndex = cell.cellIndex;
+        const rowIndex = Array.from(cell.parentElement.parentElement.children).indexOf(cell.parentElement);
+        const cellIndex = Array.from(cell.parentElement.cells).indexOf(cell);
         const mobileCard = scheduleWrapper.querySelector(`.mobile-view-container .mobile-week-card:nth-child(${rowIndex + 1})`);
         if (mobileCard) {
             const field = mobileCard.querySelector(`.mobile-field[data-row="${rowIndex}"][data-cell="${cellIndex}"]`);
@@ -899,13 +1096,14 @@
 
     function applyEventType(eventType) {
         if (!activeRowForEvents) return;
-        changeEventType(activeRowForEvents.rowIndex - 1, eventType);
+        const rowIndex = Array.from(activeRowForEvents.parentElement.children).indexOf(activeRowForEvents);
+        changeEventType(rowIndex, eventType);
         hideDesktopEventMenu();
     }
 
     function openMobileDropdown(type, cell, fieldElement) {
         currentDropdownType = type;
-        currentDropdownData = { cell, fieldElement };
+        currentDropdownData = { cell: cell, fieldElement: fieldElement };
         fieldElement.classList.add('active');
         if (type === 'member') showMobileMemberDropdown();
         else if (type === 'topic') showMobileTopicDropdown();
@@ -915,7 +1113,7 @@
 
     function openMobileEventTypeDropdown(rowIndex, fieldElement) {
         currentDropdownType = 'event-type';
-        currentDropdownData = { rowIndex, fieldElement };
+        currentDropdownData = { rowIndex: rowIndex, fieldElement: fieldElement };
         fieldElement.classList.add('active');
         showMobileEventTypeDropdown();
         mobileDropdownSearch.style.display = 'none';
@@ -927,7 +1125,7 @@
         dropdownContent.innerHTML = '';
         const sortedBrothers = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
         if (sortedBrothers.length === 0) {
-            dropdownContent.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-secondary);">No brothers found.</div>';
+            dropdownContent.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-secondary);">No brothers available</div>';
         } else {
             sortedBrothers.forEach(member => {
                 const item = document.createElement('button');
@@ -977,7 +1175,7 @@
     function hideMobileDropdown() {
         dropdownBackdrop.classList.remove('active');
         dropdownContainer.classList.remove('active');
-        if (currentDropdownData?.fieldElement) currentDropdownData.fieldElement.classList.remove('active');
+        if (currentDropdownData && currentDropdownData.fieldElement) currentDropdownData.fieldElement.classList.remove('active');
         document.body.classList.remove('dropdown-open');
         currentDropdownType = null;
         currentDropdownData = null;
@@ -997,7 +1195,7 @@
     }
 
     function selectMobileEventType(eventType) {
-        if (currentDropdownData?.rowIndex !== undefined) {
+        if (currentDropdownData && currentDropdownData.rowIndex !== undefined) {
             changeEventType(currentDropdownData.rowIndex, eventType);
         }
         hideMobileDropdown();
@@ -1016,7 +1214,8 @@
         const currentDates = getCurrentScheduleDates();
         upcomingSundays.forEach(dateStr => {
             const li = document.createElement('li');
-            li.innerHTML = `<label><input type="checkbox" value="${dateStr}" ${currentDates.includes(dateStr) ? 'checked' : ''}> ${dateStr}</label>`;
+            const isChecked = currentDates.includes(dateStr);
+            li.innerHTML = `<label><input type="checkbox" value="${dateStr}" ${isChecked ? 'checked' : ''}> ${dateStr}</label>`;
             dateList.appendChild(li);
         });
         document.querySelector('#date-selection-modal h2').textContent = 'Edit Sunday Schedule Weeks';
@@ -1029,27 +1228,36 @@
 
     function getCurrentScheduleDates() {
         const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
-        return tableBody ? Array.from(tableBody.querySelectorAll('tr')).map(row => row.cells[0]?.textContent.trim()).filter(Boolean) : [];
+        if (!tableBody) return [];
+        return Array.from(tableBody.querySelectorAll('tr')).map(row => row.cells[0]?.textContent.trim()).filter(Boolean);
     }
 
     function findExistingRowForDate(date) {
         const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
-        return tableBody ? Array.from(tableBody.querySelectorAll('tr')).find(row => row.cells[0]?.textContent.trim() === date) : null;
+        if (!tableBody) return null;
+        return Array.from(tableBody.querySelectorAll('tr')).find(row => row.cells[0]?.textContent.trim() === date) || null;
     }
 
     async function handleUpdateWeeks() {
         const selectedCheckboxes = Array.from(document.querySelectorAll('#date-checklist input:checked'));
         if (selectedCheckboxes.length === 0) return alert("Please select at least one Sunday.");
+        
         const selectedDates = selectedCheckboxes.map(cb => cb.value);
         const dateRange = `${selectedDates[0]} నుండి ${selectedDates[selectedDates.length - 1]}`;
         const tableBodyHTML = selectedDates.map(date => {
             const existingRow = findExistingRowForDate(date);
-            return existingRow ? `<tr>${Array.from(existingRow.cells).map(cell => `<td class="${cell.className}">${cell.innerHTML}</td>`).join('')}</tr>`
-                               : `<tr><td>${date}</td><td class="editable-cell"></td><td class="editable-cell"></td><td class="editable-cell"></td><td class="editable-cell"></td><td class="actions-col"><button class="event-btn"><span class="material-symbols-outlined">more_vert</span></button></td></tr>`;
+            if (existingRow) {
+                return `<tr>${Array.from(existingRow.cells).map(cell => `<td class="${cell.className}">${cell.innerHTML}</td>`).join('')}</tr>`;
+            } else {
+                return `<tr><td>${date}</td><td class="editable-cell"></td><td class="editable-cell"></td><td class="editable-cell"></td><td class="editable-cell"></td><td class="actions-col"><button class="event-btn"><span class="material-symbols-outlined">more_vert</span></button></td></tr>`;
+            }
         }).join('');
+
         try {
             updateStatus('Updating...', 'syncing');
-            await userSchedulesCollection.doc(currentScheduleId).update({ dateRange, tableHTML, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+            await userSchedulesCollection.doc(currentScheduleId).update({
+                dateRange, tableHTML, updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
             initEditor();
             dateSelectionModal.classList.remove('active');
             setTimeout(() => {
@@ -1060,7 +1268,11 @@
                 document.getElementById('confirm-creation').textContent = 'Create Schedule';
             }, 300);
             updateStatus('Synced', 'synced');
-        } catch (error) { console.error("Error updating schedule weeks:", error); alert("Could not update schedule."); updateStatus('Error', 'error'); }
+        } catch (error) {
+            console.error("Error updating schedule weeks:", error);
+            alert("Could not update schedule. Please try again.");
+            updateStatus('Error', 'error');
+        }
     }
 
     const debouncedSave = debounce(() => {
@@ -1068,14 +1280,21 @@
         const tableBodyEl = scheduleWrapper.querySelector('.schedule-table tbody');
         if (!subtitleEl || !tableBodyEl) return;
         updateStatus('Syncing...', 'syncing');
-        userSchedulesCollection.doc(currentScheduleId).update({ dateRange: subtitleEl.textContent, tableHTML: tableBodyEl.innerHTML })
+        const payload = { dateRange: subtitleEl.textContent, tableHTML: tableBodyEl.innerHTML };
+        userSchedulesCollection.doc(currentScheduleId).update(payload)
             .then(() => updateStatus('Synced', 'synced'))
             .catch(err => { console.error("Save failed:", err); updateStatus('Error', 'error'); });
     }, 1500);
 
     function initCreationFlow() {
         const dateList = document.getElementById('date-checklist');
-        dateList.innerHTML = generateNextSundays(30).map(dateStr => `<li><label><input type="checkbox" value="${dateStr}"> ${dateStr}</label></li>`).join('');
+        const upcomingSundays = generateNextSundays(30);
+        dateList.innerHTML = '';
+        upcomingSundays.forEach(dateStr => {
+            const li = document.createElement('li');
+            li.innerHTML = `<label><input type="checkbox" value="${dateStr}"> ${dateStr}</label>`;
+            dateList.appendChild(li);
+        });
         dateSelectionModal.style.display = 'flex';
         setTimeout(() => dateSelectionModal.classList.add('active'), 10);
     }
@@ -1105,22 +1324,31 @@
         try {
             const newDocRef = await userSchedulesCollection.add({ name: scheduleName, dateRange, tableHTML, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
             window.location.href = `./sunday-editor.html?id=${newDocRef.id}`;
-        } catch (error) { console.error("Error creating new schedule:", error); alert("Could not create schedule."); }
+        } catch (error) {
+            console.error("Error creating new schedule:", error);
+            alert("Could not create schedule. Please try again.");
+        }
     }
     
     async function generatePdf() {
         const printButton = document.getElementById('print-button');
         printButton.disabled = true;
         printButton.querySelector('span:last-child').textContent = 'Generating...';
+
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('l', 'mm', 'a4');
-        const A4_WIDTH_MM = 297, A4_HEIGHT_MM = 210, MARGIN_X_MM = 15, MARGIN_Y_MM = 10;
-        const USABLE_WIDTH = A4_WIDTH_MM - (MARGIN_X_MM * 2), USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_Y_MM * 2);
+        const A4_WIDTH_MM = 297, A4_HEIGHT_MM = 210;
+        const MARGIN_X_MM = 15, MARGIN_Y_MM = 10;
+        const USABLE_WIDTH = A4_WIDTH_MM - (MARGIN_X_MM * 2);
+        const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_Y_MM * 2);
 
         try {
             const tempContainer = document.createElement('div');
-            tempContainer.style.cssText = 'position:absolute; left:-9999px; top:0;';
+            tempContainer.style.position = 'absolute';
+            tempContainer.style.left = '-9999px';
+            tempContainer.style.top = '0';
             document.body.appendChild(tempContainer);
+
             const scheduleData = document.getElementById('schedule-content-wrapper');
             const title = scheduleData.querySelector('h1').textContent;
             const subtitle = scheduleData.querySelector('.subtitle').textContent;
@@ -1154,7 +1382,10 @@
                         const cell = document.createElement(j === 0 ? 'th' : 'td');
                         cell.innerHTML = originalRow.cells[j].innerHTML;
                         if (originalRow.cells[1].classList.contains('special-event') && j === 1) {
-                            cell.className = 'special-event'; cell.colSpan = 4; cell.style.width = '85%'; j += 3;
+                            cell.className = 'special-event';
+                            cell.colSpan = 4;
+                            cell.style.width = '85%';
+                            j += 3;
                         }
                         row.appendChild(cell);
                     }
@@ -1179,8 +1410,13 @@
             }
             document.body.removeChild(tempContainer);
             pdf.save(`${document.title || 'sunday-schedule'}.pdf`);
-        } catch (error) { console.error("PDF generation failed:", error); alert("Sorry, there was an error creating the PDF. Please try again."); } 
-        finally { printButton.disabled = false; printButton.querySelector('span:last-child').textContent = 'Download PDF'; }
+        } catch (error) {
+            console.error("PDF generation failed:", error);
+            alert("Sorry, there was an error creating the PDF. Please try again.");
+        } finally {
+            printButton.disabled = false;
+            printButton.querySelector('span:last-child').textContent = 'Download PDF';
+        }
     }
 
     function setupGlobalUI() {
@@ -1199,6 +1435,7 @@
             body.classList.remove('menu-open');
             menuCheckbox.checked = false;
         }
+        
         menuCheckbox.addEventListener('change', () => {
             if(menuCheckbox.checked) {
                 slideMenu.classList.add('is-open');
@@ -1210,6 +1447,7 @@
 
         document.getElementById('print-button').addEventListener('click', generatePdf);
         document.getElementById('edit-weeks-button').addEventListener('click', openWeekEditor);
+        
         document.getElementById('cancel-creation').addEventListener('click', () => {
             dateSelectionModal.classList.remove('active');
             setTimeout(() => {
@@ -1221,6 +1459,7 @@
                 if (!currentScheduleId) window.location.href = './sunday-dashboard.html';
             }, 300);
         });
+        
         document.getElementById('confirm-creation').addEventListener('click', function() {
             if (this.textContent === 'Create Schedule') handleCreateSchedule();
             else handleUpdateWeeks();
@@ -1230,15 +1469,19 @@
         dropdownClose.addEventListener('click', hideMobileDropdown);
         desktopDropdownSearch.addEventListener('input', (e) => filterDesktopItems(e.target.value));
         mobileSearchInput.addEventListener('input', (e) => filterMobileItems(e.target.value));
+
         document.addEventListener('click', (e) => {
             if (!desktopDropdown.contains(e.target) && !e.target.closest('.editable-cell')) hideDesktopDropdown();
             if (!desktopEventMenu.contains(e.target) && !e.target.closest('.event-btn')) hideDesktopEventMenu();
         });
+
         desktopEventMenu.addEventListener('click', (e) => {
             const target = e.target.closest('.desktop-event-item');
             if (target) applyEventType(target.dataset.eventType);
         });
+
         dropdownContainer.addEventListener('click', (e) => e.stopPropagation());
+
         document.querySelectorAll('.modal-overlay').forEach(modal => {
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) {
@@ -1247,6 +1490,7 @@
                 }
             });
         });
+
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 if (dropdownContainer.classList.contains('active')) hideMobileDropdown();
