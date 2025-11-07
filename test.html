@@ -294,8 +294,8 @@
         border: 1px solid var(--border-color);
     }
     
-    .schedule-display-header { text-align: center; margin-bottom: 0; }
-    .title-block { text-align: center; margin-bottom: 24px; }
+    .schedule-display-header { text-align: center; margin-bottom: 24px; }
+    .title-block { text-align: center; }
     .title-block h1 { 
         margin: 0 0 12px 0; 
         font-size: 1.8em; 
@@ -758,7 +758,7 @@
 
     @media (max-width: 768px) {
         main { padding-top: 66px; }
-        .editor-main { padding: 10px; }
+        .editor-main { padding: 16px; }
         .master-container { 
             padding: 0; 
             border-radius: 0; 
@@ -775,11 +775,8 @@
         #toggle-all-mobile {
             display: inline-flex;
             margin: 0 auto 16px;
-            background: var(--surface-color);
-            color: var(--text-secondary);
-            border: 1px solid var(--border-color);
         }
-        .title-block { padding: 0 16px; margin-bottom: 16px; }
+        .title-block { margin-bottom: 16px; }
         .title-block h1 { font-size: 1.5rem; }
         .subtitle { font-size: 1rem; padding: 6px 12px; }
         .svg-divider { width: 300px; }
@@ -1217,34 +1214,6 @@
         }
     }
 
-    function _updateMobileCardBody(rowIndex) {
-        const mobileContainer = scheduleWrapper.querySelector('.mobile-view-container');
-        const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
-        if (!mobileContainer || !tableBody || !tableBody.rows[rowIndex]) return;
-
-        const cardToUpdate = mobileContainer.children[rowIndex];
-        const rowData = tableBody.rows[rowIndex];
-        
-        if (cardToUpdate) {
-            const cardBody = cardToUpdate.querySelector('.mobile-week-body');
-            cardBody.innerHTML = getMobileCardBodyHTML(rowData, rowIndex);
-
-            cardBody.querySelectorAll('.topic-field, .member-field, .event-type-field').forEach(field => {
-                field.addEventListener('click', () => {
-                    const newRowIndex = field.dataset.row;
-                    if (field.classList.contains('topic-field') || field.classList.contains('member-field')) {
-                        const cellIndex = field.dataset.cell;
-                        const cell = tableBody.rows[newRowIndex].cells[cellIndex];
-                        const type = field.classList.contains('topic-field') ? 'topic' : 'member';
-                        openMobileDropdown(type, cell, field);
-                    } else if (field.classList.contains('event-type-field')) {
-                        openMobileEventTypeDropdown(newRowIndex, field);
-                    }
-                });
-            });
-        }
-    }
-
     function getEventTypeForRow(row) {
         const topicCell = row.cells[1];
         if (topicCell.classList.contains('special-event')) {
@@ -1278,7 +1247,7 @@
             topicCell.removeAttribute('data-original-content');
             [speakerCell, chairmanCell, readerCell].forEach(cell => cell.removeAttribute('data-original-content'));
         }
-        _updateMobileCardBody(rowIndex);
+        createMobileView();
         debouncedSave();
     }
 
@@ -1487,14 +1456,7 @@
     function selectMobileEventType(eventType) {
         if (currentDropdownData && currentDropdownData.rowIndex !== undefined) {
             changeEventType(currentDropdownData.rowIndex, eventType);
-            const eventTypeInfo = eventTypes.find(event => event.id === eventType) || eventTypes[0];
-            const fieldElement = currentDropdownData.fieldElement;
-            const valueSpan = fieldElement.querySelector('.event-type-value span:last-child');
-            const iconSpan = fieldElement.querySelector('.event-type-icon');
-            valueSpan.textContent = eventTypeInfo.name;
-            iconSpan.textContent = eventTypeInfo.icon;
         }
-        hideMobileDropdown();
     }
 
     function filterMobileItems(value) {
@@ -1557,7 +1519,7 @@
             if (existingRow) {
                 return `<tr>${existingRow.innerHTML}</tr>`;
             } else {
-                return `<tr><td>${date}</td><td></td><td></td><td></td><td></td><td class="actions-col"><button class="event-btn"><span class="material-symbols-outlined">more_vert</span></button></td></tr>`;
+                return `<tr><td>${date}</td><td class="editable-cell"></td><td class="editable-cell"></td><td class="editable-cell"></td><td class="editable-cell"></td><td class="actions-col"><button class="event-btn"><span class="material-symbols-outlined">more_vert</span></button></td></tr>`;
             }
         }).join('');
 
@@ -1629,7 +1591,7 @@
         
         const selectedDates = selectedCheckboxes.map(cb => cb.value);
         const dateRange = `${selectedDates[0]} నుండి ${selectedDates[selectedDates.length - 1]}`;
-        const tableBodyHTML = selectedDates.map(date => `<tr><td>${date}</td><td></td><td></td><td></td><td></td><td class="actions-col"><button class="event-btn"><span class="material-symbols-outlined">more_vert</span></button></td></tr>`).join('');
+        const tableBodyHTML = selectedDates.map(date => `<tr><td>${date}</td><td class="editable-cell"></td><td class="editable-cell"></td><td class="editable-cell"></td><td class="editable-cell"></td><td class="actions-col"><button class="event-btn"><span class="material-symbols-outlined">more_vert</span></button></td></tr>`).join('');
 
         try {
             const newDocRef = await userSchedulesCollection.add({
@@ -1778,26 +1740,6 @@
             else handleUpdateWeeks();
         });
 
-        const toggleAllBtn = document.getElementById('toggle-all-mobile');
-        if (toggleAllBtn) {
-            toggleAllBtn.addEventListener('click', () => {
-                const allCards = scheduleWrapper.querySelectorAll('.mobile-week-card');
-                const areAnyOpen = Array.from(allCards).some(card => card.classList.contains('active'));
-                const textSpan = toggleAllBtn.querySelector('span:last-child');
-                const iconSpan = toggleAllBtn.querySelector('.material-symbols-outlined');
-
-                if (areAnyOpen) {
-                    allCards.forEach(card => card.classList.remove('active'));
-                    textSpan.textContent = 'Expand All';
-                    iconSpan.textContent = 'unfold_more';
-                } else {
-                    allCards.forEach(card => card.classList.add('active'));
-                    textSpan.textContent = 'Collapse All';
-                    iconSpan.textContent = 'unfold_less';
-                }
-            });
-        }
-
         dropdownBackdrop.addEventListener('click', hideMobileDropdown);
         dropdownClose.addEventListener('click', hideMobileDropdown);
         desktopDropdownSearch.addEventListener('input', (e) => filterDesktopItems(e.target.value));
@@ -1829,13 +1771,30 @@
             if(header) {
                 const card = header.closest('.mobile-week-card');
                 const isAlreadyOpen = card.classList.contains('active');
-                if (!e.ctrlKey && !e.metaKey) {
-                    scheduleWrapper.querySelectorAll('.mobile-week-card').forEach(c => c.classList.remove('active'));
-                }
+                scheduleWrapper.querySelectorAll('.mobile-week-card').forEach(c => c.classList.remove('active'));
                 if (!isAlreadyOpen) card.classList.add('active');
-                else if (e.ctrlKey || e.metaKey) card.classList.remove('active');
             }
         });
+        
+        const toggleAllBtn = document.getElementById('toggle-all-mobile');
+        if(toggleAllBtn) {
+            toggleAllBtn.addEventListener('click', () => {
+                const allCards = scheduleWrapper.querySelectorAll('.mobile-week-card');
+                const areAnyOpen = Array.from(allCards).some(card => card.classList.contains('active'));
+                const textSpan = toggleAllBtn.querySelector('span:last-child');
+                const iconSpan = toggleAllBtn.querySelector('.material-symbols-outlined');
+
+                if (areAnyOpen) {
+                    allCards.forEach(card => card.classList.remove('active'));
+                    textSpan.textContent = 'Expand All';
+                    iconSpan.textContent = 'unfold_more';
+                } else {
+                    allCards.forEach(card => card.classList.add('active'));
+                    textSpan.textContent = 'Collapse All';
+                    iconSpan.textContent = 'unfold_less';
+                }
+            });
+        }
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
