@@ -845,22 +845,6 @@
     .pdf-table thead th { background-color: #F3E5D7; font-size: 1.0em; padding: 8px 6px; }
     .pdf-header { text-align: center; margin-bottom: 20px; }
     .pdf-title { font-family: 'Noto Sans Telugu', sans-serif; font-weight: 700; color: rgb(97, 40, 0); margin: 0; }
-    .pdf-subtitle-container { position: relative; display: inline-block; margin-top: 0; }
-    .pdf-subtitle {
-        font-family: 'Noto Sans Telugu', sans-serif; font-weight: 500; background: white;
-        padding: 2px 8px; display: inline-block; position: relative; z-index: 2;
-    }
-    .pdf-svg-divider {
-        width: 400px; height: 5px; display: block; position: absolute; left: 50%;
-        transform: translateX(-50%); top: 50%; margin-top: -2.5px; z-index: 1;
-    }
-    .pdf-header .title-block { text-align: center; margin-bottom: 20px; }
-    .pdf-header .subtitle-svg-container { position: relative; display: inline-block; margin-top: 10px; }
-    .pdf-header .svg-divider {
-        width: 400px; height: 5px; background: linear-gradient(to right, #ffffff, #093261, #ffffff);
-        display: block; position: absolute; left: 50%; transform: translateX(-50%);
-        top: 50%; margin-top: -2.5px; z-index: 1;
-    }
 </style>
 </head>
 <body>
@@ -1133,29 +1117,10 @@
         scheduleWrapper.querySelectorAll('.event-btn').forEach(btn => btn.addEventListener('click', openEventMenu));
         document.getElementById('app-container').classList.remove('hidden');
     }
-
-    function createMobileView() {
-        const mobileContainer = scheduleWrapper.querySelector('.mobile-view-container');
+    
+    function setupMobileCardListeners(cardElement) {
         const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
-        if (!tableBody) return;
-        mobileContainer.innerHTML = '';
-        
-        Array.from(tableBody.rows).forEach((row, rowIndex) => {
-            const dateText = row.cells[0].textContent;
-            const card = document.createElement('div');
-            card.className = 'mobile-week-card fade-in';
-            const cardBodyContent = getMobileCardBodyHTML(row, rowIndex);
-
-            card.innerHTML = `
-                <div class="mobile-week-header">
-                    <h3 class="week-date">${dateText}</h3>
-                    <span class="material-symbols-outlined accordion-icon">expand_more</span>
-                </div>
-                <div class="mobile-week-body">${cardBodyContent}</div>`;
-            mobileContainer.appendChild(card);
-        });
-
-        mobileContainer.querySelectorAll('.topic-field, .member-field, .event-type-field').forEach(field => {
+        cardElement.querySelectorAll('.topic-field, .member-field, .event-type-field').forEach(field => {
             field.addEventListener('click', () => {
                 const rowIndex = field.dataset.row;
                 if (field.classList.contains('topic-field') || field.classList.contains('member-field')) {
@@ -1168,6 +1133,42 @@
                 }
             });
         });
+    }
+
+    function createMobileView() {
+        const mobileContainer = scheduleWrapper.querySelector('.mobile-view-container');
+        const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
+        if (!tableBody) return;
+        mobileContainer.innerHTML = '';
+        
+        Array.from(tableBody.rows).forEach((row, rowIndex) => {
+            const dateText = row.cells[0].textContent;
+            const card = document.createElement('div');
+            card.className = 'mobile-week-card fade-in';
+            card.dataset.rowIndex = rowIndex;
+            const cardBodyContent = getMobileCardBodyHTML(row, rowIndex);
+
+            card.innerHTML = `
+                <div class="mobile-week-header">
+                    <h3 class="week-date">${dateText}</h3>
+                    <span class="material-symbols-outlined accordion-icon">expand_more</span>
+                </div>
+                <div class="mobile-week-body">${cardBodyContent}</div>`;
+            mobileContainer.appendChild(card);
+            setupMobileCardListeners(card);
+        });
+    }
+    
+    function updateMobileCard(rowIndex) {
+        const card = scheduleWrapper.querySelector(`.mobile-week-card[data-row-index="${rowIndex}"]`);
+        if (!card) return;
+        
+        const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
+        const row = tableBody.rows[rowIndex];
+        const cardBody = card.querySelector('.mobile-week-body');
+        
+        cardBody.innerHTML = getMobileCardBodyHTML(row, rowIndex);
+        setupMobileCardListeners(card);
     }
 
     function getMobileCardBodyHTML(row, rowIndex) {
@@ -1252,7 +1253,7 @@
             topicCell.removeAttribute('data-original-content');
             [speakerCell, chairmanCell, readerCell].forEach(cell => cell.removeAttribute('data-original-content'));
         }
-        createMobileView();
+        updateMobileCard(rowIndex);
         debouncedSave();
     }
 
@@ -1625,6 +1626,7 @@
             const tempContainer = document.createElement('div');
             tempContainer.style.position = 'absolute';
             tempContainer.style.left = '-9999px';
+            tempContainer.style.width = '1100px';
             tempContainer.style.top = '0';
             document.body.appendChild(tempContainer);
 
@@ -1638,11 +1640,25 @@
 
             while (currentRow < tableRows.length) {
                 if (pageCount > 0) pdf.addPage();
+                
                 const pageContainer = document.createElement('div');
                 pageContainer.className = 'pdf-page-container';
-
+                pageContainer.style.width = '1100px';
+                
                 if (pageCount === 0) {
-                    pageContainer.innerHTML = `<div class="pdf-header"><div class="title-block"><h1 class="pdf-title">${title}</h1><div class="pdf-subtitle-container"><p class="pdf-subtitle">${subtitle}</p><div class="pdf-svg-divider"></div></div></div></div>`;
+                     pageContainer.innerHTML = `
+                        <div class="schedule-display-header" style="text-align: center; margin-bottom: 20px;">
+                            <div class="title-block">
+                                <h1 style="margin: 0 0 12px 0; font-size: 1.8em; font-weight: 700; color: rgb(97, 40, 0); font-family: 'Noto Sans Telugu', sans-serif; line-height: 1.3;">${title}</h1>
+                                <div class="subtitle-svg-container" style="position: relative; display: inline-block; margin-top: 0;">
+                                    <p class="subtitle" style="margin: 0; font-size: 1.1em; font-weight: 500; color: #2d3748; background-color: white; padding: 8px 16px; display: inline-block; position: relative; z-index: 2; white-space: nowrap; border-radius: 8px; font-family: 'Noto Sans Telugu', sans-serif; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);">${subtitle}</p>
+                                    <svg class="svg-divider" style="width: 400px; height: 5px; display: block; position: absolute; left: 50%; transform: translateX(-50%); top: 50%; margin-top: -2.5px; z-index: 1;" role="presentation" viewBox="0 0 24039.797 260" preserveAspectRatio="xMidYMid slice">
+                                        <defs><radialGradient id="__id9__id4_pdf" gradientUnits="userSpaceOnUse" r="12020.601" cx="12019.898" cy="130" fx="12019.898" fy="130"><stop stop-color="#093261" stop-opacity="1" offset="0"></stop><stop stop-color="#ffffff" stop-opacity="1" offset="1"></stop></radialGradient></defs>
+                                        <rect x="0" y="0" width="24039.797" height="260" fill="url(#__id9__id4_pdf)"></rect>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>`;
                 }
 
                 const table = document.createElement('table');
