@@ -1,4 +1,3 @@
-is this correct ? 
 <!DOCTYPE html>
 <html lang="te">
 <head>
@@ -144,13 +143,14 @@ is this correct ?
     }
     
     /* Add this to your existing mobile CSS */
-.input-group {
-    margin-bottom: 12px;
-}
+    .input-group {
+        margin-bottom: 12px;
+    }
 
-.input-group:last-child {
-    margin-bottom: 0;
-}
+    .input-group:last-child {
+        margin-bottom: 0;
+    }
+    
     .menu-overlay.is-open { opacity: 1; visibility: visible; }
     .slide-menu { 
         position: fixed; 
@@ -169,23 +169,7 @@ is this correct ?
         box-shadow: var(--shadow-lg);
     }
     .slide-menu.is-open { transform: translateX(0); }
-.mobile-field-input {
-    width: 100%;
-    padding: 16px;
-    border: 2px solid var(--border-color);
-    border-radius: var(--radius-md);
-    background-color: #fafafa;
-    font-family: 'Noto Sans Telugu', sans-serif;
-    font-size: 1rem;
-    font-weight: 500;
-    transition: all 0.2s ease;
-}
 
-.mobile-field-input:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    background-color: white;
-}
     .menu-links { 
         list-style: none; 
         margin: 0; 
@@ -270,6 +254,68 @@ is this correct ?
     .btn:disabled { cursor: not-allowed; opacity: 0.6; }
     /* END: NEW NAVBAR STYLES */
 
+    /* START: ENHANCED TITLE BLOCK STYLES */
+    .schedule-display-header { 
+        text-align: center; 
+        margin-bottom: 0; 
+    }
+
+    .title-block { 
+        text-align: center; 
+        margin-bottom: 24px;
+    }
+
+    .title-block h1 { 
+        margin: 0 0 12px 0; 
+        font-size: 1.8em; 
+        font-weight: 700; 
+        color: rgb(97, 40, 0); 
+        font-family: 'Noto Sans Telugu', sans-serif; 
+        line-height: 1.3;
+    }
+
+    .subtitle-svg-container { 
+        position: relative; 
+        display: inline-block; 
+        margin-top: 0; 
+    }
+
+    .subtitle { 
+        margin: 0; 
+        font-size: 1.1em; 
+        font-weight: 500; 
+        color: var(--text-primary); 
+        background-color: var(--surface-color); 
+        padding: 8px 16px; 
+        display: inline-block; 
+        position: relative; 
+        z-index: 2; 
+        white-space: nowrap; 
+        border-radius: var(--radius-md); 
+        font-family: 'Noto Sans Telugu', sans-serif; 
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-sm);
+        transition: all 0.2s;
+    }
+
+    .subtitle:focus { 
+        outline: 2px solid var(--primary-color); 
+        background-color: var(--primary-light); 
+    }
+
+    .svg-divider { 
+        width: 400px; 
+        height: 5px; 
+        display: block; 
+        position: absolute; 
+        left: 50%; 
+        transform: translateX(-50%); 
+        top: 50%; 
+        margin-top: -2.5px; 
+        z-index: 1; 
+    }
+    /* END: ENHANCED TITLE BLOCK STYLES */
+
     /* START: ORIGINAL EDITOR STYLES */
     .hidden { display: none !important; }
 
@@ -283,6 +329,9 @@ is this correct ?
     }
     .page-controls { 
         margin-bottom: 24px; 
+        display: flex; /* NEW */
+        justify-content: center; /* NEW */
+        gap: 12px; /* NEW */
     }
 
     .master-container { 
@@ -291,30 +340,6 @@ is this correct ?
         border-radius: var(--radius-lg); 
         box-shadow: var(--shadow-md); 
         border: 1px solid var(--border-color);
-    }
-    .project-header { 
-        display: flex; 
-        justify-content: space-between; 
-        align-items: center; 
-        gap: 16px; 
-        margin-bottom: 24px; 
-        padding-bottom: 24px; 
-        border-bottom: 1px solid var(--border-color); 
-    }
-    .project-title { 
-        font-size: 1.75rem; 
-        font-weight: 700; 
-        margin: 0; 
-        flex-grow: 1; 
-        border: none; 
-        padding: 4px 8px; 
-        margin: -4px -8px; 
-        border-radius: var(--radius-md); 
-        font-family: 'Noto Sans Telugu', sans-serif; 
-    }
-    .project-title:focus { 
-        outline: 2px solid var(--primary-color); 
-        background-color: var(--primary-light); 
     }
 
     .schedule-block { 
@@ -536,7 +561,7 @@ is this correct ?
         border-radius: var(--radius-md); 
         border: 1px solid var(--border-color); 
     }
-    #template-list { 
+    #template-list, #edit-weeks-list { 
         list-style: none; 
         padding: 0; 
         margin: 0; 
@@ -544,11 +569,11 @@ is this correct ?
         border: 1px solid var(--border-color); 
         border-radius: var(--radius-md); 
     }
-    #template-list li { 
+    #template-list li, #edit-weeks-list li { 
         padding: 12px; 
         border-bottom: 1px solid var(--border-color); 
     }
-    #template-list label { 
+    #template-list label, #edit-weeks-list label { 
         display: flex; 
         align-items: center; 
         gap: 10px; 
@@ -570,10 +595,10 @@ is this correct ?
         cursor: pointer; 
         border: 1px solid var(--border-color); 
     }
-    #cancel-template-selection { 
+    #cancel-template-selection, #cancel-weeks-edit { 
         background-color: var(--surface-color); 
     }
-    #confirm-template-selection { 
+    #confirm-template-selection, #confirm-weeks-edit { 
         background-color: var(--primary-color); 
         color: white; 
         border-color: var(--primary-color); 
@@ -729,6 +754,42 @@ is this correct ?
         background-color: #f8fafc;
     }
 
+    /* Mobile Event Button Styles */
+    .mobile-event-button-container {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 16px;
+        padding: 0 16px;
+    }
+
+    .mobile-event-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px 20px;
+        border-radius: var(--radius-md);
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        border: 2px solid var(--primary-color);
+        background-color: var(--surface-color);
+        color: var(--primary-color);
+        transition: all 0.2s ease;
+        text-decoration: none;
+    }
+
+    .mobile-event-btn:hover {
+        background-color: var(--primary-color);
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .mobile-event-btn:active {
+        transform: translateY(0);
+    }
+
     /* ENHANCED MOBILE VIEW STYLES */
     @media (max-width: 768px) {
         main { 
@@ -747,25 +808,27 @@ is this correct ?
         .page-controls { 
             padding: 16px; 
             margin-bottom: 0; 
-            display: flex;
-            justify-content: center;
         }
-        .project-header { 
-            flex-direction: column; 
-            align-items: flex-start; 
-            gap: 12px; 
-            padding: 20px 16px 16px; 
-            margin-bottom: 0;
-            background: var(--surface-color);
-            margin: 0 16px 16px;
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-md);
+        
+        /* Title Block Mobile Styles */
+        .title-block {
+            padding: 0 16px;
+            margin-bottom: 16px;
         }
-        .project-title { 
-            font-size: 1.5rem; 
-            text-align: center;
-            width: 100%;
+        
+        .title-block h1 {
+            font-size: 1.5rem;
         }
+        
+        .subtitle {
+            font-size: 1rem;
+            padding: 6px 12px;
+        }
+        
+        .svg-divider {
+            width: 300px;
+        }
+        
         .schedule-block { 
             margin-bottom: 20px; 
             padding: 0 16px; 
@@ -775,6 +838,11 @@ is this correct ?
         }
         .schedule-block table { 
             display: none; 
+        }
+        
+        /* Hide schedule header in mobile */
+        .schedule-header {
+            display: none !important;
         }
         
         /* NEW MOBILE CARD STYLES */
@@ -990,16 +1058,37 @@ is this correct ?
 
 <main id="app-container" class="editor-main hidden">
     <div class="page-controls">
-        <button id="print-button" class="btn">
+        <!-- NEW BUTTON ADDED HERE -->
+        <button id="edit-weeks-button" class="btn" style="display: none;">
+            <span class="material-symbols-outlined">edit_calendar</span>
+            <span>Edit Weeks</span>
+        </button>
+        <button id="print-button" class="btn" style="display: none;">
             <span class="material-symbols-outlined">picture_as_pdf</span>
             <span>Download PDF</span>
         </button>
     </div>
     <div class="master-container">
-        <div id="project-header" class="project-header">
-            <h1 id="project-title" contenteditable="true">Loading Project...</h1>
-            <!-- Status indicator was here, now moved to header -->
-        </div>
+        <!-- ADDED TITLE BLOCK -->
+        <header class="schedule-display-header">
+            <div class="title-block">
+                <h1>వారం మధ్యలో జరిగే మీటింగ్ షెడ్యూల్</h1>
+                <div class="subtitle-svg-container">
+                    <p class="subtitle" contenteditable="true" id="date-range-subtitle">Loading dates...</p>
+                    <svg class="svg-divider" role="presentation" viewBox="0 0 24039.797 260" preserveAspectRatio="xMidYMid slice">
+                        <defs>
+                            <radialGradient id="__id9__id4" gradientUnits="userSpaceOnUse" r="12020.601" cx="12019.898" cy="130" fx="12019.898" fy="130">
+                                <stop stop-color="#093261" stop-opacity="1" offset="0"></stop>
+                                <stop stop-color="#ffffff" stop-opacity="1" offset="1"></stop>
+                            </radialGradient>
+                        </defs>
+                        <rect x="0" y="0" width="24039.797" height="260" fill="url(#__id9__id4)"></rect>
+                    </svg>
+                </div>
+            </div>
+        </header>
+        <!-- END OF TITLE BLOCK -->
+
         <div id="schedules-wrapper"></div>
     </div>
 </main>
@@ -1043,6 +1132,20 @@ is this correct ?
     </div>
 </div>
 
+<!-- NEW MODAL ADDED HERE -->
+<div id="edit-weeks-modal" class="modal-overlay">
+    <div class="modal-content">
+        <h2>Edit Schedule Weeks</h2>
+        <p>Add or remove weeks from this schedule. Unchecking a week will remove it and its data permanently.</p>
+        <ul id="edit-weeks-list"></ul>
+        <div class="modal-actions">
+            <button id="cancel-weeks-edit">Cancel</button>
+            <button id="confirm-weeks-edit">Update Schedule</button>
+        </div>
+    </div>
+</div>
+
+
 <script>
 (function() {
     'use strict';
@@ -1070,17 +1173,58 @@ is this correct ?
     let activeCellForDropdown = null;
 
     const appContainer = document.getElementById('app-container');
-    const projectTitleEl = document.getElementById('project-title');
     const schedulesWrapper = document.getElementById('schedules-wrapper');
     const templateSelectionModal = document.getElementById('template-selection-modal');
     const templateList = document.getElementById('template-list');
     const eventContextMenu = document.getElementById('event-context-menu');
     const memberDropdown = document.getElementById('member-dropdown');
     const statusIndicator = document.querySelector('.status-indicator');
+
+    // NEW DOM ELEMENTS FOR EDIT WEEKS FEATURE
+    const editWeeksButton = document.getElementById('edit-weeks-button');
+    const printButton = document.getElementById('print-button');
+    const editWeeksModal = document.getElementById('edit-weeks-modal');
+    const editWeeksList = document.getElementById('edit-weeks-list');
+    const cancelWeeksEditBtn = document.getElementById('cancel-weeks-edit');
+    const confirmWeeksEditBtn = document.getElementById('confirm-weeks-edit');
     
     function updateStatus(text, status) {
         statusIndicator.textContent = text;
         statusIndicator.dataset.status = status;
+    }
+
+    // Function to update date range subtitle
+    function updateDateRangeSubtitle() {
+        const scheduleBlocks = document.querySelectorAll('.schedule-block');
+        if (scheduleBlocks.length === 0) return;
+        
+        const firstTable = scheduleBlocks[0];
+        const lastTable = scheduleBlocks[scheduleBlocks.length - 1];
+        
+        const firstDateInput = firstTable.querySelector('.date-input');
+        const firstDate = firstDateInput ? firstDateInput.value : '';
+        
+        const lastDateInput = lastTable.querySelector('.date-input');
+        const lastDate = lastDateInput ? lastDateInput.value : '';
+        
+        if (firstDate && lastDate) {
+            const formatDate = (dateStr) => {
+                if (!dateStr) return '';
+                const [year, month, day] = dateStr.split('-');
+                return `${day}-${month}-${year}`;
+            };
+            
+            const formattedFirstDate = formatDate(firstDate);
+            const formattedLastDate = formatDate(lastDate);
+            
+            const subtitle = document.getElementById('date-range-subtitle');
+            if (subtitle) {
+                subtitle.textContent = `${formattedFirstDate} నుండి ${formattedLastDate}`;
+            }
+        } else {
+            const subtitle = document.getElementById('date-range-subtitle');
+            if (subtitle) subtitle.textContent = "Please set dates";
+        }
     }
 
     async function fetchMembers() {
@@ -1098,408 +1242,476 @@ is this correct ?
         });
     }
 
+    class ScheduleTable {
+        constructor(parentProject, tableData, index) {
+            this.parentProject = parentProject;
+            this.data = tableData;
+            this.index = index;
+            this.initDOM();
+            this.render();
+            this.setupEventListeners();
+            this.applyEventType(this.data.eventType || 'normal', false);
+        }
 
+        initDOM() {
+            const templateClone = document.getElementById('schedule-template').content.cloneNode(true);
+            this.element = templateClone.querySelector('.schedule-block');
+            this.titleEl = this.element.querySelector('.schedule-title');
+            this.tableBody = this.element.querySelector('.schedule-table-body');
+            this.mobileViewContainer = this.element.querySelector('.mobile-view-container');
+            this.eventBtn = this.element.querySelector('.event-btn');
+            schedulesWrapper.appendChild(this.element);
+        }
 
-
-
-class ScheduleTable {
-    constructor(parentProject, tableData, index) {
-        this.parentProject = parentProject;
-        this.data = tableData;
-        this.index = index;
-        this.initDOM();
-        this.render();
-        this.setupEventListeners();
-        this.applyEventType(this.data.eventType || 'normal', false);
-    }
-
-    initDOM() {
-        const templateClone = document.getElementById('schedule-template').content.cloneNode(true);
-        this.element = templateClone.querySelector('.schedule-block');
-        this.titleEl = this.element.querySelector('.schedule-title');
-        this.tableBody = this.element.querySelector('.schedule-table-body');
-        this.mobileViewContainer = this.element.querySelector('.mobile-view-container');
-        this.eventBtn = this.element.querySelector('.event-btn');
-        schedulesWrapper.appendChild(this.element);
-    }
-
-    render() {
-        this.titleEl.textContent = this.data.title;
-        this.tableBody.innerHTML = this.data.content;
-        
-        this.tableBody.querySelectorAll('td, th').forEach(cell => {
-            if (cell.hasAttribute('data-user-editable')) {
-                const isFirstRow = cell.closest('tr') === this.tableBody.rows[0];
-                if (isFirstRow) {
-                    const originalText = cell.textContent.trim();
-                    const dateValue = originalText.split('-').reverse().join('-');
-                    cell.innerHTML = `<input type="date" class="date-input" value="${dateValue || ''}">`;
-                    cell.removeAttribute('contenteditable');
+        render() {
+            this.titleEl.textContent = this.data.title;
+            this.tableBody.innerHTML = this.data.content;
+            
+            this.tableBody.querySelectorAll('td, th').forEach(cell => {
+                if (cell.hasAttribute('data-user-editable')) {
+                    const isFirstRow = cell.closest('tr') === this.tableBody.rows[0];
+                    if (isFirstRow) {
+                        const originalText = cell.textContent.trim();
+                        const dateValue = originalText ? originalText.split('-').reverse().join('-') : '';
+                        cell.innerHTML = `<input type="date" class="date-input" value="${dateValue || ''}">`;
+                        cell.removeAttribute('contenteditable');
+                    } else {
+                        cell.classList.add('editable-cell');
+                        cell.removeAttribute('contenteditable');
+                    }
                 } else {
-                    cell.classList.add('editable-cell');
-                    cell.removeAttribute('contenteditable');
+                    cell.setAttribute('contenteditable', 'false');
                 }
-            } else {
-                cell.setAttribute('contenteditable', 'false');
+            });
+
+            this._createMobileView();
+            setTimeout(updateDateRangeSubtitle, 100);
+        }
+
+        _createMobileView() {
+            this.mobileViewContainer.innerHTML = '';
+            
+            if (this.data.eventType && this.data.eventType !== 'normal') {
+                const eventTexts = { 
+                    'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం', 
+                    'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో', 
+                    'convention': 'ప్రాదేశిక సమావేశం' 
+                };
+                
+                const firstRow = this.tableBody.rows[0];
+                const dateCell = firstRow.cells[2];
+                const dateInput = dateCell ? dateCell.querySelector('.date-input') : null;
+                const dateValue = dateInput ? dateInput.value : '';
+
+                const card = document.createElement('div');
+                card.className = 'mobile-week-card fade-in';
+                card.innerHTML = `
+                    <h3 class="week-date">${this.data.title}</h3>
+                    <div class="field-group">
+                        <label>Event Type</label>
+                        <div class="mobile-field event-type-field">
+                            <span class="mobile-field-value">${this._getEventTypeDisplayName(this.data.eventType)}</span>
+                        </div>
+                    </div>
+                    <div class="special-event-mobile">
+                        <p class="special-event-text-mobile">${eventTexts[this.data.eventType]}</p>
+                    </div>
+                    <div class="field-group">
+                        <label>తేదీ</label>
+                        <input type="date" class="date-input" data-row-index="0" data-cell-index="2" value="${dateValue}">
+                    </div>
+                `;
+                this.mobileViewContainer.appendChild(card);
+                
+                card.querySelector('.event-type-field').addEventListener('click', () => {
+                    this._openMobileEventTypeDropdown();
+                });
+                return;
             }
-        });
 
-        this._createMobileView();
-    }
-
-    _createMobileView() {
-    this.mobileViewContainer.innerHTML = '';
-    
-    // Handle special events
-    if (this.data.eventType && this.data.eventType !== 'normal') {
-        const eventTexts = { 
-            'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం', 
-            'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో', 
-            'convention': 'ప్రాదేశిక సమావేశం' 
-        };
-        
-        const firstRow = this.tableBody.rows[0];
-        const dateCell = firstRow.cells[2];
-        const dateInput = dateCell ? dateCell.querySelector('.date-input') : null;
-        const dateValue = dateInput ? dateInput.value : '';
-
-        const card = document.createElement('div');
-        card.className = 'mobile-week-card fade-in';
-        card.innerHTML = `
-            <h3 class="week-date">${this.data.title}</h3>
-            <div class="special-event-mobile">
-                <p class="special-event-text-mobile">${eventTexts[this.data.eventType]}</p>
-            </div>
-            <div class="field-group">
-                <label>తేదీ</label>
-                <input type="date" class="date-input" data-row-index="0" data-cell-index="2" value="${dateValue}">
-            </div>
-        `;
-        this.mobileViewContainer.appendChild(card);
-        return;
-    }
-
-    // Create cards for normal schedule rows - PRESERVING ORIGINAL GROUPING LOGIC
-    Array.from(this.tableBody.rows).forEach((row, rowIndex) => {
-        if (row.classList.contains('header-row')) return;
-        
-        const editableCellsInRow = Array.from(row.cells).filter(c => c.hasAttribute('data-user-editable'));
-        if (editableCellsInRow.length === 0) return;
-        
-        const groupedInputs = {};
-
-        // ORIGINAL GROUPING LOGIC - preserve this exactly
-        editableCellsInRow.forEach(cell => {
-            const cellIndex = cell.cellIndex;
-            let labelText = '';
-            for (let i = cellIndex - 1; i >= 0; i--) {
-                const potentialLabelCell = row.cells[i];
-                if (potentialLabelCell && !potentialLabelCell.hasAttribute('data-user-editable') && potentialLabelCell.textContent.trim() !== '') {
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = potentialLabelCell.innerHTML;
-                    labelText = tempDiv.textContent.trim().replace('⠿', '').replace(':', '');
-                    break;
-                }
-            }
-            if (!labelText && row.cells[0] && !row.cells[0].hasAttribute('data-user-editable')) {
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = row.cells[0].innerHTML;
-                labelText = tempDiv.textContent.trim().replace('⠿', '').replace(':', '');
-            }
-            if (!groupedInputs[labelText]) groupedInputs[labelText] = [];
-            groupedInputs[labelText].push({cell, cellIndex});
-        });
-
-        // Create one card per group (preserving original structure)
-        for (const label in groupedInputs) {
             const card = document.createElement('div');
             card.className = 'mobile-week-card fade-in';
             
             let fieldsHTML = '';
-            
-            // Add date field for first row if it exists
-            if (rowIndex === 0) {
-                const dateCell = row.cells[2];
-                const dateInput = dateCell ? dateCell.querySelector('.date-input') : null;
-                const dateValue = dateInput ? dateInput.value : '';
-                
-                if (dateValue) {
-                    fieldsHTML += `
-                        <div class="field-group">
-                            <label>తేదీ</label>
-                            <input type="date" class="date-input" data-row-index="${rowIndex}" data-cell-index="2" value="${dateValue}">
-                        </div>
-                    `;
-                }
-            }
 
-            // Create fields for each cell in this group
-            groupedInputs[label].forEach(({cell, cellIndex}) => {
-                const cellText = cell.textContent.trim();
+            Array.from(this.tableBody.rows).forEach((row, rowIndex) => {
+                if (row.classList.contains('header-row')) return;
                 
-                if (rowIndex === 0 && cellIndex === 2) {
-                    // Date already handled above
-                    return;
-                }
+                const editableCellsInRow = Array.from(row.cells).filter(c => c.hasAttribute('data-user-editable'));
+                if (editableCellsInRow.length === 0) return;
                 
-                if (rowIndex === 0) {
-                    // For first row non-date cells
-                    const inputEl = document.createElement('input');
-                    inputEl.type = 'text';
-                    inputEl.className = 'item-input';
-                    inputEl.value = cellText;
-                    inputEl.dataset.rowIndex = rowIndex;
-                    inputEl.dataset.cellIndex = cellIndex;
-                    inputEl.placeholder = 'Enter value';
+                const groupedInputs = {};
+
+                editableCellsInRow.forEach(cell => {
+                    const cellIndex = cell.cellIndex;
+                    let labelText = '';
                     
-                    fieldsHTML += `
-                        <div class="field-group">
-                            <label>${label || 'Field'}</label>
-                            <div class="mobile-field">
-                                <input type="text" class="mobile-field-input" data-row-index="${rowIndex}" data-cell-index="${cellIndex}" value="${cellText}" placeholder="Enter value">
+                    for (let i = cellIndex - 1; i >= 0; i--) {
+                        const potentialLabelCell = row.cells[i];
+                        if (potentialLabelCell && !potentialLabelCell.hasAttribute('data-user-editable') && potentialLabelCell.textContent.trim() !== '') {
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = potentialLabelCell.innerHTML;
+                            labelText = tempDiv.textContent.trim().replace('⠿', '').replace(':', '');
+                            break;
+                        }
+                    }
+                    
+                    if (!labelText && row.cells[0] && !row.cells[0].hasAttribute('data-user-editable')) {
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = row.cells[0].innerHTML;
+                        labelText = tempDiv.textContent.trim().replace('⠿', '').replace(':', '');
+                    }
+                    
+                    if (!groupedInputs[labelText]) groupedInputs[labelText] = [];
+                    groupedInputs[labelText].push({ cell, cellIndex, rowIndex });
+                });
+
+                for (const label in groupedInputs) {
+                    let groupHTML = '';
+                    
+                    groupedInputs[label].forEach(({ cell, cellIndex, rowIndex }) => {
+                        const cellText = cell.textContent.trim();
+                        
+                        if (rowIndex === 0 && cellIndex === 2) {
+                            const dateInput = cell.querySelector('.date-input');
+                            const dateValue = dateInput ? dateInput.value : '';
+                            groupHTML += `
+                                <div class="input-group">
+                                    <input type="date" class="date-input" data-row-index="${rowIndex}" data-cell-index="${cellIndex}" value="${dateValue}">
+                                </div>
+                            `;
+                        } else {
+                            groupHTML += `
+                                <div class="input-group">
+                                    <div class="mobile-field member-field" data-row-index="${rowIndex}" data-cell-index="${cellIndex}">
+                                        <span class="mobile-field-value ${cellText ? '' : 'mobile-field-placeholder'}">
+                                            ${cellText || 'Select Option'}
+                                        </span>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    });
+
+                    if (groupHTML) {
+                        fieldsHTML += `
+                            <div class="field-group">
+                                ${label ? `<label>${label}</label>` : ''}
+                                ${groupHTML}
                             </div>
-                        </div>
-                    `;
-                } else {
-                    // For member selection fields
-                    fieldsHTML += `
-                        <div class="field-group">
-                            <label>${label || 'Field'}</label>
-                            <div class="mobile-field member-field" data-row-index="${rowIndex}" data-cell-index="${cellIndex}">
-                                <span class="mobile-field-value ${cellText ? '' : 'mobile-field-placeholder'}">
-                                    ${cellText || 'Select Name'}
-                                </span>
-                            </div>
-                        </div>
-                    `;
+                        `;
+                    }
                 }
             });
 
             card.innerHTML = `
-                <h3 class="week-date">${label || this.data.title}</h3>
+                <h3 class="week-date">${this.data.title}</h3>
+                <div class="field-group">
+                    <label>Event Type</label>
+                    <div class="mobile-field event-type-field">
+                        <span class="mobile-field-value">${this._getEventTypeDisplayName(this.data.eventType)}</span>
+                    </div>
+                </div>
                 <div class="week-fields">
                     ${fieldsHTML}
                 </div>
             `;
             
             this.mobileViewContainer.appendChild(card);
-        }
-    });
 
-    // Add event listeners to mobile fields
-    this.mobileViewContainer.querySelectorAll('.member-field').forEach(field => {
-        field.addEventListener('click', (e) => {
-            const rowIndex = field.dataset.rowIndex;
-            const cellIndex = field.dataset.cellIndex;
-            const targetCell = this.tableBody.rows[rowIndex].cells[cellIndex];
-            this._openMobileDropdown(targetCell, field);
-        });
-    });
-
-    // Add event listeners to text inputs
-    this.mobileViewContainer.querySelectorAll('.mobile-field-input').forEach(input => {
-        input.addEventListener('input', (e) => {
-            const rowIndex = input.dataset.rowIndex;
-            const cellIndex = input.dataset.cellIndex;
-            const targetCell = this.tableBody.rows[rowIndex].cells[cellIndex];
-            targetCell.textContent = input.value;
-            this.parentProject.triggerSave();
-        });
-    });
-
-    // Add event listeners to date inputs
-    this.mobileViewContainer.querySelectorAll('.date-input').forEach(input => {
-        input.addEventListener('change', (e) => {
-            const rowIndex = input.dataset.rowIndex;
-            const cellIndex = input.dataset.cellIndex;
-            const targetCell = this.tableBody.rows[rowIndex].cells[cellIndex];
-            const tableInput = targetCell.querySelector('.date-input');
-            if (tableInput) {
-                tableInput.value = input.value;
-            }
-            this.parentProject.triggerSave();
-        });
-    });
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-    _openMobileDropdown(cell, fieldElement) {
-        const isInMinistry = this._isCellInMinistrySection(cell);
-        let listToShow;
-        
-        if (isInMinistry) {
-            const sortedSisters = [...members.sisters].sort((a, b) => a.name.localeCompare(b.name));
-            const sortedBrothers = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
-            listToShow = [...sortedSisters, ...sortedBrothers];
-        } else {
-            listToShow = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
-        }
-
-        // Create mobile dropdown UI
-        const dropdownHTML = `
-            <div class="dropdown-backdrop" id="mobile-dropdown-backdrop"></div>
-            <div class="dropdown-container" id="mobile-dropdown-container">
-                <div class="dropdown-header">
-                    <h3 class="dropdown-title">Select ${isInMinistry ? 'Member' : 'Brother'}</h3>
-                    <button class="dropdown-close" id="mobile-dropdown-close">
-                        <span class="material-symbols-outlined">close</span>
-                    </button>
-                </div>
-                <div class="dropdown-content">
-                    ${listToShow.map(member => `
-                        <button class="dropdown-item" data-name="${member.name}">
-                            <span>${member.name}</span>
-                            ${member.isServant ? '<span class="servant-tag">Servant</span>' : ''}
-                        </button>
-                    `).join('')}
-                </div>
-            </div>
-        `;
-
-        // Remove existing dropdown if any
-        const existingDropdown = document.getElementById('mobile-dropdown-container');
-        if (existingDropdown) {
-            existingDropdown.remove();
-            document.getElementById('mobile-dropdown-backdrop').remove();
-        }
-
-        document.body.insertAdjacentHTML('beforeend', dropdownHTML);
-
-        const backdrop = document.getElementById('mobile-dropdown-backdrop');
-        const container = document.getElementById('mobile-dropdown-container');
-        const closeBtn = document.getElementById('mobile-dropdown-close');
-
-        const hideDropdown = () => {
-            backdrop.classList.remove('active');
-            container.classList.remove('active');
-            setTimeout(() => {
-                backdrop.remove();
-                container.remove();
-            }, 300);
-        };
-
-        backdrop.addEventListener('click', hideDropdown);
-        closeBtn.addEventListener('click', hideDropdown);
-
-        container.addEventListener('click', (e) => {
-            const item = e.target.closest('.dropdown-item');
-            if (item) {
-                const newName = item.dataset.name;
-                cell.textContent = newName;
-                const valueSpan = fieldElement.querySelector('.mobile-field-value');
-                valueSpan.textContent = newName;
-                valueSpan.classList.remove('mobile-field-placeholder');
-                this.parentProject.triggerSave();
-                hideDropdown();
-            }
-        });
-
-        // Show dropdown
-        setTimeout(() => {
-            backdrop.classList.add('active');
-            container.classList.add('active');
-        }, 10);
-    }
-
-    _isCellInMinistrySection(cell) {
-        // Implement your ministry section detection logic here
-        const table = cell.closest('table');
-        if (!table) return false;
-        // Add your specific logic to determine if cell is in ministry section
-        return false;
-    }
-
-    getContent() {
-        const tempBody = this.tableBody.cloneNode(true);
-        const dateInput = tempBody.querySelector('.date-input');
-        if (dateInput && dateInput.value) {
-            const cell = dateInput.parentElement;
-            cell.textContent = dateInput.value.split('-').reverse().join('-');
-        }
-        tempBody.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
-        tempBody.querySelectorAll('.editable-cell').forEach(el => el.classList.remove('editable-cell'));
-        return tempBody.innerHTML;
-    }
-
-    applyEventType(eventType, shouldSave = true) {
-        this.data.eventType = eventType;
-        const allRows = this.tableBody.querySelectorAll('tr');
-        const firstRow = this.tableBody.rows[0];
-
-        if (eventType === 'normal') {
-            allRows.forEach(row => row.style.display = '');
-            if (firstRow && firstRow.dataset.originalContent) {
-                firstRow.innerHTML = firstRow.dataset.originalContent;
-                delete firstRow.dataset.originalContent;
-            }
-        } else {
-            const eventTexts = {
-                'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం',
-                'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో',
-                'convention': 'ప్రాదేశిక సమావేశం'
-            };
-            allRows.forEach((row, index) => {
-                row.style.display = (index === 0) ? '' : 'none';
+            this.mobileViewContainer.querySelectorAll('.member-field').forEach(field => {
+                field.addEventListener('click', (e) => {
+                    const rowIndex = field.dataset.rowIndex;
+                    const cellIndex = field.dataset.cellIndex;
+                    const targetCell = this.tableBody.rows[rowIndex].cells[cellIndex];
+                    this._openMobileDropdown(targetCell, field);
+                });
             });
-            let existingDateValue = '';
-            if (firstRow) {
-                if (!firstRow.dataset.originalContent) firstRow.dataset.originalContent = firstRow.innerHTML;
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = firstRow.dataset.originalContent;
-                const originalDateCell = tempDiv.querySelector('[data-user-editable]');
-                if (originalDateCell) existingDateValue = originalDateCell.textContent.trim().split('-').reverse().join('-');
-            }
-            firstRow.innerHTML = `
-                <th colspan="1" class="special-event-text">${eventTexts[eventType]}</th>
-                <td style="text-align: right; font-weight: 700;">తేదీ:</td>
-                <td data-user-editable="true"><input type="date" class="date-input" value="${existingDateValue}"></td>
-            `;
+
+            this.mobileViewContainer.querySelectorAll('.date-input').forEach(input => {
+                input.addEventListener('change', (e) => {
+                    const rowIndex = input.dataset.rowIndex;
+                    const cellIndex = input.dataset.cellIndex;
+                    const targetCell = this.tableBody.rows[rowIndex].cells[cellIndex];
+                    const tableInput = targetCell.querySelector('.date-input');
+                    if (tableInput) {
+                        tableInput.value = input.value;
+                    }
+                    this.parentProject.triggerSave();
+                    setTimeout(updateDateRangeSubtitle, 100);
+                });
+            });
+
+            card.querySelector('.event-type-field').addEventListener('click', () => {
+                this._openMobileEventTypeDropdown();
+            });
         }
 
-        this._createMobileView();
-        if (shouldSave) this.parentProject.triggerSave();
-    }
+        _getEventTypeDisplayName(eventType) {
+            const eventNames = {
+                'normal': 'Normal',
+                'co-visit': 'CO Visit',
+                'assembly': 'Assembly',
+                'convention': 'Convention'
+            };
+            return eventNames[eventType] || 'Normal';
+        }
 
-    setupEventListeners() {
-        this.element.addEventListener('input', (e) => {
-            const input = e.target;
-            if(input.classList.contains('item-input')) {
-                const rowIndex = input.dataset.rowIndex;
-                const cellIndex = input.dataset.cellIndex;
-                const targetCell = this.tableBody.rows[rowIndex].cells[cellIndex];
-                if(input.type === 'date') {
-                    const tableInput = targetCell.querySelector('.date-input');
-                    if(tableInput) tableInput.value = input.value;
-                } else {
-                     targetCell.textContent = input.textContent;
-                }
+        _openMobileDropdown(cell, fieldElement) {
+            const isInMinistry = this._isCellInMinistrySection(cell);
+            let listToShow;
+            
+            if (isInMinistry) {
+                const sortedSisters = [...members.sisters].sort((a, b) => a.name.localeCompare(b.name));
+                const sortedBrothers = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
+                listToShow = [...sortedSisters, ...sortedBrothers];
+            } else {
+                listToShow = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
             }
-            this.parentProject.triggerSave();
-        });
 
-        this.eventBtn.addEventListener('click', (e) => {
-            activeEventScheduleTable = this;
-            const rect = e.currentTarget.getBoundingClientRect();
-            eventContextMenu.style.display = 'block';
-            eventContextMenu.style.top = `${rect.bottom}px`;
-            eventContextMenu.style.left = `${rect.left}px`;
-        });
+            const dropdownHTML = `
+                <div class="dropdown-backdrop" id="mobile-dropdown-backdrop"></div>
+                <div class="dropdown-container" id="mobile-dropdown-container">
+                    <div class="dropdown-header">
+                        <h3 class="dropdown-title">Select ${isInMinistry ? 'Member' : 'Brother'}</h3>
+                        <button class="dropdown-close" id="mobile-dropdown-close">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+                    <div class="dropdown-content">
+                        ${listToShow.map(member => `
+                            <button class="dropdown-item" data-name="${member.name}">
+                                <span>${member.name}</span>
+                                ${member.isServant ? '<span class="servant-tag">Servant</span>' : ''}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            const existingDropdown = document.getElementById('mobile-dropdown-container');
+            if (existingDropdown) {
+                existingDropdown.remove();
+                document.getElementById('mobile-dropdown-backdrop').remove();
+            }
+
+            document.body.insertAdjacentHTML('beforeend', dropdownHTML);
+
+            const backdrop = document.getElementById('mobile-dropdown-backdrop');
+            const container = document.getElementById('mobile-dropdown-container');
+            const closeBtn = document.getElementById('mobile-dropdown-close');
+
+            const hideDropdown = () => {
+                backdrop.classList.remove('active');
+                container.classList.remove('active');
+                setTimeout(() => {
+                    backdrop.remove();
+                    container.remove();
+                }, 300);
+            };
+
+            backdrop.addEventListener('click', hideDropdown);
+            closeBtn.addEventListener('click', hideDropdown);
+
+            container.addEventListener('click', (e) => {
+                const item = e.target.closest('.dropdown-item');
+                if (item) {
+                    const newName = item.dataset.name;
+                    cell.textContent = newName;
+                    const valueSpan = fieldElement.querySelector('.mobile-field-value');
+                    valueSpan.textContent = newName;
+                    valueSpan.classList.remove('mobile-field-placeholder');
+                    this.parentProject.triggerSave();
+                    hideDropdown();
+                }
+            });
+
+            setTimeout(() => {
+                backdrop.classList.add('active');
+                container.classList.add('active');
+            }, 10);
+        }
+
+        _openMobileEventTypeDropdown() {
+            const eventTypes = [
+                { id: 'normal', name: 'Normal', icon: 'event' },
+                { id: 'co-visit', name: 'CO Visit', icon: 'groups' },
+                { id: 'assembly', name: 'Assembly', icon: 'celebration' },
+                { id: 'convention', name: 'Convention', icon: 'festival' }
+            ];
+
+            const dropdownHTML = `
+                <div class="dropdown-backdrop" id="mobile-event-dropdown-backdrop"></div>
+                <div class="dropdown-container" id="mobile-event-dropdown-container">
+                    <div class="dropdown-header">
+                        <h3 class="dropdown-title">Select Event Type</h3>
+                        <button class="dropdown-close" id="mobile-event-dropdown-close">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+                    <div class="dropdown-content">
+                        ${eventTypes.map(event => `
+                            <button class="dropdown-item" data-event-type="${event.id}">
+                                <span style="display: flex; align-items: center; gap: 12px;">
+                                    <span class="material-symbols-outlined">${event.icon}</span>
+                                    <span>${event.name}</span>
+                                </span>
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            const existingDropdown = document.getElementById('mobile-event-dropdown-container');
+            if (existingDropdown) {
+                existingDropdown.remove();
+                document.getElementById('mobile-event-dropdown-backdrop').remove();
+            }
+
+            document.body.insertAdjacentHTML('beforeend', dropdownHTML);
+
+            const backdrop = document.getElementById('mobile-event-dropdown-backdrop');
+            const container = document.getElementById('mobile-event-dropdown-container');
+            const closeBtn = document.getElementById('mobile-event-dropdown-close');
+
+            const hideDropdown = () => {
+                backdrop.classList.remove('active');
+                container.classList.remove('active');
+                setTimeout(() => {
+                    backdrop.remove();
+                    container.remove();
+                }, 300);
+            };
+
+            backdrop.addEventListener('click', hideDropdown);
+            closeBtn.addEventListener('click', hideDropdown);
+
+            container.addEventListener('click', (e) => {
+                const item = e.target.closest('.dropdown-item');
+                if (item) {
+                    const eventType = item.dataset.eventType;
+                    this.applyEventType(eventType);
+                    hideDropdown();
+                }
+            });
+
+            setTimeout(() => {
+                backdrop.classList.add('active');
+                container.classList.add('active');
+            }, 10);
+        }
+
+        _isCellInMinistrySection(cell) {
+            const table = cell.closest('table');
+            if (!table) return false;
+            
+            const allRows = Array.from(table.querySelectorAll('tbody > tr'));
+            const cellRow = cell.closest('tr');
+            const cellIndex = allRows.indexOf(cellRow);
+            
+            let ministryHeaderIndex = -1;
+            let nextHeaderIndex = allRows.length;
+            
+            allRows.forEach((row, index) => {
+                if (row.classList.contains('header-row')) {
+                    const rowText = row.textContent.trim();
+                    if (rowText.includes('చక్కగా సువార్త ప్రకటించాలి') || rowText.includes('సువార్త ప్రకటించాలి')) {
+                        ministryHeaderIndex = index;
+                    } else if (ministryHeaderIndex !== -1 && index > ministryHeaderIndex) {
+                        if (index < nextHeaderIndex) nextHeaderIndex = index;
+                    }
+                }
+            });
+            
+            if (ministryHeaderIndex === -1) return false;
+            
+            return cellIndex > ministryHeaderIndex && cellIndex < nextHeaderIndex;
+        }
+
+        getContent() {
+            const tempBody = this.tableBody.cloneNode(true);
+            const dateInput = tempBody.querySelector('.date-input');
+            if (dateInput && dateInput.value) {
+                const cell = dateInput.parentElement;
+                cell.textContent = dateInput.value.split('-').reverse().join('-');
+            }
+            tempBody.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+            tempBody.querySelectorAll('.editable-cell').forEach(el => el.classList.remove('editable-cell'));
+            return tempBody.innerHTML;
+        }
+
+        applyEventType(eventType, shouldSave = true) {
+            this.data.eventType = eventType;
+            const allRows = this.tableBody.querySelectorAll('tr');
+            const firstRow = this.tableBody.rows[0];
+
+            if (eventType === 'normal') {
+                allRows.forEach(row => row.style.display = '');
+                if (firstRow && firstRow.dataset.originalContent) {
+                    firstRow.innerHTML = firstRow.dataset.originalContent;
+                    delete firstRow.dataset.originalContent;
+                }
+            } else {
+                const eventTexts = {
+                    'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం',
+                    'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో',
+                    'convention': 'ప్రాదేశిక సమావేశం'
+                };
+                allRows.forEach((row, index) => {
+                    row.style.display = (index === 0) ? '' : 'none';
+                });
+                let existingDateValue = '';
+                if (firstRow) {
+                    if (!firstRow.dataset.originalContent) firstRow.dataset.originalContent = firstRow.innerHTML;
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = firstRow.dataset.originalContent;
+                    const dateInput = tempDiv.querySelector('.date-input');
+                    if (dateInput) existingDateValue = dateInput.value;
+                }
+                firstRow.innerHTML = `
+                    <th colspan="1" class="special-event-text">${eventTexts[eventType]}</th>
+                    <td style="text-align: right; font-weight: 700;">తేదీ:</td>
+                    <td data-user-editable="true"><input type="date" class="date-input" value="${existingDateValue}"></td>
+                `;
+            }
+
+            this._createMobileView();
+            if (shouldSave) this.parentProject.triggerSave();
+        }
+
+        setupEventListeners() {
+            this.element.addEventListener('input', (e) => {
+                const input = e.target;
+                if(input.classList.contains('item-input')) {
+                    const rowIndex = input.dataset.rowIndex;
+                    const cellIndex = input.dataset.cellIndex;
+                    const targetCell = this.tableBody.rows[rowIndex].cells[cellIndex];
+                    if(input.type === 'date') {
+                        const tableInput = targetCell.querySelector('.date-input');
+                        if(tableInput) tableInput.value = input.value;
+                    } else {
+                         targetCell.textContent = input.textContent;
+                    }
+                }
+                this.parentProject.triggerSave();
+            });
+
+            this.eventBtn.addEventListener('click', (e) => {
+                activeEventScheduleTable = this;
+                const rect = e.currentTarget.getBoundingClientRect();
+                eventContextMenu.style.display = 'block';
+                eventContextMenu.style.top = `${rect.bottom}px`;
+                eventContextMenu.style.left = `${rect.left}px`;
+            });
+
+            this.element.addEventListener('change', (e) => {
+                if (e.target.classList.contains('date-input')) {
+                    setTimeout(updateDateRangeSubtitle, 100);
+                }
+            });
+        }
     }
-}
 
-    
-    
     class Project {
         constructor(id, initialData, collectionRef) {
             this.id = id;
@@ -1509,17 +1721,17 @@ class ScheduleTable {
             this.isSaving = false;
             this.saveTimeout = null;
             this.render();
-            this.setupEventListeners();
         }
 
         render(newData) {
             if (newData) this.data = newData;
-            if (document.activeElement !== projectTitleEl) projectTitleEl.textContent = this.data.name;
             schedulesWrapper.innerHTML = '';
             this.scheduleTables = [];
             this.data.tables.forEach((tableData, index) => {
                 this.scheduleTables.push(new ScheduleTable(this, tableData, index));
             });
+            
+            setTimeout(updateDateRangeSubtitle, 200);
         }
 
         triggerSave() {
@@ -1532,19 +1744,21 @@ class ScheduleTable {
         save() {
             this.isSaving = true;
             updateStatus('Syncing...', 'syncing');
-            this.scheduleTables.forEach(table => {
-                const dateInput = table.tableBody.querySelector('.date-input');
-                if (dateInput && dateInput.value) {
+            
+            const updatedTablesData = this.scheduleTables.map(table => {
+                 const dateInput = table.tableBody.querySelector('.date-input');
+                 if (dateInput && dateInput.value) {
                     const cell = dateInput.parentElement;
                     cell.textContent = dateInput.value.split('-').reverse().join('-');
-                }
+                 }
+                 return {
+                    title: table.data.title,
+                    content: table.getContent(),
+                    eventType: table.data.eventType || 'normal'
+                 };
             });
-            const updatedTablesData = this.scheduleTables.map(table => ({
-                title: table.data.title,
-                content: table.getContent(),
-                eventType: table.data.eventType || 'normal'
-            }));
-            const payload = { name: projectTitleEl.textContent, tables: updatedTablesData };
+            
+            const payload = { name: this.data.name, tables: updatedTablesData };
 
             this.collectionRef.doc(this.id).update(payload)
                 .then(() => {
@@ -1556,10 +1770,6 @@ class ScheduleTable {
                     updateStatus('Error', 'error');
                     this.isSaving = false;
                 });
-        }
-
-        setupEventListeners() {
-            projectTitleEl.addEventListener('input', () => this.triggerSave());
         }
     }
 
@@ -1586,6 +1796,9 @@ class ScheduleTable {
 
     function initEditor() {
         if (!currentUser || !currentProjectId) return;
+        editWeeksButton.style.display = 'inline-flex'; // Show edit button
+        printButton.style.display = 'inline-flex'; // Show print button
+
         if (currentListener) currentListener();
         currentListener = userSchedulesCollection.doc(currentProjectId).onSnapshot(doc => {
             if (doc.exists) {
@@ -1606,8 +1819,6 @@ class ScheduleTable {
     }
 
     async function initCreationFlow() {
-        document.getElementById('project-header').style.display = 'none';
-        document.getElementById('print-button').style.display = 'none';
         const templatesCollection = db.collection("templates");
         const snapshot = await templatesCollection.orderBy("createdAt").get();
         templateList.innerHTML = '';
@@ -1620,7 +1831,93 @@ class ScheduleTable {
                 templateList.appendChild(li);
             });
         }
-        templateSelectionModal.style.display = 'flex';
+        templateSelectionModal.classList.add('active');
+    }
+
+    // NEW FUNCTION
+    async function openWeekEditor() {
+        if (!activeProject) return;
+
+        const templatesCollection = db.collection("templates");
+        const snapshot = await templatesCollection.orderBy("createdAt").get();
+        const allTemplates = snapshot.docs.map(doc => ({
+            id: doc.id,
+            name: doc.data().name,
+            content: doc.data().content
+        }));
+
+        const currentTemplateTitles = activeProject.data.tables.map(table => table.title);
+
+        editWeeksList.innerHTML = '';
+        allTemplates.forEach(template => {
+            const isChecked = currentTemplateTitles.includes(template.name);
+            const li = document.createElement('li');
+            li.innerHTML = `<label>
+                <input type="checkbox" 
+                       data-id="${template.id}" 
+                       data-name="${template.name}" 
+                       data-content="${encodeURIComponent(template.content)}"
+                       ${isChecked ? 'checked' : ''}> 
+                ${template.name}
+            </label>`;
+            editWeeksList.appendChild(li);
+        });
+
+        editWeeksModal.classList.add('active');
+    }
+
+    // NEW FUNCTION
+    async function handleUpdateWeeks() {
+        if (!activeProject) return;
+
+        confirmWeeksEditBtn.disabled = true;
+        updateStatus('Updating...', 'syncing');
+
+        const selectedCheckboxes = Array.from(editWeeksList.querySelectorAll('input:checked'));
+        
+        const existingTableMap = new Map(activeProject.data.tables.map(table => [table.title, table]));
+
+        const newTables = selectedCheckboxes.map(input => {
+            const templateName = input.dataset.name;
+            if (existingTableMap.has(templateName)) {
+                return existingTableMap.get(templateName);
+            }
+
+            const rawContent = decodeURIComponent(input.dataset.content);
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = `<table><tbody>${rawContent}</tbody></table>`;
+            tempDiv.querySelectorAll('td, th').forEach(cell => {
+                const isEssentiallyEmpty = cell.textContent.trim() === '' && !cell.querySelector('img');
+                if (isEssentiallyEmpty) {
+                    cell.setAttribute('data-user-editable', 'true');
+                }
+            });
+
+            return {
+                title: templateName,
+                content: tempDiv.querySelector('tbody').innerHTML,
+                eventType: 'normal'
+            };
+        });
+
+        try {
+            await userSchedulesCollection.doc(currentProjectId).update({
+                tables: newTables,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            activeProject.data.tables = newTables;
+            activeProject.render();
+
+            editWeeksModal.classList.remove('active');
+            updateStatus('Synced', 'synced');
+        } catch (error) {
+            console.error("Error updating weeks:", error);
+            alert("Failed to update schedule. Please try again.");
+            updateStatus('Error', 'error');
+        } finally {
+            confirmWeeksEditBtn.disabled = false;
+        }
     }
 
     function setupGlobalUI() {
@@ -1648,8 +1945,7 @@ class ScheduleTable {
         menuOverlay.addEventListener('click', closeMenu);
 
         // App-specific UI
-
-        document.getElementById('print-button').addEventListener('click', generatePdf);
+        printButton.addEventListener('click', generatePdf);
         document.getElementById('cancel-template-selection').addEventListener('click', () => window.location.href = './dashboard.html');
         document.getElementById('confirm-template-selection').addEventListener('click', async () => {
             const newProjectName = document.getElementById('new-project-name').value.trim();
@@ -1675,6 +1971,16 @@ class ScheduleTable {
             window.location.href = `./editor.html?id=${newDocRef.id}`;
         });
         
+        // NEW EVENT LISTENERS
+        editWeeksButton.addEventListener('click', openWeekEditor);
+        cancelWeeksEditBtn.addEventListener('click', () => editWeeksModal.classList.remove('active'));
+        confirmWeeksEditBtn.addEventListener('click', handleUpdateWeeks);
+        document.querySelectorAll('.modal-overlay').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if(e.target === modal) modal.classList.remove('active');
+            });
+        });
+
         eventContextMenu.addEventListener('click', (e) => {
             const target = e.target.closest('.context-menu-item');
             if (target && activeEventScheduleTable) {
@@ -1722,21 +2028,27 @@ class ScheduleTable {
     function isCellInMinistrySection(cell) {
         const table = cell.closest('table');
         if (!table) return false;
+        
         const allRows = Array.from(table.querySelectorAll('tbody > tr'));
         const cellRow = cell.closest('tr');
         const cellIndex = allRows.indexOf(cellRow);
+        
         let ministryHeaderIndex = -1;
         let nextHeaderIndex = allRows.length;
+        
         allRows.forEach((row, index) => {
-            if(row.classList.contains('header-row')) {
-                if (row.dataset.section === 'ministry') {
+            if (row.classList.contains('header-row')) {
+                const rowText = row.textContent.trim();
+                if (rowText.includes('చక్కగా సువార్త ప్రకటించాలి') || rowText.includes('సువార్త ప్రకటించాలి')) {
                     ministryHeaderIndex = index;
                 } else if (ministryHeaderIndex !== -1 && index > ministryHeaderIndex) {
                     if (index < nextHeaderIndex) nextHeaderIndex = index;
                 }
             }
         });
+        
         if (ministryHeaderIndex === -1) return false;
+        
         return cellIndex > ministryHeaderIndex && cellIndex < nextHeaderIndex;
     }
 
@@ -1744,6 +2056,7 @@ class ScheduleTable {
         const isInMinistry = isCellInMinistrySection(cell);
         memberDropdown.innerHTML = '';
         let listToShow;
+        
         if (isInMinistry) {
             const sortedSisters = [...members.sisters].sort((a, b) => a.name.localeCompare(b.name));
             const sortedBrothers = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
@@ -1768,122 +2081,158 @@ class ScheduleTable {
         activeCellForDropdown = { realCell: cell, mobileDiv: mobileDiv };
     }
 
-    async function generatePdf() {
-        const printButton = document.getElementById('print-button');
-        printButton.disabled = true;
-        printButton.querySelector('span:last-child').textContent = 'Generating...';
+   async function generatePdf() {
+    printButton.disabled = true;
+    printButton.querySelector('span:last-child').textContent = 'Generating...';
 
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const A4_WIDTH_MM = 210, A4_HEIGHT_MM = 297, MARGIN_MM = 10, PAGE_SPACING_MM = 5; 
-        const USABLE_WIDTH = A4_WIDTH_MM - (MARGIN_MM * 2);
-        const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_MM * 2);
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const A4_WIDTH_MM = 210, A4_HEIGHT_MM = 297, MARGIN_MM = 10, PAGE_SPACING_MM = 5; 
+    const USABLE_WIDTH = A4_WIDTH_MM - (MARGIN_MM * 2);
+    const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_MM * 2);
 
-        const printContainer = document.createElement('div');
-        printContainer.id = 'print-container';
-        document.body.appendChild(printContainer);
+    const printContainer = document.createElement('div');
+    printContainer.id = 'print-container';
+    printContainer.style.position = 'absolute';
+    printContainer.style.left = '-9999px';
+    printContainer.style.top = '0';
+    printContainer.style.width = '1100px';
+    printContainer.style.background = 'white';
+    printContainer.style.padding = '20px';
+    document.body.appendChild(printContainer);
 
-        const itemsToPrint = [];
-        // INSIDE THE generatePdf function...
+    const headerHTML = `
+        <header class="schedule-display-header" style="display: block; margin-bottom: 10px; padding: 5px 0; background: white;">
+            <div class="title-block" style="text-align: center; margin-bottom: 0;">
+                <h1 style="font-family: 'Noto Sans Telugu', sans-serif; font-weight: 700; color: rgb(97, 40, 0); margin: 0 0 8px 0; font-size: 1.8em;">వారం మధ్యలో జరిగే మీటింగ్ షెడ్యూల్</h1>
+                <div class="subtitle-svg-container" style="position: relative; display: inline-block; margin-top: 0;">
+                    <p class="subtitle" style="margin: 0; font-size: 1.1em; font-weight: 500; color: #2d3748; background-color: white; padding: 6px 16px; display: inline-block; position: relative; z-index: 2; white-space: nowrap; border-radius: 8px; font-family: 'Noto Sans Telugu', sans-serif; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);">
+                        ${document.getElementById('date-range-subtitle').textContent}
+                    </p>
+                    <div style="width: 400px; height: 5px; background: linear-gradient(to right, #093261, #ffffff, #093261); display: block; position: absolute; left: 50%; transform: translateX(-50%); top: 50%; margin-top: -2.5px; z-index: 1;"></div>
+                </div>
+            </div>
+        </header>
+    `;
 
-        for (const block of document.querySelectorAll('.schedule-block')) {
-            const clone = block.cloneNode(true);
-            
-            clone.querySelector('.event-btn').style.display = 'none';
-            clone.querySelector('.mobile-view-container').style.display = 'none';
-            clone.querySelector('table').style.display = 'table';
-            
-            const titleEl = clone.querySelector('.schedule-title');
-            if (titleEl) {
-                titleEl.style.display = 'none';
-            }
-            clone.style.marginBottom = '0';
-            
-            
-            clone.style.padding = '0';
-            clone.style.border = 'none';
+    printContainer.innerHTML = headerHTML;
 
-            // --- START: ADD THIS NEW CODE BLOCK ---
+    const headerCanvas = await html2canvas(printContainer, { 
+        scale: 2, 
+        useCORS: true, 
+        backgroundColor: '#ffffff',
+        logging: false
+    });
+    
+    const headerImgData = headerCanvas.toDataURL('image/jpeg', 0.9);
+    const headerProps = pdf.getImageProperties(headerImgData);
+    const headerHeight = (headerProps.height * USABLE_WIDTH) / headerProps.width;
+    
+    printContainer.innerHTML = '';
 
-            // Increase the height of all table cells for better spacing in the PDF
-            const allCells = clone.querySelectorAll('th, td');
-            allCells.forEach(cell => {
-                cell.style.height = '40px'; // Adjust this value as needed
-            });
+    const itemsToPrint = [];
 
-            // --- END: ADD THIS NEW CODE BLOCK ---
-
-            printContainer.appendChild(clone);
-            
-            const canvas = await html2canvas(clone, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
-            
-            // --- And continue with the rest of the logic ---
-            const imgData = canvas.toDataURL('image/jpeg', 0.8);
-            const imgProps = pdf.getImageProperties(imgData);
-            const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
-            itemsToPrint.push({ imgData, width: USABLE_WIDTH, height: imgHeight });
-        }
+    for (const block of document.querySelectorAll('.schedule-block')) {
+        const clone = block.cloneNode(true);
         
-        document.body.removeChild(printContainer);
-        let currentY = MARGIN_MM;
-        // --- START: NEW, ADVANCED PDF LAYOUT LOGIC ---
-
-        // Stage 1: Group all printable items into pages first.
-        const pages = [];
-        let currentPageItems = [];
-        let currentPageHeight = 0;
-
-        itemsToPrint.forEach(item => {
-            const itemHeightWithSpacing = currentPageItems.length > 0 ? item.height + PAGE_SPACING_MM : item.height;
-            if (currentPageHeight + itemHeightWithSpacing > USABLE_HEIGHT && currentPageItems.length > 0) {
-                pages.push(currentPageItems); // Finalize the current page
-                currentPageItems = [item]; // Start a new page with the current item
-                currentPageHeight = item.height;
-            } else {
-                currentPageItems.push(item);
-                currentPageHeight += itemHeightWithSpacing;
-            }
-        });
-        if (currentPageItems.length > 0) {
-            pages.push(currentPageItems); // Add the last page
+        clone.querySelector('.event-btn').style.display = 'none';
+        clone.querySelector('.mobile-view-container').style.display = 'none';
+        clone.querySelector('table').style.display = 'table';
+        
+        const titleEl = clone.querySelector('.schedule-title');
+        if (titleEl) {
+            titleEl.style.display = 'none';
         }
+        clone.style.marginBottom = '0';
+        clone.style.padding = '0';
+        clone.style.border = 'none';
 
-        // Stage 2: Render each page with calculated vertical alignment.
-        pages.forEach((pageItems, pageIndex) => {
-            if (pageIndex > 0) {
-                pdf.addPage();
-            }
-
-            // Calculate the total height of all content on this specific page
-            const totalContentHeight = pageItems.reduce((sum, item) => sum + item.height, 0) + (PAGE_SPACING_MM * (pageItems.length - 1));
-
-            let startY = MARGIN_MM; // Default: top-aligned
-
-            // *** This is the key logic for your request ***
-            // If there's more than one item on the page, center the entire content block vertically.
-            if (pageItems.length > 1) {
-                const remainingSpace = USABLE_HEIGHT - totalContentHeight;
-                if (remainingSpace > 0) {
-                    startY = MARGIN_MM + (remainingSpace / 2);
-                }
-            }
-
-            // Now, draw the items for this page starting at the calculated Y position
-            let currentY = startY;
-            pageItems.forEach(item => {
-                pdf.addImage(item.imgData, 'JPEG', MARGIN_MM, currentY, item.width, item.height);
-                currentY += item.height + PAGE_SPACING_MM;
-            });
+        const allCells = clone.querySelectorAll('th, td');
+        allCells.forEach(cell => {
+            cell.style.height = '38px';
         });
 
-        // --- END: NEW LOGIC ---
+        printContainer.appendChild(clone);
+        
+        const canvas = await html2canvas(clone, { 
+            scale: 2, 
+            useCORS: true, 
+            backgroundColor: '#ffffff',
+            logging: false
+        });
+        
+        const imgData = canvas.toDataURL('image/jpeg', 0.8);
+        const imgProps = pdf.getImageProperties(imgData);
+        const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
+        itemsToPrint.push({ imgData, width: USABLE_WIDTH, height: imgHeight });
+        
+        printContainer.removeChild(clone);
+    }
+    
+    document.body.removeChild(printContainer);
 
-        const fileName = `${projectTitleEl.textContent.trim() || 'schedule'}.pdf`;
-        pdf.save(fileName);
-        printButton.disabled = false;
-        printButton.querySelector('span:last-child').textContent = 'Download PDF';
+    let currentY = MARGIN_MM;
+
+    const pages = [];
+    let currentPageItems = [];
+    let currentPageHeight = 0;
+    let isFirstPage = true;
+
+    itemsToPrint.forEach(item => {
+        const availableHeight = isFirstPage ? USABLE_HEIGHT - headerHeight - 5 : USABLE_HEIGHT;
+        
+        const itemHeightWithSpacing = currentPageItems.length > 0 ? item.height + PAGE_SPACING_MM : item.height;
+        
+        if (currentPageHeight + itemHeightWithSpacing > availableHeight && currentPageItems.length > 0) {
+            pages.push({ items: currentPageItems, isFirstPage: isFirstPage });
+            currentPageItems = [item];
+            currentPageHeight = item.height;
+            isFirstPage = false;
+        } else {
+            currentPageItems.push(item);
+            currentPageHeight += itemHeightWithSpacing;
+        }
+    });
+    
+    if (currentPageItems.length > 0) {
+        pages.push({ items: currentPageItems, isFirstPage: isFirstPage });
     }
 
+    pages.forEach((pageData, pageIndex) => {
+        if (pageIndex > 0) {
+            pdf.addPage();
+        }
+
+        const { items: pageItems, isFirstPage } = pageData;
+        const totalContentHeight = pageItems.reduce((sum, item) => sum + item.height, 0) + (PAGE_SPACING_MM * (pageItems.length - 1));
+
+        let startY = MARGIN_MM;
+
+        if (isFirstPage) {
+            pdf.addImage(headerImgData, 'JPEG', MARGIN_MM, startY, USABLE_WIDTH, headerHeight);
+            startY += headerHeight ;
+        }
+
+        if (pageItems.length > 1) {
+            const availableHeight = isFirstPage ? USABLE_HEIGHT - headerHeight - 5 : USABLE_HEIGHT;
+            const remainingSpace = availableHeight - totalContentHeight;
+            if (remainingSpace > 0) {
+                startY += remainingSpace / 2;
+            }
+        }
+
+        let currentY = startY;
+        pageItems.forEach(item => {
+            pdf.addImage(item.imgData, 'JPEG', MARGIN_MM, currentY, item.width, item.height);
+            currentY += item.height + PAGE_SPACING_MM;
+        });
+    });
+
+    const fileName = `${document.querySelector('.subtitle').textContent.trim() || 'schedule'}.pdf`;
+    pdf.save(fileName);
+    printButton.disabled = false;
+    printButton.querySelector('span:last-child').textContent = 'Download PDF';
+}
 })();
 </script>
 
