@@ -4,52 +4,61 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sunday Schedule Editor</title>
+
+<!-- FIREBASE SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+<!-- PDF Generation Libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<!-- FONTS AND ICONS -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+
 <style>
     :root {
-        --header-bg: #292929;
-        --text-light: #fff;
+        --header-bg: #1a1a1a;
+        --text-light: #ffffff;
         --body-bg: #f8fafc;
-        --menu-new-text: #4a6da7;
+        --menu-new-text: #2c5282;
         --menu-new-bg: #ffffff;
-        --menu-new-border: #eeeeee;
-        --menu-new-hover: #f5f5f5;
-        --primary-color: #012726;
-        --primary-hover: #024443;
-        --primary-light: #e6f6f6;
-        --danger-color: #d32f2f;
-        --danger-hover: #b71c1c;
-        --border-color: #e5e7eb;
+        --menu-new-border: #e2e8f0;
+        --menu-new-hover: #f7fafc;
+        --primary-color: #2d3748;
+        --primary-hover: #4a5568;
+        --primary-light: #edf2f7;
+        --danger-color: #e53e3e;
+        --danger-hover: #c53030;
+        --border-color: #e2e8f0;
         --background-color: #f8fafc;
-        --text-primary: #1f2937;
-        --text-secondary: #6b7280;
+        --text-primary: #2d3748;
+        --text-secondary: #718096;
         --surface-color: #ffffff;
         --radius-md: 8px;
-        --radius-lg: 16px;
+        --radius-lg: 12px;
         --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
         --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
         --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-        --warning-color: #f59e0b;
-        --success-color: #2e7d32;
+        --warning-color: #ed8936;
+        --success-color: #38a169;
         --accent-color: #3182ce;
     }
-
+    
     @font-face {
         font-family: "jw-icons-external";
         src: url("./jw-icons-external-d876da3.woff") format("woff");
         font-weight: normal; font-style: normal;
     }
 
-    * { box-sizing: border-box; }
+    * {
+        box-sizing: border-box;
+    }
 
     body {
         margin: 0; 
@@ -66,6 +75,7 @@
     body.menu-open { overflow: hidden; }
     body.dropdown-open { overflow: hidden; }
 
+    /* START: ENHANCED NAVBAR STYLES */
     .site-header { 
         background-color: var(--header-bg); 
         padding: 0; 
@@ -74,78 +84,89 @@
         top: 0; 
         left: 0; 
         width: 100%; 
-        z-index: 900; 
+        z-index: 1000;
         box-shadow: var(--shadow-md);
     }
     .top-bar { 
         display: flex; 
         justify-content: space-between; 
         align-items: center; 
-        height: 56px; 
-        padding: 0 15px 0 0; 
+        height: 64px; 
+        padding: 0 20px; 
         max-width: 1200px; 
         margin: 0 auto; 
     }
     .top-bar .mobileLogo { 
         display: block; 
-        width: 75px; 
-        height: 56px; 
+        width: 80px; 
+        height: 64px; 
         background-image: url(https://www.jw.org/assets/ct/46605f23da/images/siteLogo-jworg-mobile.svg), none; 
         background-repeat: no-repeat; 
         background-size: contain; 
         background-position: center left; 
         flex-shrink: 0; 
-        margin-left: 0px; 
     }
     .header-right-controls { 
         display: flex; 
         align-items: center; 
-        gap: 15px; 
+        gap: 16px; 
     }
+    
+    /* Status Indicator */
+    .status-indicator { 
+        font-size: 12px; 
+        font-weight: 600; 
+        padding: 6px 12px; 
+        border-radius: 999px; 
+        display: flex; 
+        align-items: center; 
+        gap: 6px; 
+        color: var(--text-light);
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+    }
+    
+    .status-indicator::before { 
+        content: ''; 
+        width: 8px; 
+        height: 8px; 
+        border-radius: 50%; 
+        background-color: currentColor; 
+    }
+    
+    .status-indicator[data-status="synced"] { color: var(--success-color); }
+    .status-indicator[data-status="syncing"] { color: var(--warning-color); }
+    .status-indicator[data-status="error"] { color: var(--danger-color); }
+    
     .header-icons { 
         display: flex; 
         align-items: center; 
-        justify-content: center;
-        height: 56px; 
-        width: 56px;
+        height: 64px; 
+        cursor: pointer; 
+        padding: 12px;
+        border-radius: var(--radius-md);
+        transition: background-color 0.2s;
     }
-    .hamburger {
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      width: 100%;
+    .header-icons:hover {
+        background-color: rgba(255,255,255,0.1);
     }
-    .hamburger input { display: none; }
-    .hamburger svg {
-      height: 2em;
-      transition: transform 600ms cubic-bezier(0.4, 0, 0.2, 1);
+    .header-icons svg { 
+        height: 24px; 
+        width: 24px; 
+        color: var(--text-light); 
     }
-    .line {
-      fill: none;
-      stroke: white;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      stroke-width: 3;
-      transition: stroke-dasharray 600ms cubic-bezier(0.4, 0, 0.2, 1),
-                  stroke-dashoffset 600ms cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .line-top-bottom { stroke-dasharray: 12 63; }
-    .hamburger input:checked + svg { transform: rotate(-45deg); }
-    .hamburger input:checked + svg .line-top-bottom {
-      stroke-dasharray: 20 300;
-      stroke-dashoffset: -32.42;
-    }
+    .header-icons .close-icon { display: none; }
+    body.menu-open .header-icons .hamburger-icon { display: none; }
+    body.menu-open .header-icons .close-icon { display: block; }
 
     .menu-overlay { 
         position: fixed; 
-        top: 56px; 
+        top: 64px; 
         left: 0; 
         width: 100%; 
-        height: calc(100% - 56px); 
+        height: calc(100% - 64px); 
         background-color: rgba(0, 0, 0, 0.6); 
-        z-index: 998; 
+        z-index: 999; 
         opacity: 0; 
         visibility: hidden; 
         transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; 
@@ -154,13 +175,13 @@
     .menu-overlay.is-open { opacity: 1; visibility: visible; }
     .slide-menu { 
         position: fixed; 
-        top: 56px; 
+        top: 64px; 
         right: 0; 
-        height: calc(100dvh - 56px); 
+        height: calc(100dvh - 64px); 
         width: 320px; 
         max-width: 90%; 
         background-color: var(--menu-new-bg); 
-        z-index: 999; 
+        z-index: 1000; 
         transform: translateX(100%); 
         transition: transform 0.3s ease-in-out; 
         display: flex; 
@@ -176,37 +197,49 @@
         align-items: center; 
         color: var(--menu-new-text); 
         background-color: var(--menu-new-bg); 
-        height: 50px; 
-        padding: 12px 5px 12px 12px; 
+        height: 56px; 
+        padding: 12px 20px; 
         box-sizing: border-box; 
         text-decoration: none; 
         font-size: 1rem; 
-        transition: background-color 0.2s; 
-        border-top: 1px dotted #a7a7a7; 
+        font-weight: 500;
+        transition: all 0.2s; 
+        border-bottom: 1px solid var(--border-color); 
     }
     .menu-links li:first-child a { border-top: none; }
-    .menu-links li a:hover { background-color: var(--menu-new-hover); }
+    .menu-links li a:hover { 
+        background-color: var(--menu-new-hover); 
+        color: var(--accent-color);
+    }
 
     .profile-section { 
-        padding: 16px; 
+        padding: 20px; 
         border-top: 1px solid var(--menu-new-border); 
         flex-shrink: 0; 
         background-color: #fafafa; 
         margin-top: auto; 
     }
     .profile-info { display: flex; align-items: center; }
-    .profile-name { font-weight: bold; font-size: 1rem; color: #333; word-break: break-all; }
+    .profile-name { 
+        font-weight: 600; 
+        font-size: 1rem; 
+        color: #333; 
+        word-break: break-all; 
+    }
+
     .iconLink-icon { 
         font-family: "jw-icons-external"; 
         font-size: 24px; 
         display: inline-block; 
-        color: #757575; 
-        width: 30px; 
-        margin-right: 10px; 
+        color: #718096; 
+        width: 32px; 
+        margin-right: 12px; 
         text-align: center; 
         transition: color 0.2s;
     }
-    .menu-links li a:hover .iconLink-icon { color: var(--menu-new-text); }
+    .menu-links li a:hover .iconLink-icon {
+        color: var(--accent-color);
+    }
     .home-icon::before { content: "\e661"; }
     .midweek-icon::before { content: "\e625"; }
     .sunday-icon::before { content: "\e610"; }
@@ -217,7 +250,7 @@
         align-items: center; 
         justify-content: center; 
         gap: 8px; 
-        padding: 10px 20px; 
+        padding: 12px 20px; 
         border-radius: var(--radius-md); 
         font-size: 1rem; 
         font-weight: 600; 
@@ -226,7 +259,7 @@
         text-decoration: none; 
         background-color: var(--primary-color); 
         color: white; 
-        transition: background-color 0.2s; 
+        transition: all 0.2s ease; 
         box-shadow: var(--shadow-sm);
     }
     .btn:hover:not(:disabled) { 
@@ -234,18 +267,31 @@
         transform: translateY(-1px);
         box-shadow: var(--shadow-md);
     }
-    .btn:active:not(:disabled) { transform: translateY(0); }
+    .btn:active:not(:disabled) {
+        transform: translateY(0);
+    }
     .btn:disabled { cursor: not-allowed; opacity: 0.6; }
 
+    /* END: ENHANCED NAVBAR STYLES */
+
+    /* START: ENHANCED EDITOR STYLES */
     .hidden { display: none !important; }
     
-    main { padding-top: calc(56px + 20px); min-height: 100vh; }
-    .editor-main { max-width: 1100px; margin: 0 auto; padding: 20px; }
+    main { 
+        padding-top: 84px; /* 64px navbar + 20px spacing */
+        min-height: 100vh;
+    }
+    
+    .editor-main { 
+        max-width: 1100px; 
+        margin: 0 auto; 
+        padding: 20px;
+    }
     
     .page-controls { 
         margin-bottom: 24px; 
         display: flex; 
-        justify-content: center;
+        justify-content: flex-end;
         align-items: center;
         gap: 12px;
     }
@@ -258,8 +304,16 @@
         border: 1px solid var(--border-color);
     }
     
-    .schedule-display-header { text-align: center; margin-bottom: 24px; }
-    .title-block { text-align: center; }
+    .schedule-display-header { 
+        text-align: center; 
+        margin-bottom: 0; 
+    }
+    
+    .title-block { 
+        text-align: center; 
+        margin-bottom: 24px;
+    }
+    
     .title-block h1 { 
         margin: 0 0 12px 0; 
         font-size: 1.8em; 
@@ -269,7 +323,11 @@
         line-height: 1.3;
     }
     
-    .subtitle-svg-container { position: relative; display: inline-block; margin-top: 0; }
+    .subtitle-svg-container { 
+        position: relative; 
+        display: inline-block; 
+        margin-top: 0; 
+    }
     
     .subtitle { 
         margin: 0; 
@@ -310,7 +368,7 @@
         width: 100%; 
         border-collapse: collapse; 
         font-size: 0.9em; 
-        border: 2px solid var(--border-color);
+        border: 2px solid var(--border-color); /* Updated for outer border */
         font-family: 'Noto Sans Telugu', sans-serif; 
         border-radius: var(--radius-md);
         overflow: hidden;
@@ -326,7 +384,11 @@
         font-family: 'Noto Sans Telugu', sans-serif; 
     }
     
-    .schedule-table tbody td:not(:first-child):not(.special-event) { text-align: left; padding-left: 12px; }
+    .schedule-table tbody td:not(:first-child):not(.special-event) { 
+        text-align: left; 
+        padding-left: 12px; 
+    }
+    
     .schedule-table thead th { 
         background-color: #f8f9fa; 
         font-size: 1.0em; 
@@ -337,9 +399,19 @@
         border-bottom: 2px solid var(--border-color);
     }
     
-    .schedule-table tbody tr { transition: background-color 0.2s; }
-    .schedule-table tbody tr:hover { background-color: #f8f9fa; }
-    .schedule-table [contenteditable="true"]:focus { background-color: #fffbe5; outline: 2px solid var(--warning-color); border-radius: 4px; }
+    .schedule-table tbody tr {
+        transition: background-color 0.2s;
+    }
+    
+    .schedule-table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .schedule-table [contenteditable="true"]:focus { 
+        background-color: #fffbe5; 
+        outline: 2px solid var(--warning-color); 
+        border-radius: 4px;
+    }
     
     .special-event { 
         color: var(--danger-color); 
@@ -364,8 +436,12 @@
         color: var(--text-secondary);
     }
     
-    .event-btn:hover { background-color: #f0f0f0; color: var(--text-primary); }
+    .event-btn:hover { 
+        background-color: #f0f0f0; 
+        color: var(--text-primary);
+    }
 
+    /* ENHANCED DESKTOP DROPDOWN STYLING - Updated design */
     .desktop-dropdown { 
         position: absolute; 
         background: rgba(255, 255, 255, 0.9); 
@@ -384,206 +460,856 @@
         overflow: hidden;
         display: block;
     }
-    .desktop-dropdown.active { opacity: 1; visibility: visible; transform: scale(1) translateY(0); }
-    .desktop-dropdown-search { display: flex; align-items: center; padding: 10px 14px; border-bottom: 1px solid var(--border-color); background: rgba(255,255,255,0.7); }
-    .desktop-dropdown-search svg { margin-right: 8px; }
-    .desktop-dropdown-search input { width: 100%; border: none; outline: none; background: transparent; font-size: 14px; color: var(--text-primary); }
-    .desktop-dropdown-list { max-height: 260px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--accent-color) transparent; }
-    .desktop-dropdown-list::-webkit-scrollbar { width: 6px; }
-    .desktop-dropdown-list::-webkit-scrollbar-thumb { background: var(--accent-color); border-radius: 3px; }
-    .desktop-dropdown-item { 
-        display: flex; align-items: center; width: 100%; padding: 12px 16px; border: none; 
-        background: none; cursor: pointer; transition: background-color 0.2s; font-family: 'Noto Sans Telugu', sans-serif;
-        font-size: 14px; text-align: left; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .desktop-dropdown-item:hover { background: rgba(0,123,255,0.08); color: var(--accent-color); }
-    .desktop-dropdown-item.active { background: rgba(0,123,255,0.15); color: var(--accent-color); font-weight: 500; }
     
-    .servant-tag { font-size: 0.75rem; font-weight: 600; color: var(--primary-color); background-color: var(--primary-light); padding: 4px 8px; border-radius: 12px; margin-left: auto; margin-right: 8px; }
+    .desktop-dropdown.active {
+        opacity: 1;
+        visibility: visible;
+        transform: scale(1) translateY(0);
+    }
+    
+    .desktop-dropdown-search {
+        display: flex;
+        align-items: center;
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--border-color);
+        background: rgba(255,255,255,0.7);
+    }
+    
+    .desktop-dropdown-search svg {
+        margin-right: 8px;
+    }
+    
+    .desktop-dropdown-search input {
+        width: 100%;
+        border: none;
+        outline: none;
+        background: transparent;
+        font-size: 14px;
+        color: var(--text-primary);
+    }
+    
+    .desktop-dropdown-list {
+        max-height: 260px;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: var(--accent-color) transparent;
+    }
+    
+    .desktop-dropdown-list::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .desktop-dropdown-list::-webkit-scrollbar-thumb {
+        background: var(--accent-color);
+        border-radius: 3px;
+    }
+    
+    .desktop-dropdown-item { 
+        display: flex; 
+        align-items: center; 
+        width: 100%; 
+        padding: 12px 16px; 
+        border: none; 
+        background: none; 
+        cursor: pointer; 
+        transition: background-color 0.2s;
+        font-family: 'Noto Sans Telugu', sans-serif;
+        font-size: 14px;
+        text-align: left;
+        color: var(--text-primary);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .desktop-dropdown-item:hover {
+        background: rgba(0,123,255,0.08);
+        color: var(--accent-color);
+    }
+    
+    .desktop-dropdown-item.active {
+        background: rgba(0,123,255,0.15);
+        color: var(--accent-color);
+        font-weight: 500;
+    }
+    
+    .servant-tag { 
+        font-size: 0.75rem; 
+        font-weight: 600; 
+        color: var(--primary-color); 
+        background-color: var(--primary-light); 
+        padding: 4px 8px; 
+        border-radius: 12px; 
+        margin-left: auto;
+        margin-right: 8px;
+    }
+
+    /* Desktop Event Context Menu */
     .desktop-event-menu { 
-        position: fixed; display: none; background: white; border-radius: var(--radius-md); 
-        box-shadow: var(--shadow-lg); z-index: 1001; padding: 8px; min-width: 180px; border: 1px solid var(--border-color); 
+        position: fixed; 
+        display: none; 
+        background: white; 
+        border-radius: var(--radius-md); 
+        box-shadow: var(--shadow-lg); 
+        z-index: 1001; 
+        padding: 8px; 
+        min-width: 180px; 
+        border: 1px solid var(--border-color); 
     }
     
     .desktop-event-item { 
-        display: flex; align-items: center; width: 100%; padding: 10px 12px; border: none; 
-        background: none; cursor: pointer; transition: background-color 0.2s; font-family: 'Inter', sans-serif;
-        font-size: 0.9rem; text-align: left; color: var(--text-primary); border-radius: 4px;
+        display: flex; 
+        align-items: center; 
+        width: 100%; 
+        padding: 10px 12px; 
+        border: none; 
+        background: none; 
+        cursor: pointer; 
+        transition: background-color 0.2s;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.9rem;
+        text-align: left;
+        color: var(--text-primary);
+        border-radius: 4px;
     }
-    .desktop-event-item:hover { background-color: #f8fafc; }
+    
+    .desktop-event-item:hover {
+        background-color: #f8fafc;
+    }
 
-    .editable-cell { cursor: pointer; transition: all 0.2s ease; position: relative; border-radius: 4px; }
-    .editable-cell:hover { background-color: #f0f8ff; box-shadow: inset 0 0 0 1px var(--accent-color); }
+    /* Enhanced cell styling for better UX */
+    .editable-cell {
+        cursor: pointer;
+        transition: all 0.2s ease;
+        position: relative;
+        border-radius: 4px;
+    }
+    .editable-cell:hover {
+        background-color: #f0f8ff;
+        box-shadow: inset 0 0 0 1px var(--accent-color);
+    }
     .editable-cell:after {
-        content: ""; position: absolute; right: 8px; top: 50%; transform: translateY(-50%); opacity: 0.5;
-        transition: opacity 0.2s; width: 16px; height: 16px;
+        content: "";
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        opacity: 0.5;
+        transition: opacity 0.2s;
+        width: 16px;
+        height: 16px;
         background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 9L12 15L18 9' stroke='%23002726' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3C/path%3E%3C/svg%3E");
-        background-size: contain; background-repeat: no-repeat;
+        background-size: contain;
+        background-repeat: no-repeat;
     }
-    .editable-cell:hover:after { opacity: 1; }
-    .special-event { cursor: default !important; }
-    .special-event:after { display: none; }
+    .editable-cell:hover:after {
+        opacity: 1;
+    }
+    
+    /* Special event cells should not be editable */
+    .special-event {
+        cursor: default !important;
+    }
+    .special-event:after {
+        display: none;
+    }
 
+    /* Enhanced Modal Styles */
     .modal-overlay { 
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); 
-        display: none; justify-content: center; align-items: center; z-index: 1000; padding: 16px; backdrop-filter: blur(4px);
+        position: fixed; 
+        top: 0; 
+        left: 0; 
+        width: 100%; 
+        height: 100%; 
+        background: rgba(0,0,0,0.6); 
+        display: none; 
+        justify-content: center; 
+        align-items: center; 
+        z-index: 1000; 
+        padding: 16px; 
+        backdrop-filter: blur(4px);
     }
     .modal-content { 
-        background: white; padding: 24px; border-radius: var(--radius-lg); width: 100%; max-width: 500px; max-height: 90vh; 
-        display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow-lg); 
-        transform: scale(0.9); opacity: 0; transition: all 0.3s ease;
+        background: white; 
+        padding: 24px; 
+        border-radius: var(--radius-lg); 
+        width: 100%; 
+        max-width: 500px; 
+        max-height: 90vh; 
+        display: flex; 
+        flex-direction: column; 
+        gap: 16px; 
+        box-shadow: var(--shadow-lg); 
+        transform: scale(0.9);
+        opacity: 0;
+        transition: all 0.3s ease;
     }
-    .modal-overlay.active { display: flex; }
-    .modal-overlay.active .modal-content { transform: scale(1); opacity: 1; }
+    
+    .modal-overlay.active {
+        display: flex;
+    }
+    
+    .modal-overlay.active .modal-content {
+        transform: scale(1);
+        opacity: 1;
+    }
     
     #new-schedule-name { 
-        width: 100%; padding: 12px 16px; font-size: 16px; border-radius: var(--radius-md); 
-        border: 2px solid var(--border-color); font-family: 'Inter', sans-serif; transition: border-color 0.2s;
+        width: 100%; 
+        padding: 12px 16px; 
+        font-size: 16px; 
+        border-radius: var(--radius-md); 
+        border: 2px solid var(--border-color); 
+        font-family: 'Inter', sans-serif;
+        transition: border-color 0.2s;
     }
-    #new-schedule-name:focus { outline: none; border-color: var(--accent-color); }
-    #date-checklist { list-style: none; padding: 0; margin: 0; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md); max-height: 40vh; }
+    
+    #new-schedule-name:focus {
+        outline: none;
+        border-color: var(--accent-color);
+    }
+    
+    #date-checklist { 
+        list-style: none; 
+        padding: 0; 
+        margin: 0; 
+        overflow-y: auto; 
+        border: 1px solid var(--border-color); 
+        border-radius: var(--radius-md); 
+        max-height: 40vh; 
+    }
+    
     #date-checklist label { 
-        display: flex; align-items: center; gap: 10px; font-size: 16px; cursor: pointer; 
-        font-weight: 500; padding: 12px 16px; border-bottom: 1px solid var(--border-color); transition: background-color 0.2s;
+        display: flex; 
+        align-items: center; 
+        gap: 10px; 
+        font-size: 16px; 
+        cursor: pointer; 
+        font-weight: 500; 
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border-color);
+        transition: background-color 0.2s;
     }
-    #date-checklist label:last-child { border-bottom: none; }
-    #date-checklist label:hover { background-color: #f8fafc; }
     
-    .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px; }
+    #date-checklist label:last-child {
+        border-bottom: none;
+    }
+    
+    #date-checklist label:hover {
+        background-color: #f8fafc;
+    }
+    
+    .modal-actions { 
+        display: flex; 
+        justify-content: flex-end; 
+        gap: 12px; 
+        margin-top: 16px; 
+    }
+    
     .modal-actions button { 
-        font-family: 'Inter', sans-serif; padding: 10px 20px; border-radius: var(--radius-md); 
-        font-size: 15px; font-weight: 600; cursor: pointer; border: 2px solid var(--border-color); transition: all 0.2s ease;
+        font-family: 'Inter', sans-serif; 
+        padding: 10px 20px; 
+        border-radius: var(--radius-md); 
+        font-size: 15px; 
+        font-weight: 600; 
+        cursor: pointer; 
+        border: 2px solid var(--border-color); 
+        transition: all 0.2s ease;
     }
     
-    #cancel-creation { background-color: var(--surface-color); }
-    #cancel-creation:hover { border-color: var(--text-secondary); }
-    #confirm-creation { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
-    #confirm-creation:hover { background-color: var(--primary-hover); border-color: var(--primary-hover); }
+    #cancel-creation { 
+        background-color: var(--surface-color); 
+    }
+    
+    #cancel-creation:hover {
+        border-color: var(--text-secondary);
+    }
+    
+    #confirm-creation { 
+        background-color: var(--primary-color); 
+        color: white; 
+        border-color: var(--primary-color); 
+    }
+    
+    #confirm-creation:hover {
+        background-color: var(--primary-hover);
+        border-color: var(--primary-hover);
+    }
 
+    /* MOBILE BOTTOM SHEET STYLES - Updated with search */
     .dropdown-backdrop {
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); 
-        z-index: 1100; opacity: 0; visibility: hidden; transition: all 0.3s ease; backdrop-filter: blur(4px);
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 1100;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(4px);
     }
-    .dropdown-backdrop.active { opacity: 1; visibility: visible; }
+    
+    .dropdown-backdrop.active {
+        opacity: 1;
+        visibility: visible;
+    }
+    
     .dropdown-container {
-        position: fixed; bottom: 0; left: 0; right: 0; background: white; border-radius: 24px 24px 0 0;
-        z-index: 1101; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        max-height: 80vh; display: flex; flex-direction: column; box-shadow: 0 -10px 30px rgba(0,0,0,0.2);
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        border-radius: 24px 24px 0 0;
+        z-index: 1101;
+        transform: translateY(100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        max-height: 80vh;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 -10px 30px rgba(0,0,0,0.2);
     }
-    .dropdown-container.active { transform: translateY(0); }
+    
+    .dropdown-container.active {
+        transform: translateY(0);
+    }
+    
     .dropdown-header {
-        padding: 20px 24px 12px; border-bottom: 1px solid var(--border-color); display: flex; 
-        justify-content: space-between; align-items: center; flex-shrink: 0;
+        padding: 20px 24px 12px;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-shrink: 0;
     }
-    .dropdown-title { font-size: 1.2rem; font-weight: 600; color: var(--text-primary); font-family: 'Noto Sans Telugu', sans-serif; }
+    
+    .dropdown-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        font-family: 'Noto Sans Telugu', sans-serif;
+    }
+    
     .dropdown-close {
-        background: none; border: none; padding: 8px; cursor: pointer; border-radius: 50%; 
-        display: flex; align-items: center; justify-content: center; color: var(--text-secondary); transition: background-color 0.2s;
+        background: none;
+        border: none;
+        padding: 8px;
+        cursor: pointer;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-secondary);
+        transition: background-color 0.2s;
     }
-    .dropdown-close:hover { background-color: #f5f5f5; }
     
-    .mobile-dropdown-search { display: flex; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--border-color); background: rgba(255,255,255,0.7); }
-    .mobile-dropdown-search svg { margin-right: 8px; }
-    .mobile-dropdown-search input { width: 100%; border: none; outline: none; background: transparent; font-size: 16px; color: var(--text-primary); }
-    
-    .dropdown-content { flex: 1; overflow-y: auto; padding: 8px 0; max-height: 300px; }
-    .dropdown-item { 
-        display: flex; align-items: center; width: 100%; padding: 16px 24px; border: none; background: none; 
-        cursor: pointer; transition: background-color 0.2s; font-family: 'Noto Sans Telugu', sans-serif;
-        font-size: 1rem; text-align: left; color: var(--text-primary);
+    .dropdown-close:hover {
+        background-color: #f5f5f5;
     }
-    .dropdown-item:hover { background-color: #f8fafc; }
-    .dropdown-item.active { background-color: var(--primary-light); color: var(--primary-color); font-weight: 600; }
+    
+    /* Mobile Search Bar */
+    .mobile-dropdown-search {
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border-color);
+        background: rgba(255,255,255,0.7);
+    }
+    
+    .mobile-dropdown-search svg {
+        margin-right: 8px;
+    }
+    
+    .mobile-dropdown-search input {
+        width: 100%;
+        border: none;
+        outline: none;
+        background: transparent;
+        font-size: 16px;
+        color: var(--text-primary);
+    }
+    
+    .dropdown-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 8px 0;
+        max-height: 300px;
+    }
+    
+    .dropdown-item {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        padding: 16px 24px;
+        border: none;
+        background: none;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        font-family: 'Noto Sans Telugu', sans-serif;
+        font-size: 1rem;
+        text-align: left;
+        color: var(--text-primary);
+    }
+    
+    .dropdown-item:hover {
+        background-color: #f8fafc;
+    }
+    
+    .dropdown-item.active {
+        background-color: var(--primary-light);
+        color: var(--primary-color);
+        font-weight: 600;
+    }
 
-    .mobile-view-container { display: none; }
-    #toggle-all-mobile { display: none; }
+    /* Mobile View Styles */
+    .mobile-view-container { 
+        display: none; 
+    }
     
+    .mobile-week-card {
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .mobile-week-card:last-child {
+        margin-bottom: 0;
+    }
+    
+    .mobile-week-card:hover {
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+    }
+    
+    .week-date {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0 0 20px 0;
+        padding-bottom: 12px;
+        border-bottom: 2px solid var(--border-color);
+        text-align: center;
+        font-family: 'Noto Sans Telugu', sans-serif;
+        position: relative;
+    }
+    
+    .week-date::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 3px;
+        background: var(--primary-color);
+        border-radius: 2px;
+    }
+    
+    /* Mobile Event Type Dropdown */
+    .event-type-dropdown {
+        margin-bottom: 20px;
+    }
+    
+    .event-type-field {
+        padding: 16px;
+        border: 2px solid var(--border-color);
+        border-radius: var(--radius-md);
+        background-color: #fafafa;
+        cursor: pointer;
+        font-family: 'Noto Sans Telugu', sans-serif;
+        font-weight: 500;
+        position: relative;
+        transition: all 0.2s ease;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        min-height: 56px;
+    }
+    
+    .event-type-field:hover {
+        border-color: var(--accent-color);
+        background-color: white;
+    }
+    
+    .event-type-field::after {
+        content: "";
+        width: 16px;
+        height: 16px;
+        background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 9L12 15L18 9' stroke='%23002726' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3C/path%3E%3C/svg%3E");
+        background-size: contain;
+        background-repeat: no-repeat;
+        transition: transform 0.2s ease;
+    }
+    
+    .event-type-field.active::after {
+        transform: rotate(180deg);
+    }
+    
+    .event-type-value {
+        flex: 1;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .event-type-placeholder {
+        color: var(--text-secondary);
+        font-style: italic;
+    }
+    
+    .event-type-icon {
+        font-size: 1.2rem;
+    }
+    
+    .week-fields {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+    
+    .field-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .field-group label {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        font-family: 'Noto Sans Telugu', sans-serif;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .field-group label::before {
+        content: '';
+        width: 4px;
+        height: 16px;
+        background: var(--primary-color);
+        border-radius: 2px;
+    }
+    
+    .mobile-field {
+        padding: 16px;
+        border: 2px solid var(--border-color);
+        border-radius: var(--radius-md);
+        background-color: #fafafa;
+        cursor: pointer;
+        font-family: 'Noto Sans Telugu', sans-serif;
+        font-weight: 500;
+        position: relative;
+        transition: all 0.2s ease;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        min-height: 56px;
+    }
+    
+    .mobile-field:hover {
+        border-color: var(--accent-color);
+        background-color: white;
+    }
+    
+    .mobile-field::after {
+        content: "";
+        width: 16px;
+        height: 16px;
+        background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 9L12 15L18 9' stroke='%23002726' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3C/path%3E%3C/svg%3E");
+        background-size: contain;
+        background-repeat: no-repeat;
+        transition: transform 0.2s ease;
+    }
+    
+    .mobile-field.active::after {
+        transform: rotate(180deg);
+    }
+    
+    .mobile-field-value {
+        flex: 1;
+        color: var(--text-primary);
+    }
+    
+    .mobile-field-placeholder {
+        color: var(--text-secondary);
+        font-style: italic;
+    }
+    
+    .special-event-mobile {
+        text-align: center;
+        padding: 20px;
+        background: linear-gradient(135deg, #fff5f5, #fed7d7);
+        border-radius: var(--radius-lg);
+        border: 2px dashed #fed7d7;
+        margin: 16px 0;
+    }
+    
+    .special-event-text-mobile {
+        color: var(--danger-color);
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin: 0;
+        font-family: 'Noto Sans Telugu', sans-serif;
+    }
+    
+    .mobile-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 20px;
+        padding-top: 16px;
+        border-top: 1px solid var(--border-color);
+    }
+    
+    .mobile-action-btn {
+        flex: 1;
+        padding: 12px 16px;
+        border: 2px solid var(--border-color);
+        background: white;
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        font-family: 'Noto Sans Telugu', sans-serif;
+        font-weight: 500;
+        text-align: center;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    
+    .mobile-action-btn.primary {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+    
+    .mobile-action-btn.primary:hover {
+        background: var(--primary-hover);
+        border-color: var(--primary-hover);
+    }
+    
+    .mobile-action-btn.secondary:hover {
+        border-color: var(--accent-color);
+        color: var(--accent-color);
+    }
+
+    /* Animation Classes */
+    .fade-in {
+        animation: fadeIn 0.3s ease-in-out;
+    }
+    
+    .slide-up {
+        animation: slideUp 0.3s ease-out;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    @keyframes slideUp {
+        from { 
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to { 
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Responsive Design */
     @media (max-width: 768px) {
-        main { padding-top: 60px; }
-        .editor-main { padding: 0; }
-        .page-controls { padding: 16px; }
-        .master-container { padding: 0; border-radius: 0; box-shadow: none; background: transparent; border: none; }
-        .schedule-table { display: none; }
-        .mobile-view-container { display: flex; flex-direction: column; gap: 1rem; padding: 0 16px 16px; }
-        .title-block { padding: 16px; margin-bottom: 0; }
-        .title-block h1 { font-size: 1.5rem; }
-        .subtitle { font-size: 1rem; padding: 6px 12px; }
-        .svg-divider { width: 300px; }
-        .desktop-dropdown, .desktop-event-menu { display: none !important; }
-
-        #toggle-all-mobile {
-            display: inline-flex; margin: 0 auto 16px; background: var(--surface-color);
-            color: var(--text-secondary); border: 1px solid var(--border-color);
+        .top-bar { 
+            padding: 0 16px; 
+            height: 60px;
         }
-
-        .mobile-week-card {
-            background: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--radius-lg);
-            margin-bottom: 0; box-shadow: var(--shadow-sm); transition: all 0.3s ease; overflow: hidden;
+        
+        .top-bar .mobileLogo { 
+            height: 60px; 
         }
-        .mobile-week-header {
-            display: flex; justify-content: space-between; align-items: center; cursor: pointer; padding: 20px;
+        
+        .header-icons { 
+            height: 60px; 
         }
-        .week-date {
-            font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin: 0;
-            font-family: 'Noto Sans Telugu', sans-serif; text-align: left;
+        
+        .menu-overlay { 
+            top: 60px; 
+            height: calc(100% - 60px); 
         }
-        .accordion-icon { color: var(--text-secondary); transition: transform 0.3s ease; }
-        .mobile-week-card.active .accordion-icon { transform: rotate(180deg); }
-        .mobile-week-body {
-            max-height: 0; overflow: hidden; transition: max-height 0.4s ease-in-out, padding 0.4s ease-in-out; padding: 0 20px;
+        
+        .slide-menu { 
+            top: 60px; 
+            height: calc(100dvh - 60px); 
         }
-        .mobile-week-card.active .mobile-week-body {
-            max-height: 2000px; padding: 0 20px 20px 20px;
-            border-top: 1px solid var(--border-color); margin-top: -1px;
+        
+        main { 
+            padding-top: 70px; /* 60px navbar + 10px spacing */
         }
-        .week-fields { display: flex; flex-direction: column; gap: 16px; padding-top: 20px; }
-        .field-group { display: flex; flex-direction: column; gap: 8px; }
-        .field-group label {
-            font-size: 0.95rem; font-weight: 600; color: var(--text-secondary);
-            font-family: 'Noto Sans Telugu', sans-serif; display: flex; align-items: center; gap: 6px;
+        
+        .editor-main { 
+            padding: 16px; 
         }
-        .field-group label::before { content: ''; width: 4px; height: 16px; background: var(--primary-color); border-radius: 2px; }
-        .mobile-field {
-            padding: 16px; border: 2px solid var(--border-color); border-radius: var(--radius-md); background-color: #fafafa;
-            cursor: pointer; font-family: 'Noto Sans Telugu', sans-serif; font-weight: 500; position: relative;
-            transition: all 0.2s ease; display: flex; justify-content: space-between; align-items: center; min-height: 56px;
+        
+        .page-controls { 
+            justify-content: center;
         }
-        .mobile-field:hover { border-color: var(--accent-color); background-color: white; }
-        .mobile-field::after {
-            content: ""; width: 16px; height: 16px;
-            background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 9L12 15L18 9' stroke='%23002726' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3C/path%3E%3C/svg%3E");
-            background-size: contain; background-repeat: no-repeat; transition: transform 0.2s ease;
+        
+        .master-container { 
+            padding: 0; 
+            border-radius: 0; 
+            box-shadow: none; 
+            background: transparent;
+            border: none;
         }
-        .mobile-field.active::after { transform: rotate(180deg); }
-        .mobile-field-value { flex: 1; color: var(--text-primary); }
-        .mobile-field-placeholder { color: var(--text-secondary); font-style: italic; }
-        .special-event-mobile {
-            text-align: center; padding: 20px; background: linear-gradient(135deg, #fff5f5, #fed7d7);
-            border-radius: var(--radius-lg); border: 2px dashed #fed7d7; margin-top: 16px;
+        
+        .schedule-table { 
+            display: none; 
         }
-        .special-event-text-mobile {
-            color: var(--danger-color); font-weight: 700; font-size: 1.1rem;
-            margin: 0; font-family: 'Noto Sans Telugu', sans-serif;
+        
+        .mobile-view-container { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 1rem; 
+        }
+        
+        .title-block {
+            padding: 0 16px;
+            margin-bottom: 16px;
+        }
+        
+        .title-block h1 {
+            font-size: 1.5rem;
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            padding: 6px 12px;
+        }
+        
+        .svg-divider {
+            width: 300px;
+        }
+        
+        .desktop-dropdown {
+            display: none !important;
+        }
+        
+        .desktop-event-menu {
+            display: none !important;
         }
     }
 
-    .pdf-page-container { background: white; padding: 20px; font-family: 'Noto Sans Telugu', sans-serif; width: 1100px; margin-bottom: 20px; }
+    /* PDF-specific styles */
+    .pdf-page-container {
+        background: white;
+        padding: 20px;
+        font-family: 'Noto Sans Telugu', sans-serif;
+        width: 1100px;
+        margin-bottom: 20px;
+    }
+    
     .pdf-table {
-        width: 100%; border-collapse: collapse; font-family: 'Noto Sans Telugu', sans-serif;
-        border: 2px solid #000; table-layout: fixed !important;
+        width: 100%;
+        border-collapse: collapse;
+        font-family: 'Noto Sans Telugu', sans-serif;
+        border: 2px solid #000;
+        table-layout: fixed !important;
     }
-    .pdf-table th, .pdf-table td {
-        border: 1px solid #000; padding: 8px 6px; font-family: 'Noto Sans Telugu', sans-serif; font-weight: 700;
-        height: 35px; vertical-align: middle; box-sizing: border-box; overflow: hidden !important;
-        text-overflow: ellipsis !important; white-space: nowrap !important;
+    
+    .pdf-table th,
+    .pdf-table td {
+        border: 1px solid #000;
+        padding: 8px 6px;
+        font-family: 'Noto Sans Telugu', sans-serif;
+        font-weight: 700;
+        height: 35px;
+        vertical-align: middle;
+        box-sizing: border-box;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
     }
-    .pdf-table thead th { background-color: #F3E5D7; font-size: 1.0em; padding: 8px 6px; }
-    .pdf-header { text-align: center; margin-bottom: 20px; }
-    .pdf-header .title-block { text-align: center; margin-bottom: 20px; }
-    .pdf-header .subtitle-svg-container { position: relative; display: inline-block; margin-top: 10px; }
+    
+    .pdf-table thead th {
+        background-color: #F3E5D7;
+        font-size: 1.0em;
+        padding: 8px 6px;
+    }
+    
+    .pdf-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    
+    .pdf-title {
+        font-family: 'Noto Sans Telugu', sans-serif;
+        font-weight: 700;
+        color: rgb(97, 40, 0);
+        margin: 0;
+    }
+    
+    .pdf-subtitle-container {
+        position: relative;
+        display: inline-block;
+        margin-top: 0;
+    }
+    
+    .pdf-subtitle {
+        font-family: 'Noto Sans Telugu', sans-serif;
+        font-weight: 500;
+        background: white;
+        padding: 2px 8px;
+        display: inline-block;
+        position: relative;
+        z-index: 2;
+    }
+    
+    .pdf-svg-divider {
+        width: 400px;
+        height: 5px;
+        display: block;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        top: 50%;
+        margin-top: -2.5px;
+        z-index: 1;
+    }
+
+    /* Add to your existing CSS */
+    .pdf-header .title-block {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .pdf-header .subtitle-svg-container {
+        position: relative;
+        display: inline-block;
+        margin-top: 10px;
+    }
+
     .pdf-header .svg-divider {
-        width: 400px; height: 5px; background: linear-gradient(to right, #ffffff, #093261, #ffffff); display: block;
-        position: absolute; left: 50%; transform: translateX(-50%); top: 50%; margin-top: -2.5px; z-index: 1;
+        width: 400px;
+        height: 5px;
+        background: linear-gradient(to right, #ffffff, #093261, #ffffff);
+        display: block;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        top: 50%;
+        margin-top: -2.5px;
+        z-index: 1;
     }
 </style>
 </head>
@@ -594,14 +1320,9 @@
         <a href="./sunday-dashboard.html" class="mobileLogo" title="Sunday Schedules"></a>
         <div class="header-right-controls">
             <div class="status-indicator" data-status="synced">Synced</div>
-            <div class="header-icons">
-                 <label class="hamburger">
-                  <input type="checkbox" id="menu-checkbox">
-                  <svg viewBox="0 0 32 32">
-                    <path class="line line-top-bottom" d="M27 10 13 10C10.8 10 9 8.2 9 6 9 3.5 10.8 2 13 2 15.2 2 17 3.8 17 6L17 26C17 28.2 18.8 30 21 30 23.2 30 25 28.2 25 26 25 23.8 23.2 22 21 22L7 22"></path>
-                    <path class="line" d="M7 16 27 16"></path>
-                  </svg>
-                </label>
+            <div class="header-icons" id="menu-toggle-button">
+                <svg class="hamburger-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M22.5 7h-21a.5.5 0 010-1h21a.5.5 0 010 1zM22.5 13h-21a.5.5 0 010-1h21a.5.5 0 010 1zM22.5 19h-21a.5.5 0 010-1h21a.5.5 0 010 1z"></path></svg>
+                <svg class="close-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12.707 12l6.146-6.146a.5.5 0 00-.707-.707L12 11.293 5.854 5.146a.5.5 0 00-.707.707L11.293 12l-6.147 6.146a.5.5 0 10.707.707L12 12.707l6.146 6.146a.5.5 0 00.707-.707z"></path></svg>
             </div>
         </div>
     </div>
@@ -634,39 +1355,27 @@
         </button>
     </div>
     <div class="master-container">
-        <header class="schedule-display-header">
-            <div class="title-block">
-                <h1>బహిరంగ ప్రసంగాల పట్టిక</h1>
-                <div class="subtitle-svg-container">
-                    <p class="subtitle" contenteditable="true">Loading...</p>
-                    <svg class="svg-divider" role="presentation" viewBox="0 0 24039.797 260" preserveAspectRatio="xMidYMid slice">
-                        <defs>
-                            <radialGradient id="__id9__id4-sunday" gradientUnits="userSpaceOnUse" r="12020.601" cx="12019.898" cy="130" fx="12019.898" fy="130">
-                                <stop stop-color="#093261" stop-opacity="1" offset="0"></stop>
-                                <stop stop-color="#ffffff" stop-opacity="1" offset="1"></stop>
-                            </radialGradient>
-                        </defs>
-                        <rect x="0" y="0" width="24039.797" height="260" fill="url(#__id9__id4-sunday)"></rect>
-                    </svg>
-                </div>
-            </div>
-        </header>
-        <button id="toggle-all-mobile" class="btn">
-            <span class="material-symbols-outlined">unfold_more</span>
-            <span>Open All</span>
-        </button>
-        <div id="schedule-content-wrapper"></div>
+        <div id="schedule-content-wrapper">
+            <!-- Schedule will be rendered here -->
+        </div>
     </div>
 </div>
 
+<!-- Desktop Dropdown -->
 <div class="desktop-dropdown" id="desktop-dropdown">
     <div class="desktop-dropdown-search">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
         <input type="text" id="desktop-dropdown-search" placeholder="Search...">
     </div>
-    <div class="desktop-dropdown-list" id="desktop-dropdown-list"></div>
+    <div class="desktop-dropdown-list" id="desktop-dropdown-list">
+        <!-- Desktop dropdown items will be injected here -->
+    </div>
 </div>
 
+<!-- Desktop Event Menu -->
 <div class="desktop-event-menu" id="desktop-event-menu">
     <button class="desktop-event-item" data-event-type="normal">Normal</button>
     <button class="desktop-event-item" data-event-type="co-visit">CO Visit</button>
@@ -674,17 +1383,25 @@
     <button class="desktop-event-item" data-event-type="convention">Convention</button>
 </div>
 
+<!-- Mobile Bottom Sheet Components -->
 <div class="dropdown-backdrop" id="dropdown-backdrop"></div>
 <div class="dropdown-container" id="dropdown-container">
     <div class="dropdown-header">
         <h3 class="dropdown-title" id="dropdown-title">Select Option</h3>
-        <button class="dropdown-close" id="dropdown-close"><span class="material-symbols-outlined">close</span></button>
+        <button class="dropdown-close" id="dropdown-close">
+            <span class="material-symbols-outlined">close</span>
+        </button>
     </div>
     <div class="mobile-dropdown-search" id="mobile-dropdown-search" style="display: none;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
         <input type="text" id="mobile-search-input" placeholder="Search...">
     </div>
-    <div class="dropdown-content" id="dropdown-content"></div>
+    <div class="dropdown-content" id="dropdown-content">
+        <!-- Dropdown items will be injected here -->
+    </div>
 </div>
 
 <div id="date-selection-modal" class="modal-overlay">
@@ -729,6 +1446,7 @@
     let desktopDropdownSearch = null;
     let desktopDropdownList = null;
     let mobileSearchInput = null;
+    let currentFocus = -1;
 
     const scheduleWrapper = document.getElementById('schedule-content-wrapper');
     const dateSelectionModal = document.getElementById('date-selection-modal');
@@ -736,6 +1454,7 @@
     const desktopDropdown = document.getElementById('desktop-dropdown');
     const desktopEventMenu = document.getElementById('desktop-event-menu');
 
+    // Mobile dropdown elements
     const dropdownBackdrop = document.getElementById('dropdown-backdrop');
     const dropdownContainer = document.getElementById('dropdown-container');
     const dropdownTitle = document.getElementById('dropdown-title');
@@ -743,16 +1462,37 @@
     const dropdownClose = document.getElementById('dropdown-close');
     const mobileDropdownSearch = document.getElementById('mobile-dropdown-search');
 
-    const topics = { 'అంశం-1': 'this is talk-1', 'అంశం-2': 'this is talk-2', 'అంశం-3': 'this is talk-3', 'అంశం-4': 'this is talk-4' };
-    const eventTexts = { 'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం', 'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో', 'convention': 'ప్రాదేశిక సమావేశం' };
+    // Topic definitions
+    const topics = {
+        'అంశం-1': 'this is talk-1',
+        'అంశం-2': 'this is talk-2', 
+        'అంశం-3': 'this is talk-3',
+        'అంశం-4': 'this is talk-4'
+    };
+
+    // Special event texts
+    const eventTexts = {
+        'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం',
+        'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో',
+        'convention': 'ప్రాదేశిక సమావేశం'
+    };
+
     const eventTypes = [
-        { id: 'normal', name: 'Normal', icon: 'event' }, { id: 'co-visit', name: 'CO Visit', icon: 'groups' },
-        { id: 'assembly', name: 'Assembly', icon: 'celebration' }, { id: 'convention', name: 'Convention', icon: 'festival' }
+        { id: 'normal', name: 'Normal', icon: 'event', color: 'primary' },
+        { id: 'co-visit', name: 'CO Visit', icon: 'groups', color: 'co-visit' },
+        { id: 'assembly', name: 'Assembly', icon: 'celebration', color: 'assembly' },
+        { id: 'convention', name: 'Convention', icon: 'festival', color: 'convention' }
     ];
 
-    const debounce = (func, delay) => { let timeout; return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), delay); }; };
+    const debounce = (func, delay) => {
+        let timeout;
+        return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), delay); };
+    };
 
-    function updateStatus(text, status) { statusIndicator.textContent = text; statusIndicator.dataset.status = status; }
+    function updateStatus(text, status) {
+        statusIndicator.textContent = text;
+        statusIndicator.dataset.status = status;
+    }
 
     async function fetchMembers() {
         if (!currentUser) return;
@@ -761,7 +1501,11 @@
         members = { brothers: [], sisters: [] };
         snapshot.forEach(doc => {
             const member = { id: doc.id, ...doc.data() };
-            if (member.type === 'brother') members.brothers.push(member); else members.sisters.push(member);
+            if (member.type === 'brother') {
+                members.brothers.push(member);
+            } else {
+                members.sisters.push(member);
+            }
         });
     }
 
@@ -771,8 +1515,11 @@
             await fetchMembers();
             userSchedulesCollection = db.collection(`userSundaySchedules/${currentUser.uid}/schedules`);
             document.body.classList.add('auth-ready');
-            if (document.querySelector('.profile-name')) document.querySelector('.profile-name').textContent = user.email;
+            const profileNameEl = document.querySelector('.profile-name');
+            if (profileNameEl) profileNameEl.textContent = user.email;
+            
             setupGlobalUI();
+
             const params = new URLSearchParams(window.location.search);
             currentScheduleId = params.get('id');
             if (currentScheduleId) initEditor(); else initCreationFlow();
@@ -783,128 +1530,236 @@
 
     function initEditor() {
         if (currentListener) currentListener();
+        
+        // First, get the initial data and render it
         userSchedulesCollection.doc(currentScheduleId).get().then(doc => {
             if (doc.exists) {
-                renderSchedule(doc.data());
+                const scheduleData = doc.data();
+                renderSchedule(scheduleData);
                 updateStatus('Synced', 'synced');
             } else {
                 alert("This schedule may have been deleted.");
                 window.location.href = './sunday-dashboard.html';
             }
-        }).catch(error => { updateStatus('Error', 'error'); });
+        }).catch(error => {
+            updateStatus('Error', 'error');
+        });
         
+        // Then set up the snapshot listener for real-time updates, but don't re-render on local changes
         currentListener = userSchedulesCollection.doc(currentScheduleId).onSnapshot(doc => {
-            if (doc.exists) updateStatus('Synced', 'synced');
-        }, error => { updateStatus('Error', 'error'); });
+            if (doc.exists) {
+                // Only update status, don't re-render to avoid conflicts with optimistic updates
+                updateStatus('Synced', 'synced');
+            }
+        }, error => {
+            updateStatus('Error', 'error');
+        });
     }
 
     function renderSchedule(data) {
         document.title = data.name;
         scheduleWrapper.innerHTML = `
-            <table class="schedule-table">
-                <thead><tr><th>తేదీ</th><th>ప్రసంగ అంశం</th><th>ప్రసంగీకుడు</th><th>చైర్మన్</th><th>కావలికోట రీడర్</th><th class="actions-col">Actions</th></tr></thead>
-                <tbody>${data.tableHTML}</tbody>
-            </table>
-            <div class="mobile-view-container"></div>`;
+            <header class="schedule-display-header">
+                <div class="title-block">
+                    <h1>బహిరంగ ప్రసంగాల పట్టిక</h1>
+                    <div class="subtitle-svg-container">
+                        <p class="subtitle" contenteditable="true">${data.dateRange || ''}</p>
+                        <svg class="svg-divider" role="presentation" viewBox="0 0 24039.797 260" preserveAspectRatio="xMidYMid slice">
+                            <defs>
+                                <radialGradient id="__id9__id4" gradientUnits="userSpaceOnUse" r="12020.601" cx="12019.898" cy="130" fx="12019.898" fy="130">
+                                    <stop stop-color="#093261" stop-opacity="1" offset="0"></stop>
+                                    <stop stop-color="#ffffff" stop-opacity="1" offset="1"></stop>
+                                </radialGradient>
+                            </defs>
+                            <rect x="0" y="0" width="24039.797" height="260" fill="url(#__id9__id4)"></rect>
+                        </svg>
+                    </div>
+                </div>
+            </header>
+            <main>
+                <table class="schedule-table">
+                    <thead>
+                        <tr>
+                            <th>తేదీ</th>
+                            <th>ప్రసంగ అంశం</th>
+                            <th>ప్రసంగీకుడు</th>
+                            <th>చైర్మన్</th>
+                            <th>కావలికోట రీడర్</th>
+                            <th class="actions-col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.tableHTML}
+                    </tbody>
+                </table>
+                <div class="mobile-view-container"></div>
+            </main>
+        `;
         
-        const subtitleEl = document.querySelector('.subtitle');
-        if (subtitleEl) subtitleEl.textContent = data.dateRange || '';
-        
-        scheduleWrapper.querySelectorAll('tbody td:not(:first-child):not(.special-event)').forEach(cell => {
+        // Add dropdown functionality to desktop table cells
+        scheduleWrapper.querySelectorAll('tbody td').forEach((cell, index) => {
+            const row = cell.parentElement;
+            const cellIndex = cell.cellIndex;
+            
+            // Skip date column (index 0) and actions column (index 5)
+            if (cellIndex === 0 || cellIndex === 5) return;
+            
             cell.classList.add('editable-cell');
+            cell.removeAttribute('contenteditable');
+            
+            // Update the arrow indicator to use SVG
+            cell.style.backgroundImage = "url(\"data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 9L12 15L18 9' stroke='%23002726' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3C/path%3E%3C/svg%3E\")";
+            cell.style.backgroundRepeat = "no-repeat";
+            cell.style.backgroundPosition = "right 8px center";
+            cell.style.backgroundSize = "16px";
+            cell.style.paddingRight = "30px";
+            
             cell.addEventListener('click', (e) => {
-                if (cell.cellIndex === 1) openDesktopDropdown('topic', cell);
-                else openDesktopDropdown('member', cell);
+                if (cellIndex === 1) { // Topic column
+                    openDesktopDropdown('topic', cell);
+                } else { // Brother columns (2, 3, 4)
+                    openDesktopDropdown('member', cell);
+                }
             });
         });
-        
+
+        // Create mobile view
         createMobileView();
+
         scheduleWrapper.addEventListener('input', debouncedSave);
-        scheduleWrapper.querySelectorAll('.event-btn').forEach(btn => btn.addEventListener('click', openEventMenu));
+        scheduleWrapper.querySelectorAll('.event-btn').forEach(btn => {
+            btn.addEventListener('click', openEventMenu);
+        });
+        
         document.getElementById('app-container').classList.remove('hidden');
     }
 
     function createMobileView() {
         const mobileContainer = scheduleWrapper.querySelector('.mobile-view-container');
         const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
+        
         if (!tableBody) return;
+        
         mobileContainer.innerHTML = '';
         
         Array.from(tableBody.rows).forEach((row, rowIndex) => {
+            const cells = Array.from(row.cells);
+            const dateCell = cells[0];
+            const topicCell = cells[1];
+            const speakerCell = cells[2];
+            const chairmanCell = cells[3];
+            const readerCell = cells[4];
+            const actionsCell = cells[5];
+            
             const card = document.createElement('div');
-            card.className = 'mobile-week-card';
-            card.dataset.row = rowIndex;
-            card.innerHTML = `<div class="mobile-week-header"><h3 class="week-date">${row.cells[0].textContent}</h3><span class="material-symbols-outlined accordion-icon">expand_more</span></div><div class="mobile-week-body"></div>`;
-            const cardBody = card.querySelector('.mobile-week-body');
-            cardBody.innerHTML = getMobileCardBodyHTML(row);
+            card.className = 'mobile-week-card fade-in';
+            
+            // Check if this is a special event
+            const isSpecialEvent = topicCell.classList.contains('special-event') && topicCell.colSpan === 4;
+            const currentEventType = getEventTypeForRow(row);
+            const currentEventTypeName = eventTypes.find(event => event.id === currentEventType)?.name || 'Normal';
+            const currentEventTypeIcon = eventTypes.find(event => event.id === currentEventType)?.icon || 'event';
+            
+            if (isSpecialEvent) {
+                card.innerHTML = `
+                    <h3 class="week-date">${dateCell.textContent}</h3>
+                    <div class="event-type-dropdown">
+                        <div class="event-type-field" data-row="${rowIndex}">
+                            <span class="event-type-value">
+                                <span class="material-symbols-outlined event-type-icon">${currentEventTypeIcon}</span>
+                                <span>${currentEventTypeName}</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="special-event-mobile">
+                        <p class="special-event-text-mobile">${topicCell.textContent}</p>
+                    </div>
+                `;
+            } else {
+                card.innerHTML = `
+                    <h3 class="week-date">${dateCell.textContent}</h3>
+                    <div class="event-type-dropdown">
+                        <div class="event-type-field" data-row="${rowIndex}">
+                            <span class="event-type-value">
+                                <span class="material-symbols-outlined event-type-icon">${currentEventTypeIcon}</span>
+                                <span>${currentEventTypeName}</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="week-fields">
+                        <div class="field-group">
+                            <label>ప్రసంగ అంశం</label>
+                            <div class="mobile-field topic-field" data-row="${rowIndex}" data-cell="1">
+                                <span class="mobile-field-value ${topicCell.textContent ? '' : 'mobile-field-placeholder'}">
+                                    ${topicCell.textContent || 'Select Topic'}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="field-group">
+                            <label>ప్రసంగీకుడు</label>
+                            <div class="mobile-field member-field" data-row="${rowIndex}" data-cell="2">
+                                <span class="mobile-field-value ${speakerCell.textContent ? '' : 'mobile-field-placeholder'}">
+                                    ${speakerCell.textContent || 'Select Brother'}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="field-group">
+                            <label>చైర్మన్</label>
+                            <div class="mobile-field member-field" data-row="${rowIndex}" data-cell="3">
+                                <span class="mobile-field-value ${chairmanCell.textContent ? '' : 'mobile-field-placeholder'}">
+                                    ${chairmanCell.textContent || 'Select Brother'}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="field-group">
+                            <label>కావలికోట రీడర్</label>
+                            <div class="mobile-field member-field" data-row="${rowIndex}" data-cell="4">
+                                <span class="mobile-field-value ${readerCell.textContent ? '' : 'mobile-field-placeholder'}">
+                                    ${readerCell.textContent || 'Select Brother'}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
             mobileContainer.appendChild(card);
-            setupMobileEventListeners(card);
         });
-    }
 
-    function getMobileCardBodyHTML(row) {
-        const rowIndex = row.rowIndex - 1; 
-        const isSpecialEvent = row.cells[1].classList.contains('special-event');
-        const currentEventType = getEventTypeForRow(row);
-        const currentEventTypeName = eventTypes.find(event => event.id === currentEventType)?.name || 'Normal';
-        const currentEventTypeIcon = eventTypes.find(event => event.id === currentEventType)?.icon || 'event';
+        // Add event listeners to mobile fields
+        mobileContainer.querySelectorAll('.topic-field').forEach(field => {
+            field.addEventListener('click', (e) => {
+                const rowIndex = field.dataset.row;
+                const cellIndex = field.dataset.cell;
+                const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
+                const cell = tableBody.rows[rowIndex].cells[cellIndex];
+                openMobileDropdown('topic', cell, field);
+            });
+        });
 
-        if (isSpecialEvent) {
-            return `
-                <div class="field-group">
-                    <label>Event Type</label>
-                    <div class="mobile-field event-type-field" data-row="${rowIndex}">
-                        <span class="event-type-value"><span class="material-symbols-outlined event-type-icon">${currentEventTypeIcon}</span><span>${currentEventTypeName}</span></span>
-                    </div>
-                </div>
-                <div class="special-event-mobile"><p class="special-event-text-mobile">${row.cells[1].textContent}</p></div>`;
-        } else {
-            const topic = row.cells[1].textContent || 'Select Topic';
-            const speaker = row.cells[2].textContent || 'Select Brother';
-            const chairman = row.cells[3].textContent || 'Select Brother';
-            const reader = row.cells[4].textContent || 'Select Brother';
-            return `
-                <div class="field-group">
-                    <label>Event Type</label>
-                    <div class="mobile-field event-type-field" data-row="${rowIndex}">
-                        <span class="event-type-value"><span class="material-symbols-outlined event-type-icon">${currentEventTypeIcon}</span><span>${currentEventTypeName}</span></span>
-                    </div>
-                </div>
-                <div class="week-fields">
-                    <div class="field-group"><label>ప్రసంగ అంశం</label><div class="mobile-field topic-field" data-row="${rowIndex}" data-cell="1"><span class="mobile-field-value ${row.cells[1].textContent ? '' : 'mobile-field-placeholder'}">${topic}</span></div></div>
-                    <div class="field-group"><label>ప్రసంగీకుడు</label><div class="mobile-field member-field" data-row="${rowIndex}" data-cell="2"><span class="mobile-field-value ${row.cells[2].textContent ? '' : 'mobile-field-placeholder'}">${speaker}</span></div></div>
-                    <div class="field-group"><label>చైర్మన్</label><div class="mobile-field member-field" data-row="${rowIndex}" data-cell="3"><span class="mobile-field-value ${row.cells[3].textContent ? '' : 'mobile-field-placeholder'}">${chairman}</span></div></div>
-                    <div class="field-group"><label>కావలికోట రీడర్</label><div class="mobile-field member-field" data-row="${rowIndex}" data-cell="4"><span class="mobile-field-value ${row.cells[4].textContent ? '' : 'mobile-field-placeholder'}">${reader}</span></div></div>
-                </div>`;
-        }
-    }
-    
-    function updateMobileCardBody(rowIndex) {
-        const card = scheduleWrapper.querySelector(`.mobile-week-card[data-row="${rowIndex}"]`);
-        if (!card) return;
-        const cardBody = card.querySelector('.mobile-week-body');
-        const row = scheduleWrapper.querySelector(`.schedule-table tbody tr:nth-child(${rowIndex + 1})`);
-        cardBody.innerHTML = getMobileCardBodyHTML(row);
-        setupMobileEventListeners(card);
-    }
-    
-    function setupMobileEventListeners(card) {
-        card.querySelectorAll('.topic-field').forEach(field => field.addEventListener('click', e => {
-            const rowIndex = field.dataset.row; const cellIndex = field.dataset.cell;
-            openMobileDropdown('topic', scheduleWrapper.querySelector('.schedule-table tbody').rows[rowIndex].cells[cellIndex], field);
-        }));
-        card.querySelectorAll('.member-field').forEach(field => field.addEventListener('click', e => {
-            const rowIndex = field.dataset.row; const cellIndex = field.dataset.cell;
-            openMobileDropdown('member', scheduleWrapper.querySelector('.schedule-table tbody').rows[rowIndex].cells[cellIndex], field);
-        }));
-        card.querySelector('.event-type-field').addEventListener('click', e => {
-            openMobileEventTypeDropdown(e.currentTarget.dataset.row, e.currentTarget);
+        mobileContainer.querySelectorAll('.member-field').forEach(field => {
+            field.addEventListener('click', (e) => {
+                const rowIndex = field.dataset.row;
+                const cellIndex = field.dataset.cell;
+                const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
+                const cell = tableBody.rows[rowIndex].cells[cellIndex];
+                openMobileDropdown('member', cell, field);
+            });
+        });
+
+        // Add event listeners to event type dropdown
+        mobileContainer.querySelectorAll('.event-type-field').forEach(field => {
+            field.addEventListener('click', (e) => {
+                const rowIndex = field.dataset.row;
+                openMobileEventTypeDropdown(rowIndex, field);
+            });
         });
     }
 
     function getEventTypeForRow(row) {
-        if (row.cells[1].classList.contains('special-event')) {
-            const text = row.cells[1].textContent;
+        const topicCell = row.cells[1];
+        if (topicCell.classList.contains('special-event')) {
+            const text = topicCell.textContent;
             if (text.includes('పర్యవేక్షకుని')) return 'co-visit';
             if (text.includes('సమావేశ కార్యక్రమం')) return 'assembly';
             if (text.includes('సమావేశం')) return 'convention';
@@ -913,49 +1768,107 @@
     }
 
     function changeEventType(rowIndex, eventType) {
-        const row = scheduleWrapper.querySelector('.schedule-table tbody').rows[rowIndex];
-        const [dateCell, topicCell, speakerCell, chairmanCell, readerCell] = row.cells;
-        topicCell.colSpan = 1; topicCell.classList.remove('special-event'); topicCell.classList.add('editable-cell');
-        [speakerCell, chairmanCell, readerCell].forEach(c => { c.style.display = ''; c.classList.add('editable-cell'); });
-
+        const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
+        const row = tableBody.rows[rowIndex];
+        const topicCell = row.cells[1];
+        const speakerCell = row.cells[2];
+        const chairmanCell = row.cells[3];
+        const readerCell = row.cells[4];
+        
+        // Reset all cells first
+        topicCell.colSpan = 1;
+        topicCell.classList.remove('special-event');
+        topicCell.classList.add('editable-cell');
+        [speakerCell, chairmanCell, readerCell].forEach(cell => {
+            cell.style.display = '';
+            cell.classList.add('editable-cell');
+        });
+        
         if (eventType !== 'normal') {
-            if (topicCell.textContent && !topicCell.classList.contains('special-event')) topicCell.dataset.originalContent = topicCell.textContent;
-            [speakerCell, chairmanCell, readerCell].forEach(c => { if (c.textContent) c.dataset.originalContent = c.textContent; });
-            topicCell.colSpan = 4; topicCell.classList.add('special-event'); topicCell.classList.remove('editable-cell');
+            // Save current content if any
+            if (topicCell.textContent && !topicCell.classList.contains('special-event')) {
+                topicCell.dataset.originalContent = topicCell.textContent;
+            }
+            [speakerCell, chairmanCell, readerCell].forEach(cell => {
+                if (cell.textContent) {
+                    cell.dataset.originalContent = cell.textContent;
+                }
+            });
+            
+            // Apply special event
+            topicCell.colSpan = 4;
+            topicCell.classList.add('special-event');
+            topicCell.classList.remove('editable-cell');
             topicCell.textContent = eventTexts[eventType];
-            [speakerCell, chairmanCell, readerCell].forEach(c => { c.style.display = 'none'; c.classList.remove('editable-cell'); c.textContent = ''; });
+            [speakerCell, chairmanCell, readerCell].forEach(cell => {
+                cell.style.display = 'none';
+                cell.classList.remove('editable-cell');
+                cell.textContent = '';
+            });
         } else {
-            topicCell.innerHTML = topicCell.dataset.originalContent || '';
-            [speakerCell, chairmanCell, readerCell].forEach(c => { c.innerHTML = c.dataset.originalContent || ''; });
+            // Restore normal event
+            if (topicCell.dataset.originalContent) {
+                topicCell.innerHTML = topicCell.dataset.originalContent;
+            } else {
+                topicCell.innerHTML = '';
+            }
+            [speakerCell, chairmanCell, readerCell].forEach(cell => {
+                if (cell.dataset.originalContent) {
+                    cell.innerHTML = cell.dataset.originalContent;
+                } else {
+                    cell.innerHTML = '';
+                }
+            });
             topicCell.removeAttribute('data-original-content');
-            [speakerCell, chairmanCell, readerCell].forEach(c => c.removeAttribute('data-original-content'));
+            [speakerCell, chairmanCell, readerCell].forEach(cell => {
+                cell.removeAttribute('data-original-content');
+            });
         }
-        updateMobileCardBody(rowIndex);
+        
+        // Update mobile view
+        createMobileView();
         debouncedSave();
     }
 
+    // Desktop dropdown functions
     function openDesktopDropdown(type, cell) {
-        currentDropdownType = type; activeCellForDropdown = cell;
-        if (type === 'member') showDesktopMemberDropdown(cell);
-        else if (type === 'topic') showDesktopTopicDropdown(cell);
+        currentDropdownType = type;
+        activeCellForDropdown = cell;
+        
+        if (type === 'member') {
+            showDesktopMemberDropdown(cell);
+        } else if (type === 'topic') {
+            showDesktopTopicDropdown(cell);
+        }
     }
 
     function showDesktopMemberDropdown(cell) {
         desktopDropdownList.innerHTML = '';
+        
+        // Sort brothers by name
         const sortedBrothers = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
-        if (sortedBrothers.length === 0) desktopDropdownList.innerHTML = '<div style="padding: 12px 16px; color: var(--text-secondary);">No brothers available</div>';
-        else sortedBrothers.forEach(member => {
-            const item = document.createElement('div');
-            item.className = 'desktop-dropdown-item';
-            item.innerHTML = `<span>${member.name}</span>${member.isServant ? '<span class="servant-tag">Servant</span>' : ''}`;
-            item.addEventListener('click', () => selectDesktopDropdownItem(member.name));
-            desktopDropdownList.appendChild(item);
-        });
+        
+        if (sortedBrothers.length === 0) {
+            desktopDropdownList.innerHTML = '<div style="padding: 12px 16px; color: var(--text-secondary);">No brothers available</div>';
+        } else {
+            sortedBrothers.forEach(member => {
+                const item = document.createElement('div');
+                item.className = 'desktop-dropdown-item';
+                item.innerHTML = `
+                    <span>${member.name}</span>
+                    ${member.isServant ? '<span class="servant-tag">Servant</span>' : ''}
+                `;
+                item.addEventListener('click', () => selectDesktopDropdownItem(member.name));
+                desktopDropdownList.appendChild(item);
+            });
+        }
+        
         showDesktopDropdown(cell);
     }
 
     function showDesktopTopicDropdown(cell) {
         desktopDropdownList.innerHTML = '';
+        
         Object.entries(topics).forEach(([topicName, topicText]) => {
             const item = document.createElement('div');
             item.className = 'desktop-dropdown-item';
@@ -963,218 +1876,474 @@
             item.addEventListener('click', () => selectDesktopDropdownItem(topicText));
             desktopDropdownList.appendChild(item);
         });
+        
         showDesktopDropdown(cell);
     }
 
     function showDesktopDropdown(cell) {
-        const rect = cell.getBoundingClientRect(); let top = rect.bottom + window.scrollY; let left = rect.left + window.scrollX;
-        const dropdownHeight = 300, dropdownWidth = 340;
-        if (top + dropdownHeight > window.scrollY + window.innerHeight) top = rect.top + window.scrollY - dropdownHeight;
-        if (left + dropdownWidth > window.scrollX + window.innerWidth) left = window.scrollX + window.innerWidth - dropdownWidth - 10;
-        if (left < window.scrollX) left = window.scrollX + 10;
-        desktopDropdown.style.top = `${top}px`; desktopDropdown.style.left = `${left}px`; desktopDropdown.style.width = `${rect.width}px`;
-        desktopDropdownSearch.value = ''; filterDesktopItems('');
-        setTimeout(() => { desktopDropdown.classList.add('active'); desktopDropdownSearch.focus(); }, 10);
+        const rect = cell.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+        const viewportWidth = window.innerWidth;
+        
+        // Calculate position relative to the viewport
+        let top = rect.bottom + window.scrollY;
+        let left = rect.left + window.scrollX;
+        
+        // Ensure dropdown stays within viewport
+        const dropdownHeight = 300; // Approximate max height
+        const dropdownWidth = 340; // Fixed width from CSS
+        
+        // If dropdown would go below viewport, show above the cell
+        if (top + dropdownHeight > window.scrollY + viewportHeight) {
+            top = rect.top + window.scrollY - dropdownHeight;
+        }
+        
+        // If dropdown would go beyond right edge, adjust left position
+        if (left + dropdownWidth > window.scrollX + viewportWidth) {
+            left = window.scrollX + viewportWidth - dropdownWidth - 10; // 10px margin
+        }
+        
+        // Ensure dropdown doesn't go beyond left edge
+        if (left < window.scrollX) {
+            left = window.scrollX + 10; // 10px margin
+        }
+        
+        desktopDropdown.style.display = 'block';
+        desktopDropdown.style.top = `${top}px`;
+        desktopDropdown.style.left = `${left}px`;
+        desktopDropdown.style.width = `${rect.width}px`;
+        
+        // Reset search and focus
+        desktopDropdownSearch.value = '';
+        filterDesktopItems('');
+        setTimeout(() => {
+            desktopDropdown.classList.add('active');
+            desktopDropdownSearch.focus();
+        }, 10);
     }
 
-    function hideDesktopDropdown() { desktopDropdown.classList.remove('active'); setTimeout(() => { desktopDropdown.style.display = 'none'; }, 250); activeCellForDropdown = null; }
+    function hideDesktopDropdown() {
+        desktopDropdown.classList.remove('active');
+        setTimeout(() => {
+            desktopDropdown.style.display = 'none';
+        }, 250);
+        currentDropdownType = null;
+        activeCellForDropdown = null;
+    }
 
     function selectDesktopDropdownItem(value) {
         if (activeCellForDropdown) {
+            // Update UI immediately
             activeCellForDropdown.textContent = value;
+            
+            // Also update the corresponding mobile field if it exists
             updateCorrespondingMobileField(activeCellForDropdown, value);
+            
+            // Then save to Firebase in background
             debouncedSave();
         }
         hideDesktopDropdown();
     }
 
     function updateCorrespondingMobileField(cell, value) {
-        const rowIndex = cell.parentElement.rowIndex - 1; const cellIndex = cell.cellIndex;
-        const mobileCard = scheduleWrapper.querySelector(`.mobile-view-container .mobile-week-card[data-row="${rowIndex}"]`);
-        if (mobileCard) {
-            const field = mobileCard.querySelector(`.mobile-field[data-row="${rowIndex}"][data-cell="${cellIndex}"]`);
-            if (field) {
-                const valueSpan = field.querySelector('.mobile-field-value');
-                valueSpan.textContent = value;
-                valueSpan.classList.remove('mobile-field-placeholder');
+        const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
+        const rowIndex = Array.from(cell.parentElement.parentElement.children).indexOf(cell.parentElement);
+        const cellIndex = Array.from(cell.parentElement.cells).indexOf(cell);
+        
+        const mobileContainer = scheduleWrapper.querySelector('.mobile-view-container');
+        if (mobileContainer) {
+            const mobileCard = mobileContainer.querySelectorAll('.mobile-week-card')[rowIndex];
+            if (mobileCard) {
+                const field = mobileCard.querySelector(`.mobile-field[data-row="${rowIndex}"][data-cell="${cellIndex}"]`);
+                if (field) {
+                    const valueSpan = field.querySelector('.mobile-field-value');
+                    valueSpan.textContent = value;
+                    valueSpan.classList.remove('mobile-field-placeholder');
+                }
             }
         }
     }
 
-    function filterDesktopItems(value) { desktopDropdownList.querySelectorAll('.desktop-dropdown-item').forEach(item => { item.style.display = item.textContent.toLowerCase().includes(value.toLowerCase()) ? 'flex' : 'none'; }); }
+    // Desktop dropdown search functionality
+    function filterDesktopItems(value) {
+        const itemsEl = desktopDropdownList.querySelectorAll('.desktop-dropdown-item');
+        itemsEl.forEach(item => {
+            item.style.display = item.textContent.toLowerCase().includes(value.toLowerCase()) ? 'flex' : 'none';
+        });
+    }
 
+    // Desktop Event Menu
     function openEventMenu(e) {
-        activeRowForEvents = e.currentTarget.closest('tr');
-        const rect = e.currentTarget.getBoundingClientRect();
+        const btn = e.currentTarget;
+        activeRowForEvents = btn.closest('tr');
+        const rect = btn.getBoundingClientRect();
+        
         desktopEventMenu.style.display = 'block';
         desktopEventMenu.style.top = `${rect.bottom}px`;
         desktopEventMenu.style.left = `${rect.left - desktopEventMenu.offsetWidth + rect.width}px`;
     }
 
-    function hideDesktopEventMenu() { desktopEventMenu.style.display = 'none'; activeRowForEvents = null; }
+    function hideDesktopEventMenu() {
+        desktopEventMenu.style.display = 'none';
+        activeRowForEvents = null;
+    }
 
     function applyEventType(eventType) {
         if (!activeRowForEvents) return;
-        changeEventType(activeRowForEvents.rowIndex - 1, eventType);
+        const rowIndex = Array.from(activeRowForEvents.parentElement.children).indexOf(activeRowForEvents);
+        changeEventType(rowIndex, eventType);
         hideDesktopEventMenu();
     }
 
+    // Mobile dropdown functions
     function openMobileDropdown(type, cell, fieldElement) {
-        currentDropdownData = { cell, fieldElement };
+        currentDropdownType = type;
+        currentDropdownData = { cell: cell, fieldElement: fieldElement };
+        
+        // Add active class to field
         fieldElement.classList.add('active');
-        if (type === 'member') showMobileMemberDropdown(); else if (type === 'topic') showMobileTopicDropdown();
+        
+        if (type === 'member') {
+            showMobileMemberDropdown();
+        } else if (type === 'topic') {
+            showMobileTopicDropdown();
+        }
+        
+        // Show search bar for mobile
         mobileDropdownSearch.style.display = 'flex';
+        
+        // Prevent body scrolling
         document.body.classList.add('dropdown-open');
     }
 
     function openMobileEventTypeDropdown(rowIndex, fieldElement) {
-        currentDropdownData = { rowIndex, fieldElement };
+        currentDropdownType = 'event-type';
+        currentDropdownData = { rowIndex: rowIndex, fieldElement: fieldElement };
+        
+        // Add active class to field
         fieldElement.classList.add('active');
         showMobileEventTypeDropdown();
+        
+        // Hide search bar for event type selection
         mobileDropdownSearch.style.display = 'none';
+        
+        // Prevent body scrolling
         document.body.classList.add('dropdown-open');
     }
 
     function showMobileMemberDropdown() {
-        dropdownTitle.textContent = 'Select Brother'; dropdownContent.innerHTML = '';
+        dropdownTitle.textContent = 'Select Brother';
+        dropdownContent.innerHTML = '';
+        
+        // Sort brothers by name
         const sortedBrothers = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
-        if (sortedBrothers.length === 0) dropdownContent.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-secondary);">No brothers available</div>';
-        else sortedBrothers.forEach(member => {
-            const item = document.createElement('button'); item.className = 'dropdown-item';
-            item.innerHTML = `<span>${member.name}</span>${member.isServant ? '<span class="servant-tag">Servant</span>' : ''}`;
-            item.addEventListener('click', () => selectMobileDropdownItem(member.name));
-            dropdownContent.appendChild(item);
-        });
+        
+        if (sortedBrothers.length === 0) {
+            dropdownContent.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-secondary);">No brothers available</div>';
+        } else {
+            sortedBrothers.forEach(member => {
+                const item = document.createElement('button');
+                item.className = 'dropdown-item';
+                item.innerHTML = `
+                    <span>${member.name}</span>
+                    ${member.isServant ? '<span class="servant-tag">Servant</span>' : ''}
+                `;
+                item.addEventListener('click', () => selectMobileDropdownItem(member.name));
+                dropdownContent.appendChild(item);
+            });
+        }
+        
         showMobileDropdown();
     }
 
     function showMobileTopicDropdown() {
-        dropdownTitle.textContent = 'Select Topic'; dropdownContent.innerHTML = '';
+        dropdownTitle.textContent = 'Select Topic';
+        dropdownContent.innerHTML = '';
+        
         Object.entries(topics).forEach(([topicName, topicText]) => {
-            const item = document.createElement('button'); item.className = 'dropdown-item'; item.textContent = topicName;
+            const item = document.createElement('button');
+            item.className = 'dropdown-item';
+            item.textContent = topicName;
             item.addEventListener('click', () => selectMobileDropdownItem(topicText));
             dropdownContent.appendChild(item);
         });
+        
         showMobileDropdown();
     }
 
     function showMobileEventTypeDropdown() {
-        dropdownTitle.textContent = 'Select Event Type'; dropdownContent.innerHTML = '';
+        dropdownTitle.textContent = 'Select Event Type';
+        dropdownContent.innerHTML = '';
+        
         eventTypes.forEach(event => {
-            const item = document.createElement('button'); item.className = 'dropdown-item';
-            item.innerHTML = `<span style="display: flex; align-items: center; gap: 12px;"><span class="material-symbols-outlined">${event.icon}</span><span>${event.name}</span></span>`;
+            const item = document.createElement('button');
+            item.className = 'dropdown-item';
+            item.innerHTML = `
+                <span style="display: flex; align-items: center; gap: 12px;">
+                    <span class="material-symbols-outlined">${event.icon}</span>
+                    <span>${event.name}</span>
+                </span>
+            `;
             item.addEventListener('click', () => selectMobileEventType(event.id));
             dropdownContent.appendChild(item);
         });
+        
         showMobileDropdown();
     }
 
     function showMobileDropdown() {
-        dropdownBackdrop.classList.add('active'); dropdownContainer.classList.add('active');
-        mobileSearchInput.value = ''; filterMobileItems('');
-        setTimeout(() => { if (mobileDropdownSearch.style.display !== 'none') mobileSearchInput.focus(); }, 100);
+        dropdownBackdrop.classList.add('active');
+        dropdownContainer.classList.add('active');
+        
+        // Reset search and focus
+        mobileSearchInput.value = '';
+        filterMobileItems('');
+        setTimeout(() => {
+            if (mobileDropdownSearch.style.display !== 'none') {
+                mobileSearchInput.focus();
+            }
+        }, 100);
     }
 
     function hideMobileDropdown() {
-        dropdownBackdrop.classList.remove('active'); dropdownContainer.classList.remove('active');
-        if (currentDropdownData?.fieldElement) currentDropdownData.fieldElement.classList.remove('active');
-        document.body.classList.remove('dropdown-open'); currentDropdownData = null;
+        dropdownBackdrop.classList.remove('active');
+        dropdownContainer.classList.remove('active');
+        
+        // Remove active class from field
+        if (currentDropdownData && currentDropdownData.fieldElement) {
+            currentDropdownData.fieldElement.classList.remove('active');
+        }
+        
+        // Restore body scrolling
+        document.body.classList.remove('dropdown-open');
+        
+        currentDropdownType = null;
+        currentDropdownData = null;
     }
 
     function selectMobileDropdownItem(value) {
         if (currentDropdownData) {
+            // Update both table cell and mobile field immediately
             currentDropdownData.cell.textContent = value;
             if (currentDropdownData.fieldElement) {
                 const valueSpan = currentDropdownData.fieldElement.querySelector('.mobile-field-value');
                 valueSpan.textContent = value;
                 valueSpan.classList.remove('mobile-field-placeholder');
             }
+            // Save to Firebase in background
             debouncedSave();
         }
         hideMobileDropdown();
     }
 
-    function selectMobileEventType(eventType) { if (currentDropdownData?.rowIndex !== undefined) changeEventType(currentDropdownData.rowIndex, eventType); hideMobileDropdown(); }
+    function selectMobileEventType(eventType) {
+        if (currentDropdownData && currentDropdownData.rowIndex !== undefined) {
+            changeEventType(currentDropdownData.rowIndex, eventType);
+        }
+        hideMobileDropdown();
+    }
 
-    function filterMobileItems(value) { dropdownContent.querySelectorAll('.dropdown-item').forEach(item => { item.style.display = item.textContent.toLowerCase().includes(value.toLowerCase()) ? 'flex' : 'none'; }); }
+    // Mobile dropdown search functionality
+    function filterMobileItems(value) {
+        const itemsEl = dropdownContent.querySelectorAll('.dropdown-item');
+        itemsEl.forEach(item => {
+            item.style.display = item.textContent.toLowerCase().includes(value.toLowerCase()) ? 'flex' : 'none';
+        });
+    }
 
+    // Week editing functions
     function openWeekEditor() {
-        const dateList = document.getElementById('date-checklist'); const upcomingSundays = generateNextSundays(30);
-        dateList.innerHTML = ''; const currentDates = getCurrentScheduleDates();
+        const dateList = document.getElementById('date-checklist');
+        const upcomingSundays = generateNextSundays(30);
+        
+        // Clear existing list
+        dateList.innerHTML = '';
+        
+        // Get current dates from the schedule
+        const currentDates = getCurrentScheduleDates();
+        
+        // Populate with all upcoming Sundays, pre-selecting current ones
         upcomingSundays.forEach(dateStr => {
             const li = document.createElement('li');
-            li.innerHTML = `<label><input type="checkbox" value="${dateStr}" ${currentDates.includes(dateStr) ? 'checked' : ''}> ${dateStr}</label>`;
+            const isChecked = currentDates.includes(dateStr);
+            li.innerHTML = `<label><input type="checkbox" value="${dateStr}" ${isChecked ? 'checked' : ''}> ${dateStr}</label>`;
             dateList.appendChild(li);
         });
+        
+        // Update modal text for editing
         document.querySelector('#date-selection-modal h2').textContent = 'Edit Sunday Schedule Weeks';
         document.querySelector('#date-selection-modal p').textContent = 'Add or remove weeks from your schedule.';
         document.getElementById('new-schedule-name').style.display = 'none';
         document.getElementById('confirm-creation').textContent = 'Update Schedule';
-        dateSelectionModal.style.display = 'flex'; setTimeout(() => dateSelectionModal.classList.add('active'), 10);
+        
+        // Show modal
+        dateSelectionModal.style.display = 'flex';
+        setTimeout(() => {
+            dateSelectionModal.classList.add('active');
+        }, 10);
     }
 
     function getCurrentScheduleDates() {
         const dates = [];
-        scheduleWrapper.querySelectorAll('.schedule-table tbody tr').forEach(row => { if (row.cells[0]) dates.push(row.cells[0].textContent.trim()); });
+        const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
+        
+        if (tableBody) {
+            const rows = tableBody.querySelectorAll('tr');
+            rows.forEach(row => {
+                const dateCell = row.cells[0];
+                if (dateCell) {
+                    dates.push(dateCell.textContent.trim());
+                }
+            });
+        }
+        
         return dates;
     }
 
     function findExistingRowForDate(date) {
-        const rows = scheduleWrapper.querySelectorAll('.schedule-table tbody tr');
-        for (let row of rows) { if (row.cells[0].textContent.trim() === date) return row; }
+        const tableBody = scheduleWrapper.querySelector('.schedule-table tbody');
+        if (!tableBody) return null;
+        
+        const rows = tableBody.querySelectorAll('tr');
+        for (let row of rows) {
+            if (row.cells[0].textContent.trim() === date) {
+                return row;
+            }
+        }
         return null;
     }
 
     async function handleUpdateWeeks() {
         const selectedCheckboxes = Array.from(document.querySelectorAll('#date-checklist input:checked'));
-        if (selectedCheckboxes.length === 0) return alert("Please select at least one Sunday.");
+        if (selectedCheckboxes.length === 0) {
+            alert("Please select at least one Sunday.");
+            return;
+        }
+        
         const selectedDates = selectedCheckboxes.map(cb => cb.value);
         const dateRange = `${selectedDates[0]} నుండి ${selectedDates[selectedDates.length - 1]}`;
+
+        // Generate new table HTML with the selected dates
         const tableBodyHTML = selectedDates.map(date => {
+            // Check if this date already exists in current schedule to preserve content
             const existingRow = findExistingRowForDate(date);
-            return existingRow ? `<tr>${existingRow.innerHTML}</tr>` : `<tr><td>${date}</td><td class="editable-cell"></td><td class="editable-cell"></td><td class="editable-cell"></td><td class="editable-cell"></td><td class="actions-col"><button class="event-btn"><span class="material-symbols-outlined">more_vert</span></button></td></tr>`;
+            
+            if (existingRow) {
+                // Keep existing content
+                return `
+                    <tr>
+                        <td>${date}</td>
+                        <td class="${existingRow.cells[1].className}">${existingRow.cells[1].innerHTML}</td>
+                        <td class="${existingRow.cells[2].className}">${existingRow.cells[2].innerHTML}</td>
+                        <td class="${existingRow.cells[3].className}">${existingRow.cells[3].innerHTML}</td>
+                        <td class="${existingRow.cells[4].className}">${existingRow.cells[4].innerHTML}</td>
+                        <td class="actions-col">
+                            <button class="event-btn">
+                                <span class="material-symbols-outlined">more_vert</span>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            } else {
+                // Create new empty row
+                return `
+                    <tr>
+                        <td>${date}</td>
+                        <td class="editable-cell"></td>
+                        <td class="editable-cell"></td>
+                        <td class="editable-cell"></td>
+                        <td class="editable-cell"></td>
+                        <td class="actions-col">
+                            <button class="event-btn">
+                                <span class="material-symbols-outlined">more_vert</span>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }
         }).join('');
+
         try {
-            updateStatus('Updating...', 'syncing');
-            await userSchedulesCollection.doc(currentScheduleId).update({ dateRange, tableHTML: tableBodyHTML, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
-            initEditor();
-            dateSelectionModal.classList.remove('active');
-            setTimeout(() => {
-                dateSelectionModal.style.display = 'none';
-                document.getElementById('new-schedule-name').style.display = 'block';
-                document.querySelector('#date-selection-modal h2').textContent = 'Create New Sunday Schedule';
-                document.querySelector('#date-selection-modal p').textContent = 'Give your new schedule a name and select the weeks to include.';
-                document.getElementById('confirm-creation').textContent = 'Create Schedule';
-            }, 300);
-            updateStatus('Synced', 'synced');
-        } catch (error) { console.error("Error updating schedule weeks:", error); alert("Could not update schedule."); updateStatus('Error', 'error'); }
+    updateStatus('Updating...', 'syncing');
+    
+    await userSchedulesCollection.doc(currentScheduleId).update({
+        dateRange: dateRange,
+        tableHTML: tableBodyHTML,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    
+    // Refresh the editor to show updated data
+    initEditor();
+    
+    // Close modal and reset
+    dateSelectionModal.classList.remove('active');
+    setTimeout(() => {
+        dateSelectionModal.style.display = 'none';
+        // Reset modal for next use
+        document.getElementById('new-schedule-name').style.display = 'block';
+        document.querySelector('#date-selection-modal h2').textContent = 'Create New Sunday Schedule';
+        document.querySelector('#date-selection-modal p').textContent = 'Give your new schedule a name and select the weeks to include.';
+        document.getElementById('confirm-creation').textContent = 'Create Schedule';
+    }, 300);
+    
+    updateStatus('Synced', 'synced');
+            
+        } catch (error) {
+            console.error("Error updating schedule weeks:", error);
+            alert("Could not update schedule. Please try again.");
+            updateStatus('Error', 'error');
+        }
     }
 
     const debouncedSave = debounce(() => {
-        const subtitleEl = document.querySelector('.subtitle');
+        const subtitleEl = scheduleWrapper.querySelector('.subtitle');
         const tableBodyEl = scheduleWrapper.querySelector('.schedule-table tbody');
         if (!subtitleEl || !tableBodyEl) return;
+
         updateStatus('Syncing...', 'syncing');
-        userSchedulesCollection.doc(currentScheduleId).update({ dateRange: subtitleEl.textContent, tableHTML: tableBodyEl.innerHTML })
-            .then(() => updateStatus('Synced', 'synced')).catch(err => { console.error("Save failed:", err); updateStatus('Error', 'error'); });
+        
+        const payload = {
+            dateRange: subtitleEl.textContent,
+            tableHTML: tableBodyEl.innerHTML
+        };
+        
+        userSchedulesCollection.doc(currentScheduleId).update(payload)
+            .then(() => {
+                updateStatus('Synced', 'synced');
+            })
+            .catch(err => {
+                console.error("Save failed:", err);
+                updateStatus('Error', 'error');
+            });
     }, 1500);
 
     function initCreationFlow() {
-        const dateList = document.getElementById('date-checklist'); const upcomingSundays = generateNextSundays(30);
-        dateList.innerHTML = ''; upcomingSundays.forEach(dateStr => {
+        const dateList = document.getElementById('date-checklist');
+        const upcomingSundays = generateNextSundays(30);
+        dateList.innerHTML = '';
+        upcomingSundays.forEach(dateStr => {
             const li = document.createElement('li');
             li.innerHTML = `<label><input type="checkbox" value="${dateStr}"> ${dateStr}</label>`;
             dateList.appendChild(li);
         });
-        dateSelectionModal.style.display = 'flex'; setTimeout(() => dateSelectionModal.classList.add('active'), 10);
+        dateSelectionModal.style.display = 'flex';
+        setTimeout(() => {
+            dateSelectionModal.classList.add('active');
+        }, 10);
     }
     
     function generateNextSundays(count) {
-        const sundays = []; let currentDate = new Date();
-        let dayOfWeek = currentDate.getDay(); if (dayOfWeek !== 0) currentDate.setDate(currentDate.getDate() + (7 - dayOfWeek));
+        const sundays = [];
+        let currentDate = new Date();
+        let dayOfWeek = currentDate.getDay();
+        if (dayOfWeek !== 0) { 
+            currentDate.setDate(currentDate.getDate() + (7 - dayOfWeek));
+        }
         for (let i = 0; i < count; i++) {
-            const day = String(currentDate.getDate()).padStart(2, '0'); const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-            sundays.push(`${day}-${month}-${currentDate.getFullYear()}`);
+            const day = String(currentDate.getDate()).padStart(2, '0');
+            const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+            const year = currentDate.getFullYear();
+            sundays.push(`${day}-${month}-${year}`);
             currentDate.setDate(currentDate.getDate() + 7);
         }
         return sundays;
@@ -1185,13 +2354,37 @@
         if (!scheduleName) return alert("Please enter a name for the schedule.");
         const selectedCheckboxes = Array.from(document.querySelectorAll('#date-checklist input:checked'));
         if (selectedCheckboxes.length === 0) return alert("Please select at least one Sunday.");
+        
         const selectedDates = selectedCheckboxes.map(cb => cb.value);
         const dateRange = `${selectedDates[0]} నుండి ${selectedDates[selectedDates.length - 1]}`;
-        const tableBodyHTML = selectedDates.map(date => `<tr><td>${date}</td><td class="editable-cell"></td><td class="editable-cell"></td><td class="editable-cell"></td><td class="editable-cell"></td><td class="actions-col"><button class="event-btn"><span class="material-symbols-outlined">more_vert</span></button></td></tr>`).join('');
+
+        const tableBodyHTML = selectedDates.map(date => `
+            <tr>
+                <td>${date}</td>
+                <td class="editable-cell"></td>
+                <td class="editable-cell"></td>
+                <td class="editable-cell"></td>
+                <td class="editable-cell"></td>
+                <td class="actions-col">
+                    <button class="event-btn">
+                        <span class="material-symbols-outlined">more_vert</span>
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+
         try {
-            const newDocRef = await userSchedulesCollection.add({ name: scheduleName, dateRange, tableHTML: tableBodyHTML, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+            const newDocRef = await userSchedulesCollection.add({
+                name: scheduleName,
+                dateRange: dateRange,
+                tableHTML: tableBodyHTML,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
             window.location.href = `./sunday-editor.html?id=${newDocRef.id}`;
-        } catch (error) { console.error("Error creating new schedule:", error); alert("Could not create schedule."); }
+        } catch (error) {
+            console.error("Error creating new schedule:", error);
+            alert("Could not create schedule. Please try again.");
+        }
     }
     
     async function generatePdf() {
@@ -1201,70 +2394,165 @@
 
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('l', 'mm', 'a4');
-        const A4_WIDTH_MM = 297, A4_HEIGHT_MM = 210, MARGIN_Y_MM = 10, MARGIN_X_MM = 15;
-        const USABLE_WIDTH = A4_WIDTH_MM - (MARGIN_X_MM * 2), USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_Y_MM * 2);
+        const A4_WIDTH_MM = 297;
+        const A4_HEIGHT_MM = 210;
+        const MARGIN_MM = 10;
+        
+        const USABLE_WIDTH = A4_WIDTH_MM - (MARGIN_MM * 2);
+        const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_MM * 2);
 
         try {
+            // Create a temporary container for PDF generation
             const tempContainer = document.createElement('div');
-            tempContainer.style.position = 'absolute'; tempContainer.style.left = '-9999px'; tempContainer.style.top = '0';
+            tempContainer.style.position = 'absolute';
+            tempContainer.style.left = '-9999px';
+            tempContainer.style.top = '0';
             document.body.appendChild(tempContainer);
 
+            // Get the current schedule data
             const scheduleData = document.getElementById('schedule-content-wrapper');
-            const title = scheduleWrapper.querySelector('.title-block h1').textContent;
-            const subtitle = scheduleWrapper.querySelector('.subtitle').textContent;
-            const tableRows = Array.from(scheduleWrapper.querySelectorAll('tbody tr'));
+            const title = scheduleData.querySelector('h1').textContent;
+            const subtitle = scheduleData.querySelector('.subtitle').textContent;
+            const tableRows = Array.from(scheduleData.querySelectorAll('tbody tr'));
 
-            let currentRow = 0, pageCount = 0;
-            const rowsFirstPage = 15, rowsOtherPages = 17;
+            // Define rows per page: 15 for first page, 17 for subsequent pages
+            const rowsFirstPage = 15;
+            const rowsOtherPages = 17;
+
+            let currentRow = 0;
+            let pageCount = 0;
 
             while (currentRow < tableRows.length) {
-                if (pageCount > 0) pdf.addPage();
+                if (pageCount > 0) {
+                    pdf.addPage();
+                }
+
+                // Create page container
                 const pageContainer = document.createElement('div');
                 pageContainer.className = 'pdf-page-container';
 
+                // Add header only for first page
                 if (pageCount === 0) {
-                    const header = document.createElement('div'); header.className = 'pdf-header';
-                    header.innerHTML = `<div class="title-block"><h1>${title}</h1><div class="subtitle-svg-container"><p>${subtitle}</p><div class="svg-divider"></div></div></div>`;
+                    const header = document.createElement('div');
+                    header.className = 'pdf-header';
+                    header.innerHTML = `
+                        <div class="title-block" style="text-align: center; margin-bottom: 20px;">
+                            <h1 style="font-family: 'Noto Sans Telugu', sans-serif; font-weight: 700; color: rgb(97, 40, 0); margin: 0; font-size: 1.8em;">${title}</h1>
+                            <div style="position: relative; display: inline-block; margin-top: 10px;">
+                                <p style="font-family: 'Noto Sans Telugu', sans-serif; font-weight: 500; color: #333; background-color: #ffffff; padding: 2px 8px; display: inline-block; position: relative; z-index: 2; white-space: nowrap; border-radius: 8px; margin: 0;">
+                                    ${subtitle}
+                                </p>
+                                <div style="width: 400px; height: 5px; background: linear-gradient(to right, #093261, #ffffff, #093261); position: absolute; left: 50%; transform: translateX(-50%); top: 50%; margin-top: -2.5px; z-index: 1;"></div>
+                            </div>
+                        </div>
+                    `;
                     pageContainer.appendChild(header);
                 }
 
+                // Create table for this page
                 const table = document.createElement('table');
-                table.className = 'pdf-table'; table.style.tableLayout = 'fixed';
+                table.className = 'pdf-table';
+                table.style.tableLayout = 'fixed';
+
+                // Add table header
                 const thead = document.createElement('thead');
-                thead.innerHTML = `<tr><th style="width: 15%">తేదీ</th><th style="width: 35%">ప్రసంగ అంశం</th><th style="width: 20%">ప్రసంగీకుడు</th><th style="width: 15%">చైర్మన్</th><th style="width: 15%">కావలికోట రీడర్</th></tr>`;
+                const headerHTML = `
+                    <tr>
+                        <th style="width: 15%">తేదీ</th>
+                        <th style="width: 35%">ప్రసంగ అంశం</th>
+                        <th style="width: 20%">ప్రసంగీకుడు</th>
+                        <th style="width: 15%">చైర్మన్</th>
+                        <th style="width: 15%">కావలికోట రీడర్</th>
+                    </tr>
+                `;
+                thead.innerHTML = headerHTML;
                 table.appendChild(thead);
                 
+                // Add rows for this page
                 const tbody = document.createElement('tbody');
-                const endRow = Math.min(currentRow + (pageCount === 0 ? rowsFirstPage : rowsOtherPages), tableRows.length);
+                
+                const rowsThisPage = pageCount === 0 ? rowsFirstPage : rowsOtherPages;
+                const endRow = Math.min(currentRow + rowsThisPage, tableRows.length);
+                
                 for (let i = currentRow; i < endRow; i++) {
-                    const originalRow = tableRows[i].cloneNode(true);
-                    originalRow.querySelectorAll('th, td').forEach(cell => { cell.style.fontWeight = '900'; });
-                    if (originalRow.cells.length > 5) originalRow.cells[5].remove(); 
-                    tbody.appendChild(originalRow);
+                    const originalRow = tableRows[i];
+                    const row = document.createElement('tr');
+                    
+                    // Copy cells, excluding the actions column
+                    for (let j = 0; j < originalRow.cells.length - 1; j++) {
+                        const cell = document.createElement(j === 0 ? 'th' : 'td');
+                        cell.innerHTML = originalRow.cells[j].innerHTML;
+                        
+                        // Apply special event styling if needed
+                        if (originalRow.cells[1].classList.contains('special-event')) {
+                            if (j === 1) {
+                                cell.className = 'special-event';
+                                cell.colSpan = 4;
+                                cell.style.width = '85%';
+                                j += 3;
+                            }
+                        }
+                        
+                        row.appendChild(cell);
+                    }
+                    
+                    tbody.appendChild(row);
                 }
+
                 table.appendChild(tbody);
                 pageContainer.appendChild(table);
                 tempContainer.appendChild(pageContainer);
 
+                // Wait for fonts and rendering
                 await document.fonts.ready;
-                await new Promise(resolve => setTimeout(resolve, 50));
+                await new Promise(resolve => setTimeout(resolve, 50)); // Reduced timeout
 
-                const canvas = await html2canvas(pageContainer, { scale: 1, useCORS: true, backgroundColor: '#ffffff', letterRendering: false, logging: false, imageTimeout: 15000, removeContainer: true });
+                // Capture the page with optimized settings
+                const canvas = await html2canvas(pageContainer, {
+                    scale: 1, // Reduced from 2 to 1
+                    useCORS: true,
+                    backgroundColor: '#ffffff',
+                    letterRendering: false, // Disable for smaller files
+                    logging: false,
+                    imageTimeout: 15000,
+                    removeContainer: true
+                });
+
+                // Use JPEG compression instead of PNG
                 const imgData = canvas.toDataURL('image/jpeg', 0.8);
                 const imgProps = pdf.getImageProperties(imgData);
                 const imgHeight = (imgProps.height * USABLE_WIDTH) / imgProps.width;
+
+                // Center the content vertically on the page
                 const verticalPosition = Math.max(0, (USABLE_HEIGHT - imgHeight) / 2);
                 
-                pdf.addImage(imgData, 'JPEG', MARGIN_X_MM, MARGIN_Y_MM + verticalPosition, USABLE_WIDTH, imgHeight, undefined, 'FAST');
+                pdf.addImage(
+                    imgData, 
+                    'JPEG', // Changed to JPEG
+                    MARGIN_MM, 
+                    MARGIN_MM + verticalPosition, 
+                    USABLE_WIDTH, 
+                    imgHeight,
+                    undefined,
+                    'FAST' // Use fast compression
+                );
+
+                // Remove the page container
                 tempContainer.removeChild(pageContainer);
+                
                 currentRow = endRow;
                 pageCount++;
             }
+
+            // Final cleanup
             document.body.removeChild(tempContainer);
-            pdf.save(`${document.title || 'sunday-schedule'}.pdf`);
+
+            const fileName = `${document.title || 'sunday-schedule'}.pdf`;
+            pdf.save(fileName);
+
         } catch (error) {
             console.error("PDF generation failed:", error);
-            alert("Sorry, there was an error creating the PDF.");
+            alert("Sorry, there was an error creating the PDF. Please try again.");
         } finally {
             printButton.disabled = false;
             printButton.querySelector('span:last-child').textContent = 'Download PDF';
@@ -1272,27 +2560,35 @@
     }
 
     function setupGlobalUI() {
+        // Initialize desktop dropdown elements
         desktopDropdownSearch = document.getElementById('desktop-dropdown-search');
         desktopDropdownList = document.getElementById('desktop-dropdown-list');
         mobileSearchInput = document.getElementById('mobile-search-input');
         
-        const menuCheckbox = document.getElementById('menu-checkbox');
+        // Menu Toggle Logic
+        const menuToggleButton = document.getElementById('menu-toggle-button');
         const slideMenu = document.getElementById('slide-menu');
         const menuOverlay = document.getElementById('menu-overlay');
         const body = document.body;
         
         function closeMenu() {
-            slideMenu.classList.remove('is-open'); menuOverlay.classList.remove('is-open');
-            body.classList.remove('menu-open'); menuCheckbox.checked = false;
+            slideMenu.classList.remove('is-open');
+            menuOverlay.classList.remove('is-open');
+            body.classList.remove('menu-open');
         }
-        
-        menuCheckbox.addEventListener('change', () => {
-            if(menuCheckbox.checked) {
-                slideMenu.classList.add('is-open'); menuOverlay.classList.add('is-open'); body.classList.add('menu-open');
-            } else { closeMenu(); }
+
+        menuToggleButton.addEventListener('click', () => {
+            if (body.classList.contains('menu-open')) {
+                closeMenu();
+            } else {
+                slideMenu.classList.add('is-open');
+                menuOverlay.classList.add('is-open');
+                body.classList.add('menu-open');
+            }
         });
         menuOverlay.addEventListener('click', closeMenu);
 
+        // App-specific UI
         document.getElementById('print-button').addEventListener('click', generatePdf);
         document.getElementById('edit-weeks-button').addEventListener('click', openWeekEditor);
         
@@ -1300,60 +2596,97 @@
             dateSelectionModal.classList.remove('active');
             setTimeout(() => {
                 dateSelectionModal.style.display = 'none';
+                // Reset modal to creation state
                 document.querySelector('#date-selection-modal h2').textContent = 'Create New Sunday Schedule';
                 document.querySelector('#date-selection-modal p').textContent = 'Give your new schedule a name and select the weeks to include.';
                 document.getElementById('new-schedule-name').style.display = 'block';
                 document.getElementById('confirm-creation').textContent = 'Create Schedule';
-                if (!currentScheduleId) window.location.href = './sunday-dashboard.html';
+                
+                if (!currentScheduleId) {
+                    window.location.href = './sunday-dashboard.html';
+                }
             }, 300);
         });
         
         document.getElementById('confirm-creation').addEventListener('click', function() {
-            if (this.textContent === 'Create Schedule') handleCreateSchedule(); else handleUpdateWeeks();
+            if (this.textContent === 'Create Schedule') {
+                handleCreateSchedule();
+            } else {
+                handleUpdateWeeks();
+            }
         });
 
+        // Enhanced dropdown event listeners
         dropdownBackdrop.addEventListener('click', hideMobileDropdown);
         dropdownClose.addEventListener('click', hideMobileDropdown);
-        desktopDropdownSearch.addEventListener('input', e => filterDesktopItems(e.target.value));
-        mobileSearchInput.addEventListener('input', e => filterMobileItems(e.target.value));
 
-        document.addEventListener('click', e => {
-            if (!desktopDropdown.contains(e.target) && !e.target.closest('.editable-cell')) hideDesktopDropdown();
-            if (!desktopEventMenu.contains(e.target) && !e.target.closest('.event-btn')) hideDesktopEventMenu();
-            
-            const header = e.target.closest('.mobile-week-header');
-            if (header) {
-                const currentCard = header.closest('.mobile-week-card');
-                if (!currentCard) return;
-                const isAlreadyOpen = currentCard.classList.contains('active');
-                document.querySelectorAll('.mobile-view-container .mobile-week-card').forEach(card => card.classList.remove('active'));
-                if (!isAlreadyOpen) currentCard.classList.add('active');
-            }
+        // Desktop dropdown search functionality
+        desktopDropdownSearch.addEventListener('input', (e) => {
+            filterDesktopItems(e.target.value);
         });
         
-        const toggleAllBtn = document.getElementById('toggle-all-mobile');
-        toggleAllBtn.addEventListener('click', () => {
-            const allCards = document.querySelectorAll('.mobile-view-container .mobile-week-card');
-            const areAnyOpen = Array.from(allCards).some(card => card.classList.contains('active'));
-            const textSpan = toggleAllBtn.querySelector('span:last-child');
-            const iconSpan = toggleAllBtn.querySelector('.material-symbols-outlined');
+        // Mobile dropdown search functionality
+        mobileSearchInput.addEventListener('input', (e) => {
+            filterMobileItems(e.target.value);
+        });
 
-            if (areAnyOpen) {
-                allCards.forEach(card => card.classList.remove('active'));
-                textSpan.textContent = 'Open All';
-                iconSpan.textContent = 'unfold_more';
-            } else {
-                allCards.forEach(card => card.classList.add('active'));
-                textSpan.textContent = 'Close All';
-                iconSpan.textContent = 'unfold_less';
+        // Desktop dropdown event listeners
+        document.addEventListener('click', (e) => {
+            if (!desktopDropdown.contains(e.target) && !e.target.closest('.editable-cell')) {
+                hideDesktopDropdown();
+            }
+            if (!desktopEventMenu.contains(e.target) && !e.target.closest('.event-btn')) {
+                hideDesktopEventMenu();
             }
         });
 
-        desktopEventMenu.addEventListener('click', e => { if (e.target.closest('.desktop-event-item')) applyEventType(e.target.closest('.desktop-event-item').dataset.eventType); });
-        dropdownContainer.addEventListener('click', e => e.stopPropagation());
-        document.querySelectorAll('.modal-overlay').forEach(modal => modal.addEventListener('click', e => { if (e.target === modal) { modal.classList.remove('active'); setTimeout(() => { modal.style.display = 'none'; }, 300); }}));
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') { hideMobileDropdown(); hideDesktopDropdown(); hideDesktopEventMenu(); dateSelectionModal.style.display = 'none'; } });
+        // Desktop event menu listeners
+        desktopEventMenu.addEventListener('click', (e) => {
+            const target = e.target.closest('.desktop-event-item');
+            if (target) {
+                applyEventType(target.dataset.eventType);
+            }
+        });
+
+        // Prevent dropdown container click from closing dropdown
+        dropdownContainer.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
+        // Enhanced modal handling
+        const modalOverlays = document.querySelectorAll('.modal-overlay');
+        modalOverlays.forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                    setTimeout(() => {
+                        modal.style.display = 'none';
+                    }, 300);
+                }
+            });
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (dropdownContainer.classList.contains('active')) {
+                    hideMobileDropdown();
+                }
+                if (desktopDropdown.classList.contains('active')) {
+                    hideDesktopDropdown();
+                }
+                if (desktopEventMenu.style.display === 'block') {
+                    hideDesktopEventMenu();
+                }
+                if (dateSelectionModal.style.display === 'flex') {
+                    dateSelectionModal.classList.remove('active');
+                    setTimeout(() => {
+                        dateSelectionModal.style.display = 'none';
+                    }, 300);
+                }
+            }
+        });
     }
+
 })();
 </script>
 </body>
