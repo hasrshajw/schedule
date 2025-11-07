@@ -11,77 +11,79 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 <style>
     :root {
         --header-bg: #1a1a1a;
         --text-light: #ffffff;
-        --body-bg: #f9fafb;
-        --menu-new-text: #1e40af;
+        --body-bg: #f8fafc;
+        --menu-new-text: #2563eb;
         --menu-new-bg: #ffffff;
-        --menu-new-border: #e5e7eb;
+        --menu-new-border: #f1f5f9;
         --menu-new-hover: #f8fafc;
-        --primary-color: #0f766e;
-        --primary-hover: #0d9488;
-        --primary-light: #ecfdf5;
+        --primary-color: #059669;
+        --primary-hover: #047857;
+        --primary-light: #d1fae5;
         --danger-color: #dc2626;
         --danger-hover: #b91c1c;
-        --border-color: #d1d5db;
-        --background-color: #f9fafb;
-        --text-primary: #111827;
-        --text-secondary: #6b7280;
+        --border-color: #e2e8f0;
+        --background-color: #f8fafc;
+        --text-primary: #0f172a;
+        --text-secondary: #64748b;
         --surface-color: #ffffff;
-        --radius-sm: 6px;
-        --radius-md: 10px;
+        --radius-md: 8px;
         --radius-lg: 16px;
-        --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --radius-xl: 24px;
         --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
         --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
         --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
         --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-        --warning-color: #d97706;
-        --success-color: #16a34a;
-        --transition-fast: 0.15s ease-out;
-        --transition-smooth: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        --warning-color: #f59e0b;
+        --success-color: #059669;
+        --glass-bg: rgba(255, 255, 255, 0.8);
+        --glass-border: rgba(255, 255, 255, 0.2);
     }
+
     @font-face {
         font-family: "jw-icons-external";
         src: url("./jw-icons-external-d876da3.woff") format("woff");
         font-weight: normal; font-style: normal;
     }
+
     * {
         box-sizing: border-box;
-    }
-    body {
         margin: 0;
         padding: 0;
+    }
+
+    body {
         font-family: 'Inter', sans-serif;
-        background-color: var(--body-bg);
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
         color: var(--text-primary);
         line-height: 1.6;
+        min-height: 100vh;
         visibility: hidden;
         opacity: 0;
-        transition: opacity 0.4s var(--transition-smooth);
-        overscroll-behavior: none;
+        transition: opacity 0.4s ease-in-out;
     }
     body.auth-ready { visibility: visible; opacity: 1; }
     body.menu-open { overflow: hidden; }
     body.dropdown-open { overflow: hidden; }
-    .site-header {
-        background-color: var(--header-bg);
-        padding: 0;
-        color: var(--text-light);
+
+    .site-header { 
+        background: var(--header-bg);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(255,255,255,0.1);
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
-        z-index: 900;
-        box-shadow: var(--shadow-md);
-        backdrop-filter: blur(20px);
+        z-index: 1000;
+        box-shadow: var(--shadow-lg);
     }
-    .top-bar {
+    .top-bar { 
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -90,211 +92,186 @@
         max-width: 1200px;
         margin: 0 auto;
     }
-    .top-bar .mobileLogo {
-        display: block;
-        width: 120px;
-        height: 40px;
-        background-image: ur[](https://www.jw.org/assets/ct/46605f23da/images/siteLogo-jworg-mobile.svg), none;
-        background-repeat: no-repeat;
-        background-size: contain;
-        background-position: center left;
-        flex-shrink: 0;
-        margin-left: -8px;
-        transition: opacity var(--transition-fast);
+    .top-bar .mobileLogo { 
+        width: 85px;
+        height: 32px;
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        mask: url(https://www.jw.org/assets/ct/46605f23da/images/siteLogo-jworg-mobile.svg) no-repeat center;
+        -webkit-mask: url(https://www.jw.org/assets/ct/46605f23da/images/siteLogo-jworg-mobile.svg) no-repeat center;
+        mask-size: contain;
+        -webkit-mask-size: contain;
     }
-    .top-bar .mobileLogo:hover { opacity: 0.8; }
-    .header-right-controls {
+    .header-right-controls { 
         display: flex;
         align-items: center;
         gap: 16px;
     }
-    .header-icons {
+    .header-icons { 
         display: flex;
         align-items: center;
         justify-content: center;
         height: 64px;
         width: 64px;
-        border-radius: var(--radius-lg);
-        transition: background-color var(--transition-fast);
     }
-    .header-icons:hover {
-        background-color: rgba(255, 255, 255, 0.05);
+
+    .status-indicator {
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
     }
+    .status-indicator::before {
+        content: '';
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: currentColor;
+        animation: pulse 2s infinite;
+    }
+    .status-indicator[data-status="synced"] { color: #10b981; }
+    .status-indicator[data-status="syncing"] { color: #f59e0b; }
+    .status-indicator[data-status="error"] { color: #ef4444; }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+
     .hamburger {
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      width: 100%;
-      padding: 8px;
-      border-radius: var(--radius-lg);
-      transition: all var(--transition-smooth);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        width: 100%;
+        position: relative;
     }
-    .hamburger:hover {
-        background-color: rgba(255, 255, 255, 0.05);
-    }
-    .hamburger input {
-      display: none;
-    }
+    .hamburger input { display: none; }
     .hamburger svg {
-      height: 24px;
-      width: 24px;
-      transition: transform 400ms var(--transition-smooth);
+        height: 2em;
+        transition: transform 600ms cubic-bezier(0.4, 0, 0.2, 1);
     }
     .line {
-      fill: none;
-      stroke: var(--text-light);
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      stroke-width: 2.5;
-      transition: stroke-dasharray 400ms var(--transition-smooth),
-                  stroke-dashoffset 400ms var(--transition-smooth);
+        fill: none;
+        stroke: white;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 3;
+        transition: stroke-dasharray 600ms cubic-bezier(0.4, 0, 0.2, 1),
+                    stroke-dashoffset 600ms cubic-bezier(0.4, 0, 0.2, 1);
     }
     .line-top-bottom {
-      stroke-dasharray: 10 40;
+        stroke-dasharray: 12 63;
     }
     .hamburger input:checked + svg {
-      transform: rotate(90deg);
+        transform: rotate(-45deg);
     }
     .hamburger input:checked + svg .line-top-bottom {
-      stroke-dasharray: 15 200;
-      stroke-dashoffset: -20;
+        stroke-dasharray: 20 300;
+        stroke-dashoffset: -32.42;
     }
+
     .menu-overlay {
         position: fixed;
         top: 64px;
         left: 0;
         width: 100%;
         height: calc(100% - 64px);
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 998;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(10px);
+        z-index: 999;
         opacity: 0;
         visibility: hidden;
-        transition: opacity 0.3s var(--transition-smooth), visibility 0.3s var(--transition-smooth);
-        backdrop-filter: blur(8px);
+        transition: all 0.3s ease-in-out;
     }
     .menu-overlay.is-open { opacity: 1; visibility: visible; }
+
     .slide-menu {
         position: fixed;
         top: 64px;
         right: 0;
         height: calc(100dvh - 64px);
-        width: 340px;
-        max-width: 85vw;
-        background-color: var(--menu-new-bg);
-        z-index: 999;
+        width: 360px;
+        max-width: 90%;
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        border-left: 1px solid var(--glass-border);
+        z-index: 1000;
         transform: translateX(100%);
-        transition: transform 0.4s var(--transition-smooth);
+        transition: transform 0.3s ease-in-out;
         display: flex;
         flex-direction: column;
-        border-left: 1px solid var(--menu-new-border);
         box-shadow: var(--shadow-xl);
-        overflow: hidden;
     }
     .slide-menu.is-open { transform: translateX(0); }
+
     .menu-links {
         list-style: none;
         margin: 0;
-        padding: 8px 0;
+        padding: 20px 0;
         overflow-y: auto;
         flex-grow: 1;
-        scrollbar-width: thin;
-        scrollbar-color: #e5e7eb transparent;
-    }
-    .menu-links::-webkit-scrollbar {
-        width: 4px;
-    }
-    .menu-links::-webkit-scrollbar-track {
-        background: transparent;
-    }
-    .menu-links::-webkit-scrollbar-thumb {
-        background-color: #e5e7eb;
-        border-radius: 2px;
     }
     .menu-links li a {
         display: flex;
         align-items: center;
         color: var(--text-primary);
-        background-color: transparent;
+        background: transparent;
         height: 56px;
-        padding: 0 24px;
+        padding: 16px 20px;
         text-decoration: none;
         font-size: 16px;
         font-weight: 500;
-        transition: all var(--transition-fast);
-        border-top: none;
-        position: relative;
+        transition: all 0.3s ease;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        margin: 0 16px;
+        border-radius: var(--radius-md);
     }
-    .menu-links li a::before {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 0;
-        height: 100%;
-        width: 4px;
-        background: var(--primary-color);
-        transform: scaleY(0);
-        transition: transform 0.2s var(--transition-smooth);
-    }
+    .menu-links li:first-child a { border-top: none; }
     .menu-links li a:hover {
-        background-color: var(--menu-new-hover);
+        background: var(--primary-light);
         color: var(--primary-color);
+        transform: translateX(8px);
     }
-    .menu-links li a:hover::before {
-        transform: scaleY(1);
-    }
+
     .profile-section {
-        padding: 20px 24px;
-        border-top: 1px solid var(--menu-new-border);
-        flex-shrink: 0;
-        background-color: #f8fafc;
+        padding: 24px;
+        border-top: 1px solid var(--border-color);
+        background: rgba(255,255,255,0.5);
         margin-top: auto;
     }
-    .profile-info { 
-        display: flex; 
-        align-items: center; 
-        gap: 12px;
-    }
-    .profile-avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: var(--primary-color);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: 600;
-        font-size: 14px;
-    }
+    .profile-info { display: flex; align-items: center; }
     .profile-name {
         font-weight: 600;
         font-size: 16px;
         color: var(--text-primary);
-        word-break: break-word;
+        word-break: break-all;
     }
+
     .iconLink-icon {
         font-family: "jw-icons-external";
         font-size: 20px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
+        display: inline-block;
         color: var(--text-secondary);
         width: 24px;
-        height: 24px;
         margin-right: 16px;
         text-align: center;
-        transition: color var(--transition-fast);
-        flex-shrink: 0;
+        transition: color 0.3s ease;
     }
-    .menu-links li a:hover .iconLink-icon {
-        color: var(--primary-color);
-    }
+    .menu-links li a:hover .iconLink-icon { color: var(--primary-color); }
     .home-icon::before { content: "\e661"; }
     .midweek-icon::before { content: "\e625"; }
     .sunday-icon::before { content: "\e610"; }
     .members-icon::before { content: "\e695"; }
+
     .btn {
         display: inline-flex;
         align-items: center;
@@ -302,14 +279,14 @@
         gap: 8px;
         padding: 12px 24px;
         border-radius: var(--radius-md);
-        font-size: 15px;
+        font-size: 14px;
         font-weight: 600;
         cursor: pointer;
         border: none;
         text-decoration: none;
-        background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+        background: var(--primary-color);
         color: white;
-        transition: all var(--transition-smooth);
+        transition: all 0.3s ease;
         box-shadow: var(--shadow-sm);
         position: relative;
         overflow: hidden;
@@ -324,44 +301,63 @@
         background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
         transition: left 0.5s;
     }
-    .btn:hover:not(:disabled)::before {
+    .btn:hover::before {
         left: 100%;
     }
     .btn:hover:not(:disabled) {
-        background: linear-gradient(135deg, var(--primary-hover), var(--primary-color));
+        background: var(--primary-hover);
         transform: translateY(-2px);
-        box-shadow: var(--shadow-md);
+        box-shadow: var(--shadow-lg);
     }
     .btn:active:not(:disabled) {
         transform: translateY(0);
     }
-    .btn:disabled { 
-        cursor: not-allowed; 
-        opacity: 0.6; 
-        transform: none;
-        box-shadow: var(--shadow-xs);
+    .btn:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+        transform: none !important;
     }
-    .schedule-display-header {
-        text-align: center;
-        margin-bottom: 0;
+
+    main {
+        padding: calc(64px + 24px) 24px 24px;
+        min-height: 100vh;
+        max-width: 1200px;
+        margin: 0 auto;
     }
+    .editor-main {
+        width: 100%;
+    }
+
+    .page-controls {
+        margin-bottom: 32px;
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    .master-container {
+        background: var(--surface-color);
+        padding: 32px;
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-lg);
+        border: 1px solid var(--border-color);
+        backdrop-filter: blur(10px);
+    }
+
     .title-block {
         text-align: center;
         margin-bottom: 32px;
-        position: relative;
     }
     .title-block h1 {
         margin: 0 0 16px 0;
-        font-size: 2.25rem;
-        font-weight: 800;
-        color: #7c2d12;
-        font-family: 'Noto Sans Telugu', sans-serif;
-        line-height: 1.2;
-        letter-spacing: -0.025em;
-        background: linear-gradient(135deg, #7c2d12, #b45309);
+        font-size: 2.5em;
+        font-weight: 900;
+        background: linear-gradient(135deg, #dc2626, #ea580c);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        background-clip: text;
+        font-family: 'Noto Sans Telugu', sans-serif;
+        line-height: 1.2;
     }
     .subtitle-svg-container {
         position: relative;
@@ -370,10 +366,10 @@
     }
     .subtitle {
         margin: 0;
-        font-size: 1.125rem;
+        font-size: 1.2em;
         font-weight: 600;
         color: var(--text-primary);
-        background-color: var(--surface-color);
+        background: var(--surface-color);
         padding: 12px 24px;
         display: inline-block;
         position: relative;
@@ -381,202 +377,126 @@
         white-space: nowrap;
         border-radius: var(--radius-lg);
         font-family: 'Noto Sans Telugu', sans-serif;
-        border: 1px solid var(--border-color);
-        box-shadow: var(--shadow-md);
-        transition: all var(--transition-smooth);
-        backdrop-filter: blur(10px);
+        border: 2px solid var(--border-color);
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s ease;
     }
     .subtitle:focus {
-        outline: 2px solid var(--primary-color);
-        outline-offset: 2px;
-        background-color: var(--primary-light);
-        transform: scale(1.02);
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
     }
     .svg-divider {
         width: 500px;
         height: 6px;
-        display: block;
+        background: linear-gradient(90deg, transparent, #059669, transparent);
+        border-radius: 3px;
         position: absolute;
         left: 50%;
         transform: translateX(-50%);
         top: 50%;
         margin-top: -3px;
         z-index: 1;
-        background: linear-gradient(90deg, transparent, #0f766e, transparent);
-        border-radius: 3px;
     }
+
     .hidden { display: none !important; }
-    main {
-        padding: calc(64px + 24px) 24px 24px;
-        min-height: 100vh;
-    }
-    .editor-main {
-        max-width: 1200px;
-        margin: 0 auto;
-    }
-    .page-controls {
-        margin-bottom: 32px;
-        display: flex;
-        justify-content: center;
-        gap: 16px;
-        flex-wrap: wrap;
-    }
-    .master-container {
-        background: var(--surface-color);
-        padding: 32px;
-        border-radius: var(--radius-xl);
-        box-shadow: var(--shadow-lg);
-        border: 1px solid var(--border-color);
-        overflow: hidden;
-    }
+
     .schedule-block {
         margin-bottom: 40px;
-        animation: fadeIn 0.5s var(--transition-smooth);
+        background: var(--surface-color);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border-color);
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    .schedule-block:hover {
+        box-shadow: var(--shadow-lg);
+        transform: translateY(-2px);
     }
     .schedule-block:last-child {
         margin-bottom: 0;
     }
+
     .schedule-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 20px;
-        padding-bottom: 12px;
+        padding: 24px;
+        background: linear-gradient(135deg, #f8fafc, #e2e8f0);
         border-bottom: 1px solid var(--border-color);
     }
     .schedule-title {
-        font-size: 1.375rem;
+        font-size: 1.5rem;
         font-weight: 700;
         margin: 0;
         color: var(--text-primary);
         font-family: 'Noto Sans Telugu', sans-serif;
     }
-    .status-indicator {
-        font-size: 13px;
-        font-weight: 600;
-        padding: 6px 12px;
-        border-radius: 20px;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        transition: all var(--transition-fast);
-    }
-    .status-indicator::before {
-        content: '';
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background-color: currentColor;
-        box-shadow: 0 0 0 2px white;
-    }
-    .status-indicator[data-status="synced"] {
-        color: var(--success-color);
-        background-color: rgba(22, 163, 74, 0.1);
-    }
-    .status-indicator[data-status="syncing"] {
-        color: var(--warning-color);
-        background-color: rgba(217, 119, 6, 0.1);
-    }
-    .status-indicator[data-status="error"] {
-        color: var(--danger-color);
-        background-color: rgba(220, 38, 38, 0.1);
-    }
+
     .toolbar-btn {
         display: inline-flex;
         align-items: center;
         justify-content: center;
         gap: 8px;
-        padding: 10px 16px;
+        padding: 10px 20px;
         font-size: 14px;
-        font-weight: 500;
+        font-weight: 600;
         cursor: pointer;
-        border: 1px solid var(--border-color);
-        background-color: var(--surface-color);
+        border: 2px solid var(--border-color);
+        background: var(--surface-color);
         border-radius: var(--radius-md);
-        transition: all var(--transition-smooth);
+        transition: all 0.3s ease;
         text-decoration: none;
         color: var(--text-secondary);
-        position: relative;
-        overflow: hidden;
-    }
-    .toolbar-btn::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(0,0,0,0.03), transparent);
-        transition: left 0.5s;
-    }
-    .toolbar-btn:hover:not(:disabled)::before {
-        left: 100%;
     }
     .toolbar-btn:hover:not(:disabled) {
-        background-color: #f8fafc;
+        background: var(--primary-color);
         border-color: var(--primary-color);
-        color: var(--primary-color);
+        color: white;
         transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
     }
-    .toolbar-btn:disabled { 
-        cursor: not-allowed; 
-        opacity: 0.4; 
-    }
+
     .schedule-block table {
         width: 100%;
-        border-collapse: separate;
-        border-spacing: 0;
+        border-collapse: collapse;
         border: 2px solid #4B0082;
         font-family: 'Noto Sans Telugu', sans-serif;
-        font-size: 15px;
-        font-weight: 600;
-        letter-spacing: 0.5px;
-        border-radius: var(--radius-md);
-        overflow: hidden;
-        box-shadow: var(--shadow-sm);
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.25px;
     }
     .schedule-block th, .schedule-block td {
         border: 1px solid #333;
-        padding: 12px 12px;
+        padding: 12px;
         text-align: left;
         vertical-align: middle;
         position: relative;
-        height: 48px;
-        transition: all var(--transition-fast);
-    }
-    .schedule-block th {
-        background: linear-gradient(135deg, #4B0082, #6a0dad);
-        color: white;
-        font-weight: 700;
-    }
-    .schedule-block td {
-        background: white;
+        height: 44px;
+        transition: all 0.2s ease;
     }
     .schedule-block .editable-cell:not([contenteditable="true"]) {
         cursor: pointer;
-        position: relative;
+        background: #fafafa;
     }
     .schedule-block .editable-cell:not([contenteditable="true"]):hover {
-        background-color: #f8fafc;
-        border-left: 3px solid var(--primary-color);
+        background: #f0f9ff;
     }
     .schedule-block [contenteditable="true"]:focus {
-        background-color: #fef3c7;
-        outline: 2px solid var(--warning-color);
-        outline-offset: -2px;
+        background: #fffbe5;
+        outline: 2px solid var(--primary-color);
     }
     .schedule-block .cell-content-wrapper {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
         height: 100%;
     }
     .schedule-block .cell-icon {
-        height: 80%;
-        max-height: 28px;
+        height: 70%;
+        max-height: 24px;
         object-fit: contain;
         flex-shrink: 0;
-        opacity: 0.8;
     }
     .schedule-block .header-row .cell-icon {
         filter: brightness(0) invert(1);
@@ -585,69 +505,73 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 10px;
+        gap: 8px;
         height: 100%;
     }
     .schedule-block .header-row td {
         font-size: 16px;
         color: #ffffff;
-        height: 50px;
-        font-weight: 700;
-    }
-    .schedule-block .row-handle {
-        display: none !important;
+        height: 48px;
+        background: linear-gradient(135deg, #4B0082, #6b21a8);
     }
     .special-event-text {
         color: #dc2626;
         text-align: center !important;
-        font-weight: 800;
-        font-size: 1.1em;
-        background: linear-gradient(135deg, #fee2e2, #fecaca);
-        padding: 8px;
-        border-radius: var(--radius-sm);
+        font-weight: 900;
+        font-size: 18px;
     }
+
     #event-context-menu, #member-dropdown {
         position: fixed;
         display: none;
         background: var(--surface-color);
+        backdrop-filter: blur(20px);
         border-radius: var(--radius-lg);
         box-shadow: var(--shadow-xl);
-        z-index: 1001;
-        padding: 8px 0;
+        z-index: 1100;
+        padding: 8px;
         min-width: 200px;
         border: 1px solid var(--border-color);
-        max-height: 320px;
-        overflow-y: auto;
-        backdrop-filter: blur(20px);
+        animation: slideDown 0.2s ease-out;
     }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-8px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
     .context-menu-item, .member-dropdown-item {
         font-family: 'Inter', sans-serif;
         display: block;
         width: 100%;
-        padding: 12px 20px;
+        padding: 12px 16px;
         cursor: pointer;
-        font-size: 15px;
-        border-radius: var(--radius-sm);
+        font-size: 14px;
+        font-weight: 500;
+        border-radius: var(--radius-md);
         background: none;
         border: none;
         text-align: left;
-        transition: all var(--transition-fast);
-        display: flex;
-        align-items: center;
-        gap: 12px;
+        transition: all 0.2s ease;
         color: var(--text-primary);
-        font-weight: 500;
     }
     .context-menu-item:hover, .member-dropdown-item:hover {
-        background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+        background: var(--primary-light);
         color: var(--primary-color);
-        transform: translateX(4px);
     }
     .member-dropdown-item {
+        display: flex;
         justify-content: space-between;
+        align-items: center;
     }
     #member-dropdown {
-        max-height: 300px;
+        max-height: 400px;
         overflow-y: auto;
     }
     .servant-tag {
@@ -656,46 +580,44 @@
         color: var(--primary-color);
         background-color: var(--primary-light);
         padding: 4px 8px;
-        border-radius: 6px;
-        box-shadow: var(--shadow-xs);
+        border-radius: 12px;
     }
+
     .modal-overlay {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0,0,0,0.5);
+        background: rgba(0,0,0,0.6);
+        backdrop-filter: blur(8px);
         display: none;
         justify-content: center;
         align-items: center;
-        z-index: 1000;
+        z-index: 1200;
         padding: 20px;
-        backdrop-filter: blur(20px);
-        transition: opacity 0.3s var(--transition-smooth);
     }
     .modal-content {
         background: var(--surface-color);
         padding: 32px;
         border-radius: var(--radius-xl);
         width: 100%;
-        max-width: 560px;
+        max-width: 500px;
         max-height: 90vh;
         display: flex;
         flex-direction: column;
         gap: 24px;
         box-shadow: var(--shadow-xl);
-        transform: scale(0.95) translateY(20px);
-        opacity: 0;
-        transition: all 0.3s var(--transition-smooth);
-        overflow: hidden;
         border: 1px solid var(--border-color);
+        transform: scale(0.9);
+        opacity: 0;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .modal-overlay.active {
         display: flex;
     }
     .modal-overlay.active .modal-content {
-        transform: scale(1) translateY(0);
+        transform: scale(1);
         opacity: 1;
     }
     #new-project-name {
@@ -703,65 +625,58 @@
         padding: 16px;
         font-size: 16px;
         border-radius: var(--radius-md);
-        border: 1px solid var(--border-color);
-        background: #f8fafc;
-        transition: all var(--transition-fast);
-        font-family: inherit;
+        border: 2px solid var(--border-color);
+        background: var(--surface-color);
+        transition: all 0.3s ease;
     }
     #new-project-name:focus {
         outline: none;
         border-color: var(--primary-color);
-        background: white;
-        box-shadow: 0 0 0 3px rgba(16, 118, 110, 0.1);
+        box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
     }
     #template-list, #edit-weeks-list {
         list-style: none;
         padding: 0;
         margin: 0;
         overflow-y: auto;
-        border: 1px solid var(--border-color);
+        border: 2px solid var(--border-color);
         border-radius: var(--radius-md);
-        max-height: 300px;
-        background: #f8fafc;
+        background: var(--surface-color);
     }
     #template-list li, #edit-weeks-list li {
-        padding: 0;
-        border-bottom: 1px solid #f1f5f9;
-        transition: background-color var(--transition-fast);
+        padding: 16px;
+        border-bottom: 1px solid var(--border-color);
+        transition: all 0.2s ease;
     }
     #template-list li:hover, #edit-weeks-list li:hover {
-        background: white;
+        background: var(--primary-light);
+    }
+    #template-list li:last-child, #edit-weeks-list li:last-child {
+        border-bottom: none;
     }
     #template-list label, #edit-weeks-list label {
         display: flex;
         align-items: center;
         gap: 12px;
         font-size: 16px;
-        cursor: pointer;
         font-weight: 500;
-        padding: 16px 20px;
-        transition: padding-left var(--transition-fast);
-    }
-    #template-list label:hover, #edit-weeks-list label:hover {
-        padding-left: 28px;
+        cursor: pointer;
+        color: var(--text-primary);
     }
     .modal-actions {
         display: flex;
         justify-content: flex-end;
         gap: 16px;
-        margin-top: 24px;
-        padding-top: 24px;
-        border-top: 1px solid var(--border-color);
+        margin-top: 8px;
     }
     .modal-actions button {
         padding: 12px 24px;
         border-radius: var(--radius-md);
-        font-size: 15px;
+        font-size: 14px;
         font-weight: 600;
         cursor: pointer;
-        border: 1px solid var(--border-color);
-        transition: all var(--transition-smooth);
-        font-family: inherit;
+        border: 2px solid var(--border-color);
+        transition: all 0.3s ease;
     }
     #cancel-template-selection, #cancel-weeks-edit {
         background-color: var(--surface-color);
@@ -769,28 +684,22 @@
     }
     #cancel-template-selection:hover, #cancel-weeks-edit:hover {
         background-color: #f8fafc;
-        border-color: var(--primary-color);
-        color: var(--primary-color);
+        border-color: var(--text-secondary);
     }
     #confirm-template-selection, #confirm-weeks-edit {
-        background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+        background-color: var(--primary-color);
         color: white;
         border-color: var(--primary-color);
     }
     #confirm-template-selection:hover, #confirm-weeks-edit:hover {
-        background: linear-gradient(135deg, var(--primary-hover), var(--primary-color));
-        transform: translateY(-1px);
+        background-color: var(--primary-hover);
+        border-color: var(--primary-hover);
     }
-    #print-container {
-        position: absolute;
-        left: -9999px;
-        top: auto;
-        width: 1100px;
-        background: white;
-    }
+
     .mobile-view-container {
         display: none;
     }
+
     .date-input {
         cursor: pointer;
         -webkit-appearance: none;
@@ -805,43 +714,20 @@
         font-weight: inherit;
         text-align: left;
         padding-left: 8px;
-        color: var(--text-primary);
     }
-    .date-input:focus {
-        outline: none;
-    }
-    .fade-in {
-        animation: fadeIn 0.4s var(--transition-smooth);
-    }
-    .slide-up {
-        animation: slideUp 0.4s var(--transition-smooth);
-    }
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes slideUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
+
     .dropdown-backdrop {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0,0,0,0.4);
-        z-index: 1100;
+        background: rgba(0,0,0,0.5);
+        backdrop-filter: blur(8px);
+        z-index: 1300;
         opacity: 0;
         visibility: hidden;
-        transition: all 0.3s var(--transition-smooth);
-        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
     }
     .dropdown-backdrop.active {
         opacity: 1;
@@ -853,137 +739,89 @@
         left: 0;
         right: 0;
         background: var(--surface-color);
-        border-radius: 28px 28px 0 0;
-        z-index: 1101;
+        border-radius: 32px 32px 0 0;
+        z-index: 1301;
         transform: translateY(100%);
-        transition: transform 0.4s var(--transition-smooth);
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         max-height: 85vh;
         display: flex;
         flex-direction: column;
-        box-shadow: var(--shadow-xl);
+        box-shadow: 0 -20px 40px rgba(0,0,0,0.2);
         border: 1px solid var(--border-color);
-        overflow: hidden;
     }
     .dropdown-container.active {
         transform: translateY(0);
     }
     .dropdown-header {
-        padding: 24px 28px 16px;
+        padding: 24px 24px 16px;
         border-bottom: 1px solid var(--border-color);
         display: flex;
         justify-content: space-between;
         align-items: center;
         flex-shrink: 0;
-        position: sticky;
-        top: 0;
-        background: var(--surface-color);
-        z-index: 10;
     }
     .dropdown-title {
-        font-size: 1.25rem;
+        font-size: 1.3rem;
         font-weight: 700;
         color: var(--text-primary);
         font-family: 'Noto Sans Telugu', sans-serif;
-        margin: 0;
     }
     .dropdown-close {
-        background: #f8fafc;
-        border: 1px solid var(--border-color);
-        padding: 12px;
+        background: none;
+        border: none;
+        padding: 8px;
         cursor: pointer;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         color: var(--text-secondary);
-        transition: all var(--transition-fast);
-        width: 44px;
-        height: 44px;
+        transition: all 0.2s ease;
     }
     .dropdown-close:hover {
-        background-color: #e2e8f0;
-        border-color: var(--primary-color);
-        color: var(--primary-color);
-        transform: scale(1.05);
+        background: #f1f5f9;
+        transform: rotate(90deg);
     }
     .dropdown-content {
         flex: 1;
         overflow-y: auto;
-        padding: 12px 0;
+        padding: 8px 0;
         max-height: 400px;
-        scrollbar-width: thin;
-        scrollbar-color: #e5e7eb transparent;
-    }
-    .dropdown-content::-webkit-scrollbar {
-        width: 4px;
-    }
-    .dropdown-content::-webkit-scrollbar-track {
-        background: transparent;
-    }
-    .dropdown-content::-webkit-scrollbar-thumb {
-        background-color: #e5e7eb;
-        border-radius: 2px;
     }
     .dropdown-item {
         display: flex;
         align-items: center;
         justify-content: space-between;
         width: 100%;
-        padding: 20px 28px;
+        padding: 20px 24px;
         border: none;
         background: none;
         cursor: pointer;
-        transition: all var(--transition-smooth);
+        transition: all 0.2s ease;
         font-family: 'Noto Sans Telugu', sans-serif;
         font-size: 1.1rem;
         text-align: left;
         color: var(--text-primary);
-        border-bottom: 1px solid transparent;
-        position: relative;
-    }
-    .dropdown-item::before {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 0;
-        height: 100%;
-        width: 4px;
-        background: var(--primary-color);
-        transform: scaleX(0);
-        transition: transform var(--transition-fast);
-    }
-    .dropdown-item:hover {
-        background-color: #f8fafc;
-        border-bottom-color: var(--border-color);
-        color: var(--primary-color);
-    }
-    .dropdown-item:hover::before {
-        transform: scaleX(1);
+        border-bottom: 1px solid #f1f5f9;
     }
     .dropdown-item:last-child {
         border-bottom: none;
     }
+    .dropdown-item:hover {
+        background: var(--primary-light);
+        color: var(--primary-color);
+    }
+
     #toggle-all-mobile {
         display: none;
     }
+
     @media (max-width: 768px) {
-        .top-bar {
-            height: 60px;
-            padding: 0 16px;
-        }
-        .mobileLogo {
-            width: 100px;
-            height: 36px;
-        }
-        .header-icons {
-            height: 60px;
-            width: 60px;
-        }
         main {
-            padding: 60px 0 0 0;
+            padding: 64px 0 0 0;
         }
         .editor-main {
-            padding: 0 8px;
+            padding: 0;
         }
         .master-container {
             padding: 0;
@@ -991,329 +829,289 @@
             box-shadow: none;
             background: transparent;
             border: none;
-            margin: 0;
+            backdrop-filter: none;
         }
         .page-controls {
-            padding: 80px 16px 20px;
+            padding: 80px 20px 20px;
             margin-bottom: 0;
-            gap: 12px;
-            justify-content: center;
+            background: linear-gradient(180deg, #f8fafc 0%, transparent 100%);
+            position: sticky;
+            top: 64px;
+            z-index: 100;
         }
+        .btn {
+            flex: 1;
+            min-width: 140px;
+            max-width: 200px;
+        }
+
         #toggle-all-mobile {
             display: inline-flex;
             margin: 0 auto 20px;
             background: var(--surface-color);
             color: var(--text-secondary);
-            border: 1px solid var(--border-color);
-            font-size: 14px;
-            padding: 10px 20px;
-            border-radius: var(--radius-md);
+            border: 2px solid var(--border-color);
+            width: 100%;
+            max-width: 200px;
         }
+        
         .title-block {
-            padding: 0 16px;
-            margin-bottom: 20px;
+            padding: 0 20px;
+            margin-bottom: 24px;
         }
         .title-block h1 {
-            font-size: 1.75rem;
+            font-size: 1.8rem;
             margin-bottom: 12px;
         }
         .subtitle {
-            font-size: 1rem;
+            font-size: 1.1rem;
             padding: 10px 20px;
         }
         .svg-divider {
             width: 280px;
-            height: 4px;
         }
+        
         .schedule-block {
             margin-bottom: 0;
             padding: 0;
+            border-radius: 0;
+            border-left: none;
+            border-right: none;
+            border-bottom: none;
         }
+        .schedule-block:hover {
+            transform: none;
+            box-shadow: none;
+        }
+        
         .schedule-block table {
             display: none;
         }
         .schedule-header {
             display: none !important;
         }
+        
         .mobile-view-container {
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            padding: 0 16px 24px;
+            gap: 0;
+            padding: 0;
         }
+        
         .mobile-week-card {
             background: var(--surface-color);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-xl);
+            border-bottom: 1px solid var(--border-color);
             margin-bottom: 0;
-            box-shadow: var(--shadow-md);
-            transition: all 0.4s var(--transition-smooth);
-            overflow: hidden;
-            transform: translateY(8px);
-            opacity: 0;
+            transition: all 0.3s ease;
         }
-        .mobile-week-card.animate-in {
-            transform: translateY(0);
-            opacity: 1;
+        .mobile-week-card:last-child {
+            border-bottom: none;
         }
+
         .mobile-week-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             cursor: pointer;
-            padding: 24px;
-            background: linear-gradient(135deg, #f8fafc, #e2e8f0);
-            border-bottom: 1px solid var(--border-color);
-            transition: all var(--transition-smooth);
-            position: relative;
-            overflow: hidden;
+            padding: 24px 20px;
+            background: var(--surface-color);
+            transition: all 0.3s ease;
         }
-        .mobile-week-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: var(--primary-color);
-            transform: scaleX(0);
-            transition: transform 0.3s var(--transition-smooth);
+        .mobile-week-card.active .mobile-week-header {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
         }
-        .mobile-week-header:hover {
-            background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
-        }
-        .mobile-week-header.active::before {
-            transform: scaleX(1);
-        }
+        
         .week-date {
-            font-size: 1.25rem;
+            font-size: 1.2rem;
             font-weight: 700;
             color: var(--text-primary);
             margin: 0;
             font-family: 'Noto Sans Telugu', sans-serif;
             text-align: left;
-            flex: 1;
         }
+        
         .accordion-icon {
             color: var(--text-secondary);
-            transition: transform 0.4s var(--transition-smooth);
-            font-size: 28px;
-            width: 28px;
-            height: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 24px;
         }
         .mobile-week-card.active .accordion-icon {
             transform: rotate(180deg);
+            color: var(--primary-color);
         }
+
         .mobile-week-body {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.5s var(--transition-smooth), padding 0.5s var(--transition-smooth);
-            padding: 0 24px;
+            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s ease;
+            padding: 0 20px;
+            background: var(--surface-color);
         }
         .mobile-week-card.active .mobile-week-body {
             max-height: 3000px;
-            padding: 0 24px 24px;
+            padding: 0 20px 24px 20px;
             border-top: 1px solid var(--border-color);
-            margin-top: -1px;
         }
+        
         .week-fields {
             display: flex;
             flex-direction: column;
             gap: 20px;
             padding-top: 24px;
         }
+        
         .field-group {
             display: flex;
             flex-direction: column;
             gap: 12px;
         }
+        
         .field-group label {
             font-size: 1rem;
-            font-weight: 600;
-            color: var(--text-secondary);
+            font-weight: 700;
+            color: var(--text-primary);
             font-family: 'Noto Sans Telugu', sans-serif;
             display: flex;
             align-items: center;
             gap: 8px;
-            position: relative;
+            padding: 8px 0;
         }
         .field-group label::before {
             content: '';
             width: 4px;
             height: 20px;
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            background: linear-gradient(135deg, var(--primary-color), #3b82f6);
             border-radius: 2px;
-            flex-shrink: 0;
         }
+        
         .mobile-field {
             padding: 20px;
             border: 2px solid var(--border-color);
             border-radius: var(--radius-lg);
-            background-color: #fafbfc;
+            background: #fafafa;
             cursor: pointer;
             font-family: 'Noto Sans Telugu', sans-serif;
             font-weight: 600;
             position: relative;
-            transition: all 0.3s var(--transition-smooth);
+            transition: all 0.3s ease;
             display: flex;
             justify-content: space-between;
             align-items: center;
             min-height: 64px;
-            overflow: hidden;
-        }
-        .mobile-field::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
-            width: 4px;
-            background: var(--primary-color);
-            transform: scaleX(0);
-            transition: transform var(--transition-fast);
         }
         .mobile-field:hover {
             border-color: var(--primary-color);
-            background-color: white;
-            box-shadow: var(--shadow-sm);
-            transform: translateX(4px);
-        }
-        .mobile-field:hover::before {
-            transform: scaleX(1);
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
         }
         .mobile-field::after {
-            content: "";
-            width: 20px;
-            height: 20px;
-            background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 9L12 15L18 9' stroke='%230f766e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3C/path%3E%3C/svg%3E");
-            background-size: contain;
-            background-repeat: no-repeat;
-            transition: transform 0.3s var(--transition-smooth);
-            flex-shrink: 0;
+            content: "expand_more";
+            font-family: 'Material Symbols Outlined';
+            font-size: 20px;
+            color: var(--text-secondary);
+            transition: transform 0.3s ease;
         }
         .mobile-field.active::after {
             transform: rotate(180deg);
+            color: var(--primary-color);
         }
+        
         .mobile-field-value {
             flex: 1;
             color: var(--text-primary);
-            font-size: 1.05rem;
+            font-size: 1rem;
         }
         .mobile-field-placeholder {
             color: var(--text-secondary);
             font-style: italic;
-            opacity: 0.7;
+            font-weight: 500;
         }
+        
         .date-input {
             width: 100%;
             padding: 20px;
             border: 2px solid var(--border-color);
             border-radius: var(--radius-lg);
-            background-color: #fafbfc;
+            background: #fafafa;
             font-family: 'Noto Sans Telugu', sans-serif;
-            font-size: 1.05rem;
+            font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s var(--transition-smooth);
+            transition: all 0.3s ease;
         }
         .date-input:focus {
             outline: none;
             border-color: var(--primary-color);
-            background-color: white;
-            box-shadow: 0 0 0 3px rgba(16, 118, 110, 0.1);
-            transform: scale(1.02);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
         }
+        
         .special-event-mobile {
             text-align: center;
             padding: 24px;
             background: linear-gradient(135deg, #fef2f2, #fee2e2);
-            border-radius: var(--radius-xl);
-            border: 2px dashed #fca5a5;
+            border-radius: var(--radius-lg);
+            border: 2px dashed #fecaca;
             margin-top: 20px;
-            box-shadow: var(--shadow-sm);
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
         }
         .special-event-text-mobile {
             color: var(--danger-color);
             font-weight: 800;
-            font-size: 1.125rem;
+            font-size: 1.2rem;
             margin: 0;
             font-family: 'Noto Sans Telugu', sans-serif;
-            line-height: 1.4;
         }
-        .modal-content {
-            padding: 28px;
-            max-width: 90vw;
-            margin: auto;
-        }
-        .modal-actions {
-            padding-top: 20px;
-            gap: 12px;
-        }
+        
         #member-dropdown, #event-context-menu {
             display: none !important;
         }
-        .dropdown-container {
-            border-radius: 24px 24px 0 0;
-            max-height: 90vh;
-        }
-        .dropdown-header {
-            padding: 20px 24px 12px;
-        }
-        .dropdown-item {
-            padding: 18px 24px;
-            font-size: 1rem;
+
+        .status-indicator {
+            font-size: 12px;
+            padding: 6px 12px;
         }
     }
+
     @media (max-width: 480px) {
+        .top-bar {
+            padding: 0 16px;
+        }
+        .page-controls {
+            padding: 70px 16px 16px;
+        }
+        .title-block {
+            padding: 0 16px;
+        }
         .title-block h1 {
             font-size: 1.5rem;
         }
-        .subtitle {
-            font-size: 0.95rem;
-            padding: 8px 16px;
-        }
-        .mobile-view-container {
-            padding: 0 12px 20px;
-            gap: 16px;
-        }
         .mobile-week-header {
-            padding: 20px;
+            padding: 20px 16px;
         }
         .mobile-week-body {
-            padding: 0 20px 20px;
+            padding: 0 16px;
         }
-        .week-fields {
-            gap: 16px;
-            padding-top: 20px;
+        .mobile-week-card.active .mobile-week-body {
+            padding: 0 16px 20px 16px;
         }
-        .mobile-field {
-            padding: 16px;
-            min-height: 56px;
-        }
-        .date-input {
+        .mobile-field, .date-input {
             padding: 16px;
         }
     }
 </style>
 </head>
 <body>
+
 <header class="site-header">
     <div class="top-bar">
-        <a href="./dashboard.html" class="mobileLogo" title="Dashboard" aria-label="Dashboard"></a>
+        <a href="./dashboard.html" class="mobileLogo" title="Dashboard"></a>
         <div class="header-right-controls">
-            <div class="status-indicator" data-status="synced" role="status" aria-live="polite">Synced</div>
+            <div class="status-indicator" data-status="synced">Synced</div>
             <div class="header-icons">
-                <label class="hamburger" for="menu-checkbox" aria-label="Open menu">
+                <label class="hamburger">
                   <input type="checkbox" id="menu-checkbox">
-                  <svg viewBox="0 0 32 32" aria-hidden="true">
+                  <svg viewBox="0 0 32 32">
                     <path class="line line-top-bottom" d="M27 10 13 10C10.8 10 9 8.2 9 6 9 3.5 10.8 2 13 2 15.2 2 17 3.8 17 6L17 26C17 28.2 18.8 30 21 30 23.2 30 25 28.2 25 26 25 23.8 23.2 22 21 22L7 22"></path>
                     <path class="line" d="M7 16 27 16"></path>
                   </svg>
@@ -1322,103 +1120,101 @@
         </div>
     </div>
 </header>
-<div class="menu-overlay" id="menu-overlay" aria-hidden="true"></div>
-<div class="slide-menu" id="slide-menu" role="navigation" aria-label="Main navigation">
-    <ul class="menu-links" role="list">
-        <li><a href="./home.html" role="menuitem"><span class="iconLink-icon home-icon" aria-hidden="true"></span><span>Home</span></a></li>
-        <li><a href="./mid-week.html" role="menuitem"><span class="iconLink-icon midweek-icon" aria-hidden="true"></span><span>Mid-Week Schedules</span></a></li>
-        <li><a href="./sunday-dashboard.html" role="menuitem"><span class="iconLink-icon sunday-icon" aria-hidden="true"></span><span>Sunday Schedules</span></a></li>
-        <li><a href="./members.html" role="menuitem"><span class="iconLink-icon members-icon" aria-hidden="true"></span><span>Members</span></a></li>
+<div class="menu-overlay" id="menu-overlay"></div>
+<div class="slide-menu" id="slide-menu">
+    <ul class="menu-links">
+        <li><a href="./home.html"><span class="iconLink-icon home-icon"></span><span>Home</span></a></li>
+        <li><a href="./mid-week.html"><span class="iconLink-icon midweek-icon"></span><span>Mid-Week Schedules</span></a></li>
+        <li><a href="./sunday-dashboard.html"><span class="iconLink-icon sunday-icon"></span><span>Sunday Schedules</span></a></li>
+        <li><a href="./members.html"><span class="iconLink-icon members-icon"></span><span>Members</span></a></li>
     </ul>
     <div class="profile-section">
         <div class="profile-info">
-             <div class="profile-avatar" aria-hidden="true">U</div>
              <div class="profile-name">Loading...</div>
         </div>
     </div>
 </div>
-<main id="app-container" class="editor-main hidden" role="main" aria-label="Schedule Editor">
-    <div class="page-controls" role="toolbar">
-        <button id="edit-weeks-button" class="btn" style="display: none;" aria-label="Edit weeks">
-            <span class="material-symbols-outlined" aria-hidden="true">edit_calendar</span>
+
+<main id="app-container" class="editor-main hidden">
+    <div class="page-controls">
+        <button id="edit-weeks-button" class="btn" style="display: none;">
+            <span class="material-symbols-outlined">edit_calendar</span>
             <span>Edit Weeks</span>
         </button>
-        <button id="print-button" class="btn" style="display: none;" aria-label="Download PDF">
-            <span class="material-symbols-outlined" aria-hidden="true">picture_as_pdf</span>
+        <button id="print-button" class="btn" style="display: none;">
+            <span class="material-symbols-outlined">picture_as_pdf</span>
             <span>Download PDF</span>
         </button>
     </div>
-    <div class="master-container" role="region" aria-label="Schedule content">
+    <div class="master-container">
         <header class="schedule-display-header">
             <div class="title-block">
                 <h1>వారం మధ్యలో జరిగే మీటింగ్ షెడ్యూల్</h1>
                 <div class="subtitle-svg-container">
-                    <p class="subtitle" contenteditable="true" id="date-range-subtitle" aria-label="Date range">Loading dates...</p>
-                    <svg class="svg-divider" role="presentation" viewBox="0 0 24039.797 260" preserveAspectRatio="xMidYMid slice">
-                        <defs>
-                            <radialGradient id="__id9__id4" gradientUnits="userSpaceOnUse" r="12020.601" cx="12019.898" cy="130" fx="12019.898" fy="130">
-                                <stop stop-color="#093261" stop-opacity="1" offset="0"></stop>
-                                <stop stop-color="#ffffff" stop-opacity="1" offset="1"></stop>
-                            </radialGradient>
-                        </defs>
-                        <rect x="0" y="0" width="24039.797" height="260" fill="url(#__id9__id4)"></rect>
-                    </svg>
+                    <p class="subtitle" contenteditable="true" id="date-range-subtitle">Loading dates...</p>
+                    <div class="svg-divider"></div>
                 </div>
             </div>
         </header>
-        <button id="toggle-all-mobile" class="btn" aria-label="Toggle all sections">
-            <span class="material-symbols-outlined" aria-hidden="true">unfold_more</span>
+        <button id="toggle-all-mobile" class="btn">
+            <span class="material-symbols-outlined">unfold_more</span>
             <span>Open All</span>
         </button>
-        <div id="schedules-wrapper" aria-live="polite"></div>
+        <div id="schedules-wrapper"></div>
     </div>
 </main>
+
 <template id="schedule-template">
-    <div class="schedule-block" role="region">
+    <div class="schedule-block">
         <div class="schedule-header">
-            <h2 class="schedule-title" aria-label="Schedule title"></h2>
-            <button class="toolbar-btn event-btn" aria-label="Set event type">
-                <span class="material-symbols-outlined" aria-hidden="true">celebration</span>
+            <h2 class="schedule-title"></h2>
+            <button class="toolbar-btn event-btn">
+                <span class="material-symbols-outlined">celebration</span>
                 <span>Event</span>
             </button>
         </div>
-        <table role="table" aria-label="Schedule table">
+        <table>
             <colgroup><col style="width: 60%;"><col style="width: 20%;"><col style="width: 20%;"></colgroup>
-            <tbody class="schedule-table-body" role="rowgroup"></tbody>
+            <tbody class="schedule-table-body"></tbody>
         </table>
-        <div class="mobile-view-container" aria-hidden="true"></div>
+        <div class="mobile-view-container"></div>
     </div>
 </template>
-<div id="event-context-menu" role="menu" aria-label="Event type options">
-    <button class="context-menu-item" data-event-type="normal" role="menuitem">Normal</button>
-    <button class="context-menu-item" data-event-type="co-visit" role="menuitem">CO Visit</button>
-    <button class="context-menu-item" data-event-type="assembly" role="menuitem">Assembly</button>
-    <button class="context-menu-item" data-event-type="convention" role="menuitem">Convention</button>
+
+<div id="event-context-menu">
+    <button class="context-menu-item" data-event-type="normal">Normal</button>
+    <button class="context-menu-item" data-event-type="co-visit">CO Visit</button>
+    <button class="context-menu-item" data-event-type="assembly">Assembly</button>
+    <button class="context-menu-item" data-event-type="convention">Convention</button>
 </div>
-<div id="member-dropdown" role="listbox" aria-label="Member selection"></div>
-<div id="template-selection-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="template-modal-title">
+
+<div id="member-dropdown"></div>
+
+<div id="template-selection-modal" class="modal-overlay">
     <div class="modal-content">
-        <h2 id="template-modal-title">Create a New Schedule</h2>
+        <h2>Create a New Schedule</h2>
         <p>Give your new project a name and select the templates to include.</p>
-        <input type="text" id="new-project-name" placeholder="Enter Project Name" aria-label="Project name">
-        <ul id="template-list" role="listbox"></ul>
+        <input type="text" id="new-project-name" placeholder="Enter Project Name">
+        <ul id="template-list"></ul>
         <div class="modal-actions">
             <button id="cancel-template-selection">Cancel</button>
             <button id="confirm-template-selection">Create Schedule</button>
         </div>
     </div>
 </div>
-<div id="edit-weeks-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="edit-weeks-modal-title">
+
+<div id="edit-weeks-modal" class="modal-overlay">
     <div class="modal-content">
-        <h2 id="edit-weeks-modal-title">Edit Schedule Weeks</h2>
+        <h2>Edit Schedule Weeks</h2>
         <p>Add or remove weeks from this schedule. Unchecking a week will remove it and its data permanently.</p>
-        <ul id="edit-weeks-list" role="listbox"></ul>
+        <ul id="edit-weeks-list"></ul>
         <div class="modal-actions">
             <button id="cancel-weeks-edit">Cancel</button>
             <button id="confirm-weeks-edit">Update Schedule</button>
         </div>
     </div>
 </div>
+
 <script>
 (function() {
     'use strict';
@@ -1430,6 +1226,7 @@
       messagingSenderId: "965478014820",
       appId: "1:965478014820:web:1c36c5d890a27e599aa471"
     };
+
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
@@ -1443,6 +1240,7 @@
     let activeProject = null;
     let activeEventScheduleTable = null;
     let activeCellForDropdown = null;
+
     const appContainer = document.getElementById('app-container');
     const schedulesWrapper = document.getElementById('schedules-wrapper');
     const templateSelectionModal = document.getElementById('template-selection-modal');
@@ -1456,27 +1254,35 @@
     const editWeeksList = document.getElementById('edit-weeks-list');
     const cancelWeeksEditBtn = document.getElementById('cancel-weeks-edit');
     const confirmWeeksEditBtn = document.getElementById('confirm-weeks-edit');
+    
     function updateStatus(text, status) {
         statusIndicator.textContent = text;
         statusIndicator.dataset.status = status;
     }
+
     function updateDateRangeSubtitle() {
         const scheduleBlocks = document.querySelectorAll('.schedule-block');
         if (scheduleBlocks.length === 0) return;
+        
         const firstTable = scheduleBlocks[0];
         const lastTable = scheduleBlocks[scheduleBlocks.length - 1];
+        
         const firstDateInput = firstTable.querySelector('.date-input');
         const firstDate = firstDateInput ? firstDateInput.value : '';
+        
         const lastDateInput = lastTable.querySelector('.date-input');
         const lastDate = lastDateInput ? lastDateInput.value : '';
+        
         if (firstDate && lastDate) {
             const formatDate = (dateStr) => {
                 if (!dateStr) return '';
                 const [year, month, day] = dateStr.split('-');
                 return `${day}-${month}-${year}`;
             };
+            
             const formattedFirstDate = formatDate(firstDate);
             const formattedLastDate = formatDate(lastDate);
+            
             const subtitle = document.getElementById('date-range-subtitle');
             if (subtitle) {
                 subtitle.textContent = `${formattedFirstDate} నుండి ${formattedLastDate}`;
@@ -1486,6 +1292,7 @@
             if (subtitle) subtitle.textContent = "Please set dates";
         }
     }
+
     async function fetchMembers() {
         if (!currentUser) return;
         membersCollection = db.collection(`users/${currentUser.uid}/members`);
@@ -1500,6 +1307,7 @@
             }
         });
     }
+
     class ScheduleTable {
         constructor(parentProject, tableData, index) {
             this.parentProject = parentProject;
@@ -1509,13 +1317,8 @@
             this.render();
             this.setupEventListeners();
             this.applyEventType(this.data.eventType || 'normal', false);
-            if (window.innerWidth <= 768) {
-                setTimeout(() => {
-                    const card = this.mobileViewContainer.querySelector('.mobile-week-card');
-                    if (card) card.classList.add('animate-in');
-                }, index * 100);
-            }
         }
+
         initDOM() {
             const templateClone = document.getElementById('schedule-template').content.cloneNode(true);
             this.element = templateClone.querySelector('.schedule-block');
@@ -1525,9 +1328,11 @@
             this.eventBtn = this.element.querySelector('.event-btn');
             schedulesWrapper.appendChild(this.element);
         }
+
         render() {
             this.titleEl.textContent = this.data.title;
             this.tableBody.innerHTML = this.data.content;
+            
             this.tableBody.querySelectorAll('td, th').forEach(cell => {
                 if (cell.hasAttribute('data-user-editable')) {
                     const isFirstRow = cell.closest('tr') === this.tableBody.rows[0];
@@ -1538,24 +1343,23 @@
                         cell.removeAttribute('contenteditable');
                     } else {
                         cell.classList.add('editable-cell');
-                        cell.setAttribute('tabindex', '0');
-                        cell.setAttribute('role', 'button');
-                        cell.setAttribute('aria-label', 'Edit cell');
                         cell.removeAttribute('contenteditable');
                     }
                 } else {
                     cell.setAttribute('contenteditable', 'false');
                 }
             });
+
             this._createMobileView();
             setTimeout(updateDateRangeSubtitle, 100);
         }
+        
         _getMobileCardBodyHTML() {
             if (this.data.eventType && this.data.eventType !== 'normal') {
-                const eventTexts = {
-                    'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం',
-                    'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో',
-                    'convention': 'ప్రాదేశిక సమావేశం'
+                const eventTexts = { 
+                    'co-visit': 'ప్రాంతీయ పర్యవేక్షకుని సందర్శన వారం', 
+                    'assembly': 'ప్రాంతీయ సమావేశ కార్యక్రమం, బ్రాంచి ప్రతినిధితో', 
+                    'convention': 'ప్రాదేశిక సమావేశం' 
                 };
                 const firstRow = this.tableBody.rows[0];
                 const dateInput = firstRow.querySelector('.date-input');
@@ -1563,15 +1367,14 @@
                 return `
                     <div class="field-group">
                         <label>Event Type</label>
-                        <div class="mobile-field event-type-field" tabindex="0" role="button" aria-label="Select event type">
+                        <div class="mobile-field event-type-field">
                             <span class="mobile-field-value">${this._getEventTypeDisplayName(this.data.eventType)}</span>
-                            <span class="material-symbols-outlined" style="font-size: 20px; opacity: 0.6;">arrow_drop_down</span>
                         </div>
                     </div>
                     <div class="special-event-mobile"><p class="special-event-text-mobile">${eventTexts[this.data.eventType]}</p></div>
                     <div class="field-group">
                         <label>తేదీ</label>
-                        <input type="date" class="date-input" value="${dateValue}" aria-label="Date">
+                        <input type="date" class="date-input" value="${dateValue}">
                     </div>`;
             } else {
                 let fieldsHTML = '';
@@ -1600,6 +1403,7 @@
                         if (!groupedInputs[labelText]) groupedInputs[labelText] = [];
                         groupedInputs[labelText].push({ cell, cellIndex, rowIndex });
                     });
+
                     for (const label in groupedInputs) {
                         let groupHTML = '';
                         groupedInputs[label].forEach(({ cell, cellIndex, rowIndex }) => {
@@ -1609,7 +1413,7 @@
                                 const dateValue = dateInput ? dateInput.value : '';
                                 groupHTML += `<div class="input-group"><input type="date" class="date-input" data-row-index="${rowIndex}" data-cell-index="${cellIndex}" value="${dateValue}"></div>`;
                             } else {
-                                groupHTML += `<div class="input-group"><div class="mobile-field member-field" data-row-index="${rowIndex}" data-cell-index="${cellIndex}" tabindex="0" role="button" aria-label="Select ${label}"><span class="mobile-field-value ${cellText ? '' : 'mobile-field-placeholder'}">${cellText || 'Select Option'}</span><span class="material-symbols-outlined" style="font-size: 20px; opacity: 0.6;">arrow_drop_down</span></div></div>`;
+                                groupHTML += `<div class="input-group"><div class="mobile-field member-field" data-row-index="${rowIndex}" data-cell-index="${cellIndex}"><span class="mobile-field-value ${cellText ? '' : 'mobile-field-placeholder'}">${cellText || 'Select Option'}</span></div></div>`;
                             }
                         });
                         if (groupHTML) fieldsHTML += `<div class="field-group">${label ? `<label>${label}</label>` : ''}${groupHTML}</div>`;
@@ -1618,32 +1422,31 @@
                 return `
                     <div class="field-group">
                         <label>Event Type</label>
-                        <div class="mobile-field event-type-field" tabindex="0" role="button" aria-label="Select event type">
+                        <div class="mobile-field event-type-field">
                             <span class="mobile-field-value">${this._getEventTypeDisplayName(this.data.eventType)}</span>
-                            <span class="material-symbols-outlined" style="font-size: 20px; opacity: 0.6;">arrow_drop_down</span>
                         </div>
                     </div>
                     <div class="week-fields">${fieldsHTML}</div>`;
             }
         }
+
         _createMobileView() {
             this.mobileViewContainer.innerHTML = '';
             const card = document.createElement('div');
             card.className = 'mobile-week-card';
-            card.setAttribute('tabindex', '0');
-            card.setAttribute('role', 'button');
-            card.setAttribute('aria-expanded', 'false');
             card.innerHTML = `
                 <div class="mobile-week-header">
                     <h3 class="week-date">${this.data.title}</h3>
-                    <span class="material-symbols-outlined accordion-icon" aria-hidden="true">expand_more</span>
+                    <span class="material-symbols-outlined accordion-icon">expand_more</span>
                 </div>
                 <div class="mobile-week-body"></div>`;
+            
             const cardBody = card.querySelector('.mobile-week-body');
             cardBody.innerHTML = this._getMobileCardBodyHTML();
             this.mobileViewContainer.appendChild(card);
             this._setupMobileEventListeners(card);
         }
+
         _updateMobileCardBody() {
             const card = this.mobileViewContainer.querySelector('.mobile-week-card');
             if (!card) return;
@@ -1651,22 +1454,17 @@
             cardBody.innerHTML = this._getMobileCardBodyHTML();
             this._setupMobileEventListeners(card);
         }
+
         _setupMobileEventListeners(card) {
             card.querySelectorAll('.member-field').forEach(field => {
                 field.addEventListener('click', (e) => {
-                    e.stopPropagation();
                     const rowIndex = field.dataset.rowIndex;
                     const cellIndex = field.dataset.cellIndex;
                     const targetCell = this.tableBody.rows[rowIndex].cells[cellIndex];
                     this._openMobileDropdown(targetCell, field);
                 });
-                field.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        field.click();
-                    }
-                });
             });
+
             card.querySelectorAll('.date-input').forEach(input => {
                 input.addEventListener('change', (e) => {
                     const tableInput = this.tableBody.querySelector('.date-input');
@@ -1675,36 +1473,21 @@
                     setTimeout(updateDateRangeSubtitle, 100);
                 });
             });
-            card.querySelector('.event-type-field').addEventListener('click', (e) => {
-                e.stopPropagation();
+
+            card.querySelector('.event-type-field').addEventListener('click', () => {
                 this._openMobileEventTypeDropdown();
             });
-            card.querySelector('.event-type-field').addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    card.querySelector('.event-type-field').click();
-                }
-            });
-            card.addEventListener('click', (e) => {
-                if (e.target.closest('.mobile-field') || e.target.closest('.date-input')) return;
-                const isExpanded = card.getAttribute('aria-expanded') === 'true';
-                card.setAttribute('aria-expanded', !isExpanded);
-                card.classList.toggle('active');
-            });
-            card.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    card.click();
-                }
-            });
         }
+
         _getEventTypeDisplayName(eventType) {
             const eventNames = { 'normal': 'Normal', 'co-visit': 'CO Visit', 'assembly': 'Assembly', 'convention': 'Convention' };
             return eventNames[eventType] || 'Normal';
         }
+
         _openMobileDropdown(cell, fieldElement) {
             const isInMinistry = this._isCellInMinistrySection(cell);
             let listToShow;
+            
             if (isInMinistry) {
                 const sortedSisters = [...members.sisters].sort((a, b) => a.name.localeCompare(b.name));
                 const sortedBrothers = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
@@ -1712,35 +1495,39 @@
             } else {
                 listToShow = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
             }
+
             const dropdownHTML = `
                 <div class="dropdown-backdrop" id="mobile-dropdown-backdrop"></div>
-                <div class="dropdown-container" id="mobile-dropdown-container" role="dialog" aria-modal="true" aria-labelledby="member-dropdown-title">
+                <div class="dropdown-container" id="mobile-dropdown-container">
                     <div class="dropdown-header">
-                        <h3 class="dropdown-title" id="member-dropdown-title">Select ${isInMinistry ? 'Member' : 'Brother'}</h3>
-                        <button class="dropdown-close" id="mobile-dropdown-close"><span class="material-symbols-outlined" aria-hidden="true">close</span></button>
+                        <h3 class="dropdown-title">Select ${isInMinistry ? 'Member' : 'Brother'}</h3>
+                        <button class="dropdown-close" id="mobile-dropdown-close"><span class="material-symbols-outlined">close</span></button>
                     </div>
-                    <div class="dropdown-content" role="listbox">
-                        ${listToShow.map(member => `<button class="dropdown-item" role="option" data-name="${member.name}"><span>${member.name}</span>${member.isServant ? '<span class="servant-tag">Servant</span>' : ''}</button>`).join('')}
+                    <div class="dropdown-content">
+                        ${listToShow.map(member => `<button class="dropdown-item" data-name="${member.name}"><span>${member.name}</span>${member.isServant ? '<span class="servant-tag">Servant</span>' : ''}</button>`).join('')}
                     </div>
                 </div>`;
+
             const existingDropdown = document.getElementById('mobile-dropdown-container');
             if (existingDropdown) {
                 existingDropdown.remove();
                 document.getElementById('mobile-dropdown-backdrop').remove();
             }
+
             document.body.insertAdjacentHTML('beforeend', dropdownHTML);
-            document.body.classList.add('dropdown-open');
             const backdrop = document.getElementById('mobile-dropdown-backdrop');
             const container = document.getElementById('mobile-dropdown-container');
             const closeBtn = document.getElementById('mobile-dropdown-close');
+
             const hideDropdown = () => {
-                document.body.classList.remove('dropdown-open');
                 backdrop.classList.remove('active');
                 container.classList.remove('active');
-                setTimeout(() => { backdrop.remove(); container.remove(); }, 400);
+                setTimeout(() => { backdrop.remove(); container.remove(); }, 300);
             };
+
             backdrop.addEventListener('click', hideDropdown);
             closeBtn.addEventListener('click', hideDropdown);
+
             container.addEventListener('click', (e) => {
                 const item = e.target.closest('.dropdown-item');
                 if (item) {
@@ -1753,11 +1540,10 @@
                     hideDropdown();
                 }
             });
-            container.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') hideDropdown();
-            });
+
             setTimeout(() => { backdrop.classList.add('active'); container.classList.add('active'); }, 10);
         }
+
         _openMobileEventTypeDropdown() {
             const eventTypes = [
                 { id: 'normal', name: 'Normal', icon: 'event' },
@@ -1765,35 +1551,39 @@
                 { id: 'assembly', name: 'Assembly', icon: 'celebration' },
                 { id: 'convention', name: 'Convention', icon: 'festival' }
             ];
+
             const dropdownHTML = `
                 <div class="dropdown-backdrop" id="mobile-event-dropdown-backdrop"></div>
-                <div class="dropdown-container" id="mobile-event-dropdown-container" role="dialog" aria-modal="true" aria-labelledby="event-dropdown-title">
+                <div class="dropdown-container" id="mobile-event-dropdown-container">
                     <div class="dropdown-header">
-                        <h3 class="dropdown-title" id="event-dropdown-title">Select Event Type</h3>
-                        <button class="dropdown-close" id="mobile-event-dropdown-close"><span class="material-symbols-outlined" aria-hidden="true">close</span></button>
+                        <h3 class="dropdown-title">Select Event Type</h3>
+                        <button class="dropdown-close" id="mobile-event-dropdown-close"><span class="material-symbols-outlined">close</span></button>
                     </div>
-                    <div class="dropdown-content" role="listbox">
-                        ${eventTypes.map(event => `<button class="dropdown-item" role="option" data-event-type="${event.id}"><span style="display: flex; align-items: center; gap: 16px;"><span class="material-symbols-outlined" style="font-size: 24px; opacity: 0.8;">${event.icon}</span><span>${event.name}</span></span></button>`).join('')}
+                    <div class="dropdown-content">
+                        ${eventTypes.map(event => `<button class="dropdown-item" data-event-type="${event.id}"><span style="display: flex; align-items: center; gap: 12px;"><span class="material-symbols-outlined">${event.icon}</span><span>${event.name}</span></span></button>`).join('')}
                     </div>
                 </div>`;
+
             const existingDropdown = document.getElementById('mobile-event-dropdown-container');
             if (existingDropdown) {
                 existingDropdown.remove();
                 document.getElementById('mobile-event-dropdown-backdrop').remove();
             }
+
             document.body.insertAdjacentHTML('beforeend', dropdownHTML);
-            document.body.classList.add('dropdown-open');
             const backdrop = document.getElementById('mobile-event-dropdown-backdrop');
             const container = document.getElementById('mobile-event-dropdown-container');
             const closeBtn = document.getElementById('mobile-event-dropdown-close');
+
             const hideDropdown = () => {
-                document.body.classList.remove('dropdown-open');
                 backdrop.classList.remove('active');
                 container.classList.remove('active');
-                setTimeout(() => { backdrop.remove(); container.remove(); }, 400);
+                setTimeout(() => { backdrop.remove(); container.remove(); }, 300);
             };
+
             backdrop.addEventListener('click', hideDropdown);
             closeBtn.addEventListener('click', hideDropdown);
+
             container.addEventListener('click', (e) => {
                 const item = e.target.closest('.dropdown-item');
                 if (item) {
@@ -1802,19 +1592,21 @@
                     hideDropdown();
                 }
             });
-            container.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') hideDropdown();
-            });
+
             setTimeout(() => { backdrop.classList.add('active'); container.classList.add('active'); }, 10);
         }
+
         _isCellInMinistrySection(cell) {
             const table = cell.closest('table');
             if (!table) return false;
+            
             const allRows = Array.from(table.querySelectorAll('tbody > tr'));
             const cellRow = cell.closest('tr');
             const cellIndex = allRows.indexOf(cellRow);
+            
             let ministryHeaderIndex = -1;
             let nextHeaderIndex = allRows.length;
+            
             allRows.forEach((row, index) => {
                 if (row.classList.contains('header-row')) {
                     const rowText = row.textContent.trim();
@@ -1822,9 +1614,11 @@
                     else if (ministryHeaderIndex !== -1 && index > ministryHeaderIndex && index < nextHeaderIndex) nextHeaderIndex = index;
                 }
             });
+            
             if (ministryHeaderIndex === -1) return false;
             return cellIndex > ministryHeaderIndex && cellIndex < nextHeaderIndex;
         }
+
         getContent() {
             const tempBody = this.tableBody.cloneNode(true);
             const dateInput = tempBody.querySelector('.date-input');
@@ -1836,10 +1630,12 @@
             tempBody.querySelectorAll('.editable-cell').forEach(el => el.classList.remove('editable-cell'));
             return tempBody.innerHTML;
         }
+
         applyEventType(eventType, shouldSave = true) {
             this.data.eventType = eventType;
             const allRows = this.tableBody.querySelectorAll('tr');
             const firstRow = this.tableBody.rows[0];
+
             if (eventType === 'normal') {
                 allRows.forEach(row => row.style.display = '');
                 if (firstRow && firstRow.dataset.originalContent) {
@@ -1859,9 +1655,11 @@
                 }
                 firstRow.innerHTML = `<th colspan="1" class="special-event-text">${eventTexts[eventType]}</th><td style="text-align: right; font-weight: 700;">తేదీ:</td><td data-user-editable="true"><input type="date" class="date-input" value="${existingDateValue}"></td>`;
             }
+
             this._updateMobileCardBody();
             if (shouldSave) this.parentProject.triggerSave();
         }
+
         setupEventListeners() {
             this.element.addEventListener('input', (e) => {
                 if(e.target.classList.contains('item-input')) {
@@ -1877,30 +1675,23 @@
                 }
                 this.parentProject.triggerSave();
             });
+
             this.eventBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
                 activeEventScheduleTable = this;
                 const rect = e.currentTarget.getBoundingClientRect();
                 eventContextMenu.style.display = 'block';
-                eventContextMenu.style.top = `${rect.bottom + window.scrollY}px`;
-                eventContextMenu.style.left = `${rect.left + window.scrollX}px`;
-                eventContextMenu.querySelectorAll('.context-menu-item').forEach((item, idx) => {
-                    setTimeout(() => item.focus(), idx * 50);
-                });
+                eventContextMenu.style.top = `${rect.bottom}px`;
+                eventContextMenu.style.left = `${rect.left}px`;
             });
+
             this.element.addEventListener('change', (e) => {
                 if (e.target.classList.contains('date-input')) {
                     setTimeout(updateDateRangeSubtitle, 100);
                 }
             });
-            this.element.addEventListener('keydown', (e) => {
-                if (e.target.classList.contains('editable-cell') && (e.key === 'Enter' || e.key === ' ')) {
-                    e.preventDefault();
-                    openMemberDropdown(e.target, null);
-                }
-            });
         }
     }
+
     class Project {
         constructor(id, initialData, collectionRef) {
             this.id = id;
@@ -1911,6 +1702,7 @@
             this.saveTimeout = null;
             this.render();
         }
+
         render(newData) {
             if (newData) this.data = newData;
             schedulesWrapper.innerHTML = '';
@@ -1920,12 +1712,14 @@
             });
             setTimeout(updateDateRangeSubtitle, 200);
         }
+
         triggerSave() {
             clearTimeout(this.saveTimeout);
             if (!this.isSaving) {
                 this.saveTimeout = setTimeout(() => this.save(), 500);
             }
         }
+        
         save() {
             this.isSaving = true;
             updateStatus('Syncing...', 'syncing');
@@ -1935,6 +1729,7 @@
                 eventType: table.data.eventType || 'normal'
             }));
             const payload = { name: this.data.name, tables: updatedTablesData };
+
             this.collectionRef.doc(this.id).update(payload)
                 .then(() => {
                     updateStatus('Synced', 'synced');
@@ -1947,20 +1742,20 @@
                 });
         }
     }
+
     auth.onAuthStateChanged(async user => {
         if (user) {
             if (user.email === ADMIN_EMAIL) { window.location.replace('./admin.html'); return; }
             currentUser = user;
-            await fetchMembers();
+            await fetchMembers(); 
             userSchedulesCollection = db.collection(`userSchedules/${currentUser.uid}/schedules`);
             appContainer.classList.remove('hidden');
             document.body.classList.add('auth-ready');
             const profileNameEl = document.querySelector('.profile-name');
-            if (profileNameEl) {
-                const emailParts = user.email.split('@')[0];
-                profileNameEl.textContent = emailParts.charAt(0).toUpperCase() + emailParts.slice(1);
-            }
+            if (profileNameEl) profileNameEl.textContent = user.email;
+            
             setupGlobalUI();
+
             const params = new URLSearchParams(window.location.search);
             currentProjectId = params.get('id');
             if (currentProjectId) { initEditor(); } else { initCreationFlow(); }
@@ -1968,10 +1763,12 @@
             window.location.replace('./login.html');
         }
     });
+
     function initEditor() {
         if (!currentUser || !currentProjectId) return;
         editWeeksButton.style.display = 'inline-flex';
         printButton.style.display = 'inline-flex';
+
         if (currentListener) currentListener();
         currentListener = userSchedulesCollection.doc(currentProjectId).onSnapshot(doc => {
             if (doc.exists) {
@@ -1990,6 +1787,7 @@
              updateStatus('Error', 'error');
         });
     }
+
     async function initCreationFlow() {
         const templatesCollection = db.collection("templates");
         const snapshot = await templatesCollection.orderBy("createdAt").get();
@@ -1999,16 +1797,16 @@
         } else {
             snapshot.docs.forEach(doc => {
                 const li = document.createElement('li');
-                li.setAttribute('role', 'option');
                 li.innerHTML = `<label><input type="checkbox" data-id="${doc.id}" data-name="${doc.data().name}" data-content="${encodeURIComponent(doc.data().content)}"> ${doc.data().name}</label>`;
                 templateList.appendChild(li);
             });
         }
         templateSelectionModal.classList.add('active');
-        templateSelectionModal.querySelector('#new-project-name').focus();
     }
+
     async function openWeekEditor() {
         if (!activeProject) return;
+
         const templatesCollection = db.collection("templates");
         const snapshot = await templatesCollection.orderBy("createdAt").get();
         const allTemplates = snapshot.docs.map(doc => ({
@@ -2016,37 +1814,45 @@
             name: doc.data().name,
             content: doc.data().content
         }));
+
         const currentTemplateTitles = activeProject.data.tables.map(table => table.title);
+
         editWeeksList.innerHTML = '';
         allTemplates.forEach(template => {
             const isChecked = currentTemplateTitles.includes(template.name);
             const li = document.createElement('li');
-            li.setAttribute('role', 'option');
             li.innerHTML = `<label><input type="checkbox" data-id="${template.id}" data-name="${template.name}" data-content="${encodeURIComponent(template.content)}" ${isChecked ? 'checked' : ''}> ${template.name}</label>`;
             editWeeksList.appendChild(li);
         });
+
         editWeeksModal.classList.add('active');
-        editWeeksModal.querySelector('input[type="checkbox"]').focus();
     }
+
     async function handleUpdateWeeks() {
         if (!activeProject) return;
+
         confirmWeeksEditBtn.disabled = true;
         updateStatus('Updating...', 'syncing');
+
         const selectedCheckboxes = Array.from(editWeeksList.querySelectorAll('input:checked'));
         const existingTableMap = new Map(activeProject.data.tables.map(table => [table.title, table]));
+
         const newTables = selectedCheckboxes.map(input => {
             const templateName = input.dataset.name;
             if (existingTableMap.has(templateName)) {
                 return existingTableMap.get(templateName);
             }
+
             const rawContent = decodeURIComponent(input.dataset.content);
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = `<table><tbody>${rawContent}</tbody></table>`;
             tempDiv.querySelectorAll('td, th').forEach(cell => {
                 if ((cell.textContent.trim() === '' && !cell.querySelector('img'))) cell.setAttribute('data-user-editable', 'true');
             });
+
             return { title: templateName, content: tempDiv.querySelector('tbody').innerHTML, eventType: 'normal' };
         });
+
         try {
             await userSchedulesCollection.doc(currentProjectId).update({
                 tables: newTables,
@@ -2064,18 +1870,20 @@
             confirmWeeksEditBtn.disabled = false;
         }
     }
+
     function setupGlobalUI() {
         const menuCheckbox = document.getElementById('menu-checkbox');
         const slideMenu = document.getElementById('slide-menu');
         const menuOverlay = document.getElementById('menu-overlay');
         const body = document.body;
+        
         function closeMenu() {
             slideMenu.classList.remove('is-open');
             menuOverlay.classList.remove('is-open');
             body.classList.remove('menu-open');
             menuCheckbox.checked = false;
-            menuCheckbox.focus();
         }
+        
         menuCheckbox.addEventListener('change', () => {
             if(menuCheckbox.checked) {
                 slideMenu.classList.add('is-open');
@@ -2086,6 +1894,7 @@
             }
         });
         menuOverlay.addEventListener('click', closeMenu);
+
         printButton.addEventListener('click', generatePdf);
         document.getElementById('cancel-template-selection').addEventListener('click', () => window.location.href = './dashboard.html');
         document.getElementById('confirm-template-selection').addEventListener('click', async () => {
@@ -2093,6 +1902,7 @@
             if (!newProjectName) return alert("Please enter a name for your new project.");
             const selectedCheckboxes = Array.from(templateList.querySelectorAll('input:checked'));
             if (selectedCheckboxes.length === 0) return alert("Please select at least one template.");
+
             const tablesArray = selectedCheckboxes.map(input => {
                 const rawContent = decodeURIComponent(input.dataset.content);
                 const tempDiv = document.createElement('div');
@@ -2109,15 +1919,14 @@
             });
             window.location.href = `./editorr.html?id=${newDocRef.id}`;
         });
+        
         editWeeksButton.addEventListener('click', openWeekEditor);
         cancelWeeksEditBtn.addEventListener('click', () => editWeeksModal.classList.remove('active'));
         confirmWeeksEditBtn.addEventListener('click', handleUpdateWeeks);
         document.querySelectorAll('.modal-overlay').forEach(modal => {
             modal.addEventListener('click', (e) => { if(e.target === modal) modal.classList.remove('active'); });
-            modal.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') modal.classList.remove('active');
-            });
         });
+
         eventContextMenu.addEventListener('click', (e) => {
             const target = e.target.closest('.context-menu-item');
             if (target && activeEventScheduleTable) {
@@ -2126,13 +1935,7 @@
             eventContextMenu.style.display = 'none';
             activeEventScheduleTable = null;
         });
-        eventContextMenu.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                eventContextMenu.style.display = 'none';
-                activeEventScheduleTable = null;
-                document.activeElement.blur();
-            }
-        });
+
         schedulesWrapper.addEventListener('click', e => {
             const header = e.target.closest('.mobile-week-header');
             if (header) {
@@ -2143,17 +1946,20 @@
                 if (!isAlreadyOpen) currentCard.classList.add('active');
                 return;
             }
+
             const targetElement = e.target.closest('.editable-cell');
             if (targetElement) {
                 openMemberDropdown(targetElement, null);
             }
         });
+        
         const toggleAllBtn = document.getElementById('toggle-all-mobile');
         toggleAllBtn.addEventListener('click', () => {
             const allCards = document.querySelectorAll('.mobile-view-container .mobile-week-card');
             const areAnyOpen = Array.from(allCards).some(card => card.classList.contains('active'));
             const textSpan = toggleAllBtn.querySelector('span:last-child');
             const iconSpan = toggleAllBtn.querySelector('.material-symbols-outlined');
+
             if (areAnyOpen) {
                 allCards.forEach(card => card.classList.remove('active'));
                 textSpan.textContent = 'Open All';
@@ -2164,6 +1970,7 @@
                 iconSpan.textContent = 'unfold_less';
             }
         });
+
         memberDropdown.addEventListener('click', e => {
             const item = e.target.closest('.member-dropdown-item');
             if (item && activeCellForDropdown.realCell) {
@@ -2177,25 +1984,23 @@
             memberDropdown.style.display = 'none';
             activeCellForDropdown = null;
         });
+
         document.addEventListener('click', (e) => {
             if (!eventContextMenu.contains(e.target) && !e.target.closest('.event-btn')) { eventContextMenu.style.display = 'none'; }
             if (!memberDropdown.contains(e.target) && !e.target.closest('.editable-cell')) { memberDropdown.style.display = 'none'; }
         });
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                eventContextMenu.style.display = 'none';
-                memberDropdown.style.display = 'none';
-                document.querySelectorAll('.mobile-week-card').forEach(card => card.classList.remove('active'));
-            }
-        });
     }
+    
     function isCellInMinistrySection(cell) {
         const table = cell.closest('table');
         if (!table) return false;
+        
         const allRows = Array.from(table.querySelectorAll('tbody > tr'));
         const cellRow = cell.closest('tr');
         const cellIndex = allRows.indexOf(cellRow);
+        
         let ministryHeaderIndex = -1, nextHeaderIndex = allRows.length;
+        
         allRows.forEach((row, index) => {
             if (row.classList.contains('header-row')) {
                 const rowText = row.textContent.trim();
@@ -2203,12 +2008,15 @@
                 else if (ministryHeaderIndex !== -1 && index > ministryHeaderIndex && index < nextHeaderIndex) nextHeaderIndex = index;
             }
         });
+        
         return ministryHeaderIndex !== -1 && cellIndex > ministryHeaderIndex && cellIndex < nextHeaderIndex;
     }
+
     function openMemberDropdown(cell, mobileDiv = null) {
         const isInMinistry = isCellInMinistrySection(cell);
         memberDropdown.innerHTML = '';
         let listToShow;
+        
         if (isInMinistry) {
             const sortedSisters = [...members.sisters].sort((a, b) => a.name.localeCompare(b.name));
             const sortedBrothers = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
@@ -2216,24 +2024,23 @@
         } else {
             listToShow = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
         }
-        listToShow.forEach(member => {
+
+        listToShow.forEach(member => { 
             const item = document.createElement('button');
             item.className = 'member-dropdown-item';
             item.dataset.name = member.name;
-            item.setAttribute('role', 'option');
             item.innerHTML = `<span>${member.name}</span>${member.isServant ? '<span class="servant-tag">Servant</span>' : ''}`;
             memberDropdown.appendChild(item);
         });
+
         const rect = (mobileDiv || cell).getBoundingClientRect();
         memberDropdown.style.display = 'block';
-        memberDropdown.style.top = `${rect.bottom + window.scrollY}px`;
-        memberDropdown.style.left = `${rect.left + window.scrollX}px`;
+        memberDropdown.style.top = `${rect.bottom}px`;
+        memberDropdown.style.left = `${rect.left}px`;
         memberDropdown.style.width = `${rect.width}px`;
-        memberDropdown.querySelectorAll('.member-dropdown-item').forEach((item, idx) => {
-            setTimeout(() => item.focus(), idx * 50);
-        });
         activeCellForDropdown = { realCell: cell, mobileDiv: mobileDiv };
     }
+
    async function generatePdf() {
     if (!activeProject) return;
     for (let i = 0; i < activeProject.scheduleTables.length; i++) {
@@ -2260,19 +2067,23 @@
             }
         }
     }
+
     printButton.disabled = true;
     printButton.querySelector('span:last-child').textContent = 'Generating...';
+
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF('p', 'mm', 'a4');
     const A4_WIDTH_MM = 210, A4_HEIGHT_MM = 297;
-const MARGIN_X_MM = 15; // Increased horizontal margin
-const MARGIN_Y_MM = 10; // Original vertical margin
+const MARGIN_X_MM = 15;
+const MARGIN_Y_MM = 10;
 const PAGE_SPACING_MM = 5;
     const USABLE_WIDTH = A4_WIDTH_MM - (MARGIN_X_MM * 2);
 const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_Y_MM * 2);
+
     const printContainer = document.createElement('div');
     printContainer.id = 'print-container';
     document.body.appendChild(printContainer);
+
     const headerHTML = `
         <header class="schedule-display-header" style="display: block; margin-bottom: 10px; padding: 5px 0; background: white;">
             <div class="title-block" style="text-align: center; margin-bottom: 0;">
@@ -2286,11 +2097,13 @@ const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_Y_MM * 2);
             </div>
         </header>`;
     printContainer.innerHTML = headerHTML;
+
     const headerCanvas = await html2canvas(printContainer, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false });
     const headerImgData = headerCanvas.toDataURL('image/jpeg', 0.9);
     const headerProps = pdf.getImageProperties(headerImgData);
     const headerHeight = (headerProps.height * USABLE_WIDTH) / headerProps.width;
     printContainer.innerHTML = '';
+
     const itemsToPrint = [];
     for (const block of document.querySelectorAll('.schedule-block')) {
         const clone = block.cloneNode(true);
@@ -2301,6 +2114,7 @@ const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_Y_MM * 2);
             const parentCell = dateInput.parentElement;
             parentCell.innerHTML = formattedDate;
         }
+
         clone.querySelector('.event-btn').style.display = 'none';
         clone.querySelector('.mobile-view-container').style.display = 'none';
         clone.querySelector('table').style.display = 'table';
@@ -2311,6 +2125,7 @@ const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_Y_MM * 2);
         clone.querySelectorAll('th, td').forEach(cell => cell.style.height = '38px');
         clone.querySelectorAll('tbody th, tbody td').forEach(cell => cell.style.fontWeight = '900');
         printContainer.appendChild(clone);
+        
         const canvas = await html2canvas(clone, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false });
         const imgData = canvas.toDataURL('image/jpeg', 0.8);
         const imgProps = pdf.getImageProperties(imgData);
@@ -2319,10 +2134,12 @@ const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_Y_MM * 2);
         printContainer.removeChild(clone);
     }
     document.body.removeChild(printContainer);
+
     const pages = [];
     let currentPageItems = [];
     let currentPageHeight = 0;
     let isFirstPage = true;
+
     itemsToPrint.forEach(item => {
         const availableHeight = isFirstPage ? USABLE_HEIGHT - headerHeight - 5 : USABLE_HEIGHT;
         const itemHeightWithSpacing = currentPageItems.length > 0 ? item.height + PAGE_SPACING_MM : item.height;
@@ -2337,6 +2154,7 @@ const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_Y_MM * 2);
         }
     });
     if (currentPageItems.length > 0) pages.push({ items: currentPageItems, isFirstPage: isFirstPage });
+
     pages.forEach((pageData, pageIndex) => {
         if (pageIndex > 0) pdf.addPage();
         const { items: pageItems, isFirstPage } = pageData;
@@ -2357,6 +2175,7 @@ const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_Y_MM * 2);
             currentY += item.height + PAGE_SPACING_MM;
         });
     });
+
     const fileName = `${document.querySelector('.subtitle').textContent.trim() || 'schedule'}.pdf`;
     pdf.save(fileName);
     printButton.disabled = false;
@@ -2364,5 +2183,6 @@ const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_Y_MM * 2);
 }
 })();
 </script>
+
 </body>
 </html>
