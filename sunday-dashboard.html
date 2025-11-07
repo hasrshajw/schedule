@@ -27,7 +27,8 @@
         --menu-new-bg: #ffffff;
         --menu-new-border: #eeeeee;
         --menu-new-hover: #f5f5f5;
-        --primary-color: #4a6da7;
+        --primary-color: #2d3748;
+        --primary-hover: #4a5568;
         --primary-light: #eef2f9;
         --border-color: #e5e7eb;
         --text-primary: #1f2937;
@@ -36,7 +37,8 @@
         --danger-light: #fde8e8;
         --radius-md: 8px;
         --radius-lg: 16px;
-        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
     }
     
     @font-face {
@@ -44,6 +46,8 @@
         src: url("./jw-icons-external-d876da3.woff") format("woff");
         font-weight: normal; font-style: normal;
     }
+
+    * { box-sizing: border-box; }
 
     body {
         margin: 0; padding: 0;
@@ -56,18 +60,49 @@
     body.auth-ready { visibility: visible; opacity: 1; }
     body.menu-open { overflow: hidden; }
 
-    .site-header { background-color: var(--header-bg); padding: 0; color: var(--text-light); position: fixed; top: 0; left: 0; width: 100%; z-index: 900; }
-    .top-bar { display: flex; justify-content: space-between; align-items: center; height: 56px; padding: 0 15px 0 0; max-width: 1200px; margin: 0 auto; }
-    #mobileNavTopBar .mobileLogo { display: block; width: 75px; height: 56px; background-image: url(https://www.jw.org/assets/ct/46605f23da/images/siteLogo-jworg-mobile.svg), none; background-repeat: no-repeat; background-size: contain; background-position: center left; flex-shrink: 0; }
+    .site-header { 
+        background-color: var(--header-bg); 
+        padding: 0; 
+        color: var(--text-light); 
+        position: fixed; 
+        top: 0; 
+        left: 0; 
+        width: 100%; 
+        z-index: 900; 
+        box-shadow: var(--shadow-md);
+    }
+    .top-bar { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        height: 56px; 
+        padding: 0 15px 0 0; 
+        max-width: 1200px; 
+        margin: 0 auto; 
+    }
+    .top-bar .mobileLogo { 
+        display: block; 
+        width: 75px; 
+        height: 56px; 
+        background-image: url(https://www.jw.org/assets/ct/46605f23da/images/siteLogo-jworg-mobile.svg), none; 
+        background-repeat: no-repeat; 
+        background-size: contain; 
+        background-position: center left; 
+        flex-shrink: 0; 
+    }
     .header-right-controls { display: flex; align-items: center; gap: 15px; }
-    .header-icons { display: flex; align-items: center; height: 56px; cursor: pointer; }
-    .header-icons svg { height: 24px; width: 24px; color: var(--text-light); }
-    .header-icons .close-icon { display: none; }
-    body.menu-open .header-icons .hamburger-icon { display: none; }
-    body.menu-open .header-icons .close-icon { display: block; }
-    .menu-overlay { position: fixed; top: 56px; left: 0; width: 100%; height: calc(100% - 56px); background-color: rgba(0, 0, 0, 0.6); z-index: 998; opacity: 0; visibility: hidden; transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; }
+    .header-icons { display: flex; align-items: center; justify-content: center; height: 56px; width: 56px; }
+    .hamburger { cursor: pointer; display: flex; align-items: center; justify-content: center; height: 100%; width: 100%; }
+    .hamburger input { display: none; }
+    .hamburger svg { height: 2em; transition: transform 600ms cubic-bezier(0.4, 0, 0.2, 1); }
+    .line { fill: none; stroke: white; stroke-linecap: round; stroke-linejoin: round; stroke-width: 3; transition: stroke-dasharray 600ms cubic-bezier(0.4, 0, 0.2, 1), stroke-dashoffset 600ms cubic-bezier(0.4, 0, 0.2, 1); }
+    .line-top-bottom { stroke-dasharray: 12 63; }
+    .hamburger input:checked + svg { transform: rotate(-45deg); }
+    .hamburger input:checked + svg .line-top-bottom { stroke-dasharray: 20 300; stroke-dashoffset: -32.42; }
+
+    .menu-overlay { position: fixed; top: 56px; left: 0; width: 100%; height: calc(100% - 56px); background-color: rgba(0, 0, 0, 0.6); z-index: 998; opacity: 0; visibility: hidden; transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; backdrop-filter: blur(2px); }
     .menu-overlay.is-open { opacity: 1; visibility: visible; }
-    .slide-menu { position: fixed; top: 56px; right: 0; height: calc(100dvh - 56px); width: 320px; max-width: 90%; background-color: var(--menu-new-bg); z-index: 999; transform: translateX(100%); transition: transform 0.3s ease-in-out; display: flex; flex-direction: column; border-left: 1px solid var(--menu-new-border); }
+    .slide-menu { position: fixed; top: 56px; right: 0; height: calc(100dvh - 56px); width: 320px; max-width: 90%; background-color: var(--menu-new-bg); z-index: 999; transform: translateX(100%); transition: transform 0.3s ease-in-out; display: flex; flex-direction: column; border-left: 1px solid var(--menu-new-border); box-shadow: var(--shadow-lg); }
     .slide-menu.is-open { transform: translateX(0); }
     .menu-links { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex-grow: 1; }
     .menu-links li a { display: flex; align-items: center; color: var(--menu-new-text); background-color: var(--menu-new-bg); height: 50px; padding: 12px 5px 12px 12px; box-sizing: border-box; text-decoration: none; font-size: 1rem; transition: background-color 0.2s; border-top: 1px dotted #a7a7a7; }
@@ -75,40 +110,165 @@
     .menu-links li a:hover { background-color: var(--menu-new-hover); }
     .profile-section { padding: 16px; border-top: 1px solid var(--menu-new-border); flex-shrink: 0; background-color: #fafafa; margin-top: auto; }
     .profile-info { display: flex; align-items: center; }
-    .profile-name { font-weight: bold; font-size: 1.1rem; color: #333; }
-    .iconLink-icon { font-family: "jw-icons-external"; font-size: 24px; display: inline-block; color: #757575; width: 30px; margin-right: 10px; text-align: center; }
+    .profile-name { font-weight: bold; font-size: 1rem; color: #333; word-break: break-all; }
+    .iconLink-icon { font-family: "jw-icons-external"; font-size: 24px; display: inline-block; color: #757575; width: 30px; margin-right: 10px; text-align: center; transition: color 0.2s; }
+    .menu-links li a:hover .iconLink-icon { color: var(--menu-new-text); }
     .home-icon::before { content: "\e661"; }
     .midweek-icon::before { content: "\e625"; }
     .sunday-icon::before { content: "\e610"; }
     .members-icon::before { content: "\e695"; }
 
-    .master-container { max-width: 1000px; margin: 0 auto; padding: calc(56px + 2rem) 1rem 2rem; }
-    .page-title { font-size: 2rem; font-weight: 700; margin: 0 0 24px 0; }
+    .master-container { max-width: 1000px; margin: 0 auto; padding: calc(56px + 2rem) 1.5rem 2rem; }
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .page-title { font-size: 2rem; font-weight: 700; margin: 0; }
     
-    .add-button { width: 100%; padding: 16px; font-size: 16px; font-weight: 600; color: var(--primary-color); background-color: var(--primary-light); border: 2px dashed var(--primary-color); border-radius: var(--radius-lg); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; margin-bottom: 24px; }
-    .add-button:hover { background-color: var(--primary-color); color: white; }
+    .add-button { 
+        width: 100%; 
+        padding: 24px; 
+        font-size: 1rem; 
+        font-weight: 600; 
+        color: var(--primary-color); 
+        background-color: var(--primary-light); 
+        border: 2px dashed var(--border-color); 
+        border-radius: var(--radius-lg); 
+        cursor: pointer; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        gap: 8px; 
+        transition: all 0.2s; 
+        margin-bottom: 24px; 
+    }
+    .add-button:hover { 
+        background-color: var(--primary-color); 
+        color: white; 
+        border-color: var(--primary-color);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
 
-    #schedule-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 16px; }
-    .schedule-item-card { display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; background-color: var(--surface-color); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); transition: all 0.2s; }
-    .schedule-item-card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1); }
-    .schedule-name { font-family: 'Noto Sans Telugu', sans-serif; font-weight: 700; font-size: 1.125rem; }
-    .schedule-actions { display: flex; align-items: center; gap: 8px; }
+    #schedule-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 16px; }
+    
+    .schedule-item-card { 
+        display: flex; 
+        flex-wrap: wrap;
+        justify-content: space-between; 
+        align-items: center; 
+        padding: 20px 24px; 
+        background-color: var(--surface-color); 
+        border-radius: var(--radius-lg); 
+        box-shadow: var(--shadow-md); 
+        transition: all 0.2s ease-in-out;
+        border: 1px solid var(--border-color);
+    }
+    .schedule-item-card:hover { 
+        transform: translateY(-4px); 
+        box-shadow: var(--shadow-lg); 
+        border-color: var(--primary-color);
+    }
+    
+    .schedule-details {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-right: 16px;
+    }
+
+    .schedule-icon {
+        background-color: var(--primary-light);
+        color: var(--primary-color);
+        border-radius: 50%;
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .schedule-icon .material-symbols-outlined {
+        font-size: 24px;
+    }
+
+    .schedule-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .schedule-name { 
+        font-family: 'Noto Sans Telugu', sans-serif; 
+        font-weight: 700; 
+        font-size: 1.125rem; 
+        color: var(--text-primary);
+    }
+    .schedule-date {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
+
+    .schedule-actions { 
+        display: flex; 
+        align-items: center; 
+        gap: 8px; 
+    }
 
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none; border: none; cursor: pointer; font-weight: 600; border-radius: var(--radius-md); transition: all 0.2s; }
-    .btn-primary { background-color: var(--primary-color); color: white; }
+    .btn-primary { background-color: var(--primary-color); color: white; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+    .btn-primary:hover { background-color: var(--primary-hover); }
     .btn-sm { padding: 8px 16px; font-size: 14px; }
     .btn-icon { background-color: transparent; color: var(--text-secondary); padding: 8px; border-radius: 50%; }
     .btn-icon:hover { background-color: var(--danger-light); color: var(--danger-color); }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background-color: var(--surface-color);
+        border-radius: var(--radius-lg);
+        border: 2px dashed var(--border-color);
+    }
+    .empty-state .material-symbols-outlined {
+        font-size: 48px;
+        color: var(--text-secondary);
+        margin-bottom: 1rem;
+    }
+    .empty-state h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0 0 0.5rem 0;
+    }
+    .empty-state p {
+        color: var(--text-secondary);
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    @media (max-width: 640px) {
+        .master-container { padding: calc(56px + 1.5rem) 1rem 1.5rem; }
+        .page-title { font-size: 1.75rem; }
+        .schedule-item-card { flex-direction: column; align-items: flex-start; gap: 16px; }
+        .schedule-actions { width: 100%; justify-content: flex-end; }
+        .btn-sm { flex-grow: 1; text-align: center; }
+    }
 </style>
 </head>
 <body>
     <header class="site-header">
-        <div class="top-bar" id="mobileNavTopBar">
+        <div class="top-bar">
             <a href="./home.html" class="mobileLogo" title="Home"></a>
             <div class="header-right-controls">
-                <div class="header-icons" id="menu-toggle-button">
-                    <svg class="hamburger-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M22.5 7h-21a.5.5 0 010-1h21a.5.5 0 010 1zM22.5 13h-21a.5.5 0 010-1h21a.5.5 0 010 1zM22.5 19h-21a.5.5 0 010-1h21a.5.5 0 010 1z"></path></svg>
-                    <svg class="close-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12.707 12l6.146-6.146a.5.5 0 00-.707-.707L12 11.293 5.854 5.146a.5.5 0 00-.707.707L11.293 12l-6.147 6.146a.5.5 0 10.707.707L12 12.707l6.146 6.146a.5.5 0 00.707-.707z"></path></svg>
+                <div class="header-icons">
+                    <label class="hamburger">
+                        <input type="checkbox" id="menu-checkbox">
+                        <svg viewBox="0 0 32 32">
+                            <path class="line line-top-bottom" d="M27 10 13 10C10.8 10 9 8.2 9 6 9 3.5 10.8 2 13 2 15.2 2 17 3.8 17 6L17 26C17 28.2 18.8 30 21 30 23.2 30 25 28.2 25 26 25 23.8 23.2 22 21 22L7 22"></path>
+                            <path class="line" d="M7 16 27 16"></path>
+                        </svg>
+                    </label>
                 </div>
             </div>
         </div>
@@ -130,14 +290,21 @@
     </div>
 
     <div class="master-container">
-        <h2 class="page-title">Sunday Public Talk Schedules</h2>
+        <div class="page-header">
+             <h2 class="page-title">Sunday Schedules</h2>
+        </div>
         <button id="createSundayScheduleBtn" class="add-button">
-             <span class="material-symbols-outlined">add</span>
+             <span class="material-symbols-outlined">add_circle</span>
             Create New Sunday Schedule
         </button>
-        <ul id="schedule-list">
-            <!-- Schedule items will be rendered here -->
-        </ul>
+        <div id="schedule-list-container">
+            <ul id="schedule-list"></ul>
+            <div id="empty-state" class="empty-state" style="display: none;">
+                <span class="material-symbols-outlined">event_note</span>
+                <h3>No Schedules Found</h3>
+                <p>Get started by creating a new Sunday public talk schedule. Click the button above to begin.</p>
+            </div>
+        </div>
     </div>
 
 <script>
@@ -164,8 +331,8 @@
             currentUser = user;
             document.body.classList.add('auth-ready');
             const profileNameEl = document.querySelector('.profile-name');
-            if (profileNameEl && user.displayName) {
-                profileNameEl.textContent = user.displayName;
+            if (profileNameEl) {
+                profileNameEl.textContent = user.displayName || user.email;
             }
             initSundayDashboard();
         } else {
@@ -176,7 +343,7 @@
     function initSundayDashboard() {
         const userSchedulesCollection = db.collection(`userSundaySchedules/${currentUser.uid}/schedules`);
         const scheduleListEl = document.getElementById('schedule-list');
-        const createBtn = document.getElementById('createSundayScheduleBtn');
+        const emptyStateEl = document.getElementById('empty-state');
 
         if (currentListener) currentListener();
         currentListener = userSchedulesCollection.orderBy("createdAt", "desc").onSnapshot(snapshot => {
@@ -184,12 +351,12 @@
             
             if (snapshot.empty) {
                 scheduleListEl.style.display = 'none';
-                createBtn.style.display = 'flex'; // Show button as the empty state
+                emptyStateEl.style.display = 'block';
                 return;
             }
             
-            scheduleListEl.style.display = 'flex';
-            createBtn.style.display = 'flex'; // Always show button at the top
+            scheduleListEl.style.display = 'grid';
+            emptyStateEl.style.display = 'none';
             
             snapshot.docs.forEach(doc => {
                 const schedule = doc.data();
@@ -199,10 +366,23 @@
                 li.className = 'schedule-item-card';
                 li.dataset.id = scheduleId;
 
+                const date = schedule.createdAt ? schedule.createdAt.toDate().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'No date';
+
                 li.innerHTML = `
-                    <span class="schedule-name">${schedule.name}</span>
+                    <div class="schedule-details">
+                        <div class="schedule-icon">
+                            <span class="material-symbols-outlined">event</span>
+                        </div>
+                        <div class="schedule-info">
+                            <span class="schedule-name">${schedule.name}</span>
+                            <span class="schedule-date">Created on ${date}</span>
+                        </div>
+                    </div>
                     <div class="schedule-actions">
-                        <a href="./sunday-editor.html?id=${scheduleId}" class="btn btn-primary btn-sm">View / Edit</a>
+                        <a href="./sunday-editor.html?id=${scheduleId}" class="btn btn-primary btn-sm">
+                            <span class="material-symbols-outlined">edit</span>
+                            View / Edit
+                        </a>
                         <button class="btn btn-icon delete-btn" data-id="${scheduleId}" title="Delete Schedule">
                             <span class="material-symbols-outlined">delete</span>
                         </button>
@@ -233,27 +413,23 @@
         window.location.href = './sunday-editor.html';
     });
     
-    const menuToggleButton = document.getElementById('menu-toggle-button');
+    const menuCheckbox = document.getElementById('menu-checkbox');
     const slideMenu = document.getElementById('slide-menu');
     const menuOverlay = document.getElementById('menu-overlay');
-    const body = document.body;
     
-    function closeMenu() {
+    menuCheckbox.addEventListener('change', () => {
+        const isOpen = menuCheckbox.checked;
+        document.body.classList.toggle('menu-open', isOpen);
+        slideMenu.classList.toggle('is-open', isOpen);
+        menuOverlay.classList.toggle('is-open', isOpen);
+    });
+    
+    menuOverlay.addEventListener('click', () => {
+        menuCheckbox.checked = false;
+        document.body.classList.remove('menu-open');
         slideMenu.classList.remove('is-open');
         menuOverlay.classList.remove('is-open');
-        body.classList.remove('menu-open');
-    }
-
-    menuToggleButton.addEventListener('click', () => {
-        if (body.classList.contains('menu-open')) {
-            closeMenu();
-        } else {
-            slideMenu.classList.add('is-open');
-            menuOverlay.classList.add('is-open');
-            body.classList.add('menu-open');
-        }
     });
-    menuOverlay.addEventListener('click', closeMenu);
 
 })();
 </script>
