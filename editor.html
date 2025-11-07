@@ -4,14 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>User - Schedule Editor</title>
-<!-- FIREBASE SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-<!-- PDF Generation Libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<!-- FONTS AND ICONS -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -106,14 +103,15 @@
         align-items: center; 
         gap: 15px; 
     }
-    
+    #menu-toggle-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 56px;
+        width: 48px;
+    }
     .hamburger {
       cursor: pointer;
-      height: 3em;
-      width: 3em;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
     .hamburger input {
       display: none;
@@ -642,11 +640,26 @@
         animation: fadeIn 0.3s ease-in-out;
     }
     
+    .slide-up {
+        animation: slideUp 0.3s ease-out;
+    }
+    
     @keyframes fadeIn {
         from { opacity: 0; }
         to { opacity: 1; }
     }
     
+    @keyframes slideUp {
+        from { 
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to { 
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
     .dropdown-backdrop {
         position: fixed;
         top: 0;
@@ -989,13 +1002,15 @@
         <a href="./dashboard.html" class="mobileLogo" title="Dashboard"></a>
         <div class="header-right-controls">
             <div class="status-indicator" data-status="synced">Synced</div>
-            <label class="hamburger" id="menu-toggle-button">
-              <input type="checkbox" id="menu-toggle-input">
-              <svg viewBox="0 0 32 32">
-                <path class="line line-top-bottom" d="M27 10 13 10C10.8 10 9 8.2 9 6 9 3.5 10.8 2 13 2 15.2 2 17 3.8 17 6L17 26C17 28.2 18.8 30 21 30 23.2 30 25 28.2 25 26 25 23.8 23.2 22 21 22L7 22"></path>
-                <path class="line" d="M7 16 27 16"></path>
-              </svg>
-            </label>
+            <div id="menu-toggle-container">
+                <label class="hamburger">
+                  <input type="checkbox">
+                  <svg viewBox="0 0 32 32">
+                    <path class="line line-top-bottom" d="M27 10 13 10C10.8 10 9 8.2 9 6 9 3.5 10.8 2 13 2 15.2 2 17 3.8 17 6L17 26C17 28.2 18.8 30 21 30 23.2 30 25 28.2 25 26 25 23.8 23.2 22 21 22L7 22"></path>
+                    <path class="line" d="M7 16 27 16"></path>
+                  </svg>
+                </label>
+            </div>
         </div>
     </div>
 </header>
@@ -1241,11 +1256,11 @@
             setTimeout(updateDateRangeSubtitle, 100);
         }
 
-        _createMobileView() {
+        _createMobileView(shouldBeActive = false) {
             this.mobileViewContainer.innerHTML = '';
             
             const card = document.createElement('div');
-            card.className = 'mobile-week-card';
+            card.className = `mobile-week-card ${shouldBeActive ? 'active' : ''}`;
             
             let cardBodyHTML = '';
             
@@ -1257,7 +1272,7 @@
                 };
                 
                 const firstRow = this.tableBody.rows[0];
-                const dateCell = firstRow.cells.length > 2 ? firstRow.cells[2] : firstRow.cells[0];
+                const dateCell = firstRow.cells[2];
                 const dateInput = dateCell ? dateCell.querySelector('.date-input') : null;
                 const dateValue = dateInput ? dateInput.value : '';
                 
@@ -1555,13 +1570,7 @@
                 firstRow.innerHTML = `<th colspan="1" class="special-event-text">${eventTexts[eventType]}</th><td style="text-align: right; font-weight: 700;">తేదీ:</td><td data-user-editable="true"><input type="date" class="date-input" value="${existingDateValue}"></td>`;
             }
 
-            const currentCardState = this.mobileViewContainer.querySelector('.mobile-week-card')?.classList.contains('active');
-            this._createMobileView();
-            if (currentCardState) {
-                const newCard = this.mobileViewContainer.querySelector('.mobile-week-card');
-                if (newCard) newCard.classList.add('active');
-            }
-            
+            this._createMobileView(true);
             if (shouldSave) this.parentProject.triggerSave();
         }
 
@@ -1780,30 +1789,31 @@
     }
 
     function setupGlobalUI() {
-        const menuToggleButton = document.getElementById('menu-toggle-button');
-        const menuToggleInput = document.getElementById('menu-toggle-input');
         const slideMenu = document.getElementById('slide-menu');
         const menuOverlay = document.getElementById('menu-overlay');
         const body = document.body;
-        
-        function closeMenu() {
-            slideMenu.classList.remove('is-open');
-            menuOverlay.classList.remove('is-open');
-            body.classList.remove('menu-open');
-            menuToggleInput.checked = false;
-        }
+        const hamburgerInput = document.querySelector('.hamburger input');
 
-        menuToggleButton.addEventListener('click', () => {
-            body.classList.toggle('menu-open');
-            if (body.classList.contains('menu-open')) {
+        function toggleMenu(isOpen) {
+            if (isOpen) {
                 slideMenu.classList.add('is-open');
                 menuOverlay.classList.add('is-open');
+                body.classList.add('menu-open');
             } else {
                 slideMenu.classList.remove('is-open');
                 menuOverlay.classList.remove('is-open');
+                body.classList.remove('menu-open');
             }
+        }
+
+        hamburgerInput.addEventListener('change', () => {
+            toggleMenu(hamburgerInput.checked);
         });
-        menuOverlay.addEventListener('click', closeMenu);
+        
+        menuOverlay.addEventListener('click', () => {
+            hamburgerInput.checked = false;
+            toggleMenu(false);
+        });
 
         printButton.addEventListener('click', generatePdf);
         document.getElementById('cancel-template-selection').addEventListener('click', () => window.location.href = './dashboard.html');
@@ -1905,11 +1915,14 @@
     function isCellInMinistrySection(cell) {
         const table = cell.closest('table');
         if (!table) return false;
+        
         const allRows = Array.from(table.querySelectorAll('tbody > tr'));
         const cellRow = cell.closest('tr');
         const cellIndex = allRows.indexOf(cellRow);
+        
         let ministryHeaderIndex = -1;
         let nextHeaderIndex = allRows.length;
+        
         allRows.forEach((row, index) => {
             if (row.classList.contains('header-row')) {
                 const rowText = row.textContent.trim();
@@ -1917,6 +1930,7 @@
                 else if (ministryHeaderIndex !== -1 && index > ministryHeaderIndex && index < nextHeaderIndex) nextHeaderIndex = index;
             }
         });
+        
         if (ministryHeaderIndex === -1) return false;
         return cellIndex > ministryHeaderIndex && cellIndex < nextHeaderIndex;
     }
@@ -1925,6 +1939,7 @@
         const isInMinistry = isCellInMinistrySection(cell);
         memberDropdown.innerHTML = '';
         let listToShow;
+        
         if (isInMinistry) {
             const sortedSisters = [...members.sisters].sort((a, b) => a.name.localeCompare(b.name));
             const sortedBrothers = [...members.brothers].sort((a, b) => a.name.localeCompare(b.name));
@@ -1950,47 +1965,59 @@
     }
 
    async function generatePdf() {
-    let isEmpty = false;
-    let emptyCellWeek = '';
+    let firstEmptyField = null;
     const scheduleBlocks = document.querySelectorAll('.schedule-block');
-    for (const block of scheduleBlocks) {
-        const table = block.querySelector('table');
-        const title = block.querySelector('.schedule-title').textContent;
-        const eventType = activeProject.scheduleTables.find(t => t.data.title === title)?.data.eventType || 'normal';
 
-        if (eventType !== 'normal') {
-            const dateInput = table.querySelector('.date-input');
-            if (!dateInput || !dateInput.value) {
+    for (const block of scheduleBlocks) {
+        if (firstEmptyField) break;
+        const scheduleTitle = block.querySelector('.schedule-title').textContent;
+        const allFields = block.querySelectorAll('td[data-user-editable="true"], .editable-cell');
+        
+        for (const cell of allFields) {
+            let isEmpty = false;
+            let labelText = 'Date';
+
+            if (cell.querySelector('.date-input')) {
+                const input = cell.querySelector('.date-input');
+                if (!input.value) isEmpty = true;
+            } else if (!cell.textContent.trim()) {
                 isEmpty = true;
-                emptyCellWeek = title;
-                break;
-            }
-        } else {
-            const editableCells = table.querySelectorAll('td[data-user-editable]');
-            for (const cell of editableCells) {
-                if (cell.textContent.trim() === '') {
-                    isEmpty = true;
-                    emptyCellWeek = title;
-                    break;
+                let currentCell = cell.previousElementSibling;
+                while (currentCell) {
+                    if (!currentCell.hasAttribute('data-user-editable') && currentCell.textContent.trim()) {
+                        labelText = currentCell.textContent.trim().replace(':', '');
+                        break;
+                    }
+                    currentCell = currentCell.previousElementSibling;
                 }
             }
-            if (isEmpty) break;
-            const dateInput = table.querySelector('.date-input');
-            if (!dateInput || !dateInput.value) {
-                 isEmpty = true;
-                 emptyCellWeek = title;
-                 break;
+
+            if (isEmpty) {
+                firstEmptyField = { week: scheduleTitle, field: labelText };
+                break;
             }
         }
     }
 
-    if (isEmpty) {
-        alert(`Please fill all fields before downloading. The week "${emptyCellWeek}" has an empty field.`);
+    if (firstEmptyField) {
+        alert(`Please fill all fields. The field "${firstEmptyField.field}" in the week "${firstEmptyField.week}" is empty.`);
         return;
     }
-       
+
     printButton.disabled = true;
     printButton.querySelector('span:last-child').textContent = 'Generating...';
+
+    const originalContents = new Map();
+    document.querySelectorAll('.date-input').forEach(input => {
+        const cell = input.parentElement;
+        originalContents.set(cell, cell.innerHTML);
+        if (input.value) {
+            const [year, month, day] = input.value.split('-');
+            cell.textContent = `${day}-${month}-${year}`;
+        } else {
+            cell.textContent = '';
+        }
+    });
 
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF('p', 'mm', 'a4');
@@ -2012,16 +2039,8 @@
     printContainer.innerHTML = '';
 
     const itemsToPrint = [];
-    for (const block of document.querySelectorAll('.schedule-block')) {
+    for (const block of scheduleBlocks) {
         const clone = block.cloneNode(true);
-        const dateInput = clone.querySelector('.date-input');
-        if (dateInput && dateInput.value) {
-            const formattedDate = dateInput.value.split('-').reverse().join('-');
-            const dateCell = dateInput.parentElement;
-            dateCell.innerHTML = formattedDate;
-            dateCell.style.textAlign = 'left';
-            dateCell.style.paddingLeft = '8px';
-        }
         clone.querySelector('.event-btn').style.display = 'none';
         clone.querySelector('.mobile-view-container').style.display = 'none';
         clone.querySelector('table').style.display = 'table';
@@ -2080,6 +2099,10 @@
             pdf.addImage(item.imgData, 'JPEG', MARGIN_MM, currentY, item.width, item.height);
             currentY += item.height + PAGE_SPACING_MM;
         });
+    });
+
+    originalContents.forEach((innerHTML, cell) => {
+        cell.innerHTML = innerHTML;
     });
 
     const fileName = `${document.querySelector('.subtitle').textContent.trim() || 'schedule'}.pdf`;
