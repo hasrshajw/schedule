@@ -40,6 +40,8 @@
         --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
         --warning-color: #f59e0b;
         --success-color: #2e7d32;
+        --accent-color: #2563eb;
+        --accent-light: #dbeafe;
     }
 
     @font-face {
@@ -257,7 +259,7 @@
         text-decoration: none; 
         background-color: var(--primary-color); 
         color: white; 
-        transition: background-color 0.2s; 
+        transition: all 0.2s; 
         box-shadow: var(--shadow-sm);
     }
     .btn:hover:not(:disabled) { 
@@ -769,6 +771,35 @@
         display: none;
     }
 
+    .floating-action-btn {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: var(--primary-color);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: var(--shadow-lg);
+        z-index: 800;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .floating-action-btn:hover {
+        transform: scale(1.1);
+        background: var(--primary-hover);
+    }
+    
+    .floating-action-btn.hidden {
+        transform: scale(0);
+        opacity: 0;
+    }
+
     @media (max-width: 768px) {
         main { 
             padding: 56px 0 0 0; 
@@ -786,6 +817,7 @@
         .page-controls { 
             padding: 70PX 16PX 16PX 16px; 
             margin-bottom: 0; 
+            flex-wrap: wrap;
         }
 
         #toggle-all-mobile {
@@ -838,7 +870,7 @@
             background: var(--surface-color);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
-            margin-bottom: 0;
+            margin-bottom: 16px;
             box-shadow: var(--shadow-sm);
             transition: all 0.3s ease;
             overflow: hidden;
@@ -850,6 +882,8 @@
             align-items: center;
             cursor: pointer;
             padding: 20px;
+            background: linear-gradient(135deg, var(--surface-color), var(--accent-light));
+            position: relative;
         }
         
         .week-date {
@@ -998,6 +1032,39 @@
         #member-dropdown, #event-context-menu {
             display: none !important;
         }
+        
+        .floating-action-btn {
+            bottom: 80px;
+            right: 20px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .page-controls {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .title-block h1 {
+            font-size: 1.3rem;
+        }
+        
+        .subtitle {
+            font-size: 0.9rem;
+        }
+        
+        .mobile-week-header {
+            padding: 16px;
+        }
+        
+        .week-date {
+            font-size: 1rem;
+        }
     }
 </style>
 </head>
@@ -1071,6 +1138,10 @@
         <div id="schedules-wrapper"></div>
     </div>
 </main>
+
+<button class="floating-action-btn hidden" id="mobile-actions-fab">
+    <span class="material-symbols-outlined">more_vert</span>
+</button>
 
 <template id="schedule-template">
     <div class="schedule-block">
@@ -1162,6 +1233,7 @@
     const editWeeksList = document.getElementById('edit-weeks-list');
     const cancelWeeksEditBtn = document.getElementById('cancel-weeks-edit');
     const confirmWeeksEditBtn = document.getElementById('confirm-weeks-edit');
+    const mobileActionsFab = document.getElementById('mobile-actions-fab');
     
     function updateStatus(text, status) {
         statusIndicator.textContent = text;
@@ -1677,6 +1749,10 @@
         editWeeksButton.style.display = 'inline-flex';
         printButton.style.display = 'inline-flex';
 
+        if (window.innerWidth <= 768) {
+            mobileActionsFab.classList.remove('hidden');
+        }
+
         if (currentListener) currentListener();
         currentListener = userSchedulesCollection.doc(currentProjectId).onSnapshot(doc => {
             if (doc.exists) {
@@ -1835,6 +1911,55 @@
             modal.addEventListener('click', (e) => { if(e.target === modal) modal.classList.remove('active'); });
         });
 
+        mobileActionsFab.addEventListener('click', () => {
+            const actionSheetHTML = `
+                <div class="dropdown-backdrop" id="mobile-actions-backdrop"></div>
+                <div class="dropdown-container" id="mobile-actions-container">
+                    <div class="dropdown-header">
+                        <h3 class="dropdown-title">Actions</h3>
+                        <button class="dropdown-close" id="mobile-actions-close"><span class="material-symbols-outlined">close</span></button>
+                    </div>
+                    <div class="dropdown-content">
+                        <button class="dropdown-item" id="mobile-edit-weeks"><span style="display: flex; align-items: center; gap: 12px;"><span class="material-symbols-outlined">edit_calendar</span><span>Edit Weeks</span></span></button>
+                        <button class="dropdown-item" id="mobile-download-pdf"><span style="display: flex; align-items: center; gap: 12px;"><span class="material-symbols-outlined">picture_as_pdf</span><span>Download PDF</span></span></button>
+                    </div>
+                </div>`;
+
+            document.body.insertAdjacentHTML('beforeend', actionSheetHTML);
+            const backdrop = document.getElementById('mobile-actions-backdrop');
+            const container = document.getElementById('mobile-actions-container');
+            const closeBtn = document.getElementById('mobile-actions-close');
+
+            const hideActionSheet = () => {
+                backdrop.classList.remove('active');
+                container.classList.remove('active');
+                setTimeout(() => { backdrop.remove(); container.remove(); }, 300);
+            };
+
+            backdrop.addEventListener('click', hideActionSheet);
+            closeBtn.addEventListener('click', hideActionSheet);
+
+            document.getElementById('mobile-edit-weeks').addEventListener('click', () => {
+                hideActionSheet();
+                setTimeout(() => openWeekEditor(), 300);
+            });
+
+            document.getElementById('mobile-download-pdf').addEventListener('click', () => {
+                hideActionSheet();
+                setTimeout(() => generatePdf(), 300);
+            });
+
+            setTimeout(() => { backdrop.classList.add('active'); container.classList.add('active'); }, 10);
+        });
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth <= 768) {
+                mobileActionsFab.classList.remove('hidden');
+            } else {
+                mobileActionsFab.classList.add('hidden');
+            }
+        });
+
         eventContextMenu.addEventListener('click', (e) => {
             const target = e.target.closest('.context-menu-item');
             if (target && activeEventScheduleTable) {
@@ -1982,8 +2107,8 @@
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF('p', 'mm', 'a4');
     const A4_WIDTH_MM = 210, A4_HEIGHT_MM = 297;
-const MARGIN_X_MM = 15; // Increased horizontal margin
-const MARGIN_Y_MM = 10; // Original vertical margin
+const MARGIN_X_MM = 15;
+const MARGIN_Y_MM = 10;
 const PAGE_SPACING_MM = 5;
     const USABLE_WIDTH = A4_WIDTH_MM - (MARGIN_X_MM * 2);
 const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_Y_MM * 2);
