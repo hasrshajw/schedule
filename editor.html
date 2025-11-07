@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 <style>
     :root {
@@ -2031,7 +2031,7 @@ const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_Y_MM * 2);
         clone.style.padding = '0';
         clone.style.border = 'none';
         clone.querySelectorAll('th, td').forEach(cell => cell.style.height = '38px');
-        clone.querySelectorAll('tbody th, tbody td').forEach(cell => cell.style.fontWeight = 'bold');
+        clone.querySelectorAll('tbody th, tbody td').forEach(cell => cell.style.fontWeight = '900');
         printContainer.appendChild(clone);
         
         const canvas = await html2canvas(clone, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false });
