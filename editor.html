@@ -2031,6 +2031,7 @@ const USABLE_HEIGHT = A4_HEIGHT_MM - (MARGIN_Y_MM * 2);
         clone.style.padding = '0';
         clone.style.border = 'none';
         clone.querySelectorAll('th, td').forEach(cell => cell.style.height = '38px');
+        clone.querySelectorAll('tbody th, tbody td').forEach(cell => cell.style.fontWeight = 'bold');
         printContainer.appendChild(clone);
         
         const canvas = await html2canvas(clone, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false });
