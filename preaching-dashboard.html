@@ -2,8 +2,8 @@
 <html lang="te">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Preaching Schedules - Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale-1.0">
+<title>Preaching Schedules</title>
 
 <!-- FIREBASE SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -27,8 +27,8 @@
         --menu-new-bg: #ffffff;
         --menu-new-border: #eeeeee;
         --menu-new-hover: #f5f5f5;
-        --primary-color: #0b355f; /* A navy color from your table */
-        --primary-hover: #244872;
+        --primary-color: #2d3748;
+        --primary-hover: #4a5568;
         --primary-light: #eef2f9;
         --border-color: #e5e7eb;
         --text-primary: #1f2937;
@@ -119,7 +119,14 @@
     .members-icon::before { content: "\e695"; }
 
     .master-container { max-width: 1000px; margin: 0 auto; padding: calc(56px + 2rem) 1.5rem 2rem; }
-    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border-color); }
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--border-color);
+    }
     .page-title { font-size: 2rem; font-weight: 700; margin: 0; }
     
     .add-button { 
@@ -167,7 +174,13 @@
         border-color: var(--primary-color);
     }
     
-    .schedule-details { display: flex; align-items: center; gap: 16px; margin-right: 16px; }
+    .schedule-details {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-right: 16px;
+    }
+
     .schedule-icon {
         background-color: var(--primary-light);
         color: var(--primary-color);
@@ -178,11 +191,31 @@
         align-items: center;
         justify-content: center;
     }
-    .schedule-icon .material-symbols-outlined { font-size: 24px; }
-    .schedule-info { display: flex; flex-direction: column; }
-    .schedule-name { font-family: 'Noto Sans Telugu', sans-serif; font-weight: 700; font-size: 1.125rem; color: var(--text-primary); }
-    .schedule-date { font-size: 0.875rem; color: var(--text-secondary); }
-    .schedule-actions { display: flex; align-items: center; gap: 8px; }
+    .schedule-icon .material-symbols-outlined {
+        font-size: 24px;
+    }
+
+    .schedule-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .schedule-name { 
+        font-family: 'Noto Sans Telugu', sans-serif; 
+        font-weight: 700; 
+        font-size: 1.125rem; 
+        color: var(--text-primary);
+    }
+    .schedule-date {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
+
+    .schedule-actions { 
+        display: flex; 
+        align-items: center; 
+        gap: 8px; 
+    }
 
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none; border: none; cursor: pointer; font-weight: 600; border-radius: var(--radius-md); transition: all 0.2s; }
     .btn-primary { background-color: var(--primary-color); color: white; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
@@ -198,9 +231,21 @@
         border-radius: var(--radius-lg);
         border: 2px dashed var(--border-color);
     }
-    .empty-state .material-symbols-outlined { font-size: 48px; color: var(--text-secondary); margin-bottom: 1rem; }
-    .empty-state h3 { font-size: 1.25rem; font-weight: 600; margin: 0 0 0.5rem 0; }
-    .empty-state p { color: var(--text-secondary); max-width: 400px; margin: 0 auto; }
+    .empty-state .material-symbols-outlined {
+        font-size: 48px;
+        color: var(--text-secondary);
+        margin-bottom: 1rem;
+    }
+    .empty-state h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0 0 0.5rem 0;
+    }
+    .empty-state p {
+        color: var(--text-secondary);
+        max-width: 400px;
+        margin: 0 auto;
+    }
 
     @media (max-width: 640px) {
         .master-container { padding: calc(56px + 1.5rem) 1rem 1.5rem; }
@@ -235,7 +280,6 @@
             <li><a href="./dashboard.html"><span class="iconLink-icon home-icon"></span><span>Dashboard</span></a></li>
             <li><a href="./mid-week.html"><span class="iconLink-icon midweek-icon"></span><span>Mid-Week Schedules</span></a></li>
             <li><a href="./sunday-dashboard.html"><span class="iconLink-icon sunday-icon"></span><span>Sunday Schedules</span></a></li>
-            <li><a href="./preaching-dashboard.html"><span class="iconLink-icon" style="font-size: 20px;">&#xe600;</span><span>Preaching</span></a></li>
             <li><a href="./members.html"><span class="iconLink-icon members-icon"></span><span>Members</span></a></li>
         </ul>
         <div class="profile-section">
@@ -247,7 +291,7 @@
 
     <div class="master-container">
         <div class="page-header">
-            <h2 class="page-title">Preaching Schedules</h2>
+             <h2 class="page-title">Preaching Schedules</h2>
         </div>
         <button id="createPreachingScheduleBtn" class="add-button">
              <span class="material-symbols-outlined">add_circle</span>
@@ -258,7 +302,7 @@
             <div id="empty-state" class="empty-state" style="display: none;">
                 <span class="material-symbols-outlined">explore</span>
                 <h3>No Schedules Found</h3>
-                <p>Get started by creating a new preaching schedule. Click the button above to begin.</p>
+                <p>Get started by creating a new preaching schedule for your field service arrangements.</p>
             </div>
         </div>
     </div>
@@ -290,13 +334,13 @@
             if (profileNameEl) {
                 profileNameEl.textContent = user.displayName || user.email;
             }
-            initPreachingDashboard();
+            initDashboard();
         } else {
             window.location.replace('./index.html');
         }
     });
 
-    function initPreachingDashboard() {
+    function initDashboard() {
         const userSchedulesCollection = db.collection(`userPreachingSchedules/${currentUser.uid}/schedules`);
         const scheduleListEl = document.getElementById('schedule-list');
         const emptyStateEl = document.getElementById('empty-state');
@@ -366,20 +410,7 @@
     }
 
     document.getElementById('createPreachingScheduleBtn').addEventListener('click', () => {
-        const name = prompt("Enter a name for your new Preaching Schedule (e.g., 'October 2025'):");
-        if (name && name.trim() !== '') {
-            const userSchedulesCollection = db.collection(`userPreachingSchedules/${currentUser.uid}/schedules`);
-            userSchedulesCollection.add({
-                name: name.trim(),
-                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                rows: [] // Start with an empty schedule
-            }).then(docRef => {
-                window.location.href = `./preaching-editor.html?id=${docRef.id}`;
-            }).catch(error => {
-                console.error("Error creating new schedule: ", error);
-                alert("Could not create the schedule. Please try again.");
-            });
-        }
+        window.location.href = './preaching-editor.html';
     });
     
     const menuCheckbox = document.getElementById('menu-checkbox');
@@ -399,6 +430,7 @@
         slideMenu.classList.remove('is-open');
         menuOverlay.classList.remove('is-open');
     });
+
 })();
 </script>
 </body>
