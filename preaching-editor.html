@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Preaching Schedule Editor</title>
 
-<!-- FIREBASE SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-<!-- FONTS & ICONS -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -27,8 +27,8 @@
         --menu-new-bg: #ffffff;
         --menu-new-border: #eeeeee;
         --menu-new-hover: #f5f5f5;
-        --primary-color: #0b355f;
-        --primary-hover: #244872;
+        --primary-color: #2d3748;
+        --primary-hover: #4a5568;
         --primary-light: #eef2f9;
         --border-color: #e5e7eb;
         --text-primary: #1f2937;
@@ -39,7 +39,10 @@
         --radius-lg: 16px;
         --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
         --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        --table-outer-border: #093261;
+        --table-inner-border: #244872;
         --table-header-bg: #E9EEF4;
+        --table-row-tint: #F2F6FC;
     }
     
     @font-face {
@@ -59,9 +62,8 @@
         transition: opacity 0.3s ease-in;
     }
     body.auth-ready { visibility: visible; opacity: 1; }
-    body.menu-open, body.dropdown-open { overflow: hidden; }
+    body.menu-open, body.modal-open { overflow: hidden; }
 
-    /* Header, Navbar, etc. */
     .site-header { background-color: var(--header-bg); padding: 0; color: var(--text-light); position: fixed; top: 0; left: 0; width: 100%; z-index: 900; box-shadow: var(--shadow-md); }
     .top-bar { display: flex; justify-content: space-between; align-items: center; height: 56px; padding: 0 15px 0 0; max-width: 1200px; margin: 0 auto; }
     .top-bar .mobileLogo { display: block; width: 75px; height: 56px; background-image: url(https://www.jw.org/assets/ct/46605f23da/images/siteLogo-jworg-mobile.svg), none; background-repeat: no-repeat; background-size: contain; background-position: center left; flex-shrink: 0; }
@@ -92,65 +94,74 @@
     .midweek-icon::before { content: "\e625"; }
     .sunday-icon::before { content: "\e610"; }
     .members-icon::before { content: "\e695"; }
-    
-    .status-indicator { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; display: flex; align-items: center; gap: 6px; }
-    .status-indicator::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background-color: currentColor; }
-    .status-indicator[data-status="synced"] { color: #38a169; background-color: #eaf5ea; }
-    .status-indicator[data-status="syncing"] { color: #ed8936; background-color: #fffbeb; }
-    .status-indicator[data-status="error"] { color: #d32f2f; background-color: #fde8e8; }
-    
-    /* Main Content */
-    main { padding: calc(56px + 2rem) 1rem 2rem; max-width: 1200px; margin: 0 auto; }
-    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
-    .page-title { font-size: 2rem; font-weight: 700; margin: 0; color: var(--primary-color); }
-    .add-row-btn { background-color: var(--primary-color); color: white; border: none; padding: 10px 20px; border-radius: var(--radius-md); font-size: 1rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; }
-    
-    .table-frame { border: 2px solid var(--primary-color); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-md); }
-    .schedule-table { width: 100%; border-collapse: collapse; font-family: "Noto Sans Telugu", "Poppins", sans-serif; }
-    .schedule-table thead th { background: var(--table-header-bg); color: var(--text-primary); font-weight: 700; padding: 12px 8px; text-align: center; border-bottom: 2px solid var(--primary-hover); }
-    .schedule-table tbody td { border-bottom: 1px solid var(--border-color); padding: 0; text-align: center; vertical-align: middle; }
-    .schedule-table tbody tr:last-child td { border-bottom: none; }
-    
-    .editable-cell { cursor: pointer; padding: 12px 8px; transition: background-color 0.2s; }
-    .editable-cell:hover { background-color: #f9fafb; }
-    .editable-cell:focus { background-color: var(--primary-light); outline: 2px solid var(--primary-color); }
-    
-    input.cell-input { width: 100%; height: 100%; border: none; background: transparent; padding: 12px 8px; font: inherit; color: inherit; text-align: center; }
-    input.cell-input:focus { outline: none; }
-    
-    .delete-row-btn { background: none; border: none; cursor: pointer; color: var(--text-secondary); padding: 12px; }
-    .delete-row-btn:hover { color: var(--danger-color); }
-    
-    /* Mobile View */
-    .mobile-view-container { display: none; }
-    .mobile-card { background: var(--surface-color); border-radius: var(--radius-lg); border: 1px solid var(--border-color); box-shadow: var(--shadow-md); overflow: hidden; }
-    .mobile-card-header { padding: 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-    .mobile-card-title { font-weight: 700; font-size: 1.1rem; }
-    .mobile-card-body { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
-    .mobile-card.active .mobile-card-body { max-height: 500px; }
-    .mobile-card-content { padding: 16px; border-top: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 1rem; }
-    .field-group { display: flex; flex-direction: column; gap: 0.5rem; }
-    .field-group label { font-weight: 500; color: var(--text-secondary); font-size: 0.9rem; }
-    .mobile-input { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: 1rem; }
+    .preaching-icon::before { content: "\e62f"; }
 
-    /* Dropdown */
-    .dropdown-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1100; opacity: 0; visibility: hidden; transition: all 0.3s ease; backdrop-filter: blur(4px); }
-    .dropdown-backdrop.active { opacity: 1; visibility: visible; }
-    .dropdown-container { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-radius: var(--radius-lg) var(--radius-lg) 0 0; z-index: 1101; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); max-height: 80vh; display: flex; flex-direction: column; box-shadow: var(--shadow-lg); }
-    .dropdown-container.active { transform: translateY(0); }
-    .dropdown-header { padding: 20px 24px 12px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
-    .dropdown-title { font-size: 1.2rem; font-weight: 600; color: var(--text-primary); }
-    .dropdown-close { background: none; border: none; padding: 8px; cursor: pointer; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text-secondary); }
-    .dropdown-content { flex: 1; overflow-y: auto; padding: 8px 0; }
-    .dropdown-item { width: 100%; padding: 16px 24px; border: none; background: none; cursor: pointer; transition: background-color 0.2s; font-size: 1rem; text-align: left; color: var(--text-primary); }
-    .dropdown-item:hover { background-color: #f8fafc; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; border-radius: var(--radius-md); font-size: 1rem; font-weight: 600; cursor: pointer; border: none; text-decoration: none; transition: all 0.2s ease; background-color: var(--primary-color); color: white; }
+    .btn:hover:not(:disabled) { background-color: var(--primary-hover); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+    .btn:disabled { cursor: not-allowed; opacity: 0.6; }
+
+    main { padding: calc(56px + 2rem) 1.5rem 2rem; max-width: 1200px; margin: 0 auto; }
+    .page-header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-bottom: 24px; gap: 16px; }
+    .page-title { font-size: 2rem; font-weight: 700; margin: 0; font-family: 'Noto Sans Telugu', sans-serif; }
+    .header-actions { display: flex; gap: 12px; }
+
+    .table-frame { border: 3px solid var(--table-outer-border); border-radius: 6px; overflow-x: auto; display: block; box-shadow: var(--shadow-md); }
+    .schedule-table { width: 100%; min-width: 800px; border-collapse: separate; border-spacing: 0; table-layout: fixed; font-size: 14px; text-align: center; }
+    .schedule-table thead th { background: var(--table-header-bg); color: var(--table-outer-border); font-weight: 700; border-bottom: 2px solid var(--table-inner-border); border-left: 1px solid var(--table-inner-border); border-right: 1px solid var(--table-inner-border); padding: 10px 6px; vertical-align: middle; line-height: 1.2; font-family: 'Noto Sans Telugu', sans-serif; }
+    .schedule-table thead th:first-child { border-left: none; }
+    .schedule-table thead th:last-child { border-right: none; }
+    .schedule-table tbody td { padding: 8px 6px; border-left: 1px solid var(--table-inner-border); border-right: 1px solid var(--table-inner-border); border-bottom: 1px solid var(--table-inner-border); vertical-align: middle; line-height: 1.25; color: var(--table-outer-border); word-break: break-word; font-family: 'Noto Sans Telugu', sans-serif; font-weight: 500; }
+    .schedule-table tbody tr:first-child td { border-top: 1px solid var(--table-inner-border); }
+    .schedule-table tbody tr:nth-child(even) { background: var(--table-row-tint); }
+    .schedule-table tbody tr:nth-child(odd) { background: #fff; }
+    .schedule-table .editable-cell { cursor: pointer; transition: background-color 0.2s; }
+    .schedule-table .editable-cell:hover { background-color: #e0e7ff; }
+    .schedule-table [contenteditable="true"]:focus { background-color: #fffbe5; outline: 2px solid #f59e0b; }
+    .schedule-table .add-row-btn { background: var(--primary-light); color: var(--primary-color); border: none; width: 100%; padding: 10px; cursor: pointer; font-weight: 600; }
+    .schedule-table .add-row-btn:hover { background: var(--primary-color); color: white; }
+    .schedule-table .delete-row-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; opacity: 0; transition: opacity 0.2s; }
+    .schedule-table tbody tr:hover .delete-row-btn { opacity: 1; }
+    .schedule-table .delete-row-btn:hover { color: var(--danger-color); }
+    
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(4px); }
+    .modal-content { background: var(--surface-color); padding: 24px; border-radius: var(--radius-lg); width: 90%; max-width: 400px; box-shadow: var(--shadow-lg); transform: scale(0.9); opacity: 0; transition: all 0.3s ease; }
+    .modal-overlay.active { display: flex; }
+    .modal-overlay.active .modal-content { transform: scale(1); opacity: 1; }
+    .modal-content h2 { margin-top: 0; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-weight: 500; margin-bottom: 8px; }
+    .form-group input { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: 1rem; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; }
+    
+    .time-picker-modal .modal-content { max-width: 300px; }
+    .time-picker-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+    .time-picker-grid button { padding: 1rem; font-size: 1rem; font-weight: 600; border: 2px solid var(--border-color); border-radius: var(--radius-md); background: none; cursor: pointer; }
+    .time-picker-grid button.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+    .time-input-group { display: flex; align-items: center; gap: 0.5rem; justify-content: center; }
+    .time-input-group input { width: 60px; text-align: center; font-size: 1.5rem; padding: 0.5rem; }
+    
+    #dropdown-menu { position: fixed; background: white; border-radius: var(--radius-md); box-shadow: var(--shadow-lg); z-index: 1001; padding: 6px; min-width: 200px; display: none; }
+    .dropdown-item { display: block; width: 100%; padding: 8px 12px; cursor: pointer; border: none; background: none; text-align: left; border-radius: 4px; font-family: 'Noto Sans Telugu', sans-serif; }
+    .dropdown-item:hover { background: #f3f4f6; }
+
+    #toggle-all-mobile { display: none; }
+    .mobile-view-container { display: none; }
 
     @media (max-width: 768px) {
-        main { padding: calc(56px + 1rem) 1rem 1rem; }
-        .page-title { font-size: 1.75rem; }
+        main { padding: calc(56px + 1.5rem) 1rem 1.5rem; }
         .table-frame { display: none; }
         .mobile-view-container { display: flex; flex-direction: column; gap: 1rem; }
+        #toggle-all-mobile { display: inline-flex; margin: 0 auto 16px; background: var(--surface-color); color: var(--text-secondary); border: 1px solid var(--border-color); }
+        .mobile-card { background: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); overflow: hidden; }
+        .mobile-card-header { display: flex; justify-content: space-between; align-items: center; padding: 16px; cursor: pointer; }
+        .mobile-card-title { font-weight: 600; font-family: 'Noto Sans Telugu', sans-serif; }
+        .mobile-card-subtitle { font-size: 0.875rem; color: var(--text-secondary); }
+        .accordion-icon { transition: transform 0.3s; }
+        .mobile-card.active .accordion-icon { transform: rotate(180deg); }
+        .mobile-card-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-in-out, padding 0.4s ease-in-out; padding: 0 16px; border-top: 1px solid transparent; }
+        .mobile-card.active .mobile-card-body { max-height: 1000px; padding: 16px; border-top-color: var(--border-color); }
     }
+
 </style>
 </head>
 <body>
@@ -158,11 +169,13 @@
         <div class="top-bar">
             <a href="./dashboard.html" class="mobileLogo" title="Home"></a>
             <div class="header-right-controls">
-                <div class="status-indicator" data-status="synced">Synced</div>
                 <div class="header-icons">
                     <label class="hamburger">
                         <input type="checkbox" id="menu-checkbox">
-                        <svg viewBox="0 0 32 32"><path class="line line-top-bottom" d="M27 10 13 10C10.8 10 9 8.2 9 6 9 3.5 10.8 2 13 2 15.2 2 17 3.8 17 6L17 26C17 28.2 18.8 30 21 30 23.2 30 25 28.2 25 26 25 23.8 23.2 22 21 22L7 22"></path><path class="line" d="M7 16 27 16"></path></svg>
+                        <svg viewBox="0 0 32 32">
+                            <path class="line line-top-bottom" d="M27 10 13 10C10.8 10 9 8.2 9 6 9 3.5 10.8 2 13 2 15.2 2 17 3.8 17 6L17 26C17 28.2 18.8 30 21 30 23.2 30 25 28.2 25 26 25 23.8 23.2 22 21 22L7 22"></path>
+                            <path class="line" d="M7 16 27 16"></path>
+                        </svg>
                     </label>
                 </div>
             </div>
@@ -173,9 +186,9 @@
     <div class="slide-menu" id="slide-menu">
         <ul class="menu-links">
             <li><a href="./dashboard.html"><span class="iconLink-icon home-icon"></span><span>Dashboard</span></a></li>
-            <li><a href="./mid-week.html"><span class="iconLink-icon midweek-icon"></span><span>Mid-Week Schedules</span></a></li>
-            <li><a href="./sunday-dashboard.html"><span class="iconLink-icon sunday-icon"></span><span>Sunday Schedules</span></a></li>
-            <li><a href="./preaching-dashboard.html"><span class="iconLink-icon" style="font-size: 20px;">&#xe600;</span><span>Preaching</span></a></li>
+            <li><a href="./mid-week.html"><span class="iconLink-icon midweek-icon"></span><span>Mid-Week</span></a></li>
+            <li><a href="./sunday-dashboard.html"><span class="iconLink-icon sunday-icon"></span><span>Sunday</span></a></li>
+            <li><a href="./preaching-dashboard.html"><span class="iconLink-icon preaching-icon"></span><span>Preaching</span></a></li>
             <li><a href="./members.html"><span class="iconLink-icon members-icon"></span><span>Members</span></a></li>
         </ul>
         <div class="profile-section">
@@ -186,315 +199,518 @@
     </div>
 
     <main>
-        <div class="page-header">
-            <h1 id="schedule-title" class="page-title">Loading Schedule...</h1>
-            <button id="add-row-btn" class="add-row-btn"><span class="material-symbols-outlined">add</span> New Entry</button>
-        </div>
+        <div id="editor-container" style="display: none;">
+            <div class="page-header">
+                <h1 class="page-title" id="schedule-title">Preaching Schedule</h1>
+                <div class="header-actions">
+                    <button id="add-row-btn" class="btn"><span class="material-symbols-outlined">add</span>Add Row</button>
+                    <button id="download-pdf-btn" class="btn"><span class="material-symbols-outlined">download</span>Download PDF</button>
+                </div>
+            </div>
+            
+            <button id="toggle-all-mobile" class="btn">
+                <span class="material-symbols-outlined">unfold_more</span>
+                <span>Open All</span>
+            </button>
 
-        <div class="table-frame">
-            <table class="schedule-table">
-                <thead>
-                    <tr>
-                        <th>తేది</th>
-                        <th>వారము</th>
-                        <th>ఉదయం / సాయంత్రం</th>
-                        <th>క్షేత్ర సేవ కూటం నిర్వహించు ప్రదేశము</th>
-                        <th>పద్ధతి</th>
-                        <th>నిర్వహించు సహోదరుడు</th>
-                        <th style="width: 60px;"></th>
-                    </tr>
-                </thead>
-                <tbody id="schedule-body"></tbody>
-            </table>
-        </div>
+            <div class="table-frame">
+                <table class="schedule-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 12%;">తేది</th>
+                            <th style="width: 14%;">వారము</th>
+                            <th style="width: 16%;">ఉదయం/సాయంత్రం</th>
+                            <th style="width: 28%;">క్షేత్ర సేవ కూటం ప్రదేశము</th>
+                            <th style="width: 16%;">పద్ధతి</th>
+                            <th style="width: 14%;">నిర్వహించు సహోదరుడు</th>
+                        </tr>
+                    </thead>
+                    <tbody id="schedule-tbody"></tbody>
+                </table>
+            </div>
 
-        <div class="mobile-view-container" id="mobile-schedule-body"></div>
+            <div class="mobile-view-container" id="mobile-view-container"></div>
+        </div>
     </main>
     
-    <!-- Dropdown for Mobile and Popups -->
-    <div class="dropdown-backdrop" id="dropdown-backdrop"></div>
-    <div class="dropdown-container" id="dropdown-container">
-        <div class="dropdown-header">
-            <h3 class="dropdown-title" id="dropdown-title">Select an option</h3>
-            <button class="dropdown-close" id="dropdown-close"><span class="material-symbols-outlined">close</span></button>
+    <!-- Modals -->
+    <div id="create-schedule-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h2>Create New Preaching Schedule</h2>
+            <div class="form-group">
+                <label for="new-schedule-name">Schedule Name</label>
+                <input type="text" id="new-schedule-name" placeholder="e.g., October 2025 Preaching">
+            </div>
+            <div class="modal-actions">
+                <a href="./preaching-dashboard.html" style="margin-right: auto; color: var(--text-secondary);">Cancel</a>
+                <button id="create-schedule-confirm" class="btn">Create</button>
+            </div>
         </div>
-        <div class="dropdown-content" id="dropdown-content"></div>
+    </div>
+
+    <div id="time-picker-modal" class="modal-overlay time-picker-modal">
+        <div class="modal-content">
+            <h2>Select Time</h2>
+            <div class="time-picker-grid">
+                <button id="am-btn">ఉదయం</button>
+                <button id="pm-btn">సాయంత్రం</button>
+            </div>
+            <div class="time-input-group">
+                <input type="number" id="hour-input" min="1" max="12" value="10">
+                <span>:</span>
+                <input type="number" id="minute-input" min="0" max="59" value="00">
+            </div>
+            <div class="modal-actions">
+                <button id="time-cancel-btn">Cancel</button>
+                <button id="time-save-btn" class="btn">Save</button>
+            </div>
+        </div>
     </div>
     
-    <script>
-    (function() {
-        'use strict';
-        const firebaseConfig = {
-          apiKey: "AIzaSyDLK5f4C-nfG6fz0ajqqay1q9TTN6rxgmQ",
-          authDomain: "schedule-harsha.firebaseapp.com",
-          projectId: "schedule-harsha",
-          storageBucket: "schedule-harsha.firebasestorage.app",
-          messagingSenderId: "965478014820",
-          appId: "1:965478014820:web:1c36c5d890a27e599aa471"
-        };
-        
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        
-        let currentUser = null;
-        let scheduleId = null;
-        let scheduleRef = null;
-        let members = [];
-        let currentScheduleData = { rows: [] };
-        
-        const teluguWeekdays = ['ఆదివారం', 'సోమవారం', 'మంగళవారం', 'బుధవారం', 'గురువారం', 'శుక్రవారం', 'శనివారం'];
-        const preachingMethods = ['ఇంటింటి పరిచర్య','రిటర్న్ విజిట్','బహిరంగ సాక్ష్యం','అనియత సాక్ష్యం','టెలిఫోన్ ద్వారా సాక్ష్యం','ఉత్తరాల ద్వారా సాక్ష్యం'];
+    <div id="dropdown-menu"></div>
+    <input type="date" id="date-picker-input" style="display:none;">
 
-        const dom = {
-            scheduleTitle: document.getElementById('schedule-title'),
-            scheduleBody: document.getElementById('schedule-body'),
-            mobileScheduleBody: document.getElementById('mobile-schedule-body'),
-            statusIndicator: document.querySelector('.status-indicator'),
-            dropdownBackdrop: document.getElementById('dropdown-backdrop'),
-            dropdownContainer: document.getElementById('dropdown-container'),
-            dropdownTitle: document.getElementById('dropdown-title'),
-            dropdownContent: document.getElementById('dropdown-content'),
-            dropdownClose: document.getElementById('dropdown-close'),
-        };
-        
-        const debounce = (func, delay) => {
-            let timeout;
-            return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), delay); };
-        };
+<script>
+(function() {
+    'use strict';
+    // Firebase and Auth setup remains the same
+    const firebaseConfig = {
+      apiKey: "AIzaSyDLK5f4C-nfG6fz0ajqqay1q9TTN6rxgmQ",
+      authDomain: "schedule-harsha.firebaseapp.com",
+      projectId: "schedule-harsha",
+      storageBucket: "schedule-harsha.firebasestorage.app",
+      messagingSenderId: "965478014820",
+      appId: "1:965478014820:web:1c36c5d890a27e599aa471"
+    };
 
-        const updateStatus = (text, status) => {
-            dom.statusIndicator.textContent = text;
-            dom.statusIndicator.dataset.status = status;
-        };
-        
-        auth.onAuthStateChanged(async user => {
-            if (user) {
-                currentUser = user;
-                document.body.classList.add('auth-ready');
-                document.querySelector('.profile-name').textContent = user.displayName || user.email;
-                
-                const params = new URLSearchParams(window.location.search);
-                scheduleId = params.get('id');
-                if (!scheduleId) {
-                    alert("No schedule specified.");
-                    window.location.href = './preaching-dashboard.html';
-                    return;
-                }
-                
-                scheduleRef = db.collection(`userPreachingSchedules/${currentUser.uid}/schedules`).doc(scheduleId);
-                await fetchMembers();
-                initEditor();
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    
+    let currentUser = null;
+    let members = [];
+    let currentScheduleId = null;
+    let scheduleCollection = null;
+    let scheduleUnsubscribe = null;
+
+    const dom = {
+        editorContainer: document.getElementById('editor-container'),
+        tbody: document.getElementById('schedule-tbody'),
+        scheduleTitle: document.getElementById('schedule-title'),
+        createModal: document.getElementById('create-schedule-modal'),
+        timePickerModal: document.getElementById('time-picker-modal'),
+        datePickerInput: document.getElementById('date-picker-input'),
+        dropdownMenu: document.getElementById('dropdown-menu'),
+        mobileViewContainer: document.getElementById('mobile-view-container'),
+    };
+    
+    const preachingMethods = ['ఇంటింటి పరిచర్య', 'రిటర్న్ విజిట్', 'బహిరంగ సాక్ష్యం', 'అనియత సాక్ష్యం', 'టెలిఫోన్ ద్వారా సాక్ష్యం', 'ఉత్తరాల ద్వారా సాక్ష్యం'];
+    const teluguWeekdays = ['ఆదివారం', 'సోమవారం', 'మంగళవారం', 'బుధవారం', 'గురువారం', 'శుక్రవారం', 'శనివారం'];
+
+    let activeCell = null;
+    
+    auth.onAuthStateChanged(async user => {
+        if (user) {
+            currentUser = user;
+            document.body.classList.add('auth-ready');
+            document.querySelector('.profile-name').textContent = user.displayName || user.email;
+            
+            await fetchMembers();
+
+            const params = new URLSearchParams(window.location.search);
+            currentScheduleId = params.get('id');
+            scheduleCollection = db.collection(`userPreachingSchedules/${currentUser.uid}/schedules`);
+            
+            if (currentScheduleId) {
+                loadSchedule(currentScheduleId);
             } else {
-                window.location.replace('./index.html');
+                dom.createModal.classList.add('active');
+                document.body.classList.add('modal-open');
             }
+        } else {
+            window.location.replace('./index.html');
+        }
+    });
+
+    async function fetchMembers() {
+        const membersSnapshot = await db.collection(`users/${currentUser.uid}/members`).where('type', '==', 'brother').orderBy('name').get();
+        members = membersSnapshot.docs.map(doc => doc.data().name);
+    }
+
+    function loadSchedule(scheduleId) {
+        dom.editorContainer.style.display = 'block';
+        if (scheduleUnsubscribe) scheduleUnsubscribe();
+        
+        scheduleUnsubscribe = scheduleCollection.doc(scheduleId).onSnapshot(doc => {
+            if (!doc.exists) {
+                alert("Schedule not found.");
+                window.location.href = './preaching-dashboard.html';
+                return;
+            }
+            const schedule = doc.data();
+            dom.scheduleTitle.textContent = schedule.name;
+            renderTable(schedule.rows || []);
+            renderMobileView(schedule.rows || []);
         });
+    }
 
-        async function fetchMembers() {
-            const membersCollection = db.collection(`users/${currentUser.uid}/members`);
-            const snapshot = await membersCollection.where("type", "==", "brother").orderBy("name").get();
-            members = snapshot.docs.map(doc => doc.data().name);
-        }
+    function renderTable(rows) {
+        dom.tbody.innerHTML = '';
+        rows.forEach((row, index) => {
+            const tr = createTableRow(row, index);
+            dom.tbody.appendChild(tr);
+        });
+    }
+    
+    function createTableRow(rowData, index) {
+        const tr = document.createElement('tr');
+        tr.dataset.index = index;
+        tr.innerHTML = `
+            <td class="editable-cell" data-col="0">${rowData[0] || ''}</td>
+            <td data-col="1">${rowData[1] || ''}</td>
+            <td class="editable-cell" data-col="2">${rowData[2] || ''}</td>
+            <td contenteditable="true" data-col="3">${rowData[3] || ''}</td>
+            <td class="editable-cell" data-col="4">${rowData[4] || ''}</td>
+            <td class="editable-cell" data-col="5">${rowData[5] || ''}</td>
+            <td><button class="delete-row-btn" title="Delete Row"><span class="material-symbols-outlined">delete</span></button></td>
+        `;
+        return tr;
+    }
 
-        function initEditor() {
-            scheduleRef.onSnapshot(doc => {
-                if (doc.exists) {
-                    currentScheduleData = doc.data();
-                    dom.scheduleTitle.textContent = currentScheduleData.name;
-                    renderTable();
-                } else {
-                    alert("This schedule may have been deleted.");
-                    window.location.href = './preaching-dashboard.html';
-                }
-            }, error => {
-                console.error("Error fetching schedule: ", error);
-                updateStatus('Error', 'error');
-            });
-        }
+    function renderMobileView(rows) {
+        dom.mobileViewContainer.innerHTML = '';
+        if (rows.length === 0) return;
         
-        const debouncedSave = debounce(async () => {
-            if (!scheduleRef) return;
-            updateStatus('Syncing...', 'syncing');
-            try {
-                await scheduleRef.update({ rows: currentScheduleData.rows });
-                updateStatus('Synced', 'synced');
-            } catch (error) {
-                console.error("Error saving data: ", error);
-                updateStatus('Error', 'error');
-            }
-        }, 1500);
-
-        function updateRowData(index, field, value) {
-            if (currentScheduleData.rows[index]) {
-                currentScheduleData.rows[index][field] = value;
-                debouncedSave();
-            }
-        }
-        
-        function renderTable() {
-            dom.scheduleBody.innerHTML = '';
-            dom.mobileScheduleBody.innerHTML = '';
-
-            currentScheduleData.rows.forEach((row, index) => {
-                // Desktop View Row
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><input type="date" class="cell-input date-input" value="${row.date || ''}" data-index="${index}"></td>
-                    <td><span class="editable-cell weekday-cell">${row.day || ''}</span></td>
-                    <td><input type="time" class="cell-input time-input" value="${row.rawTime || ''}" data-index="${index}"></td>
-                    <td><input type="text" class="cell-input" value="${row.location || ''}" data-index="${index}" data-field="location" placeholder="Enter location..."></td>
-                    <td><span class="editable-cell method-cell" data-index="${index}">${row.method || 'Select...'}</span></td>
-                    <td><span class="editable-cell brother-cell" data-index="${index}">${row.brother || 'Select...'}</span></td>
-                    <td><button class="delete-row-btn" data-index="${index}"><span class="material-symbols-outlined">delete</span></button></td>
-                `;
-                dom.scheduleBody.appendChild(tr);
-                
-                // Mobile View Card
-                const card = document.createElement('div');
-                card.className = 'mobile-card';
-                card.innerHTML = `
-                    <div class="mobile-card-header" data-index="${index}">
-                        <span class="mobile-card-title">${row.date ? new Date(row.date).toLocaleDateString('en-GB') : `Entry ${index + 1}`}</span>
-                        <span class="material-symbols-outlined">expand_more</span>
+        rows.forEach((row, index) => {
+            const card = document.createElement('div');
+            card.className = 'mobile-card';
+            card.dataset.index = index;
+            card.innerHTML = `
+                <div class="mobile-card-header">
+                    <div>
+                        <div class="mobile-card-title">${row[0] || 'Set Date'}</div>
+                        <div class="mobile-card-subtitle">${row[3] || 'No Location'}</div>
                     </div>
-                    <div class="mobile-card-body">
-                        <div class="mobile-card-content">
-                            <div class="field-group">
-                                <label>తేది</label>
-                                <input type="date" class="mobile-input date-input" value="${row.date || ''}" data-index="${index}">
-                            </div>
-                            <div class="field-group">
-                                <label>ఉదయం / సాయంత్రం</label>
-                                <input type="time" class="mobile-input time-input" value="${row.rawTime || ''}" data-index="${index}">
-                            </div>
-                            <div class="field-group">
-                                <label>క్షేత్ర సేవ కూటం నిర్వహించు ప్రదేశము</label>
-                                <input type="text" class="mobile-input" value="${row.location || ''}" data-index="${index}" data-field="location" placeholder="Enter location...">
-                            </div>
-                             <div class="field-group">
-                                <label>పద్ధతి</label>
-                                <div class="mobile-input method-cell" data-index="${index}">${row.method || 'Select...'}</div>
-                            </div>
-                            <div class="field-group">
-                                <label>నిర్వహించు సహోదరుడు</label>
-                                <div class="mobile-input brother-cell" data-index="${index}">${row.brother || 'Select...'}</div>
-                            </div>
-                        </div>
+                    <span class="material-symbols-outlined accordion-icon">expand_more</span>
+                </div>
+                <div class="mobile-card-body">
+                    <div class="form-group">
+                        <label>తేది</label>
+                        <input type="date" value="${row[0] ? row[0].split('-').reverse().join('-') : ''}" class="mobile-input" data-col="0">
                     </div>
-                `;
-                dom.mobileScheduleBody.appendChild(card);
-            });
-        }
-        
-        function handleInteraction(e) {
-            const index = e.target.dataset.index;
-            if (index === undefined) return;
+                    <div class="form-group">
+                        <label>ఉదయం/సాయంత్రం</label>
+                        <input type="text" value="${row[2] || ''}" class="mobile-input editable-cell" data-col="2" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>క్షేత్ర సేవ కూటం ప్రదేశము</label>
+                        <input type="text" value="${row[3] || ''}" class="mobile-input" data-col="3">
+                    </div>
+                    <div class="form-group">
+                        <label>పద్ధతి</label>
+                        <input type="text" value="${row[4] || ''}" class="mobile-input editable-cell" data-col="4" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>నిర్వహించు సహోదరుడు</label>
+                        <input type="text" value="${row[5] || ''}" class="mobile-input editable-cell" data-col="5" readonly>
+                    </div>
+                </div>
+            `;
+            dom.mobileViewContainer.appendChild(card);
+        });
+    }
 
-            // Date Input
-            if (e.target.matches('.date-input')) {
-                const date = new Date(e.target.value);
-                const dayName = teluguWeekdays[date.getDay()];
-                updateRowData(index, 'date', e.target.value);
-                updateRowData(index, 'day', dayName);
-                renderTable(); // Re-render to show updated day
-            }
-            // Time Input
-            else if (e.target.matches('.time-input')) {
-                const [h, m] = e.target.value.split(':');
-                const hour = parseInt(h, 10);
-                const period = hour < 12 ? 'ఉదయం' : 'సాయంత్రం';
-                const formattedHour = hour % 12 || 12;
-                const formattedTime = `${period} - ${formattedHour}:${m}`;
-                updateRowData(index, 'time', formattedTime);
-                updateRowData(index, 'rawTime', e.target.value);
-                renderTable();
-            }
-            // Text Input
-            else if (e.target.matches('input[type="text"]')) {
-                updateRowData(index, e.target.dataset.field, e.target.value);
-            }
-            // Method Dropdown
-            else if (e.target.matches('.method-cell')) {
-                openDropdown('పద్ధతి', preachingMethods, (value) => {
-                    updateRowData(index, 'method', value);
-                    renderTable();
-                });
-            }
-            // Brother Dropdown
-            else if (e.target.matches('.brother-cell')) {
-                openDropdown('నిర్వహించు సహోదరుడు', members, (value) => {
-                    updateRowData(index, 'brother', value);
-                    renderTable();
-                });
-            }
-             // Delete Button
-            else if (e.target.closest('.delete-row-btn')) {
-                if(confirm('Are you sure you want to delete this entry?')) {
-                    currentScheduleData.rows.splice(index, 1);
-                    debouncedSave();
-                    renderTable();
+    const debounce = (func, delay) => {
+        let timeout;
+        return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), delay); };
+    };
+
+    const saveData = debounce(async () => {
+        if (!currentScheduleId) return;
+        
+        const rows = Array.from(dom.tbody.children).map(tr => 
+            Array.from(tr.children).slice(0, 6).map(td => td.textContent)
+        );
+        
+        try {
+            await scheduleCollection.doc(currentScheduleId).update({ rows });
+            console.log("Schedule saved.");
+        } catch (error) {
+            console.error("Error saving schedule:", error);
+            alert("Could not save changes.");
+        }
+    }, 1000);
+    
+    // Event Listeners
+    dom.tbody.addEventListener('input', e => {
+        if (e.target.isContentEditable) saveData();
+    });
+
+    dom.tbody.addEventListener('click', e => {
+        const cell = e.target.closest('.editable-cell');
+        if (!cell) {
+            if (e.target.closest('.delete-row-btn')) {
+                const row = e.target.closest('tr');
+                if (confirm('Are you sure you want to delete this row?')) {
+                    row.remove();
+                    saveData();
                 }
             }
-            // Mobile Accordion
-            else if (e.target.closest('.mobile-card-header')) {
-                 e.target.closest('.mobile-card').classList.toggle('active');
+            return;
+        }
+        
+        activeCell = cell;
+        const colIndex = parseInt(cell.dataset.col);
+        
+        switch(colIndex) {
+            case 0: // Date
+                dom.datePickerInput.showPicker();
+                break;
+            case 2: // Time
+                openTimePicker(cell.textContent);
+                break;
+            case 4: // Method
+                showDropdown(preachingMethods, cell);
+                break;
+            case 5: // Brother
+                showDropdown(members, cell);
+                break;
+        }
+    });
+    
+    dom.datePickerInput.addEventListener('change', e => {
+        if (!activeCell) return;
+        const date = new Date(e.target.value);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        activeCell.textContent = `${day}-${month}-${year}`;
+        
+        const weekdayCell = activeCell.nextElementSibling;
+        weekdayCell.textContent = teluguWeekdays[date.getDay()];
+        saveData();
+    });
+
+    function showDropdown(items, cell) {
+        dom.dropdownMenu.innerHTML = '';
+        items.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'dropdown-item';
+            div.textContent = item;
+            div.onclick = () => {
+                cell.textContent = item;
+                dom.dropdownMenu.style.display = 'none';
+                saveData();
+            };
+            dom.dropdownMenu.appendChild(div);
+        });
+        
+        const rect = cell.getBoundingClientRect();
+        dom.dropdownMenu.style.display = 'block';
+        dom.dropdownMenu.style.top = `${rect.bottom}px`;
+        dom.dropdownMenu.style.left = `${rect.left}px`;
+    }
+
+    document.addEventListener('click', e => {
+        if (!e.target.closest('.editable-cell')) {
+            dom.dropdownMenu.style.display = 'none';
+        }
+    });
+
+    // Mobile View Listeners
+    dom.mobileViewContainer.addEventListener('click', e => {
+        const header = e.target.closest('.mobile-card-header');
+        if (header) {
+            header.parentElement.classList.toggle('active');
+            return;
+        }
+        
+        const input = e.target.closest('.mobile-input.editable-cell');
+        if(input) {
+            const rowIndex = parseInt(input.closest('.mobile-card').dataset.index);
+            const tableRow = dom.tbody.children[rowIndex];
+            activeCell = tableRow.querySelector(`[data-col="${input.dataset.col}"]`);
+            
+            const colIndex = parseInt(input.dataset.col);
+            switch(colIndex) {
+                case 2: openTimePicker(input.value); break;
+                case 4: showDropdown(preachingMethods, input); break;
+                case 5: showDropdown(members, input); break;
             }
         }
-        
-        document.body.addEventListener('input', handleInteraction);
-        document.body.addEventListener('click', handleInteraction);
-        
-        function openDropdown(title, items, callback) {
-            dom.dropdownTitle.textContent = title;
-            dom.dropdownContent.innerHTML = '';
-            items.forEach(item => {
-                const itemEl = document.createElement('div');
-                itemEl.className = 'dropdown-item';
-                itemEl.textContent = item;
-                itemEl.onclick = () => {
-                    callback(item);
-                    closeDropdown();
-                };
-                dom.dropdownContent.appendChild(itemEl);
+    });
+
+    dom.mobileViewContainer.addEventListener('change', e => {
+        if(e.target.matches('.mobile-input[type="date"]')) {
+            const rowIndex = parseInt(e.target.closest('.mobile-card').dataset.index);
+            const tableRow = dom.tbody.children[rowIndex];
+            const dateCell = tableRow.querySelector('[data-col="0"]');
+            
+            const date = new Date(e.target.value);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            dateCell.textContent = `${day}-${month}-${year}`;
+            tableRow.querySelector('[data-col="1"]').textContent = teluguWeekdays[date.getDay()];
+            
+            saveData();
+        }
+    });
+    
+     dom.mobileViewContainer.addEventListener('input', e => {
+        if(e.target.matches('.mobile-input[data-col="3"]')) {
+             const rowIndex = parseInt(e.target.closest('.mobile-card').dataset.index);
+             const tableRow = dom.tbody.children[rowIndex];
+             tableRow.querySelector('[data-col="3"]').textContent = e.target.value;
+             saveData();
+        }
+    });
+
+    // Time Picker Logic
+    function openTimePicker(currentValue) {
+        document.body.classList.add('modal-open');
+        dom.timePickerModal.classList.add('active');
+        // Parse current value if exists
+    }
+    
+    function closeTimePicker() {
+        document.body.classList.remove('modal-open');
+        dom.timePickerModal.classList.remove('active');
+    }
+
+    dom.timePickerModal.addEventListener('click', e => {
+        if (e.target.id === 'time-cancel-btn' || e.target === dom.timePickerModal) {
+            closeTimePicker();
+        }
+        if (e.target.id === 'am-btn' || e.target.id === 'pm-btn') {
+            document.getElementById('am-btn').classList.remove('active');
+            document.getElementById('pm-btn').classList.remove('active');
+            e.target.classList.add('active');
+        }
+        if (e.target.id === 'time-save-btn') {
+            const period = document.querySelector('.time-picker-grid button.active')?.id === 'am-btn' ? 'ఉదయం' : 'సాయంత్రం';
+            const hour = document.getElementById('hour-input').value.padStart(2, '0');
+            const minute = document.getElementById('minute-input').value.padStart(2, '0');
+            const timeString = `${period} - ${hour}:${minute}`;
+            
+            if(activeCell) {
+                if(activeCell.tagName === 'INPUT') { // Mobile
+                    activeCell.value = timeString;
+                    const rowIndex = parseInt(activeCell.closest('.mobile-card').dataset.index);
+                    dom.tbody.children[rowIndex].querySelector('[data-col="2"]').textContent = timeString;
+                } else { // Desktop
+                    activeCell.textContent = timeString;
+                }
+                saveData();
+            }
+            closeTimePicker();
+        }
+    });
+
+
+    // Creation and Global Buttons
+    document.getElementById('create-schedule-confirm').addEventListener('click', async () => {
+        const name = document.getElementById('new-schedule-name').value.trim();
+        if (!name) {
+            alert('Please enter a name for the schedule.');
+            return;
+        }
+        try {
+            const docRef = await scheduleCollection.add({
+                name: name,
+                rows: [],
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
-            dom.dropdownBackdrop.classList.add('active');
-            dom.dropdownContainer.classList.add('active');
-            document.body.classList.add('dropdown-open');
+            window.location.search = `?id=${docRef.id}`;
+        } catch (error) {
+            alert('Could not create schedule.');
+        }
+    });
+    
+    document.getElementById('add-row-btn').addEventListener('click', () => {
+        const newRow = createTableRow(['', '', '', '', '', ''], dom.tbody.children.length);
+        dom.tbody.appendChild(newRow);
+        renderMobileView(Array.from(dom.tbody.children).map(tr => Array.from(tr.children).slice(0, 6).map(td => td.textContent)));
+        saveData();
+    });
+
+    document.getElementById('toggle-all-mobile').addEventListener('click', e => {
+        const btn = e.currentTarget;
+        const allCards = dom.mobileViewContainer.querySelectorAll('.mobile-card');
+        const areAnyOpen = Array.from(allCards).some(card => card.classList.contains('active'));
+        const textSpan = btn.querySelector('span:last-child');
+        const iconSpan = btn.querySelector('.material-symbols-outlined');
+        
+        if (areAnyOpen) {
+            allCards.forEach(card => card.classList.remove('active'));
+            textSpan.textContent = 'Open All';
+            iconSpan.textContent = 'unfold_more';
+        } else {
+            allCards.forEach(card => card.classList.add('active'));
+            textSpan.textContent = 'Close All';
+            iconSpan.textContent = 'unfold_less';
+        }
+    });
+
+    document.getElementById('download-pdf-btn').addEventListener('click', async () => {
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+        const table = document.querySelector('.schedule-table');
+        
+        // Temporarily add a frame for PDF capture
+        const frame = document.createElement('div');
+        frame.className = 'table-frame';
+        frame.style.width = '1100px';
+        
+        const clonedTable = table.cloneNode(true);
+        // Remove delete buttons for PDF
+        clonedTable.querySelectorAll('.delete-row-btn').forEach(btn => btn.parentElement.innerHTML = '');
+
+        frame.appendChild(clonedTable);
+        document.body.appendChild(frame);
+        
+        const canvas = await html2canvas(frame, { scale: 2, useCORS: true });
+        document.body.removeChild(frame);
+
+        const imgData = canvas.toDataURL('image/png');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        const imgProps = pdf.getImageProperties(imgData);
+        const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
+        
+        let heightLeft = imgHeight;
+        let position = 0;
+        
+        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+        heightLeft -= pdfHeight;
+
+        while (heightLeft >= 0) {
+            position = heightLeft - imgHeight;
+            pdf.addPage();
+            pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+            heightLeft -= pdfHeight;
         }
 
-        function closeDropdown() {
-            dom.dropdownBackdrop.classList.remove('active');
-            dom.dropdownContainer.classList.remove('active');
-            document.body.classList.remove('dropdown-open');
-        }
-        dom.dropdownBackdrop.addEventListener('click', closeDropdown);
-        dom.dropdownClose.addEventListener('click', closeDropdown);
+        pdf.save(`${dom.scheduleTitle.textContent}.pdf`);
+    });
 
-        document.getElementById('add-row-btn').addEventListener('click', () => {
-            currentScheduleData.rows.push({
-                date: '', day: '', time: '', rawTime: '', location: '', method: '', brother: ''
-            });
-            debouncedSave();
-            renderTable();
-        });
+    const menuCheckbox = document.getElementById('menu-checkbox');
+    const slideMenu = document.getElementById('slide-menu');
+    const menuOverlay = document.getElementById('menu-overlay');
+    menuCheckbox.addEventListener('change', () => {
+        const isOpen = menuCheckbox.checked;
+        document.body.classList.toggle('menu-open', isOpen);
+        slideMenu.classList.toggle('is-open', isOpen);
+        menuOverlay.classList.toggle('is-open', isOpen);
+    });
+    menuOverlay.addEventListener('click', () => {
+        menuCheckbox.checked = false;
+        document.body.classList.remove('menu-open');
+        slideMenu.classList.remove('is-open');
+        menuOverlay.classList.remove('is-open');
+    });
 
-        // Menu Logic
-        const menuCheckbox = document.getElementById('menu-checkbox');
-        const slideMenu = document.getElementById('slide-menu');
-        const menuOverlay = document.getElementById('menu-overlay');
-        menuCheckbox.addEventListener('change', () => {
-            const isOpen = menuCheckbox.checked;
-            document.body.classList.toggle('menu-open', isOpen);
-            slideMenu.classList.toggle('is-open', isOpen);
-            menuOverlay.classList.toggle('is-open', isOpen);
-        });
-        menuOverlay.addEventListener('click', () => {
-            menuCheckbox.checked = false;
-            document.body.classList.remove('menu-open');
-            slideMenu.classList.remove('is-open');
-            menuOverlay.classList.remove('is-open');
-        });
-    })();
-    </script>
+})();
+</script>
 </body>
 </html>
