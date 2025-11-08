@@ -5,12 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard - Schedule Editor</title>
 
-<!-- FIREBASE SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
-<!-- STYLES -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -44,7 +42,7 @@
         src: url("./jw-icons-external-d876da3.woff") format("woff");
         font-weight: normal; font-style: normal;
     }
-
+    
     * { box-sizing: border-box; }
 
     body {
@@ -113,163 +111,55 @@
     .menu-links li a:hover .iconLink-icon { color: var(--menu-new-text); }
     .home-icon::before { content: "\e661"; }
     .midweek-icon::before { content: "\e625"; }
-    .sunday-icon::before { content: "\e610"; }
-    .members-icon::before { content: "\e695"; }
+    .sunday-icon::before { content: "\e675"; }
+    .members-icon::before { content: "\e62d"; }
 
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; border-radius: var(--radius-md); font-size: 1rem; font-weight: 600; cursor: pointer; border: none; text-decoration: none; transition: all 0.2s ease; }
-    .btn-primary { background-color: var(--primary-color); color: white; box-shadow: var(--shadow-md); }
-    .btn-primary:hover { background-color: var(--primary-hover); transform: translateY(-1px); }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none; border: none; cursor: pointer; font-weight: 600; border-radius: var(--radius-md); transition: all 0.2s; }
+    .btn-primary { background-color: var(--primary-color); color: white; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+    .btn-primary:hover { background-color: var(--primary-hover); }
+    .btn-sm { padding: 8px 16px; font-size: 14px; }
 
-    main { padding: calc(56px + 2rem) 1.5rem 2rem; max-width: 1200px; margin: 0 auto; }
-    .main-header { margin-bottom: 2rem; }
-    .main-header h1 { font-size: 2rem; font-weight: 700; margin: 0; color: var(--text-primary); }
-    .main-header p { font-size: 1.1rem; color: var(--text-secondary); margin: 0.25rem 0 0 0; }
+    main { padding: calc(56px + 2rem) 1.5rem 2rem; max-width: 1100px; margin: 0 auto; }
+    .page-header { margin-bottom: 2rem; }
+    .page-header h1 { font-size: 2.25rem; font-weight: 700; margin: 0 0 0.5rem 0; color: var(--text-primary); }
+    .page-header p { font-size: 1.1rem; color: var(--text-secondary); margin: 0; }
     
-    .dashboard-grid {
-        display: grid;
-        grid-template-columns: repeat(12, 1fr);
-        gap: 24px;
-    }
+    .nav-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 3rem; }
+    .nav-card { display: flex; flex-direction: column; justify-content: space-between; padding: 1.5rem; background-color: var(--surface-color); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); border: 1px solid var(--border-color); text-decoration: none; color: var(--text-primary); transition: all 0.2s ease-in-out; }
+    .nav-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); border-color: var(--primary-color); }
+    .nav-card-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+    .nav-card-icon { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background-color: var(--primary-light); color: var(--primary-color); }
+    .nav-card-icon .material-symbols-outlined { font-size: 24px; }
+    .nav-card-title { font-size: 1.25rem; font-weight: 600; }
+    .nav-card-description { font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 1.5rem; }
+    .nav-card-footer { display: flex; justify-content: flex-end; }
+    .nav-card-footer .material-symbols-outlined { transition: transform 0.2s; }
+    .nav-card:hover .nav-card-footer .material-symbols-outlined { transform: translateX(4px); }
+
+    .section-header { font-size: 1.5rem; font-weight: 600; margin: 0 0 1.5rem 0; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-color); }
     
-    .grid-section { grid-column: span 12; }
-
-    .section-title {
-        font-size: 1.25rem;
-        font-weight: 600;
-        margin: 0 0 1rem 0;
-        padding-bottom: 0.75rem;
-        border-bottom: 1px solid var(--border-color);
-    }
-
-    .quick-actions-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 16px;
-    }
-
-    .action-card {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        padding: 24px;
-        background-color: var(--surface-color);
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-md);
-        border: 1px solid var(--border-color);
-        text-decoration: none;
-        color: var(--text-primary);
-        transition: all 0.2s ease-in-out;
-    }
-    .action-card:hover {
-        transform: translateY(-4px);
-        box-shadow: var(--shadow-lg);
-        border-color: var(--primary-color);
-    }
-    
-    .action-card-header {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 12px;
-    }
-    .action-card-icon {
-        background-color: var(--primary-light);
-        color: var(--primary-color);
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .action-card-title {
-        font-size: 1.1rem;
-        font-weight: 600;
-    }
-    .action-card p {
-        font-size: 0.9rem;
-        color: var(--text-secondary);
-        margin: 0 0 1rem 0;
-        line-height: 1.6;
-    }
-    .action-card-footer {
-        font-size: 0.9rem;
-        font-weight: 600;
-        color: var(--primary-color);
-        display: flex;
-        align-items: center;
-        gap: 4px;
-    }
-    .action-card-footer .material-symbols-outlined { font-size: 1rem; }
-
-    #recent-schedules-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 1rem; }
-    .schedule-card { 
-        display: flex; 
-        justify-content: space-between; 
-        align-items: center; 
-        padding: 16px; 
-        background-color: var(--surface-color); 
-        border-radius: var(--radius-lg); 
-        box-shadow: var(--shadow-md); 
-        border: 1px solid var(--border-color);
-        transition: all 0.2s ease-in-out;
-    }
-    .schedule-card:hover {
-        transform: translateX(4px);
-        border-color: var(--primary-color);
-    }
+    #recent-schedules-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 1rem; }
+    .schedule-card { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; background-color: var(--surface-color); border-radius: var(--radius-md); border: 1px solid var(--border-color); transition: background-color 0.2s; }
+    .schedule-card:hover { background-color: #f9fafb; }
+    .schedule-info { display: flex; align-items: center; gap: 1rem; }
     .schedule-info .name { font-weight: 600; color: var(--text-primary); }
-    .schedule-info .type { 
-        font-size: 0.8rem; 
-        color: var(--text-secondary); 
-        background-color: #f3f4f6; 
-        padding: 2px 8px; 
-        border-radius: 99px; 
-        display: inline-block; 
-        margin-top: 4px; 
-        font-weight: 500;
-    }
-
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(4px); }
-    .modal-overlay.active { display: flex; }
-    .modal-content { background: var(--surface-color); padding: 24px; border-radius: var(--radius-lg); width: 90%; max-width: 400px; box-shadow: var(--shadow-lg); transform: scale(0.95); opacity: 0; transition: all 0.3s ease; }
-    .modal-overlay.active .modal-content { transform: scale(1); opacity: 1; }
-    .modal-content h2 { margin-top: 0; }
-    .modal-options { display: flex; flex-direction: column; gap: 1rem; }
-    .modal-options a { padding: 16px; border: 1px solid var(--border-color); border-radius: var(--radius-md); text-decoration: none; color: var(--text-primary); font-weight: 600; display: flex; align-items: center; gap: 12px; transition: background-color 0.2s, border-color 0.2s; }
-    .modal-options a:hover { background-color: var(--primary-light); border-color: var(--primary-color); color: var(--primary-color); }
-
+    .schedule-info .type { font-size: 0.8rem; color: var(--text-secondary); background: var(--primary-light); color: var(--primary-color); padding: 3px 8px; border-radius: 99px; display: inline-block; font-weight: 500; }
+    
     .empty-state {
         text-align: center;
-        padding: 2rem;
+        padding: 3rem 1.5rem;
         background-color: var(--surface-color);
         border-radius: var(--radius-lg);
         border: 2px dashed var(--border-color);
     }
-    .empty-state p {
-        color: var(--text-secondary);
-        max-width: 400px;
-        margin: 0 auto;
-    }
+    .empty-state .material-symbols-outlined { font-size: 40px; color: var(--text-secondary); margin-bottom: 1rem; }
+    .empty-state h3 { font-size: 1.1rem; font-weight: 600; margin: 0 0 0.5rem 0; }
+    .empty-state p { color: var(--text-secondary); max-width: 400px; margin: 0 auto; font-size: 0.95rem; }
 
-    @media (min-width: 768px) {
-        #main-grid {
-            grid-template-columns: repeat(3, 1fr);
-        }
-        #quick-actions-section {
-            grid-column: span 3;
-        }
-        #recent-activity-section {
-            grid-column: span 3;
-        }
-    }
-    @media (min-width: 1024px) {
-        #quick-actions-section {
-            grid-column: span 2;
-        }
-        #recent-activity-section {
-            grid-column: span 1;
-        }
+    @media (max-width: 640px) {
+        main { padding: calc(56px + 1.5rem) 1rem 1.5rem; }
+        .page-header h1 { font-size: 1.75rem; }
+        .page-header p { font-size: 1rem; }
     }
 </style>
 </head>
@@ -294,7 +184,7 @@
     <div class="menu-overlay" id="menu-overlay"></div>
     <div class="slide-menu" id="slide-menu">
         <ul class="menu-links">
-            <li><a href="./dashboard.html"><span class="iconLink-icon home-icon"></span><span>Dashboard</span></a></li>
+            <li><a href="./home.html"><span class="iconLink-icon home-icon"></span><span>Dashboard</span></a></li>
             <li><a href="./mid-week.html"><span class="iconLink-icon midweek-icon"></span><span>Mid-Week Schedules</span></a></li>
             <li><a href="./sunday-dashboard.html"><span class="iconLink-icon sunday-icon"></span><span>Sunday Schedules</span></a></li>
             <li><a href="./members.html"><span class="iconLink-icon members-icon"></span><span>Members</span></a></li>
@@ -307,74 +197,54 @@
     </div>
 
     <main>
-        <div class="main-header">
-            <h1 id="welcome-header">Welcome</h1>
-            <p id="welcome-subheader">Here's a summary of your schedules.</p>
-        </div>
-        
-        <div class="dashboard-grid">
-            <section class="grid-section" id="quick-actions-section">
-                <h2 class="section-title">Quick Actions</h2>
-                <div class="quick-actions-grid">
-                    <a href="./mid-week.html" class="action-card">
-                        <div>
-                            <div class="action-card-header">
-                                <div class="action-card-icon"><span class="material-symbols-outlined">calendar_month</span></div>
-                                <h3 class="action-card-title">Mid-Week Schedules</h3>
-                            </div>
-                            <p>View, create, and manage your mid-week meeting schedules.</p>
-                        </div>
-                        <div class="action-card-footer">Go to Mid-Week <span class="material-symbols-outlined">arrow_forward</span></div>
-                    </a>
-                    <a href="./sunday-dashboard.html" class="action-card">
-                        <div>
-                            <div class="action-card-header">
-                                <div class="action-card-icon"><span class="material-symbols-outlined">event</span></div>
-                                <h3 class="action-card-title">Sunday Schedules</h3>
-                            </div>
-                            <p>Manage all your Sunday public talk and Watchtower study schedules.</p>
-                        </div>
-                        <div class="action-card-footer">Go to Sunday <span class="material-symbols-outlined">arrow_forward</span></div>
-                    </a>
-                    <a href="./members.html" class="action-card">
-                        <div>
-                            <div class="action-card-header">
-                                <div class="action-card-icon"><span class="material-symbols-outlined">groups</span></div>
-                                <h3 class="action-card-title">Manage Members</h3>
-                            </div>
-                            <p>Add, edit, or remove brothers and sisters from your congregation list.</p>
-                        </div>
-                        <div class="action-card-footer">Manage Members <span class="material-symbols-outlined">arrow_forward</span></div>
-                    </a>
-                </div>
-            </section>
-            
-            <section class="grid-section" id="recent-activity-section">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                    <h2 class="section-title" style="margin: 0; border: none;">Recent Activity</h2>
-                    <button id="create-new-btn" class="btn btn-primary">
-                        <span class="material-symbols-outlined">add</span> Create
-                    </button>
-                </div>
-                <ul id="recent-schedules-list"></ul>
-            </section>
+        <div class="page-header">
+            <h1 id="welcome-message">Welcome back!</h1>
+            <p id="schedule-summary">Loading your schedules...</p>
         </div>
 
-    </main>
+        <div class="nav-grid">
+            <a href="./mid-week.html" class="nav-card">
+                <div>
+                    <div class="nav-card-header">
+                        <div class="nav-card-icon"><span class="material-symbols-outlined">calendar_month</span></div>
+                        <h2 class="nav-card-title">Mid-Week Schedules</h2>
+                    </div>
+                    <p class="nav-card-description">Create, view, and edit schedules for the mid-week meeting.</p>
+                </div>
+                <div class="nav-card-footer"><span class="material-symbols-outlined">arrow_forward</span></div>
+            </a>
+            <a href="./sunday-dashboard.html" class="nav-card">
+                <div>
+                    <div class="nav-card-header">
+                        <div class="nav-card-icon"><span class="material-symbols-outlined">event</span></div>
+                        <h2 class="nav-card-title">Sunday Schedules</h2>
+                    </div>
+                    <p class="nav-card-description">Manage public talks and other Sunday meeting assignments.</p>
+                </div>
+                <div class="nav-card-footer"><span class="material-symbols-outlined">arrow_forward</span></div>
+            </a>
+            <a href="./members.html" class="nav-card">
+                <div>
+                    <div class="nav-card-header">
+                        <div class="nav-card-icon"><span class="material-symbols-outlined">groups</span></div>
+                        <h2 class="nav-card-title">Manage Members</h2>
+                    </div>
+                    <p class="nav-card-description">Add, edit, and manage the list of brothers and sisters.</p>
+                </div>
+                <div class="nav-card-footer"><span class="material-symbols-outlined">arrow_forward</span></div>
+            </a>
+        </div>
 
-    <div id="create-modal" class="modal-overlay">
-        <div class="modal-content">
-            <h2>Create a New Schedule</h2>
-            <div class="modal-options">
-                <a href="./editor.html">
-                    <span class="material-symbols-outlined">calendar_month</span> Mid-Week Meeting
-                </a>
-                <a href="./sunday-editor.html">
-                    <span class="material-symbols-outlined">event</span> Sunday Meeting
-                </a>
+        <div>
+            <h2 class="section-header">Recent Activity</h2>
+            <div id="recent-schedules-list"></div>
+            <div id="empty-state" class="empty-state" style="display: none;">
+                <span class="material-symbols-outlined">history</span>
+                <h3>No Recent Activity</h3>
+                <p>Your 5 most recently created schedules will appear here.</p>
             </div>
         </div>
-    </div>
+    </main>
 
     <script>
     (function() {
@@ -395,34 +265,37 @@
         auth.onAuthStateChanged(user => {
             if (user) {
                 currentUser = user;
-                document.body.classList.add('auth-ready');
-                
                 const profileNameEl = document.querySelector('.profile-name');
-                const welcomeHeader = document.getElementById('welcome-header');
-                
+                const welcomeMessageEl = document.getElementById('welcome-message');
+
                 if (user.displayName) {
                     profileNameEl.textContent = user.displayName;
-                    welcomeHeader.textContent = `Welcome back, ${user.displayName.split(' ')[0]}`;
+                    welcomeMessageEl.textContent = `Welcome back, ${user.displayName.split(' ')[0]}!`;
                 } else {
                     profileNameEl.textContent = user.email;
-                     welcomeHeader.textContent = `Welcome`;
+                    welcomeMessageEl.textContent = 'Welcome back!';
                 }
-                loadRecentSchedules();
+                
+                document.body.classList.add('auth-ready');
+                loadDashboardData();
             } else {
-                window.location.replace('/index.html');
+                window.location.replace('./index.html');
             }
         });
 
-        async function loadRecentSchedules() {
+        async function loadDashboardData() {
             if (!currentUser) return;
             const listEl = document.getElementById('recent-schedules-list');
-            listEl.innerHTML = `<li>Loading recent activity...</li>`;
+            const emptyStateEl = document.getElementById('empty-state');
+            const summaryEl = document.getElementById('schedule-summary');
 
-            const midWeekRef = db.collection(`userSchedules/${currentUser.uid}/schedules`).orderBy('createdAt', 'desc').limit(3);
-            const sundayRef = db.collection(`userSundaySchedules/${currentUser.uid}/schedules`).orderBy('createdAt', 'desc').limit(3);
+            const midWeekRef = db.collection(`userSchedules/${currentUser.uid}/schedules`).orderBy('createdAt', 'desc').limit(5);
+            const sundayRef = db.collection(`userSundaySchedules/${currentUser.uid}/schedules`).orderBy('createdAt', 'desc').limit(5);
 
             try {
                 const [midWeekSnap, sundaySnap] = await Promise.all([midWeekRef.get(), sundayRef.get()]);
+
+                summaryEl.textContent = `You have ${midWeekSnap.size + sundaySnap.size} total schedules.`;
 
                 const allSchedules = [];
                 midWeekSnap.forEach(doc => allSchedules.push({ id: doc.id, type: 'Mid-Week', editor: 'editor.html', ...doc.data() }));
@@ -432,33 +305,40 @@
 
                 listEl.innerHTML = '';
                 if (allSchedules.length === 0) {
-                    listEl.innerHTML = '<div class="empty-state"><p>No recent schedules. Get started by creating a new one!</p></div>';
+                    listEl.style.display = 'none';
+                    emptyStateEl.style.display = 'block';
                     return;
                 }
+
+                listEl.style.display = 'grid';
+                emptyStateEl.style.display = 'none';
 
                 allSchedules.slice(0, 5).forEach(schedule => {
                     const li = document.createElement('li');
                     li.className = 'schedule-card';
                     li.innerHTML = `
                         <div class="schedule-info">
-                            <div class="name">${schedule.name}</div>
-                            <div class="type">${schedule.type}</div>
+                            <span class="type">${schedule.type}</span>
+                            <span class="name">${schedule.name}</span>
                         </div>
-                        <a href="./${schedule.editor}?id=${schedule.id}" class="btn btn-primary btn-sm">View</a>
+                        <a href="./${schedule.editor}?id=${schedule.id}" class="btn btn-sm">View</a>
                     `;
                     listEl.appendChild(li);
                 });
 
             } catch (error) {
                 console.error("Error loading recent schedules:", error);
-                listEl.innerHTML = '<div class="empty-state"><p>Could not load recent activity.</p></div>';
+                listEl.innerHTML = '';
+                emptyStateEl.style.display = 'block';
+                emptyStateEl.querySelector('h3').textContent = 'Error Loading Schedules';
+                emptyStateEl.querySelector('p').textContent = 'There was a problem fetching your data. Please refresh the page.';
             }
         }
 
         const menuCheckbox = document.getElementById('menu-checkbox');
         const slideMenu = document.getElementById('slide-menu');
         const menuOverlay = document.getElementById('menu-overlay');
-
+        
         menuCheckbox.addEventListener('change', () => {
             const isOpen = menuCheckbox.checked;
             document.body.classList.toggle('menu-open', isOpen);
@@ -471,17 +351,6 @@
             document.body.classList.remove('menu-open');
             slideMenu.classList.remove('is-open');
             menuOverlay.classList.remove('is-open');
-        });
-
-        const createBtn = document.getElementById('create-new-btn');
-        const createModal = document.getElementById('create-modal');
-        createBtn.addEventListener('click', () => {
-            createModal.classList.add('active');
-        });
-        createModal.addEventListener('click', (e) => {
-            if (e.target === createModal) {
-                createModal.classList.remove('active');
-            }
         });
     })();
     </script>
