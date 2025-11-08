@@ -336,7 +336,7 @@
         padding: calc(56px + 20px) 20px 20px; 
         min-height: 100vh;
     }
-    .editor-main { 
+    .-main { 
         max-width: 1100px; 
         margin: 0 auto; 
     }
@@ -1825,7 +1825,7 @@
                 tables: tablesArray,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
-            window.location.href = `./editorr.html?id=${newDocRef.id}`;
+            window.location.href = `./editor.html?id=${newDocRef.id}`;
         });
         
         editWeeksButton.addEventListener('click', openWeekEditor);
