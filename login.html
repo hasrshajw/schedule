@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading...</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2d3748;
+            --light-gray: #F3F4F6;
+            --text-color: #1f2937;
+            --text-light: #6b7280;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--light-gray);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            color: var(--text-color);
+            text-align: center;
+        }
+
+        .loading-container {
+            padding: 2rem;
+        }
+        
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 5px solid rgba(45, 55, 72, 0.2);
+            border-bottom-color: var(--primary-color);
+            border-radius: 50%;
+            display: inline-block;
+            animation: rotation 1s linear infinite;
+            margin-bottom: 1.5rem;
+        }
+
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        p {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--text-light);
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-container">
+        <div class="spinner"></div>
+        <p>Loading, please wait...</p>
+    </div>
+
+    <script>
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDLK5f4C-nfG6fz0ajqqay1q9TTN6rxgmQ",
+            authDomain: "schedule-harsha.firebaseapp.com",
+            projectId: "schedule-harsha",
+            storageBucket: "schedule-harsha.firebasestorage.app",
+            messagingSenderId: "965478014820",
+            appId: "1:965478014820:web:1c36c5d890a27e599aa471"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Define the admin email
+        const ADMIN_EMAIL = 'harshavardhanjw@gmail.com';
+
+        // Listen for authentication state changes
+        firebase.auth().onAuthStateChanged(user => {
+            // Use a short delay to prevent a "flash" of the loading screen on fast connections
+            setTimeout(() => {
+                if (user) {
+                    // User is signed in.
+                    // Check if the user is the admin.
+                    if (user.email === ADMIN_EMAIL) {
+                        // Redirect admin to the admin panel.
+                        window.location.replace('./admin.html');
+                    } else {
+                        // Redirect regular users to their dashboard.
+                        window.location.replace('./dashboard.html');
+                    }
+                } else {
+                    // No user is signed in.
+                    // Redirect to the login page.
+                    window.location.replace('./login.html');
+                }
+            }, 250); // A small delay of 250ms
+        });
+    </script>
+</body>
+</html>
